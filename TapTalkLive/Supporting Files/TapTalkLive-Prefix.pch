@@ -1,0 +1,17 @@
+//
+//  TapTalkLive-Prefix.pch
+//  TapTalk.io
+//
+//  Created by Dominic Vedericho on 12/11/19.
+//  Copyright © 2019 TapTalk.io. All rights reserved.
+//
+
+#ifndef TapTalkLive_Prefix_pch
+#define TapTalkLive_Prefix_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#import "Configs.h"
+#import "TapTalkLive.h"
+#endif /* TapTalkLive_Prefix_pch */

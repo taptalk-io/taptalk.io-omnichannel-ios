@@ -3,14 +3,17 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		5314F77E53B8919667FE449B /* Pods_TapTalkLive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46DBEB46C573D319A2B455D9 /* Pods_TapTalkLive.framework */; };
+		D7054C7723A0B0BA00B20950 /* TapTalkLive.h in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7523A0B0BA00B20950 /* TapTalkLive.h */; };
+		D7054C7823A0B0BA00B20950 /* TapTalkLive.m in Sources */ = {isa = PBXBuildFile; fileRef = D7054C7623A0B0BA00B20950 /* TapTalkLive.m */; };
+		D7054C7B23A0B13B00B20950 /* TapTalkLive-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7A23A0B13B00B20950 /* TapTalkLive-Prefix.pch */; };
+		D7054C7D23A0B14100B20950 /* Configs.h in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7C23A0B14100B20950 /* Configs.h */; };
 		D7A4EB5923A0A6F700011755 /* TapTalkLive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7A4EB4F23A0A6F600011755 /* TapTalkLive.framework */; };
 		D7A4EB5E23A0A6F700011755 /* TapTalkLiveTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A4EB5D23A0A6F700011755 /* TapTalkLiveTests.m */; };
-		D7A4EB6023A0A6F700011755 /* TapTalkLive.h in Headers */ = {isa = PBXBuildFile; fileRef = D7A4EB5223A0A6F600011755 /* TapTalkLive.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,8 +30,11 @@
 		46DBEB46C573D319A2B455D9 /* Pods_TapTalkLive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TapTalkLive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		47C6BAE8C45228CC9E71B516 /* Pods-TapTalkLive.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.debug.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.debug.xcconfig"; sourceTree = "<group>"; };
 		D4DB80AC0E047821EE6C64EB /* Pods-TapTalkLive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.release.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.release.xcconfig"; sourceTree = "<group>"; };
+		D7054C7523A0B0BA00B20950 /* TapTalkLive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapTalkLive.h; sourceTree = "<group>"; };
+		D7054C7623A0B0BA00B20950 /* TapTalkLive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TapTalkLive.m; sourceTree = "<group>"; };
+		D7054C7A23A0B13B00B20950 /* TapTalkLive-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TapTalkLive-Prefix.pch"; sourceTree = "<group>"; };
+		D7054C7C23A0B14100B20950 /* Configs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Configs.h; sourceTree = "<group>"; };
 		D7A4EB4F23A0A6F600011755 /* TapTalkLive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TapTalkLive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D7A4EB5223A0A6F600011755 /* TapTalkLive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TapTalkLive.h; sourceTree = "<group>"; };
 		D7A4EB5323A0A6F600011755 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D7A4EB5823A0A6F700011755 /* TapTalkLiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TapTalkLiveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D7A4EB5D23A0A6F700011755 /* TapTalkLiveTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapTalkLiveTests.m; sourceTree = "<group>"; };
@@ -63,6 +69,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		D7054C7923A0B10300B20950 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D7A4EB5323A0A6F600011755 /* Info.plist */,
+				D7054C7A23A0B13B00B20950 /* TapTalkLive-Prefix.pch */,
+				D7054C7C23A0B14100B20950 /* Configs.h */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		D7A4EB4523A0A6F600011755 = {
 			isa = PBXGroup;
 			children = (
@@ -86,8 +102,9 @@
 		D7A4EB5123A0A6F600011755 /* TapTalkLive */ = {
 			isa = PBXGroup;
 			children = (
-				D7A4EB5223A0A6F600011755 /* TapTalkLive.h */,
-				D7A4EB5323A0A6F600011755 /* Info.plist */,
+				D7054C7523A0B0BA00B20950 /* TapTalkLive.h */,
+				D7054C7623A0B0BA00B20950 /* TapTalkLive.m */,
+				D7054C7923A0B10300B20950 /* Supporting Files */,
 			);
 			path = TapTalkLive;
 			sourceTree = "<group>";
@@ -107,7 +124,6 @@
 				47C6BAE8C45228CC9E71B516 /* Pods-TapTalkLive.debug.xcconfig */,
 				D4DB80AC0E047821EE6C64EB /* Pods-TapTalkLive.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -118,7 +134,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D7A4EB6023A0A6F700011755 /* TapTalkLive.h in Headers */,
+				D7054C7723A0B0BA00B20950 /* TapTalkLive.h in Headers */,
+				D7054C7D23A0B14100B20950 /* Configs.h in Headers */,
+				D7054C7B23A0B13B00B20950 /* TapTalkLive-Prefix.pch in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,6 +281,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D7054C7823A0B0BA00B20950 /* TapTalkLive.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,7 +430,9 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = TapTalkLive/Info.plist;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TapTalkLive/Supporting Files/TapTalkLive-Prefix.pch";
+				INFOPLIST_FILE = "TapTalkLive/Supporting Files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -435,7 +456,9 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = TapTalkLive/Info.plist;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TapTalkLive/Supporting Files/TapTalkLive-Prefix.pch";
+				INFOPLIST_FILE = "TapTalkLive/Supporting Files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
