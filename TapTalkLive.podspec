@@ -42,7 +42,7 @@ Pod::Spec.new do |s|
 
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.prefix_header_contents ='#import "Configs.h"', '#import "TapTalkLive.h"'
+    s.prefix_header_contents ='#import "Configs.h"', '#import "TapTalkLive.h"', '#import "TTLUtil.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "PodAsset.h"'
     # ――― Bundle ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     
     s.resource_bundles = {

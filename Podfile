@@ -4,7 +4,7 @@ inhibit_all_warnings!
 use_frameworks!
 
 def tapTalkLive_pods
-    pod 'TapTalk'
+  pod 'TapTalk'
 end
 
 target "TapTalkLive" do
