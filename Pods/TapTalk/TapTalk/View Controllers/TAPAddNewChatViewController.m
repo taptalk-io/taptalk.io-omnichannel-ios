@@ -13,7 +13,7 @@
 #import "TAPAddNewContactViewController.h"
 #import "TAPCreateGroupViewController.h"
 
-#import "TAPChatViewController.h"
+#import "TapUIChatViewController.h"
 #import <Photos/Photos.h>
 #import <Contacts/Contacts.h>
 
@@ -32,6 +32,7 @@
 @property (strong, nonatomic) NSArray *alphabetSectionTitles;
 @property (strong, nonatomic) NSArray *contactListArray;
 @property (strong, nonatomic) NSMutableArray *searchResultUserMutableArray;
+@property (strong, nonatomic) NSMutableArray *filledMenuOptionArray;
 
 @property (strong, nonatomic) NSMutableDictionary *indexSectionDictionary;
 @property (strong, nonatomic) NSMutableDictionary *contactListDictionary;
@@ -85,6 +86,21 @@
     [self.addNewChatView showSyncContactButtonView:NO];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActiveNotification:) name:TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE object:nil];
+    
+    _filledMenuOptionArray = [NSMutableArray array];
+    
+    if ([[TapUI sharedInstance] getNewContactMenuButtonVisibleState]) {
+        //options Add New Contact
+        [self.filledMenuOptionArray addObject:@"1"];
+    }
+    if ([[TapUI sharedInstance] getScanQRMenuButtonVisibleState]) {
+        //options Scan QR Code
+        [self.filledMenuOptionArray addObject:@"2"];
+    }
+    if ([[TapUI sharedInstance] getNewGroupMenuButtonVisibleState]) {
+        //options Create Group
+        [self.filledMenuOptionArray addObject:@"3"];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -131,7 +147,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (tableView == self.addNewChatView.contactsTableView) {
         if (section == 0) {
-            return 3; //options (Add New Contact, Create Group, Scan QR Code)
+            return [self.filledMenuOptionArray count];
         }
         else if (section <= [[self.indexSectionDictionary allKeys] count]) {
             
@@ -201,13 +217,17 @@
                 cell = [[TAPNewChatOptionTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
             }
             
-            if (indexPath.row == 0) {
+            NSInteger obtainedIndexOptionFromArray = [[self.filledMenuOptionArray objectAtIndex:indexPath.row] integerValue];
+            if (obtainedIndexOptionFromArray == 1) {
+                //options Add New Contact
                 [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeNewContact];
             }
-            else if (indexPath.row == 1) {
+            else if (obtainedIndexOptionFromArray == 2) {
+                //options Scan QR Code
                 [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeScanQRCode];
             }
-            else if (indexPath.row == 2) {
+            else if (obtainedIndexOptionFromArray == 3) {
+                //options Create Group
                 [cell setNewChatOptionTableViewCellType:TAPNewChatOptionTableViewCellTypeNewGroup];
             }
             
@@ -219,6 +239,8 @@
             if (cell == nil) {
                 cell = [[TAPContactTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
             }
+            
+            [cell setContactTableViewCellType:TAPContactTableViewCellTypeWithUsername];
             
             NSArray *keysArray = [self.indexSectionDictionary allKeys];
             NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
@@ -260,6 +282,8 @@
                 cell = [[TAPContactTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
             }
 
+            [cell setContactTableViewCellType:TAPContactTableViewCellTypeWithUsername];
+            
             TAPUserModel *user = [self.searchResultUserMutableArray objectAtIndex:indexPath.row];
             [cell setContactTableViewCellWithUser:user];
             [cell isRequireSelection:NO];
@@ -393,23 +417,23 @@
     
     if (tableView == self.addNewChatView.contactsTableView) {
         if (indexPath.section == 0) {
-            if (indexPath.row == 0) {
-                //New Contact
+            NSInteger obtainedIndexOptionFromArray = [[self.filledMenuOptionArray objectAtIndex:indexPath.row] integerValue];
+            if (obtainedIndexOptionFromArray == 1) {
+                //options Add New Contact
                 TAPAddNewContactViewController *addNewContactViewController = [[TAPAddNewContactViewController alloc] init];
                 addNewContactViewController.delegate = self;
                 [self.navigationController pushViewController:addNewContactViewController animated:YES];
             }
-            else if (indexPath.row == 1) {
-                //Scan QR Code
+            else if (obtainedIndexOptionFromArray == 2) {
+                //options Scan QR Code
                 [self openScanQRCode];
             }
-            else if (indexPath.row == 2) {
-                //New Group
+            else if (obtainedIndexOptionFromArray == 3) {
+                //options Create Group
                 TAPCreateGroupViewController *createGroupViewController = [[TAPCreateGroupViewController alloc] init]; //createGroupViewController
                 createGroupViewController.roomListViewController = self.roomListViewController;
                 createGroupViewController.tapCreateGroupViewControllerType = TAPCreateGroupViewControllerTypeDefault;
                 [self.navigationController pushViewController:createGroupViewController animated:YES];
-                
             }
         }
         else if (indexPath.section <= [[self.indexSectionDictionary allKeys] count]) {
@@ -611,7 +635,7 @@
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -676,6 +700,10 @@
     [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (granted) {
+                
+                [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                
                 if (loading) {
                     [self.addNewChatView showSyncNotificationWithString:NSLocalizedString(@"Syncing Contacts", @"") type:TAPSyncNotificationViewTypeSyncing];
                 }
@@ -773,7 +801,7 @@
                 [alertController addAction:cancelAction];
                 
                 UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    if (IS_IOS_10_OR_ABOVE) {
+                    if (IS_IOS_11_OR_ABOVE) {
                         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
                     }
                     else {
@@ -790,39 +818,33 @@
 
 - (void)requestAccessAndCheckNewContact {
     BOOL isAutoSyncEnabled = [[TapTalk sharedInstance] isAutoContactSyncEnabled];
-    BOOL isDoneFirstTimeAutoSync = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT valid:nil];
+    BOOL isContactSyncAllowedByUser = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER valid:nil];
     if (!isAutoSyncEnabled) {
         //Auto sync contact disabled
         return;
     }
     
-    if (isDoneFirstTimeAutoSync) {
-        //Allow Access
+    BOOL isContactPermissionAsked = [[TAPContactManager sharedManager] isContactPermissionAsked];
+    if (isContactPermissionAsked) {
         CNContactStore *store = [[CNContactStore alloc] init];
         [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (granted && [[TAPContactManager sharedManager] isContactPermissionAsked]) {
-                    //2nd time sync contact and so on, no loading
+                if (granted && isContactSyncAllowedByUser) {
+                    //2nd time sync contact and so on, not show loading
                     [self syncContactWithLoading:NO];
-                }
-                else if (granted) {
-                    //1st time sync contact, show loading
-                    [self syncContactWithLoading:YES];
-                    
-                    //Save done auto sync contact
-                    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT];
-                    [[NSUserDefaults standardUserDefaults] synchronize];
                 }
                 else {
                     //not granted, show sync button view
                     [self.addNewChatView showSyncContactButtonView:YES];
                 }
-                [[TAPContactManager sharedManager] setContactPermissionAsked];
             });
         }];
     }
     else {
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Contact Access" title:NSLocalizedString(@"Contact Access", @"") detailInformation:NSLocalizedString(@"We need your permission to access your contact, we will sync your contact to our server and automatically find your friend so it is easier for you to find your friends.", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Allow"];
+        [[TAPContactManager sharedManager] setContactPermissionAsked];
+        [[NSUserDefaults standardUserDefaults] setSecureBool:NO forKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
@@ -852,34 +874,21 @@
         CNContactStore *store = [[CNContactStore alloc] init];
         [store requestAccessForEntityType:CNEntityTypeContacts completionHandler:^(BOOL granted, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (granted && [[TAPContactManager sharedManager] isContactPermissionAsked]) {
-                    //2nd time sync contact and so on, no loading
-                    [self syncContactWithLoading:NO];
-                }
-                else if (granted) {
+                if (granted) {
                     //1st time sync contact, show loading
                     [self syncContactWithLoading:YES];
-                    
-                    //Save done auto sync contact
-                    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT];
-                    [[NSUserDefaults standardUserDefaults] synchronize];
                 }
                 else {
                     //not granted, show sync button view
                     [self.addNewChatView showSyncContactButtonView:YES];
                     _skipCheckContactSync = YES;
                 }
-                [[TAPContactManager sharedManager] setContactPermissionAsked];
             });
         }];
     }
     else if ([popupIdentifier isEqualToString:@"Sync Contact Manually"]) {
         [self.addNewChatView showSyncContactButtonView:NO];
         [self syncContactWithLoading:YES];
-        
-        //Save done auto sync contact
-        [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT];
-        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 

@@ -9,7 +9,19 @@
 #import <Foundation/Foundation.h>
 
 typedef NS_ENUM(NSInteger, TTLAPIManagerType) {
-    TTLAPIManagerTypeGet,
+    TTLAPIManagerTypeGetAccessToken,
+    TTLAPIManagerTypeRefreshAccessToken,
+    TTLAPIManagerTypeGetTapTalkAuthTicket,
+    TTLAPIManagerTypeGetProjectConfigs,
+    TTLAPIManagerTypeGetServerTime,
+    TTLAPIManagerTypeLogout,
+    TTLAPIManagerTypeCreateUser,
+    TTLAPIManagerTypeGetTopicList,
+    TTLAPIManagerTypeGetUserProfile,
+    TTLAPIManagerTypeCreateCase,
+    TTLAPIManagerTypeCloseCase,
+    TTLAPIManagerTypeGetCaseDetails,
+    TTLAPIManagerTypeRateConversation,
 };
 
 @interface TTLAPIManager : NSObject

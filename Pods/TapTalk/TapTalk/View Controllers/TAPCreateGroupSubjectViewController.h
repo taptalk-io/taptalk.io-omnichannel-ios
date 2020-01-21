@@ -25,11 +25,12 @@ typedef NS_ENUM(NSInteger, TAPCreateGroupSubjectViewControllerType) {
 
 @interface TAPCreateGroupSubjectViewController : TAPBaseViewController
 
-@property (weak, nonatomic) TAPRoomListViewController *roomListViewController;
+@property (weak, nonatomic) TapUIRoomListViewController *roomListViewController;
 @property (weak, nonatomic) id<TAPCreateGroupSubjectViewControllerDelegate> delegate;
-@property (weak, nonatomic) TAPRoomModel *roomModel;
 @property (strong, nonatomic) NSArray *selectedContactArray;
 @property (nonatomic) TAPCreateGroupSubjectViewControllerType tapCreateGroupSubjectControllerType;
+
+- (void)setRoomData:(TAPRoomModel *)room;
 
 @end
 

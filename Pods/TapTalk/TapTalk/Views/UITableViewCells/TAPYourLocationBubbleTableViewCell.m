@@ -30,6 +30,9 @@
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 
+@property (strong, nonatomic) IBOutlet UIView *senderInitialView;
+@property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
+@property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
 
@@ -62,6 +65,7 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderProfileImageButtonWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
 
@@ -78,6 +82,8 @@
 - (IBAction)chatBubbleButtonDidTapped:(id)sender;
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)quoteButtonDidTapped:(id)sender;
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender;
+
 
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer;
 - (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer;
@@ -107,8 +113,9 @@
     
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleView.layer.cornerRadius = 8.0f;
-    self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+    self.bubbleView.layer.cornerRadius = 8.0f;    
+    self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
+
     
     self.replyView.layer. cornerRadius = 4.0f;
     
@@ -185,6 +192,14 @@
     UIFont *senderNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleSenderName];
     UIColor *senderNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleSenderName];
     
+    UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+    UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+    
+    self.senderInitialLabel.textColor = initialNameLabelColor;
+    self.senderInitialLabel.font = initialNameLabelFont;
+    self.senderInitialView.layer.cornerRadius = CGRectGetWidth(self.senderInitialView.frame) / 2.0f;
+    self.senderInitialView.clipsToBounds = YES;
+
     self.centerMarkerLocationImageView.image = [self.centerMarkerLocationImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLocationBubbleMarker]];
     
     self.replyNameLabel.textColor = quoteTitleColor;
@@ -307,19 +322,46 @@
     }
     
     //CS NOTE - check chat room type, show sender info if group type
-    if (message.room.type == RoomTypeGroup) {
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
         [self showSenderInfo:YES];
 
-        if ([message.user.imageURL.thumbnail isEqualToString:@""]) {
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        NSString *thumbnailImageString = @"";
+        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:message.user.userID];
+        if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+          thumbnailImageString = obtainedUser.imageURL.thumbnail;
+          thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
         }
         else {
-            if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
+          thumbnailImageString = message.user.imageURL.thumbnail;
+          thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
+        }
+
+        NSString *fullNameString = @"";
+        if (obtainedUser != nil && ![obtainedUser.fullname isEqualToString:@""]) {
+          fullNameString = obtainedUser.fullname;
+          fullNameString = [TAPUtil nullToEmptyString:fullNameString];
+        }
+        else {
+          fullNameString = message.user.fullname;
+          fullNameString = [TAPUtil nullToEmptyString:fullNameString];
+        }
+        
+        if ([thumbnailImageString isEqualToString:@""]) {
+            //No photo found, get the initial
+            self.senderInitialView.alpha = 1.0f;
+            self.senderImageView.alpha = 0.0f;
+            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:message.user.fullname];
+            self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:message.user.fullname isGroup:NO];
+        }
+        else {
+            if(![self.currentProfileImageURLString isEqualToString:thumbnailImageString]) {
                 self.senderImageView.image = nil;
             }
             
-            [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
-            _currentProfileImageURLString = message.user.imageURL.thumbnail;
+            self.senderInitialView.alpha = 0.0f;
+            self.senderImageView.alpha = 1.0f;
+            [self.senderImageView setImageWithURLString:thumbnailImageString];
+            _currentProfileImageURLString = thumbnailImageString;
         }
         
         self.senderNameLabel.text = message.user.fullname;
@@ -419,6 +461,12 @@
         if ([self.delegate respondsToSelector:@selector(yourLocationBubbleLongPressedWithMessage:)]) {
             [self.delegate yourLocationBubbleLongPressedWithMessage:self.message];
         }
+    }
+}
+
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourLocationBubbleDidTappedProfilePictureWithMessage:)]) {
+        [self.delegate yourLocationBubbleDidTappedProfilePictureWithMessage:self.message];
     }
 }
 
@@ -556,7 +604,7 @@
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
-    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
         self.fileView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
@@ -594,12 +642,16 @@
     if (show) {
         self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 30.0f;
+        self.senderProfileImageButton.userInteractionEnabled = YES;
         self.senderNameHeightConstraint.constant = 18.0f;
         self.forwardTitleLabelTopConstraint.constant = 4.0f;
     }
     else {
         self.senderImageViewWidthConstraint.constant = 0.0f;
         self.senderImageViewTrailingConstraint.constant = 0.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 0.0f;
+        self.senderProfileImageButton.userInteractionEnabled = NO;
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelTopConstraint.constant = 0.0f;
     }

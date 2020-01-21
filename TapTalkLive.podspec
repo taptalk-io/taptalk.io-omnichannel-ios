@@ -39,10 +39,14 @@ Pod::Spec.new do |s|
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.dependency "TapTalk"
+    s.dependency "AFNetworking", "~> 3.1.0"
+    s.dependency "JSONModel", "~> 1.1"
+    s.dependency "SDWebImage", "4.4.2"
+    s.dependency "PodAsset"
 
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.prefix_header_contents ='#import "Configs.h"', '#import "TapTalkLive.h"', '#import "TTLUtil.h"', '#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+MPSecureUserDefaults.h"', '#import "PodAsset.h"'
+    s.prefix_header_contents ='#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+DVSecureUserDefaults.h"', '#import "PodAsset.h"', '#import "TTLConfigs.h"', '#import "TTLStyle.h"', '#import "TapTalkLive.h"', '#import "TTLUtil.h"', '#import "TTLImageView.h"', '#import "TTLImage.h"', '#import "TTLCustomDropDownTextFieldView.h"', '#import "TTLFormGrowingTextView.h"', '#import "TTLCustomButtonView.h"', '#import "TTLStyleManager.h"', '#import "TTLAPIManager.h"', '#import "TTLDataManager.h"', '#import "TTLNetworkManager.h"', '#import "TTLUserModel.h"', '#import "TTLCaseModel.h"', '#import "TTLTopicModel.h"'
     # ――― Bundle ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     
     s.resource_bundles = {

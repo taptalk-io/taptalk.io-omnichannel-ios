@@ -172,6 +172,13 @@
                                             searchedString:self.updatedString
                                     numberOfUnreadMessages:[self.searchResultUnreadCountArray objectAtIndex:indexPath.row]];
             
+            if (indexPath.row == [self.searchResultChatAndContactArray count] - 1) {
+                [cell hideSeparatorView:YES];
+            }
+            else {
+                [cell hideSeparatorView:NO];
+            }
+            
             return cell;
         }
         else if (indexPath.section == 1) {
@@ -269,9 +276,11 @@
     if (tableView == self.searchView.recentSearchTableView) {
         TAPRecentSearchModel *selectedRecentSearch = [self.recentSearchArray objectAtIndex:indexPath.row];
         TAPRoomModel *selectedRoom = selectedRecentSearch.room;
-        TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:selectedRoom];
-        obtainedChatViewController.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:obtainedChatViewController animated:YES];
+        
+        [[TapUI sharedInstance] createRoomWithRoom:selectedRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            chatViewController.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:chatViewController animated:YES];
+        }];
         
         NSDate *date = [NSDate date];
         long createdDate = [date timeIntervalSince1970] * 1000.0f;
@@ -288,9 +297,11 @@
         if (indexPath.section == 0) {
             //CHATS AND CONTACTS
             TAPRoomModel *selectedRoom = [self.searchResultChatAndContactArray objectAtIndex:indexPath.row];
-            TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:selectedRoom];
-            obtainedChatViewController.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:obtainedChatViewController animated:YES];
+            
+            [[TapUI sharedInstance] createRoomWithRoom:selectedRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                chatViewController.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:chatViewController animated:YES];
+            }];
             
             //Add to recent chat
             TAPRecentSearchModel *recentSearch = [TAPRecentSearchModel new];
@@ -321,9 +332,10 @@
             TAPMessageModel *selectedMessage = [self.searchResultMessageArray objectAtIndex:indexPath.row];
             TAPRoomModel *selectedRoom = selectedMessage.room;
             
-            TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:selectedRoom scrollToMessageWithLocalID:selectedMessage.localID];
-            obtainedChatViewController.hidesBottomBarWhenPushed = YES;
-            [self.navigationController pushViewController:obtainedChatViewController animated:YES];
+            [[TapUI sharedInstance] createRoomWithRoom:selectedRoom scrollToMessageWithLocalID:selectedMessage.localID success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                chatViewController.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:chatViewController animated:YES];
+            }];
         }
     }
 }
@@ -427,14 +439,14 @@
 
     _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
     [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
-    self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+    self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
     [self.rightBarButton addTarget:self action:nil forControlEvents:UIControlEventTouchUpInside];
     UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
     [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     
     UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-    self.searchBarView.frame = CGRectMake(-57.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
+    self.searchBarView.frame = CGRectMake(-55.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
     
     [TAPUtil performBlock:^{
         if ([self.delegate respondsToSelector:@selector(searchViewControllerDidTappedSearchCancelButton)]) {
@@ -443,7 +455,7 @@
     } afterDelay:0.1f];
     
     [UIView animateWithDuration:0.2f animations:^{
-        self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 57.0f - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
+        self.searchBarView.frame = CGRectMake(0.0f, CGRectGetMinY(self.searchBarView.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 55.0f - 73.0f - 16.0f, CGRectGetHeight(self.searchBarView.frame));
         
         self.view.alpha = 0.0f;
     } completion:^(BOOL finished) {

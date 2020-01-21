@@ -80,6 +80,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorMediaPreviewWarningBackgroundColor,
     TAPComponentColorSearchConnectionLostBackgroundColor,
     TAPComponentColorButtonIcon,
+    TAPComponentColorButtonIconPrimary,
     TAPComponentColorButtonIconDestructive,
     TAPComponentColorIconMessageSending,
     TAPComponentColorIconMessageFailed,
@@ -173,6 +174,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconChatRoomScrollToBottomBackground, //Chat Room Page
     TAPComponentColorIconChatRoomScrollToBottom, //Chat Room Page
     TAPComponentColorIconChatRoomUnreadButton, //Chat Room Page
+    TAPComponentColorIconChatRoomFloatingUnreadButton, //Chat Room Page
     TAPComponentColorIconChatComposerBurgerMenuBackground, //Chat Room Page
     TAPComponentColorIconChatComposerShowKeyboardBackground, //Chat Room Page
     TAPComponentColorIconChatComposerAttach, //Chat Room Page
@@ -218,6 +220,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorTableViewSectionHeaderLabel,
     TAPTextColorContactListName,
     TAPTextColorContactListNameHighlighted,
+    TAPTextColorContactListUsername,
     TAPTextColorMediaListInfoLabel,
     TAPTextColorRoomListName,
     TAPTextColorRoomListNameHighlighted,
@@ -299,7 +302,11 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorLoginVerificationCodeInputLabel,
     TAPTextColorSearchClearHistoryLabel,
     TAPTextColorCreateGroupSubjectLoadingLabel,
-    TAPTextColorCustomWebViewNavigationTitleLabel
+    TAPTextColorCustomWebViewNavigationTitleLabel,
+    TAPTextColorRoomAvatarSmallLabel,
+    TAPTextColorRoomAvatarMediumLabel,
+    TAPTextColorRoomAvatarLargeLabel,
+    TAPTextColorRoomAvatarExtraLargeLabel,
 };
 
 typedef NS_ENUM(NSInteger, TAPComponentFont) {
@@ -337,6 +344,7 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontTableViewSectionHeaderLabel,
     TAPComponentFontContactListName,
     TAPComponentFontContactListNameHighlighted,
+    TAPComponentFontContactListUsername,
     TAPComponentFontMediaListInfoLabel,
     TAPComponentFontRoomListName,
     TAPComponentFontRoomListNameHighlighted,
@@ -415,6 +423,10 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontLoginVerificationStatusCountdownLabel,
     TAPComponentFontLoginVerificationStatusLoadingLabel,
     TAPComponentFontLoginVerificationStatusSuccessLabel,
+    TAPComponentFontRoomAvatarSmallLabel,
+    TAPComponentFontRoomAvatarMediumLabel,
+    TAPComponentFontRoomAvatarLargeLabel,
+    TAPComponentFontRoomAvatarExtraLargeLabel,
 };
 
 @interface TAPStyleManager : NSObject
@@ -433,6 +445,9 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
 - (UIColor *)getDefaultColorForType:(TAPDefaultColor)defaultColorType;
 - (UIColor *)getTextColorForType:(TAPTextColor)textColorType;
 - (UIColor *)getComponentColorForType:(TAPComponentColor)componentType;
+
+- (UIColor *)getRandomDefaultAvatarBackgroundColorWithName:(NSString *)name;
+- (NSString *)getInitialsWithName:(NSString *)name isGroup:(BOOL)isGroup;
 
 @end
 

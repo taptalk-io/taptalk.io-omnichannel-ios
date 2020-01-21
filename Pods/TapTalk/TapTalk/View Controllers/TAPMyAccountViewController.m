@@ -63,7 +63,11 @@
     [self.myAccountView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.myAccountView.removeProfilePictureButton addTarget:self action:@selector(removeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.myAccountView.logoutButton addTarget:self action:@selector(logoutButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    
+    if ([[TapUI sharedInstance] getLogoutButtonVisibleState]) {
+        //Handle only when logout is visible
+        [self.myAccountView.logoutButton addTarget:self action:@selector(logoutButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    }
     
     [self.myAccountView setContinueButtonEnabled:YES];
     
@@ -245,7 +249,7 @@
             }
             
             self.selectedProfileImage = selectedImage;
-            [self.myAccountView setProfilePictureWithImage:self.selectedProfileImage];
+            [self.myAccountView setProfilePictureWithImage:self.selectedProfileImage userFullName:self.currentUser.fullname];
             
             [self.myAccountView setAsLoading:YES];
             //upload Image
@@ -255,6 +259,11 @@
                 
                 [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
                     [self.myAccountView setAsLoading:NO];
+                    
+                    if ([self.delegate respondsToSelector:@selector(myAccountViewControllerDoneChangingImageProfile)]) {
+                        [self.delegate myAccountViewControllerDoneChangingImageProfile];
+                    }
+                    
                 } progressBlock:^(CGFloat progress, CGFloat total) {
                     [self.myAccountView animateProgressUploadingImageWithProgress:progress total:total];
                 } failureBlock:^(NSError *error) {
@@ -408,7 +417,7 @@
 
 - (void)removeProfilePictureButtonDidTapped {
     self.selectedProfileImage = nil;
-    [self.myAccountView setProfilePictureWithImage:self.selectedProfileImage];
+    [self.myAccountView setProfilePictureWithImage:self.selectedProfileImage userFullName:self.currentUser.fullname];
 }
 
 - (void)changeProfilePictureButtonDidTapped {
@@ -493,7 +502,7 @@
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -537,7 +546,7 @@
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -575,7 +584,7 @@
     [self.myAccountView.emailTextField setTextFieldWithData:email];
     
     //Set Profile Picture
-    [self.myAccountView setProfilePictureWithImageURL:imageURL];
+    [self.myAccountView setProfilePictureWithImageURL:imageURL userFullName:fullname];
 }
 
 - (void)logoutButtonDidTapped {
@@ -603,8 +612,11 @@
                 [self dismissViewControllerAnimated:NO completion:nil];
                 [self.myAccountView showLogoutLoadingView:NO];
                 
-                TAPLoginViewController *loginViewController = [[TAPLoginViewController alloc] init];
-                [loginViewController presentLoginViewControllerIfNeededFromViewController:[[TapUI sharedInstance] roomListViewController] force:YES];
+                id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+                if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
+                    [tapTalkDelegate userLogout];
+                }
+
             } failure:^(NSError *error) {
                 //Show alert
                 [self.myAccountView showLogoutLoadingView:NO];

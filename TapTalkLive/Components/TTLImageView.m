@@ -2,7 +2,7 @@
 //  TTLImageView.m
 //  TapTalkLive
 //
-//  Created by Dominic Vedericho on 03/01/20.
+//  Created by Dominic Vedericho on 18/01/20.
 //  Copyright © 2020 taptalk.io. All rights reserved.
 //
 
@@ -45,8 +45,6 @@
     imageCache.config.maxCacheAge = kMaxCacheAge;
 //    imageCache.maxCacheSize = kMaxDiskCountLimit;
 //    imageCache.maxCacheAge = kMaxCacheAge;
-    
-    self.backgroundColor = [TTLUtil getColor:@"E4E4E4"];
 }
 
 /*

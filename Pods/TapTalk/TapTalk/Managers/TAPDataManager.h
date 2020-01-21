@@ -71,12 +71,11 @@
                       ascending:(BOOL)isAscending
                         success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
                         failure:(void (^)(NSError *error))failure;
-+ (void)getAllMessageWithRoomID:(NSString *)roomID
-                          query:(NSString *)query
-                      sortByKey:(NSString *)columnName
-                      ascending:(BOOL)isAscending
-                        success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
-                        failure:(void (^)(NSError *error))failure;
++ (void)getAllMessageWithQuery:(NSString *)query
+                     sortByKey:(NSString *)columnName
+                     ascending:(BOOL)isAscending
+                       success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                       failure:(void (^)(NSError *error))failure;
 + (void)getAllMessageWithRoomID:(NSString *)roomID
                    messageTypes:(NSArray *)messageTypeArray
              minimumDateCreated:(NSTimeInterval)minCreated
@@ -112,6 +111,10 @@
                                  sortBy:(NSString *)columnName
                                 success:(void (^)(NSArray *resultArray))success
                                 failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseNonContactSearchKeyword:(NSString *)keyword
+                                    sortBy:(NSString *)columnName
+                                   success:(void (^)(NSArray *resultArray))success
+                                   failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseAllUserSortBy:(NSString *)columnName
                          success:(void (^)(NSArray *resultArray))success
                          failure:(void (^)(NSError *error))failure;
@@ -210,6 +213,9 @@
 + (void)callAPIGetUserByUsername:(NSString *)username
                          success:(void (^)(TAPUserModel *user))success
                          failure:(void (^)(NSError *error))failure;
++ (void)callAPISearchUserByUsernameKeyword:(NSString *)username
+                                   success:(void (^)(TAPUserModel *user, NSString *inputKeyword))success
+                                   failure:(void (^)(NSError *error, NSString *inputKeyword))failure;
 + (void)callAPIUpdatePushNotificationWithToken:(NSString *)token
                                        isDebug:(BOOL)isDebug
                                        success:(void (^)(void))success
@@ -218,8 +224,8 @@
                                         success:(void (^)(NSArray *updatedMessageIDsArray))success
                                         failure:(void (^)(NSError *error, NSArray *messageArray))failure;
 + (void)callAPIUpdateMessageReadStatusWithArray:(NSArray *)messageArray
-                                       success:(void (^)(NSArray *updatedMessageIDsArray))success
-                                       failure:(void (^)(NSError *error, NSArray *messageArray))failure;
+                                        success:(void (^)(NSArray *updatedMessageIDsArray, NSArray *originMessageArray))success
+                                        failure:(void (^)(NSError *error, NSArray *messageArray))failure;
 + (NSURLSessionUploadTask *)callAPIUploadFileWithFileData:(NSData *)fileData
                                                    roomID:(NSString *)roomID
                                                  fileName:(NSString *)fileName
@@ -291,6 +297,9 @@
 + (void)callAPIGetRoomWithRoomID:(NSString *)roomID
                          success:(void (^)(TAPRoomModel *room))success
                          failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetRoomWithXCRoomID:(NSString *)xcRoomID
+                           success:(void (^)(TAPRoomModel *room))success
+                           failure:(void (^)(NSError *error))failure;
 + (void)callAPIAddRoomParticipantsWithRoomID:(NSString *)roomID
                                  userIDArray:(NSArray *)userIDArray
                                      success:(void (^)(TAPRoomModel *room))success

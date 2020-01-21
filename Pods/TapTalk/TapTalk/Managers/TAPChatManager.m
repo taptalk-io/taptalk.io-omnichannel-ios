@@ -10,7 +10,7 @@
 #import "TAPConnectionManager.h"
 #import <TapTalk/Base64.h>
 
-#define kCharacterLimit 1000
+#define kCharacterLimit 4000
 #define kMaximumRetryAttempt 10
 #define kDelayTime 60.0f
 
@@ -33,6 +33,7 @@
 @property (strong, nonatomic) NSMutableArray *delegatesArray;
 @property (strong, nonatomic) NSMutableArray *pendingMessageArray;
 @property (strong, nonatomic) NSMutableArray *incomingMessageArray;
+@property (strong, nonatomic) NSMutableArray *toBeMarkAsReadMessageArray;
 @property (strong, nonatomic) NSMutableDictionary *waitingResponseDictionary;
 @property (strong, nonatomic) NSMutableDictionary *waitingUploadDictionary;
 @property (strong, nonatomic) NSMutableDictionary *typingDictionary;
@@ -67,6 +68,7 @@
         _delegatesArray = [[NSMutableArray alloc] init];
         _pendingMessageArray = [[NSMutableArray alloc] init];
         _incomingMessageArray = [[NSMutableArray alloc] init];
+        _toBeMarkAsReadMessageArray = [[NSMutableArray alloc] init];
         _waitingResponseDictionary = [[NSMutableDictionary alloc] init];
         _waitingUploadDictionary = [[NSMutableDictionary alloc] init];
         _messageDraftDictionary = [[NSMutableDictionary alloc] init];
@@ -458,7 +460,7 @@
             TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
             quotedMessage = [quotedMessage copy];
             
-            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]]) {
+            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]] || [quotedMessage.quote.fileType isEqualToString:@"file"]) {
                 //TYPE FILE
                 message.quote = quotedMessage.quote;
             }
@@ -760,7 +762,7 @@
             //if message quoted from message model then should construct quote and reply to model
             TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
             quotedMessage = [quotedMessage copy];
-            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]]) {
+            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]] || [quotedMessage.quote.fileType isEqualToString:@"file"]) {
                 //TYPE FILE
                 message.quote = quotedMessage.quote;
             }
@@ -852,7 +854,7 @@
             //if message quoted from message model then should construct quote and reply to model
             TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
             quotedMessage = [quotedMessage copy];
-            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]]) {
+            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]] || [quotedMessage.quote.fileType isEqualToString:@"file"]) {
                 //TYPE FILE
                 message.quote = quotedMessage.quote;
             }
@@ -1013,7 +1015,7 @@
     TAPMessageModel *decryptedMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:dataDictionary];
     
     //Add User to Contact Manager
-    [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO];
+    [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:YES];
     
     decryptedMessage.isSending = NO;
     
@@ -1456,6 +1458,11 @@
     [[TAPChatManager sharedManager].quoteActionTypeDictionary removeAllObjects];
     [[TAPChatManager sharedManager].userInfoDictionary removeAllObjects];
     [[TAPChatManager sharedManager].filePathStoredDictionary removeAllObjects];
+}
+
+- (void)updateReadMessageToDatabaseQueueWithArray:(NSArray *)readMessageArray {
+    //Add read message to incoming array
+    [self.incomingMessageArray addObjectsFromArray:readMessageArray];
 }
 
 @end

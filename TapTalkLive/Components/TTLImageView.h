@@ -2,13 +2,11 @@
 //  TTLImageView.h
 //  TapTalkLive
 //
-//  Created by Dominic Vedericho on 03/01/20.
+//  Created by Dominic Vedericho on 18/01/20.
 //  Copyright © 2020 taptalk.io. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-
-NS_ASSUME_NONNULL_BEGIN
 
 static const NSInteger kMaxCacheAge = 60 * 60 * 24 * 7; // 1 Week in Seconds
 static const NSInteger kMaxDiskCountLimit = 1048576000; // 1GB in B
@@ -36,7 +34,4 @@ static const NSInteger kMaxDiskCountLimit = 1048576000; // 1GB in B
 
 - (void)setImageWithURLString:(NSString *)urlString;
 - (void)setAsTintedWithColor:(UIColor *)color;
-
 @end
-
-NS_ASSUME_NONNULL_END
