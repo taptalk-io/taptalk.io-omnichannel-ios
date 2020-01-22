@@ -52,6 +52,19 @@
         self.logoImageView.layer.cornerRadius = 8.0f;
         self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.scrollView addSubview:self.logoImageView];
+
+        _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 24.0f, CGRectGetMinY(self.logoImageView.frame) + 12.0f, 24.0f, 24.0f)];
+        self.closeImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
+        TTLImage *closeIconImage = self.closeImageView.image;
+        closeIconImage = [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
+        self.closeImageView.image = closeIconImage;
+        self.closeImageView.alpha = 0.0f;
+        [self.scrollView addSubview:self.closeImageView];
+        
+        _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.closeImageView.frame) - 8.0f, CGRectGetMinY(self.closeImageView.frame) - 8.0f, 40.0f, 40.0f)];
+        self.closeButton.alpha = 0.0f;
+        self.closeButton.userInteractionEnabled = NO;
+        [self.scrollView addSubview:self.closeButton];
         
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(12.0f, CGRectGetMaxY(self.logoImageView.frame) + 16.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 12.0f - 12.0f, 36.0f)];
         self.titleLabel.text = NSLocalizedString(@"Need help with anything?", @"");
@@ -113,11 +126,11 @@
         [self.messageTextView setPlaceholderFont:textFieldFont];
         [self.formContainerView addSubview:self.messageTextView];
         
-        _keyboardAccessoryView = [[TTLKeyboardAccessoryView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 44.0f)];
+        _keyboardAccessoryView = [[TTLKeyboardAccessoryView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 48.0f)];
         [self.keyboardAccessoryView setHeaderKeyboardButtonTitleWithText:NSLocalizedString(@"DONE", @"")];
         self.messageTextView.textView.inputAccessoryView = self.keyboardAccessoryView;
         
-        _createCaseButtonView = [[TTLCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.messageTextView.frame) + 24.0f, CGRectGetWidth(self.formContainerView.frame), 42.0f)];
+        _createCaseButtonView = [[TTLCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.messageTextView.frame) + 24.0f, CGRectGetWidth(self.formContainerView.frame), 48.0f)];
         [self.createCaseButtonView setCustomButtonViewStyleType:TTLCustomButtonViewStyleTypeWithIcon];
         [self.createCaseButtonView setCustomButtonViewType:TTLCustomButtonViewTypeInactive];
         [self.createCaseButtonView setButtonWithTitle:NSLocalizedString(@"Send Message", @"") andIcon:@"TTLIconSend" iconPosition:TTLCustomButtonViewIconPosititonLeft];
@@ -166,6 +179,8 @@
 
 - (void)showUserDataForm:(BOOL)isShow {
     if (isShow) {
+        [self.fullNameTextField setAsHidden:NO];
+        [self.emailTextField setAsHidden:NO];
         self.fullNameTextField.frame = CGRectMake(CGRectGetMinX(self.fullNameTextField.frame), CGRectGetMinY(self.fullNameTextField.frame), CGRectGetWidth(self.fullNameTextField.frame), [self.fullNameTextField getTextFieldHeight]);
         self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMaxY(self.fullNameTextField.frame) + 12.0f, CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
         self.topicDropDownView.frame = CGRectMake(CGRectGetMinX(self.topicDropDownView.frame), CGRectGetMaxY(self.emailTextField.frame) + 12.0f, CGRectGetWidth(self.topicDropDownView.frame), [self.topicDropDownView getTextFieldHeight]);
@@ -178,9 +193,11 @@
         self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame));
     }
     else {
+        [self.fullNameTextField setAsHidden:YES];
+        [self.emailTextField setAsHidden:YES];
         self.fullNameTextField.frame = CGRectMake(CGRectGetMinX(self.fullNameTextField.frame), CGRectGetMinY(self.fullNameTextField.frame), CGRectGetWidth(self.fullNameTextField.frame), 0.0f);
         self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMaxY(self.fullNameTextField.frame), CGRectGetWidth(self.emailTextField.frame), 0.0f);
-        self.topicDropDownView.frame = CGRectMake(CGRectGetMinX(self.topicDropDownView.frame), CGRectGetMaxY(self.emailTextField.frame) + 12.0f, CGRectGetWidth(self.topicDropDownView.frame), [self.topicDropDownView getTextFieldHeight]);
+        self.topicDropDownView.frame = CGRectMake(CGRectGetMinX(self.topicDropDownView.frame), CGRectGetMaxY(self.emailTextField.frame), CGRectGetWidth(self.topicDropDownView.frame), [self.topicDropDownView getTextFieldHeight]);
         self.messageTextView.frame = CGRectMake(CGRectGetMinX(self.messageTextView.frame), CGRectGetMaxY(self.topicDropDownView.frame) + 12.0f, CGRectGetWidth(self.messageTextView.frame), [self.messageTextView getHeight]);
         self.createCaseButtonView.frame = CGRectMake(CGRectGetMinX(self.createCaseButtonView.frame), CGRectGetMaxY(self.messageTextView.frame) + 24.0f, CGRectGetWidth(self.createCaseButtonView.frame), CGRectGetHeight(self.createCaseButtonView.frame));
         self.formContainerView.frame = CGRectMake(CGRectGetMinX(self.formContainerView.frame), CGRectGetMinY(self.formContainerView.frame), CGRectGetWidth(self.formContainerView.frame), CGRectGetMaxY(self.createCaseButtonView.frame) + 16.0f);
@@ -189,6 +206,23 @@
         self.formContainerView.layer.mask = containerViewLayer;
         self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame));
     }
+}
+
+- (void)showCloseButton:(BOOL)isShow {
+    if (isShow) {
+        self.closeImageView.alpha = 1.0f;
+        self.closeButton.alpha = 1.0f;
+        self.closeButton.userInteractionEnabled = YES;
+    }
+    else {
+        self.closeImageView.alpha = 0.0f;
+        self.closeButton.alpha = 0.0f;
+        self.closeButton.userInteractionEnabled = NO;
+    }
+}
+
+- (void)showCreateCaseButtonAsLoading:(BOOL)loading {
+    [self.createCaseButtonView setAsLoading:loading animated:YES];
 }
 
 @end

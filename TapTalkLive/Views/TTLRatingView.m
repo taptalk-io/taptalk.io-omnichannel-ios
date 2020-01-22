@@ -141,7 +141,7 @@
         [self.commentTextView setPlaceholderFont:textFieldFont];
         [self.containerView addSubview:self.commentTextView];
     
-        _submitButtonView = [[TTLCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.commentTextView.frame) + 24.0f, CGRectGetWidth(self.containerView.frame), 42.0f)];
+        _submitButtonView = [[TTLCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.commentTextView.frame) + 24.0f, CGRectGetWidth(self.containerView.frame), 48.0f)];
         [self.submitButtonView setCustomButtonViewStyleType:TTLCustomButtonViewStyleTypePlain];
         [self.submitButtonView setCustomButtonViewType:TTLCustomButtonViewTypeInactive];
         [self.submitButtonView setButtonWithTitle:NSLocalizedString(@"Submit Review", @"")];

@@ -48,6 +48,7 @@ typedef NS_ENUM(NSInteger,TTLCustomTextFieldViewType) {
 - (void)setErrorInfoText:(NSString *)string;
 - (NSString *)getText;
 - (void)setTextFieldWithData:(NSString *)dataString;
+- (void)setAsHidden:(BOOL)hidden;
 
 @end
 

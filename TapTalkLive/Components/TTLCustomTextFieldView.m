@@ -441,4 +441,15 @@
     self.textField.text = dataString;
 }
 
+- (void)setAsHidden:(BOOL)hidden {
+    if (hidden) {
+        self.titleLabel.alpha = 0.0f;
+        self.textField.userInteractionEnabled = NO;
+    }
+    else {
+        self.titleLabel.alpha = 1.0f;
+        self.textField.userInteractionEnabled = YES;
+    }
+}
+
 @end

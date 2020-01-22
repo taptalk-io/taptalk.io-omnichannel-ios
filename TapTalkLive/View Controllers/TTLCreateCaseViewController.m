@@ -14,6 +14,7 @@
 #import <TapTalk/TapTalk.h>
 #import <TapTalk/TapUI.h>
 #import <TapTalk/TapUIRoomListViewController.h>
+#import <TapTalk/TAPCoreChatRoomManager.h>
 
 @interface TTLCreateCaseViewController () <UIScrollViewDelegate, TTLCustomDropDownTextFieldViewDelegate, TTLFormGrowingTextViewDelegate, TTLCustomButtonViewDelegate, TTLTopicListViewControllerDelegate, TTLCustomTextFieldViewDelegate>
 
@@ -26,6 +27,7 @@
 @property (strong, nonatomic) NSString *obtainedMessageString;
 @property (nonatomic) BOOL isTopicSelected;
 
+- (void)closeButtonDidTapped;
 - (void)doneKeyboardButtonDidTapped;
 - (void)handleSubmitCaseFormFlow;
 
@@ -49,7 +51,8 @@
     self.createCaseView.messageTextView.delegate = self;
     self.createCaseView.createCaseButtonView.delegate = self;
     [self.createCaseView.keyboardAccessoryView.doneKeyboardButton addTarget:self action:@selector(doneKeyboardButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    
+    [self.createCaseView.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+
     //DV Note
     //Check if already logged-in do not show full name and email form
     NSString *currentAccessToken = [TTLDataManager getAccessToken];
@@ -57,9 +60,19 @@
     NSString *currentActiveUserID = currentActiveUser.userID;
     currentActiveUserID = [TTLUtil nullToEmptyString:currentActiveUserID];
     if ([currentAccessToken isEqualToString:@""] || [currentActiveUserID isEqualToString:@""]) {
+        [self.createCaseView showUserDataForm:YES];
+    }
+    else {
         [self.createCaseView showUserDataForm:NO];
     }
     //END DV Note
+    
+    if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+        [self.createCaseView showCloseButton:YES];
+    }
+    else {
+        [self.createCaseView showCloseButton:NO];
+    }
     
     _topicListDataArray = [[NSArray alloc] init];
     _selectedTopic = nil;
@@ -102,6 +115,7 @@
 
 #pragma mark TTLCustomDropDownTextFieldView
 - (void)customDropDownTextFieldViewDidTapped {
+    [self.createCaseView.emailTextField.textField resignFirstResponder];
     TTLTopicListViewController *topicListViewController = [[TTLTopicListViewController alloc] init];
     topicListViewController.delegate = self;
     topicListViewController.topicListArray = self.topicListDataArray;
@@ -147,22 +161,28 @@
     _obtainedEmailString = emailTextFieldString;
     _obtainedMessageString = messageTextViewString;
     BOOL isEmailValid = [TTLUtil validateEmail:emailTextFieldString];
+    
+    NSString *currentAccessToken = [TTLDataManager getAccessToken];
+    TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
+    NSString *currentActiveUserID = currentActiveUser.userID;
+    currentActiveUserID = [TTLUtil nullToEmptyString:currentActiveUserID];
 
-    if ([self.obtainedFullNameString isEqualToString:@""]) {
-        //Validation failed - show error full name must be filled
-        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Full Name" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please enter your name", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    if ([currentAccessToken isEqualToString:@""] || [currentActiveUserID isEqualToString:@""]) {
+        if ([self.obtainedFullNameString isEqualToString:@""]) {
+            //Validation failed - show error full name must be filled
+            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Full Name" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please enter your name", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }
+        else if ([self.obtainedEmailString isEqualToString:@""]) {
+            //Validation failed - show error email must be filled
+            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please enter your email", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }
+        else if (!isEmailValid) {
+            //Validation failed - show error invalid email format
+            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email Format" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Email address format is invalid", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }
     }
-    else if ([self.obtainedEmailString isEqualToString:@""]) {
-        //Validation failed - show error email must be filled
-        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please enter your email", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-
-    }
-    else if (!isEmailValid) {
-        //Validation failed - show error invalid email format
-        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email Format" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Email address format is invalid", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-
-    }
-    else if (!self.isTopicSelected) {
+    
+    if (!self.isTopicSelected) {
         //Validation failed - show error topic must be selected
         [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Topic" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please select your topic", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
 
@@ -174,10 +194,6 @@
     }
     else {
         //Validation success
-        NSString *currentAccessToken = [TTLDataManager getAccessToken];
-        TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
-        NSString *currentActiveUserID = currentActiveUser.userID;
-        currentActiveUserID = [TTLUtil nullToEmptyString:currentActiveUserID];
         if (![currentAccessToken isEqualToString:@""] && ![currentActiveUserID isEqualToString:@""]) {
             [self handleSubmitCaseFormFlowAfterLogin];
         }
@@ -223,7 +239,12 @@
     [self.view endEditing:YES];
 }
 
+- (void)closeButtonDidTapped {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (void)handleSubmitCaseFormFlow {
+    [self.createCaseView showCreateCaseButtonAsLoading:YES];
     [TTLDataManager callAPICreateUserWithFullName:self.obtainedFullNameString email:self.obtainedEmailString success:^(TTLUserModel * _Nonnull user, NSString * _Nonnull ticket) {
         //Get TapTalkLive access token
         [TTLDataManager callAPIGetAccessTokenWithTicket:ticket success:^{
@@ -233,42 +254,65 @@
                 [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                     //Call API create case
                     [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
-                        
                         TapUIRoomListViewController *tapTalkRoomListViewController = [[TapUI sharedInstance] roomListViewController];
-                        tapTalkRoomListViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-                        UINavigationController *tapTalkRoomListNavigationController = [[UINavigationController alloc] initWithRootViewController:tapTalkRoomListViewController];
-                        [self.navigationController presentViewController:tapTalkRoomListNavigationController animated:YES completion:nil];
-                        
+                        if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                            [self.navigationController dismissViewControllerAnimated:YES completion:^{
+                                [self.previousNavigationController pushViewController:tapTalkRoomListViewController animated:YES];
+                            }];
+                        }
+                        else {
+                            [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
+                                [self.createCaseView showCreateCaseButtonAsLoading:NO];
+                                [self.navigationController pushViewController:tapTalkRoomListViewController animated:NO];
+                                [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                                    [self.navigationController pushViewController:chatViewController animated:YES];
+                                }];
+                            } failure:^(NSError * _Nonnull error) {
+                                //Error get chat room from TapTalk
+                                [self.createCaseView showCreateCaseButtonAsLoading:NO];
+                            }];
+                        }
                     } failure:^(NSError * _Nonnull error) {
                         //Error create case
+                        [self.createCaseView showCreateCaseButtonAsLoading:NO];
                     }];
                 } failure:^(NSError * _Nonnull error) {
                     //Error authenticate TapTalk.io Chat SDK
+                    [self.createCaseView showCreateCaseButtonAsLoading:NO];
                 }];
             } failure:^(NSError * _Nonnull error) {
                 //Error get TapTalk auth ticket
+                [self.createCaseView showCreateCaseButtonAsLoading:NO];
             }];
         } failure:^(NSError * _Nonnull error) {
             //Error get access token
+            [self.createCaseView showCreateCaseButtonAsLoading:NO];
         }];
     } failure:^(NSError * _Nonnull error) {
         //Error create user
+        [self.createCaseView showCreateCaseButtonAsLoading:NO];
     }];
 }
 
 - (void)handleSubmitCaseFormFlowAfterLogin {
+    [self.createCaseView showCreateCaseButtonAsLoading:YES];
     BOOL isTapTalkAuthenticate = [TapTalk sharedInstance].isAuthenticated;
     if (isTapTalkAuthenticate) {
         //Call API create case
         [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
-            
+            [self.createCaseView showCreateCaseButtonAsLoading:NO];
             TapUIRoomListViewController *tapTalkRoomListViewController = [[TapUI sharedInstance] roomListViewController];
-            tapTalkRoomListViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-            UINavigationController *tapTalkRoomListNavigationController = [[UINavigationController alloc] initWithRootViewController:tapTalkRoomListViewController];
-            [self.navigationController presentViewController:tapTalkRoomListNavigationController animated:YES completion:nil];
-            
+            if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                [self.navigationController dismissViewControllerAnimated:YES completion:^{
+                    [self.previousNavigationController pushViewController:tapTalkRoomListViewController animated:YES];
+                }];
+            }
+            else {
+                [self.navigationController pushViewController:tapTalkRoomListViewController animated:YES];
+            }
         } failure:^(NSError * _Nonnull error) {
             //Error create case
+            [self.createCaseView showCreateCaseButtonAsLoading:NO];
         }];
     }
     else {
@@ -278,21 +322,38 @@
             [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                 //Call API create case
                 [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
-                    
+                    [self.createCaseView showCreateCaseButtonAsLoading:NO];
                     TapUIRoomListViewController *tapTalkRoomListViewController = [[TapUI sharedInstance] roomListViewController];
-                    tapTalkRoomListViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-                    UINavigationController *tapTalkRoomListNavigationController = [[UINavigationController alloc] initWithRootViewController:tapTalkRoomListViewController];
-                    [self.navigationController presentViewController:tapTalkRoomListNavigationController animated:YES completion:nil];
-                    
+                    if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                        [self.navigationController dismissViewControllerAnimated:YES completion:^{
+                            [self.previousNavigationController pushViewController:tapTalkRoomListViewController animated:YES];
+                        }];
+                    }
+                    else {
+                        [self.navigationController pushViewController:tapTalkRoomListViewController animated:YES];
+                    }
                 } failure:^(NSError * _Nonnull error) {
                     //Error create case
+                    [self.createCaseView showCreateCaseButtonAsLoading:NO];
                 }];
             } failure:^(NSError * _Nonnull error) {
                 //Error authenticate TapTalk.io Chat SDK
+                [self.createCaseView showCreateCaseButtonAsLoading:NO];
             }];
         } failure:^(NSError * _Nonnull error) {
             //Error get TapTalk auth ticket
+            [self.createCaseView showCreateCaseButtonAsLoading:NO];
         }];
+    }
+}
+
+- (void)setCreateCaseViewControllerType:(TTLCreateCaseViewControllerType)createCaseViewControllerType {
+    _createCaseViewControllerType = createCaseViewControllerType;
+    if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+        [self.createCaseView showCloseButton:YES];
+    }
+    else {
+        [self.createCaseView showCloseButton:NO];
     }
 }
 

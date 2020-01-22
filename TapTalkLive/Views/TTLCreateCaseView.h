@@ -21,11 +21,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) TTLFormGrowingTextView *messageTextView;
 @property (strong, nonatomic) TTLCustomButtonView *createCaseButtonView;
 @property (strong, nonatomic) TTLKeyboardAccessoryView *keyboardAccessoryView;
+@property (strong, nonatomic) UIButton *closeButton;
+@property (strong, nonatomic) TTLImageView *closeImageView;
 
 - (void)setMessageTextViewAsActive:(BOOL)active animated:(BOOL)animated;
 - (void)adjustGrowingContentView;
 - (void)setCreateCaseButtonAsActive:(BOOL)active;
 - (void)showUserDataForm:(BOOL)isShow;
+- (void)showCloseButton:(BOOL)isShow;
+- (void)showCreateCaseButtonAsLoading:(BOOL)loading;
+
 
 @end
 

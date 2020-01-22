@@ -33,7 +33,7 @@ PODS:
     - SDWebImage/Core (= 4.4.2)
   - SDWebImage/Core (4.4.2)
   - SocketRocket (0.5.1)
-  - TapTalk (1.0.22):
+  - TapTalk (1.0.21):
     - AFNetworking (~> 3.1.0)
     - GoogleMaps
     - GooglePlacePicker
@@ -51,7 +51,7 @@ DEPENDENCIES:
   - JSONModel (~> 1.1)
   - PodAsset
   - SDWebImage (= 4.4.2)
-  - TapTalk
+  - TapTalk (~> 1.0.21)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -77,9 +77,9 @@ SPEC CHECKSUMS:
   Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
-  TapTalk: 57379bd95629d2daf4e4cfc000d1aa16f645bc7b
+  TapTalk: 2bff26b260fe3a94d38a6cfbafad36308110af1f
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: ec12c457943e797d58d8cc5074224e79e4384a71
+PODFILE CHECKSUM: a79ec4c891a4e9f16ae085bd1a708607a8f02d44
 
 COCOAPODS: 1.8.3

@@ -32,9 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getGroupChatRoomWithGroupRoomID:(NSString *)groupRoomID
                                 success:(void (^)(TAPRoomModel *room))success
                                 failure:(void (^)(NSError *error))failure;
-- (void)getChatRoomByXCRoomID:(NSString *)xcRoomID
-                      success:(void (^)(TAPRoomModel *room))success
-                      failure:(void (^)(NSError *error))failure;
 - (void)createGroupChatRoomWithGroupName:(NSString *)groupName
             listOfParticipantUserIDs:(NSArray *)participantUserIDArray
                              success:(void (^)(TAPRoomModel *room))success

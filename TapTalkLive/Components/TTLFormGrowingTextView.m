@@ -110,7 +110,7 @@
         self.textView.backgroundColor = [UIColor clearColor];
         self.textView.showsVerticalScrollIndicator = NO;
         self.textView.showsHorizontalScrollIndicator = NO;
-        self.textView.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        self.textView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
         self.textView.autocorrectionType = UITextAutocorrectionTypeDefault;
         self.textView.spellCheckingType = UITextSpellCheckingTypeDefault;
         self.textView.keyboardType = UIKeyboardTypeDefault;
