@@ -18,6 +18,8 @@
 		D72740D723D4C14D0073784E /* TTLCaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D72740D523D4C14D0073784E /* TTLCaseModel.m */; };
 		D73506F023AB3F990076E7A6 /* TTLAPIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D73506EE23AB3F970076E7A6 /* TTLAPIManager.m */; };
 		D73506F123AB3F990076E7A6 /* TTLAPIManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D73506EF23AB3F980076E7A6 /* TTLAPIManager.h */; };
+		D73A666823D8597200F91F53 /* TTLRoomListViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D73A666623D8597200F91F53 /* TTLRoomListViewController.h */; };
+		D73A666923D8597200F91F53 /* TTLRoomListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D73A666723D8597200F91F53 /* TTLRoomListViewController.m */; };
 		D747615C23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h in Headers */ = {isa = PBXBuildFile; fileRef = D747615A23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h */; };
 		D747615D23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.m in Sources */ = {isa = PBXBuildFile; fileRef = D747615B23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.m */; };
 		D7485F9E23D1B277001770FA /* TTLBaseTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7485F9C23D1B277001770FA /* TTLBaseTableViewCell.h */; };
@@ -102,6 +104,8 @@
 		D72740D523D4C14D0073784E /* TTLCaseModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLCaseModel.m; sourceTree = "<group>"; };
 		D73506EE23AB3F970076E7A6 /* TTLAPIManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLAPIManager.m; sourceTree = "<group>"; };
 		D73506EF23AB3F980076E7A6 /* TTLAPIManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLAPIManager.h; sourceTree = "<group>"; };
+		D73A666623D8597200F91F53 /* TTLRoomListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLRoomListViewController.h; sourceTree = "<group>"; };
+		D73A666723D8597200F91F53 /* TTLRoomListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLRoomListViewController.m; sourceTree = "<group>"; };
 		D747615A23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLCustomDropDownTextFieldView.h; sourceTree = "<group>"; };
 		D747615B23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLCustomDropDownTextFieldView.m; sourceTree = "<group>"; };
 		D7485F9C23D1B277001770FA /* TTLBaseTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLBaseTableViewCell.h; sourceTree = "<group>"; };
@@ -321,6 +325,8 @@
 				D74C324423D305C500626C9D /* TTLRatingViewController.m */,
 				D7E4910E23D368BB0021F13D /* TTLPopUpInfoViewController.h */,
 				D7E4910F23D368BB0021F13D /* TTLPopUpInfoViewController.m */,
+				D73A666623D8597200F91F53 /* TTLRoomListViewController.h */,
+				D73A666723D8597200F91F53 /* TTLRoomListViewController.m */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -424,6 +430,7 @@
 				D72740C823D4A9260073784E /* TTLUserModel.h in Headers */,
 				D74C323923D3058A00626C9D /* TTLTopicListView.h in Headers */,
 				D7485F9E23D1B277001770FA /* TTLBaseTableViewCell.h in Headers */,
+				D73A666823D8597200F91F53 /* TTLRoomListViewController.h in Headers */,
 				D74C324523D305C500626C9D /* TTLRatingViewController.h in Headers */,
 				D7054C7B23A0B13B00B20950 /* TapTalkLive-Prefix.pch in Headers */,
 				D73506F123AB3F990076E7A6 /* TTLAPIManager.h in Headers */,
@@ -573,6 +580,7 @@
 			files = (
 				D7E4911523D368C60021F13D /* TTLPopUpInfoView.m in Sources */,
 				D7E4911123D368BB0021F13D /* TTLPopUpInfoViewController.m in Sources */,
+				D73A666923D8597200F91F53 /* TTLRoomListViewController.m in Sources */,
 				D73506F023AB3F990076E7A6 /* TTLAPIManager.m in Sources */,
 				D7A96BD423BF16B900654C71 /* TTLCreateCaseView.m in Sources */,
 				D74C323223D2D2CB00626C9D /* TTLCustomTextFieldView.m in Sources */,

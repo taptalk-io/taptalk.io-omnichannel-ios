@@ -52,7 +52,7 @@
         self.logoImageView.layer.cornerRadius = 8.0f;
         self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.scrollView addSubview:self.logoImageView];
-
+        
         _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 24.0f, CGRectGetMinY(self.logoImageView.frame) + 12.0f, 24.0f, 24.0f)];
         self.closeImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
         TTLImage *closeIconImage = self.closeImageView.image;
@@ -126,7 +126,7 @@
         [self.messageTextView setPlaceholderFont:textFieldFont];
         [self.formContainerView addSubview:self.messageTextView];
         
-        _keyboardAccessoryView = [[TTLKeyboardAccessoryView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 48.0f)];
+        _keyboardAccessoryView = [[TTLKeyboardAccessoryView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 44.0f)];
         [self.keyboardAccessoryView setHeaderKeyboardButtonTitleWithText:NSLocalizedString(@"DONE", @"")];
         self.messageTextView.textView.inputAccessoryView = self.keyboardAccessoryView;
         
@@ -224,5 +224,6 @@
 - (void)showCreateCaseButtonAsLoading:(BOOL)loading {
     [self.createCaseButtonView setAsLoading:loading animated:YES];
 }
+
 
 @end

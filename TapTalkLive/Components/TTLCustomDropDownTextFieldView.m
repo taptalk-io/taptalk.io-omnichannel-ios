@@ -254,25 +254,12 @@
 - (void)setAsLoading:(BOOL)loading animated:(BOOL)animated {
     if (loading) {
         if (animated) {
-            //ADD ANIMATION
-            if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] == nil) {
-                CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-                animation.fromValue = [NSNumber numberWithFloat:0.0f];
-                animation.toValue = [NSNumber numberWithFloat:(2*M_PI)];
-                animation.duration = 1.5f;
-                animation.repeatCount = INFINITY;
-                animation.cumulative = YES;
-                animation.removedOnCompletion = NO;
-                [self.loadingImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
-            }
-            
             [UIView animateWithDuration:0.2f animations:^{
                 self.loadingImageView.alpha = 1.0f;
                 self.arrowImageView.alpha = 0.0f;
                 self.containerButton.userInteractionEnabled = NO;
             }];
-        }
-        else {
+            
             //ADD ANIMATION
             if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] == nil) {
                 CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
@@ -284,34 +271,47 @@
                 animation.removedOnCompletion = NO;
                 [self.loadingImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
             }
-            
+        }
+        else {
             self.loadingImageView.alpha = 1.0f;
             self.arrowImageView.alpha = 0.0f;
             self.containerButton.userInteractionEnabled = NO;
+            
+            //ADD ANIMATION
+            if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] == nil) {
+                CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+                animation.fromValue = [NSNumber numberWithFloat:0.0f];
+                animation.toValue = [NSNumber numberWithFloat:(2*M_PI)];
+                animation.duration = 1.5f;
+                animation.repeatCount = INFINITY;
+                animation.cumulative = YES;
+                animation.removedOnCompletion = NO;
+                [self.loadingImageView.layer addAnimation:animation forKey:@"SpinAnimation"];
+            }
         }
     }
     else {
         if (animated) {
-            //REMOVE ANIMATION
-            if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] != nil) {
-                [self.loadingImageView.layer removeAnimationForKey:@"SpinAnimation"];
-            }
-            
             [UIView animateWithDuration:0.2f animations:^{
                 self.loadingImageView.alpha = 0.0f;
                 self.arrowImageView.alpha = 1.0f;
                 self.containerButton.userInteractionEnabled = YES;
             }];
-        }
-        else {
+            
             //REMOVE ANIMATION
             if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] != nil) {
                 [self.loadingImageView.layer removeAnimationForKey:@"SpinAnimation"];
             }
-            
+        }
+        else {
             self.loadingImageView.alpha = 0.0f;
             self.arrowImageView.alpha = 1.0f;
             self.containerButton.userInteractionEnabled = YES;
+
+            //REMOVE ANIMATION
+            if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] != nil) {
+                [self.loadingImageView.layer removeAnimationForKey:@"SpinAnimation"];
+            }
         }
     }
 }

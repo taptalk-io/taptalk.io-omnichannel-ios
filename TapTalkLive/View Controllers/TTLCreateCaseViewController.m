@@ -52,7 +52,7 @@
     self.createCaseView.createCaseButtonView.delegate = self;
     [self.createCaseView.keyboardAccessoryView.doneKeyboardButton addTarget:self action:@selector(doneKeyboardButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.createCaseView.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-
+    
     //DV Note
     //Check if already logged-in do not show full name and email form
     NSString *currentAccessToken = [TTLDataManager getAccessToken];
@@ -73,7 +73,7 @@
     else {
         [self.createCaseView showCloseButton:NO];
     }
-    
+
     _topicListDataArray = [[NSArray alloc] init];
     _selectedTopic = nil;
     
@@ -161,7 +161,7 @@
     _obtainedEmailString = emailTextFieldString;
     _obtainedMessageString = messageTextViewString;
     BOOL isEmailValid = [TTLUtil validateEmail:emailTextFieldString];
-    
+
     NSString *currentAccessToken = [TTLDataManager getAccessToken];
     TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
     NSString *currentActiveUserID = currentActiveUser.userID;
@@ -175,13 +175,14 @@
         else if ([self.obtainedEmailString isEqualToString:@""]) {
             //Validation failed - show error email must be filled
             [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please enter your email", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+
         }
         else if (!isEmailValid) {
             //Validation failed - show error invalid email format
             [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email Format" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Email address format is invalid", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }
     }
-    
+
     if (!self.isTopicSelected) {
         //Validation failed - show error topic must be selected
         [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Topic" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please select your topic", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
@@ -194,6 +195,10 @@
     }
     else {
         //Validation success
+        NSString *currentAccessToken = [TTLDataManager getAccessToken];
+        TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
+        NSString *currentActiveUserID = currentActiveUser.userID;
+        currentActiveUserID = [TTLUtil nullToEmptyString:currentActiveUserID];
         if (![currentAccessToken isEqualToString:@""] && ![currentActiveUserID isEqualToString:@""]) {
             [self handleSubmitCaseFormFlowAfterLogin];
         }
@@ -235,12 +240,12 @@
     
 }
 
-- (void)doneKeyboardButtonDidTapped {
-    [self.view endEditing:YES];
-}
-
 - (void)closeButtonDidTapped {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)doneKeyboardButtonDidTapped {
+    [self.view endEditing:YES];
 }
 
 - (void)handleSubmitCaseFormFlow {
@@ -254,6 +259,7 @@
                 [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                     //Call API create case
                     [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
+                        
                         TapUIRoomListViewController *tapTalkRoomListViewController = [[TapUI sharedInstance] roomListViewController];
                         if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
                             [self.navigationController dismissViewControllerAnimated:YES completion:^{
