@@ -89,6 +89,10 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/case/close";
         return [NSString stringWithFormat:@"%@/%@/%@", kAPIBaseURLString, kAPIVersionString, apiPath];
     }
+    else if (type == TTLAPIManagerTypeGetCaseList) {
+        NSString *apiPath = @"client/case/get_list";
+        return [NSString stringWithFormat:@"%@/%@/%@", kAPIBaseURLString, kAPIVersionString, apiPath];
+    }
     else if (type == TTLAPIManagerTypeGetCaseDetails) {
         NSString *apiPath = @"client/case/get_by_id";
         return [NSString stringWithFormat:@"%@/%@/%@", kAPIBaseURLString, kAPIVersionString, apiPath];

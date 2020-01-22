@@ -45,6 +45,8 @@ NS_ASSUME_NONNULL_BEGIN
                                    failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetTopicListSuccess:(void (^)(NSArray<TTLTopicModel *> *topicListArray))success
                            failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetCaseListSuccess:(void (^)(NSArray<TTLCaseModel *> *caseListArray))success
+                          failure:(void (^)(NSError *error))failure;
 + (void)callAPICreateCaseWithTopicID:(NSString *)topicID
                              message:(NSString *)message
                              success:(void (^)(TTLCaseModel *caseData))success

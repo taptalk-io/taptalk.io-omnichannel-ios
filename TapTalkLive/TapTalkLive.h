@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
 #import "TTLCreateCaseViewController.h"
+#import "TTLRoomListViewController.h"
 
 //! Project version number for TapTalkLive.
 FOUNDATION_EXPORT double TapTalkLiveVersionNumber;
@@ -22,34 +23,8 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 //Initalization
 + (TapTalkLive *_Nonnull)sharedInstance;
 
-////==========================================================
-////                     Authentication
-////==========================================================
-///**
-// Authenticate user to TapTalk.io server by providing the auth ticket
-// set connectWhenSuccess to YES if you want to connect to TapTalk.io automatically after authentication
-// */
-//- (void)authenticateWithAuthTicket:(NSString *_Nonnull)authTicket
-//                connectWhenSuccess:(BOOL)connectWhenSuccess
-//                           success:(void (^_Nonnull)(void))success
-//                           failure:(void (^_Nonnull)(NSError * _Nonnull error))failure;
-//
-///**
-// To check if user authenticated to TapTalk.io server or not
-// return YES if the user is authenticated to TapTalk.io server
-// */
-//- (BOOL)isAuthenticated;
-//
-///**
-// Logout from TapTalk.io and clear all local cached data
-// */
-//- (void)logoutAndClearAllTapTalkLiveDataWithSuccess:(void (^_Nonnull)(void))success
-//                                            failure:(void (^_Nonnull)(NSError *_Nonnull error))failure;
-//
-///**
-// Clear all local cached data
-// */
-//- (void)clearAllTapTalkLiveData;
+//Property
+- (TTLRoomListViewController *_Nonnull)roomListViewController;
 
 //==========================================================
 //            UIApplicationDelegate Handling
@@ -112,19 +87,25 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 - (void)handleException:(NSException * _Nonnull)exception;
 
 //==========================================================
-//            Create Case View
+//                   TapTalk Live View
 //==========================================================
-
 /**
-Called to show case form view from your application.
+Called to show TapTalk Live view with present animation
 
 @param navigationController (UINavigationController *) your current navigation controller
 */
-- (void)openCreateCaseFormWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController;
+- (void)presentTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController;
 
 /**
-Called to obtain create case form view controller object
+Called to show TapTalk Live view with push animation
+
+@param navigationController (UINavigationController *) your current navigation controller
 */
-- (TTLCreateCaseViewController *)getCreateCaseFormViewController;
+- (void)pushTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController;
+
+/**
+Obtain main view controller of TapTalk Live
+*/
+- (TTLRoomListViewController *_Nonnull)getTapTalkLiveViewMainController;
 
 @end

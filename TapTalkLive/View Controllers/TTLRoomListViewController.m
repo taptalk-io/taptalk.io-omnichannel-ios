@@ -7,7 +7,7 @@
 //
 
 #import "TTLRoomListViewController.h"
-#import "TapTalkLive.h"
+#import "TTLCreateCaseViewController.h"
 
 @interface TTLRoomListViewController ()
 
@@ -44,7 +44,31 @@
 }
 
 #pragma mark - Custom Method
-- (void)presentCreateCaseFormViewIfNeeded {
-    [[TapTalkLive sharedInstance] openCreateCaseFormWithCurrentNavigationController:self.navigationController];
+- (void)openCreateCaseFormViewIfNeeded {
+    BOOL isContainCaseList = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST valid:nil];
+    NSString *currentAccessToken = [TTLDataManager getAccessToken];
+    currentAccessToken = [TTLUtil nullToEmptyString:currentAccessToken];
+    
+    if ([currentAccessToken isEqualToString:@""]) {
+        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.3f];
+    }
+    else if (![currentAccessToken isEqualToString:@""] && !isContainCaseList) {
+        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.3f];
+    }
 }
+
+- (void)showCreateCaseFormView {
+    
+    [self hideSetupView];
+    
+    TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
+    createCaseViewController.previousNavigationController = self.navigationController;
+    [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeDefault];
+    createCaseViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    UINavigationController *createCaseNavigationController = [[UINavigationController alloc] initWithRootViewController:createCaseViewController];
+    createCaseNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [createCaseNavigationController setNavigationBarHidden:YES animated:YES];
+    [self.navigationController presentViewController:createCaseNavigationController animated:YES completion:nil];
+}
+
 @end

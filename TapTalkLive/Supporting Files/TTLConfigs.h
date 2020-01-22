@@ -9,6 +9,7 @@
 #define TTL_PREFS_REFRESH_TOKEN @"Prefs.TapTalkLiveRefreshToken"
 #define TTL_PREFS_REFRESH_TOKEN_EXPIRED_TIME @"Prefs.TapTalkLiveRefreshTokenExpiredTime"
 #define TTL_PREFS_ACCESS_TOKEN_EXPIRED_TIME @"Prefs.TapTalkLiveAccessTokenExpiredTime"
+#define TTL_PREFS_IS_CONTAIN_CASE_LIST @"Prefs.TapTalkLiveIsContainCaseList"
 
 #define TTL_PREFS_TAPTALK_API_URL @"Prefs.TapTalkLiveTapTalkApiUrl"
 #define TTL_PREFS_TAPTALK_APP_KEY_ID @"Prefs.TapTalkLiveTapTalkAppKeyId"

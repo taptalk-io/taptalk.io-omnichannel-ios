@@ -259,25 +259,20 @@
                 [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                     //Call API create case
                     [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
-                        
-                        TapUIRoomListViewController *tapTalkRoomListViewController = [[TapUI sharedInstance] roomListViewController];
-                        if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
-                            [self.navigationController dismissViewControllerAnimated:YES completion:^{
-                                [self.previousNavigationController pushViewController:tapTalkRoomListViewController animated:YES];
-                            }];
-                        }
-                        else {
-                            [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
-                                [self.createCaseView showCreateCaseButtonAsLoading:NO];
-                                [self.navigationController pushViewController:tapTalkRoomListViewController animated:NO];
+                        [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
+                            [self.createCaseView showCreateCaseButtonAsLoading:NO];
+                            
+                            TapUIRoomListViewController *tapTalkRoomListViewController = [[TapTalkLive sharedInstance] roomListViewController];
+                            [tapTalkRoomListViewController viewLoadedSequence];
+                            [self.navigationController dismissViewControllerAnimated:NO completion:^{
                                 [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
-                                    [self.navigationController pushViewController:chatViewController animated:YES];
+                                    [self.previousNavigationController pushViewController:chatViewController animated:YES];
                                 }];
-                            } failure:^(NSError * _Nonnull error) {
-                                //Error get chat room from TapTalk
-                                [self.createCaseView showCreateCaseButtonAsLoading:NO];
                             }];
-                        }
+                        } failure:^(NSError * _Nonnull error) {
+                            //Error get chat room from TapTalk
+                            [self.createCaseView showCreateCaseButtonAsLoading:NO];
+                        }];
                     } failure:^(NSError * _Nonnull error) {
                         //Error create case
                         [self.createCaseView showCreateCaseButtonAsLoading:NO];
@@ -306,16 +301,20 @@
     if (isTapTalkAuthenticate) {
         //Call API create case
         [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
-            [self.createCaseView showCreateCaseButtonAsLoading:NO];
-            TapUIRoomListViewController *tapTalkRoomListViewController = [[TapUI sharedInstance] roomListViewController];
-            if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
-                [self.navigationController dismissViewControllerAnimated:YES completion:^{
-                    [self.previousNavigationController pushViewController:tapTalkRoomListViewController animated:YES];
+            [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
+                [self.createCaseView showCreateCaseButtonAsLoading:NO];
+                
+                TapUIRoomListViewController *tapTalkRoomListViewController = [[TapTalkLive sharedInstance] roomListViewController];
+                [tapTalkRoomListViewController viewLoadedSequence];
+                [self.navigationController dismissViewControllerAnimated:NO completion:^{
+                    [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                        [self.previousNavigationController pushViewController:chatViewController animated:YES];
+                    }];
                 }];
-            }
-            else {
-                [self.navigationController pushViewController:tapTalkRoomListViewController animated:YES];
-            }
+            } failure:^(NSError * _Nonnull error) {
+                //Error get chat room from TapTalk
+                [self.createCaseView showCreateCaseButtonAsLoading:NO];
+            }];
         } failure:^(NSError * _Nonnull error) {
             //Error create case
             [self.createCaseView showCreateCaseButtonAsLoading:NO];

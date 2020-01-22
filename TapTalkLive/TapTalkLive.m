@@ -13,6 +13,9 @@
 
 @interface TapTalkLive () <TapUIRoomListDelegate, TapUICustomKeyboardDelegate>
 
+@property (strong, nonatomic) TTLRoomListViewController *roomListViewController;
+@property (nonatomic) BOOL isDoneTapTalkInitialization;
+
 - (void)loadCustomFontData;
 
 @end
@@ -46,6 +49,9 @@
 #endif
         //END DV Temp
         
+        //Init TTLRoomListViewController
+        _roomListViewController = [[TTLRoomListViewController alloc] init];
+                
         //Call API project configs
         [TTLDataManager callAPIGetTapTalkLiveProjectConfigsSuccess:^(NSDictionary * _Nonnull tapTalkConfigsDictionary) {
             //Obtain TapTalk.io Chat SDK credential configs
@@ -59,8 +65,31 @@
             //Init TapTalk.io Chat SDK
             [[TapTalk sharedInstance] initWithAppKeyID:tapTalkAppKeyIDString appKeySecret:tapTalkAppKeySecretString apiURLString:tapTalkAPIURLString implementationType:TapTalkImplentationTypeCombine];
             
+            _isDoneTapTalkInitialization = YES;
+            
+            //Try to connect to TapTalk.io
+            [[TapTalk sharedInstance] connectWithSuccess:^{
+                
+            } failure:^(NSError * _Nonnull error) {
+                
+            }];
+            
         } failure:^(NSError * _Nonnull error) {
             //Failed get project configs
+        }];
+        
+        //Call API get case list
+        [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
+            BOOL isContainCaseList = NO;
+            if ([caseListArray count] > 0) {
+                isContainCaseList = YES;
+            }
+            
+            [[NSUserDefaults standardUserDefaults] setSecureBool:isContainCaseList forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
+        } failure:^(NSError * _Nonnull error) {
+            //Failed get case list
         }];
         
         //Set delegate for Room List TapTalk
@@ -71,6 +100,11 @@
     return self;
 }
 
+#pragma mark - Property
+- (TTLRoomListViewController *)roomListViewController {
+    return _roomListViewController;
+}
+
 #pragma mark - AppDelegate Handling
 - (void)application:(UIApplication *_Nonnull)application didFinishLaunchingWithOptions:(NSDictionary *_Nonnull)launchOptions {
     // Override point for customization after application launch.
@@ -79,8 +113,14 @@
     //Load custom font data
     [self loadCustomFontData];
     
+    //Disable auto connect TapTalk because needs to wait Base URL called from init TapLive using API
+    [[TapTalk sharedInstance] setAutoConnectEnabled:NO];
+    
     //Hide profile button in TapTalk Chat in chat room view
     [[TapUI sharedInstance] setProfileButtonInChatRoomVisible:NO];
+    
+    //Initialize Google Places API Key
+    [[TapTalk sharedInstance] initializeGooglePlacesAPIKey:@"AIzaSyD0NlVEN0mdU9mLp05ZnTc_EEATMzFzvuc"];
 }
 
 - (void)applicationWillResignActive:(UIApplication *_Nonnull)application {
@@ -103,6 +143,15 @@
 - (void)applicationDidBecomeActive:(UIApplication *_Nonnull)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [[TapTalk sharedInstance] applicationDidBecomeActive:application];
+    
+    //Check to connect to socket
+    if (self.isDoneTapTalkInitialization) {
+        [[TapTalk sharedInstance] connectWithSuccess:^{
+            
+        } failure:^(NSError * _Nonnull error) {
+            
+        }];
+    }
 }
 
 - (void)applicationWillTerminate:(UIApplication *_Nonnull)application {
@@ -123,27 +172,43 @@
     [[TapTalk sharedInstance] handleException:exception];
 }
 
-#pragma mark - Create Case View
+#pragma mark - TapTalk Live View
 /**
-Called to show case form view from your application.
+Called to show TapTalk Live view with present animation
 
 @param navigationController (UINavigationController *) your current navigation controller
 */
-- (void)openCreateCaseFormWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController {
-    TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
-    createCaseViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    UINavigationController *createCaseNavigationController = [[UINavigationController alloc] initWithRootViewController:createCaseViewController];
-    createCaseNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [createCaseNavigationController setNavigationBarHidden:YES animated:YES];
-    [navigationController presentViewController:createCaseNavigationController animated:YES completion:nil];
+- (void)presentTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController {
+    TTLRoomListViewController *roomListViewController = [[TTLRoomListViewController alloc] init];
+    [roomListViewController openCreateCaseFormViewIfNeeded];
+    roomListViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    UINavigationController *roomListNavigationController = [[UINavigationController alloc] initWithRootViewController:roomListViewController];
+    roomListNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [navigationController presentViewController:roomListNavigationController animated:YES completion:nil];
 }
 
 /**
-Called to obtain create case form view controller object
+Called to show TapTalk Live view with push animation
+
+@param navigationController (UINavigationController *) your current navigation controller
 */
-- (TTLCreateCaseViewController *)getCreateCaseFormViewController {
-    TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
-    return createCaseViewController;
+- (void)pushTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController {
+    TTLRoomListViewController *roomListViewController = [TapTalkLive sharedInstance].roomListViewController;
+    [roomListViewController openCreateCaseFormViewIfNeeded];
+    roomListViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    UINavigationController *roomListNavigationController = [[UINavigationController alloc] initWithRootViewController:roomListViewController];
+    roomListNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [navigationController pushViewController:roomListNavigationController animated:YES];
+}
+
+/**
+Obtain main view controller of TapTalk Live
+*/
+- (TTLRoomListViewController *_Nonnull)getTapTalkLiveViewMainController {
+    TTLRoomListViewController *roomListViewController = [TapTalkLive sharedInstance].roomListViewController;
+    [roomListViewController openCreateCaseFormViewIfNeeded];
+    roomListViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    return roomListViewController;
 }
 
 #pragma mark - TapTalk Delegate
@@ -151,6 +216,7 @@ Called to obtain create case form view controller object
 - (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController {
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
+    createCaseViewController.previousNavigationController = currentNavigationController;
     [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeWithCloseButton];
     createCaseViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     UINavigationController *createCaseNavigationController = [[UINavigationController alloc] initWithRootViewController:createCaseViewController];

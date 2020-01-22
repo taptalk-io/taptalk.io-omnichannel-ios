@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TTLRoomListViewController : TapUIRoomListViewController
 
+- (void)openCreateCaseFormViewIfNeeded;
+
 @end
 
 NS_ASSUME_NONNULL_END

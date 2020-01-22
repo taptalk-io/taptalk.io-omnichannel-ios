@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, TTLAPIManagerType) {
     TTLAPIManagerTypeGetUserProfile,
     TTLAPIManagerTypeCreateCase,
     TTLAPIManagerTypeCloseCase,
+    TTLAPIManagerTypeGetCaseList,
     TTLAPIManagerTypeGetCaseDetails,
     TTLAPIManagerTypeRateConversation,
 };
