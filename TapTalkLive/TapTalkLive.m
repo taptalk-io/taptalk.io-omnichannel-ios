@@ -11,7 +11,7 @@
 #import <TapTalk/TapTalk.h>
 #import <TapTalk/TapUI.h>
 
-@interface TapTalkLive () <TapUIRoomListDelegate, TapUICustomKeyboardDelegate>
+@interface TapTalkLive () <TapUIRoomListDelegate, TapUICustomKeyboardDelegate, TapUIChatRoomDelegate>
 
 @property (strong, nonatomic) TTLRoomListViewController *roomListViewController;
 @property (nonatomic) BOOL isDoneTapTalkInitialization;
@@ -48,6 +48,9 @@
         [[TTLNetworkManager sharedManager] setSecretKey:@"8916d032524deb06e6d1b6ed5e6839abe08553c9bc117ce0e156a04ad946a882"];
 #endif
         //END DV Temp
+        
+        //Hide setup loading view flow in room list
+        [[TapUI sharedInstance] hideSetupLoadingFlowInSetupRoomListView:YES];
         
         //Init TTLRoomListViewController
         _roomListViewController = [[TTLRoomListViewController alloc] init];
@@ -91,10 +94,6 @@
         } failure:^(NSError * _Nonnull error) {
             //Failed get case list
         }];
-        
-        //Set delegate for Room List TapTalk
-        [[TapUI sharedInstance] setRoomListDelegate:self];
-        [[TapUI sharedInstance] setCustomKeyboardDelegate:self];
     }
     
     return self;
@@ -119,8 +118,20 @@
     //Hide profile button in TapTalk Chat in chat room view
     [[TapUI sharedInstance] setProfileButtonInChatRoomVisible:NO];
     
+    //Hide my account in TapTalk Chat in chat room view
+    [[TapUI sharedInstance] setMyAccountButtonInRoomListVisible:NO];
+    
     //Initialize Google Places API Key
     [[TapTalk sharedInstance] initializeGooglePlacesAPIKey:@"AIzaSyD0NlVEN0mdU9mLp05ZnTc_EEATMzFzvuc"];
+    
+    //Add custom bubble cell
+    [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];    
+    [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLReviewBubbleTableViewCell" type:3003 delegate:self bundle:[TTLUtil currentBundle]];
+    
+    //Set delegate for Room List TapTalk
+    [[TapUI sharedInstance] setRoomListDelegate:self];
+    [[TapUI sharedInstance] setCustomKeyboardDelegate:self];
+    [[TapUI sharedInstance] setChatRoomDelegate:self];
 }
 
 - (void)applicationWillResignActive:(UIApplication *_Nonnull)application {
@@ -178,13 +189,15 @@ Called to show TapTalk Live view with present animation
 
 @param navigationController (UINavigationController *) your current navigation controller
 */
-- (void)presentTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController {
-    TTLRoomListViewController *roomListViewController = [[TTLRoomListViewController alloc] init];
-    [roomListViewController openCreateCaseFormViewIfNeeded];
+- (void)presentTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
+    TTLRoomListViewController *roomListViewController = [[TapTalkLive sharedInstance] roomListViewController];
     roomListViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [roomListViewController openCreateCaseFormViewIfNeeded];
+    
     UINavigationController *roomListNavigationController = [[UINavigationController alloc] initWithRootViewController:roomListViewController];
     roomListNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [navigationController presentViewController:roomListNavigationController animated:YES completion:nil];
+    [navigationController presentViewController:roomListNavigationController animated:animated completion:^{
+    }];
 }
 
 /**
@@ -192,13 +205,14 @@ Called to show TapTalk Live view with push animation
 
 @param navigationController (UINavigationController *) your current navigation controller
 */
-- (void)pushTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController {
+- (void)pushTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
     TTLRoomListViewController *roomListViewController = [TapTalkLive sharedInstance].roomListViewController;
-    [roomListViewController openCreateCaseFormViewIfNeeded];
     roomListViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [roomListViewController openCreateCaseFormViewIfNeeded];
+
     UINavigationController *roomListNavigationController = [[UINavigationController alloc] initWithRootViewController:roomListViewController];
     roomListNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [navigationController pushViewController:roomListNavigationController animated:YES];
+    [navigationController pushViewController:roomListNavigationController animated:animated];
 }
 
 /**
@@ -206,12 +220,19 @@ Obtain main view controller of TapTalk Live
 */
 - (TTLRoomListViewController *_Nonnull)getTapTalkLiveViewMainController {
     TTLRoomListViewController *roomListViewController = [TapTalkLive sharedInstance].roomListViewController;
-    [roomListViewController openCreateCaseFormViewIfNeeded];
     roomListViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [roomListViewController openCreateCaseFormViewIfNeeded];
     return roomListViewController;
 }
 
 #pragma mark - TapTalk Delegate
+#pragma mark TapUIChatRoom
+- (void)tapTalkGroupMemberAvatarTappedWithRoom:(TAPRoomModel *)room
+                            user:(TAPUserModel *)user
+              currentShownNavigationController:(UINavigationController *)currentNavigationController {
+    
+}
+
 #pragma mark TapUIRoomList
 - (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController {
@@ -239,7 +260,24 @@ Obtain main view controller of TapTalk Live
                                recipient:(TAPUserModel * _Nullable)recipient
                             keyboardItem:(TAPCustomKeyboardItemModel * _Nonnull)keyboardItem {
   //Do an action when user taps a custom keyboard item
-    
+    if ([keyboardItem.itemID isEqualToString:@"1"]) {
+        //Mark as solved - close case
+        NSString *formattedCaseID = room.xcRoomID;
+        formattedCaseID = [TTLUtil nullToEmptyString:formattedCaseID];
+        
+        NSString *caseID = [formattedCaseID stringByReplacingOccurrencesOfString:@"case:" withString:@""];
+        caseID = [TTLUtil nullToEmptyString:caseID];
+        
+#ifdef DEBUG
+        NSLog(@"Close Case - Case ID: %@", caseID);
+#endif
+        
+        [TTLDataManager callAPICloseCaseWithCaseID:caseID success:^(BOOL isSuccess) {
+
+        } failure:^(NSError * _Nonnull error) {
+
+        }];
+    }
 }
 
 #pragma mark - Custom Method

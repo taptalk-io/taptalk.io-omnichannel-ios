@@ -183,6 +183,7 @@ typedef NS_ENUM(NSInteger, TTLComponentColor) {
     TTLComponentColorIconFileCancelUploadDownload, //Chat Room Page
     TTLComponentColorIconFileRetryUploadDownload, //Chat Room Page
     TTLComponentColorIconFilePlayMedia, //Chat Room Page
+    TTLComponentColorIconReviewBubbleCellDoneReviewCheck, //Review Bubble Cell
 };
 
 typedef NS_ENUM(NSInteger, TTLTextColor) {
@@ -310,6 +311,7 @@ typedef NS_ENUM(NSInteger, TTLTextColor) {
     TTLTextColorTopicListLabel,
     TTLTextColorTopicListLabelSelected,
     TTLTextColorRatingBodyLabel,
+    TTLTextColorReviewBubbleDoneReviewButtonTitleLabel
 };
 
 typedef NS_ENUM(NSInteger, TTLComponentFont) {

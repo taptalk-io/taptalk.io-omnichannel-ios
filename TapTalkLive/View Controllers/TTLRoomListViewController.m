@@ -50,10 +50,10 @@
     currentAccessToken = [TTLUtil nullToEmptyString:currentAccessToken];
     
     if ([currentAccessToken isEqualToString:@""]) {
-        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.3f];
+        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
     }
     else if (![currentAccessToken isEqualToString:@""] && !isContainCaseList) {
-        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.3f];
+        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
     }
 }
 

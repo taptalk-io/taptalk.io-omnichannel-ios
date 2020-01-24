@@ -221,7 +221,7 @@
     }
 }
 
-- (void)showCreateCaseButtonAsLoading:(BOOL)loading {
+- (void)showCreateCaseButtonAsLoading:(BOOL)loading {    
     [self.createCaseButtonView setAsLoading:loading animated:YES];
 }
 

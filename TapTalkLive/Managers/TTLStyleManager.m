@@ -1811,6 +1811,12 @@
             return color;
             break;
         }
+        case TTLTextColorReviewBubbleDoneReviewButtonTitleLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextMedium];
+            return color;
+            break;
+        }
+            
         default: {
             //Set default color to black to prevent crash
             UIColor *color = [TTLUtil getColor:@"9B9B9B"];
@@ -2723,6 +2729,12 @@
         case TTLComponentColorIconLocationPickerAddressInactive:
         {
             UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextMedium];
+            return color;
+            break;
+        }
+        case TTLComponentColorIconReviewBubbleCellDoneReviewCheck:
+        {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconGray];
             return color;
             break;
         }

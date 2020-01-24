@@ -51,9 +51,9 @@ NS_ASSUME_NONNULL_BEGIN
                              message:(NSString *)message
                              success:(void (^)(TTLCaseModel *caseData))success
                              failure:(void (^)(NSError *error))failure;
-+ (void)callAPICloseCaseWithTopicID:(NSString *)topicID
-                            success:(void (^)(BOOL isSuccess))success
-                            failure:(void (^)(NSError *error))failure;
++ (void)callAPICloseCaseWithCaseID:(NSString *)caseID
+                           success:(void (^)(BOOL isSuccess))success
+                           failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetCaseDetailWithCaseID:(NSString *)caseID
                                success:(void (^)(TTLCaseModel *caseData))success
                                failure:(void (^)(NSError *error))failure;

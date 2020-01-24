@@ -1321,14 +1321,14 @@
     }];
 }
 
-+ (void)callAPICloseCaseWithTopicID:(NSString *)topicID
-                            success:(void (^)(BOOL isSuccess))success
-                            failure:(void (^)(NSError *error))failure {
++ (void)callAPICloseCaseWithCaseID:(NSString *)caseID
+                           success:(void (^)(BOOL isSuccess))success
+                           failure:(void (^)(NSError *error))failure {
     NSString *requestURL = [[TTLAPIManager sharedManager] urlForType:TTLAPIManagerTypeCloseCase];
     
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
-    NSInteger topicIDInteger = [topicID integerValue];
-    [parameterDictionary setObject:[NSNumber numberWithInteger:topicIDInteger] forKey:@"id"];
+    NSInteger caseIDInteger = [caseID integerValue];
+    [parameterDictionary setObject:[NSNumber numberWithInteger:caseIDInteger] forKey:@"id"];
     
     [[TTLNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -1345,7 +1345,7 @@
             if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
-                    [TTLDataManager callAPICloseCaseWithTopicID:topicID success:success failure:failure];
+                    [TTLDataManager callAPICloseCaseWithCaseID:caseID success:success failure:failure];
                 } failure:^(NSError *error) {
                     failure(error);
                 }];

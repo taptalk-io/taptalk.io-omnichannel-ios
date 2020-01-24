@@ -249,6 +249,7 @@
 }
 
 - (void)handleSubmitCaseFormFlow {
+    self.createCaseView.closeButton.userInteractionEnabled = NO;
     [self.createCaseView showCreateCaseButtonAsLoading:YES];
     [TTLDataManager callAPICreateUserWithFullName:self.obtainedFullNameString email:self.obtainedEmailString success:^(TTLUserModel * _Nonnull user, NSString * _Nonnull ticket) {
         //Get TapTalkLive access token
@@ -260,10 +261,12 @@
                     //Call API create case
                     [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
                         [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
+                            if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                                self.createCaseView.closeButton.userInteractionEnabled = YES;
+                            }
                             [self.createCaseView showCreateCaseButtonAsLoading:NO];
-                            
-                            TapUIRoomListViewController *tapTalkRoomListViewController = [[TapTalkLive sharedInstance] roomListViewController];
-                            [tapTalkRoomListViewController viewLoadedSequence];
+                            [[TapTalkLive sharedInstance] roomListViewController].isShouldNotLoadFromAPI = NO;
+                            [[[TapTalkLive sharedInstance] roomListViewController] viewLoadedSequence];
                             [self.navigationController dismissViewControllerAnimated:NO completion:^{
                                 [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
                                     [self.previousNavigationController pushViewController:chatViewController animated:YES];
@@ -271,41 +274,62 @@
                             }];
                         } failure:^(NSError * _Nonnull error) {
                             //Error get chat room from TapTalk
+                            if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                                self.createCaseView.closeButton.userInteractionEnabled = YES;
+                            }
                             [self.createCaseView showCreateCaseButtonAsLoading:NO];
                         }];
                     } failure:^(NSError * _Nonnull error) {
                         //Error create case
+                        if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                            self.createCaseView.closeButton.userInteractionEnabled = YES;
+                        }
                         [self.createCaseView showCreateCaseButtonAsLoading:NO];
                     }];
                 } failure:^(NSError * _Nonnull error) {
                     //Error authenticate TapTalk.io Chat SDK
+                    if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                        self.createCaseView.closeButton.userInteractionEnabled = YES;
+                    }
                     [self.createCaseView showCreateCaseButtonAsLoading:NO];
                 }];
             } failure:^(NSError * _Nonnull error) {
                 //Error get TapTalk auth ticket
+                if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                    self.createCaseView.closeButton.userInteractionEnabled = YES;
+                }
                 [self.createCaseView showCreateCaseButtonAsLoading:NO];
             }];
         } failure:^(NSError * _Nonnull error) {
             //Error get access token
+            if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                self.createCaseView.closeButton.userInteractionEnabled = YES;
+            }
             [self.createCaseView showCreateCaseButtonAsLoading:NO];
         }];
     } failure:^(NSError * _Nonnull error) {
         //Error create user
+        if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+            self.createCaseView.closeButton.userInteractionEnabled = YES;
+        }
         [self.createCaseView showCreateCaseButtonAsLoading:NO];
     }];
 }
 
 - (void)handleSubmitCaseFormFlowAfterLogin {
+    self.createCaseView.closeButton.userInteractionEnabled = NO;
     [self.createCaseView showCreateCaseButtonAsLoading:YES];
     BOOL isTapTalkAuthenticate = [TapTalk sharedInstance].isAuthenticated;
     if (isTapTalkAuthenticate) {
         //Call API create case
         [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
             [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
+                if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                    self.createCaseView.closeButton.userInteractionEnabled = YES;
+                }
                 [self.createCaseView showCreateCaseButtonAsLoading:NO];
-                
-                TapUIRoomListViewController *tapTalkRoomListViewController = [[TapTalkLive sharedInstance] roomListViewController];
-                [tapTalkRoomListViewController viewLoadedSequence];
+                [[TapTalkLive sharedInstance] roomListViewController].isShouldNotLoadFromAPI = NO;
+                [[[TapTalkLive sharedInstance] roomListViewController] viewLoadedSequence];
                 [self.navigationController dismissViewControllerAnimated:NO completion:^{
                     [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
                         [self.previousNavigationController pushViewController:chatViewController animated:YES];
@@ -313,10 +337,16 @@
                 }];
             } failure:^(NSError * _Nonnull error) {
                 //Error get chat room from TapTalk
+                if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                    self.createCaseView.closeButton.userInteractionEnabled = YES;
+                }
                 [self.createCaseView showCreateCaseButtonAsLoading:NO];
             }];
         } failure:^(NSError * _Nonnull error) {
             //Error create case
+            if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                self.createCaseView.closeButton.userInteractionEnabled = YES;
+            }
             [self.createCaseView showCreateCaseButtonAsLoading:NO];
         }];
     }
@@ -327,6 +357,9 @@
             [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                 //Call API create case
                 [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
+                    if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                        self.createCaseView.closeButton.userInteractionEnabled = YES;
+                    }
                     [self.createCaseView showCreateCaseButtonAsLoading:NO];
                     TapUIRoomListViewController *tapTalkRoomListViewController = [[TapUI sharedInstance] roomListViewController];
                     if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
@@ -339,14 +372,23 @@
                     }
                 } failure:^(NSError * _Nonnull error) {
                     //Error create case
+                    if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                        self.createCaseView.closeButton.userInteractionEnabled = YES;
+                    }
                     [self.createCaseView showCreateCaseButtonAsLoading:NO];
                 }];
             } failure:^(NSError * _Nonnull error) {
                 //Error authenticate TapTalk.io Chat SDK
+                if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                    self.createCaseView.closeButton.userInteractionEnabled = YES;
+                }
                 [self.createCaseView showCreateCaseButtonAsLoading:NO];
             }];
         } failure:^(NSError * _Nonnull error) {
             //Error get TapTalk auth ticket
+            if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeWithCloseButton) {
+                self.createCaseView.closeButton.userInteractionEnabled = YES;
+            }
             [self.createCaseView showCreateCaseButtonAsLoading:NO];
         }];
     }

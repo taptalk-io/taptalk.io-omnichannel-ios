@@ -1,6 +1,6 @@
 //
 //  TapUI.h
-//  
+//
 //
 //  Created by Dominic Vedericho on 24/07/19.
 //
@@ -223,6 +223,14 @@ Show or hide right bar button item view in the top of Room List view (New Chat B
 - (void)setNewChatButtonInRoomListVisible:(BOOL)isVisible;
 
 /**
+Show or hide setup loading view flow of Room List view
+The default is false (showing), set the boolean to TRUE when you don't want to show setup loading view
+
+ @param hide (BOOL) boolean to indicating show or not
+*/
+- (void)hideSetupLoadingFlowInSetupRoomListView:(BOOL)hide;
+
+/**
 Get current visibility state of search bar view in the top of Room List view
 */
 - (BOOL)getSearchBarInRoomListVisibleState;
@@ -236,6 +244,11 @@ Get current visibility state of left bar button item view in the top of Room Lis
 Get current visibility state of right bar button item view in the top of Room List view (New Chat Button)
 */
 - (BOOL)getNewChatButtonInRoomListVisibleState;
+
+/**
+Get current visibility state of setup loading view flow in Room List vie
+*/
+- (BOOL)getSetupLoadingFlowHiddenState;
 
 //==========================================================
 //                      New Chat View
