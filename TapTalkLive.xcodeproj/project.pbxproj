@@ -53,15 +53,15 @@
 		D74C324623D305C500626C9D /* TTLRatingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C324423D305C500626C9D /* TTLRatingViewController.m */; };
 		D74C324A23D3066F00626C9D /* TTLBaseModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C324823D3066F00626C9D /* TTLBaseModel.h */; };
 		D74C324B23D3066F00626C9D /* TTLBaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C324923D3066F00626C9D /* TTLBaseModel.m */; };
-		D754A61023DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D754A60D23DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.h */; };
-		D754A61123DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D754A60E23DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.m */; };
-		D754A61223DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D754A60F23DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.xib */; };
 		D76D884B23C71B37009F87B8 /* TTLCreateCaseViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D76D884923C71B37009F87B8 /* TTLCreateCaseViewController.h */; };
 		D76D884C23C71B37009F87B8 /* TTLCreateCaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D76D884A23C71B37009F87B8 /* TTLCreateCaseViewController.m */; };
 		D785CF0023D171C200651638 /* TTLFormGrowingTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = D785CEFE23D171C200651638 /* TTLFormGrowingTextView.h */; };
 		D785CF0123D171C200651638 /* TTLFormGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D785CEFF23D171C200651638 /* TTLFormGrowingTextView.m */; };
 		D79A7DA523D4C8CC00862E57 /* TTLTopicModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D79A7DA323D4C8CC00862E57 /* TTLTopicModel.h */; };
 		D79A7DA623D4C8CC00862E57 /* TTLTopicModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D79A7DA423D4C8CC00862E57 /* TTLTopicModel.m */; };
+		D79EDBA323DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */; };
+		D79EDBA423DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */; };
+		D79EDBA523DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */; };
 		D7A4EB5923A0A6F700011755 /* TapTalkLive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7A4EB4F23A0A6F600011755 /* TapTalkLive.framework */; };
 		D7A4EB5E23A0A6F700011755 /* TapTalkLiveTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A4EB5D23A0A6F700011755 /* TapTalkLiveTests.m */; };
 		D7A96BBA23B9C8D600654C71 /* TTLBaseView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7A96BB823B9C8D600654C71 /* TTLBaseView.h */; };
@@ -145,15 +145,15 @@
 		D74C324423D305C500626C9D /* TTLRatingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLRatingViewController.m; sourceTree = "<group>"; };
 		D74C324823D3066F00626C9D /* TTLBaseModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLBaseModel.h; sourceTree = "<group>"; };
 		D74C324923D3066F00626C9D /* TTLBaseModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLBaseModel.m; sourceTree = "<group>"; };
-		D754A60D23DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLCaseCloseBubbleTableViewCell.h; sourceTree = "<group>"; };
-		D754A60E23DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLCaseCloseBubbleTableViewCell.m; sourceTree = "<group>"; };
-		D754A60F23DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLCaseCloseBubbleTableViewCell.xib; sourceTree = "<group>"; };
 		D76D884923C71B37009F87B8 /* TTLCreateCaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLCreateCaseViewController.h; sourceTree = "<group>"; };
 		D76D884A23C71B37009F87B8 /* TTLCreateCaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLCreateCaseViewController.m; sourceTree = "<group>"; };
 		D785CEFE23D171C200651638 /* TTLFormGrowingTextView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLFormGrowingTextView.h; sourceTree = "<group>"; };
 		D785CEFF23D171C200651638 /* TTLFormGrowingTextView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLFormGrowingTextView.m; sourceTree = "<group>"; };
 		D79A7DA323D4C8CC00862E57 /* TTLTopicModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLTopicModel.h; sourceTree = "<group>"; };
 		D79A7DA423D4C8CC00862E57 /* TTLTopicModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLTopicModel.m; sourceTree = "<group>"; };
+		D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLCaseCloseBubbleTableViewCell.h; sourceTree = "<group>"; };
+		D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLCaseCloseBubbleTableViewCell.xib; sourceTree = "<group>"; };
+		D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLCaseCloseBubbleTableViewCell.m; sourceTree = "<group>"; };
 		D7A4EB4F23A0A6F600011755 /* TapTalkLive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TapTalkLive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D7A4EB5323A0A6F600011755 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D7A4EB5823A0A6F700011755 /* TapTalkLiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TapTalkLiveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -236,9 +236,9 @@
 				D7C55F5F23D9A33E008B4CC3 /* TTLReviewBubbleTableViewCell.h */,
 				D7C55F6023D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.m */,
 				D7C55F6123D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib */,
-				D754A60D23DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.h */,
-				D754A60E23DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.m */,
-				D754A60F23DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.xib */,
+				D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */,
+				D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */,
+				D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */,
 			);
 			path = UITableViewCells;
 			sourceTree = "<group>";
@@ -437,7 +437,7 @@
 				D7C55F6223D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.h in Headers */,
 				D7485FA623D1B2C0001770FA /* TTLDataManager.h in Headers */,
 				D7E4911423D368C60021F13D /* TTLPopUpInfoView.h in Headers */,
-				D754A61023DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.h in Headers */,
+				D79EDBA323DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.h in Headers */,
 				D7054C7D23A0B14100B20950 /* TTLConfigs.h in Headers */,
 				D74C324123D305B400626C9D /* TTLRatingView.h in Headers */,
 				D747615C23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h in Headers */,
@@ -540,7 +540,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D7C55F6423D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib in Resources */,
-				D754A61223DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.xib in Resources */,
+				D79EDBA423DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -613,7 +613,7 @@
 				D79A7DA623D4C8CC00862E57 /* TTLTopicModel.m in Sources */,
 				D7485FA723D1B2C0001770FA /* TTLDataManager.m in Sources */,
 				D7A96BCC23B9C96A00654C71 /* TTLBaseViewController.m in Sources */,
-				D754A61123DADEBF00921E45 /* TTLCaseCloseBubbleTableViewCell.m in Sources */,
+				D79EDBA523DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m in Sources */,
 				D74C322A23D2CE1C00626C9D /* TTLImage.m in Sources */,
 				D74C324B23D3066F00626C9D /* TTLBaseModel.m in Sources */,
 				D76D884C23C71B37009F87B8 /* TTLCreateCaseViewController.m in Sources */,
