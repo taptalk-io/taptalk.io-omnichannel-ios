@@ -1,6 +1,6 @@
 //
 //  TapUI.h
-//
+//  
 //
 //  Created by Dominic Vedericho on 24/07/19.
 //
@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Called when user click the profile button on the top right side of personal chat room page.
  
- @param viewController (UIViewController *) current shown view controller
+ @param currentViewController (UIViewController *) current shown view controller
  @param otherUser (TapUserModel *) user data that will be shown
  @param room (TAPRoomModel *) room data that will be shown
  @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Called when user click the profile button on the top right side of group chat room page.
  
- @param viewController (UIViewController *) current shown view controller
+ @param currentViewController (UIViewController *) current shown view controller
  @param room (TAPRoomModel *) room data that will be shown
  @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
  */
@@ -180,8 +180,10 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 /**
  Add new custom bubble class
  */
-- (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate bundle:(NSBundle *)bundle;
-
+- (void)addCustomBubbleWithClassName:(NSString *)className
+                                type:(NSInteger)type
+                            delegate:(id)delegate
+                              bundle:(NSBundle *)bundle;
 
 //==========================================================
 //                      My Account View
