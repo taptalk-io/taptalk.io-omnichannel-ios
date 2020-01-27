@@ -36,7 +36,7 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *reviewButtonViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *reviewButtonViewTopConstraint;
-@property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleViewLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleViewTrailingConstraint;
 
 - (IBAction)reviewButtonDidTapped:(id)sender;
@@ -130,7 +130,13 @@
         
         self.reviewButtonViewHeightConstraint.constant = 0.0f;
         self.reviewButtonViewTopConstraint.constant = 0.0f;
+        self.senderNameHeightConstraint.constant = 0.0f;
+        self.senderNameTopConstraint.constant = 0.0f;
         
+        self.senderImageViewLeadingConstraint.active = NO;
+        self.senderImageViewLeadingConstraint.constant = 0.0f;
+        self.bubbleViewTrailingConstraint.active = YES;
+        self.bubbleViewTrailingConstraint.constant = 16.0f;
     }
     else {
         //Message is from other user
@@ -147,6 +153,13 @@
         
         self.reviewButtonViewHeightConstraint.constant = 48.0f;
         self.reviewButtonViewTopConstraint.constant = 10.0f;
+        self.senderNameHeightConstraint.constant = 18.0f;
+        self.senderNameTopConstraint.constant = 10.0f;
+        
+        self.senderImageViewLeadingConstraint.constant = 16.0f;
+        self.senderImageViewLeadingConstraint.active = YES;
+        self.bubbleViewTrailingConstraint.active = NO;
+        self.bubbleViewTrailingConstraint.constant = 0.0f;
     }
 }
 
