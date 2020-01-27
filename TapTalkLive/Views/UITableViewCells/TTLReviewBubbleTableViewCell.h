@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, TTLReviewBubbleType) {
 
 @property (weak, nonatomic) id<TTLReviewBubbleTableViewCellDelegate> delegate;
 @property (nonatomic) TTLReviewBubbleType reviewBubbleType;
+@property (strong, nonatomic) TAPMessageModel *message;
 
 - (void)setReviewBubbleType:(TTLReviewBubbleType)reviewBubbleType;
 

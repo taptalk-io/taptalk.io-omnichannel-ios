@@ -180,7 +180,7 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 /**
  Add new custom bubble class
  */
-- (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate;
+- (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate bundle:(NSBundle *)bundle;
 
 
 //==========================================================

@@ -12,7 +12,7 @@
 @interface TTLReviewBubbleTableViewCell ()
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
-@property (strong, nonatomic) IBOutlet UILabel *textLabel;
+@property (strong, nonatomic) IBOutlet UILabel *titleLabel;
 @property (strong, nonatomic) IBOutlet UIView *reviewButtonView;
 
 @property (strong, nonatomic) IBOutlet UIView *doneReviewView;
@@ -20,13 +20,28 @@
 @property (strong, nonatomic) IBOutlet UILabel *doneReviewLabel;
 @property (strong, nonatomic) IBOutlet UIView *notReviewView;
 @property (strong, nonatomic) IBOutlet UILabel *notReviewLabel;
-
 @property (strong, nonatomic) IBOutlet UIButton *reviewButton;
+@property (strong, nonatomic) IBOutlet TTLImageView *senderImageView;
+@property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
+@property (strong, nonatomic) IBOutlet UIView *senderInitialView;
+@property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
+@property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
+
+
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderProfileImageButtonWidthConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *reviewButtonViewHeightConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *reviewButtonViewTopConstraint;
 
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleViewLeadingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleViewTrailingConstraint;
+
 - (IBAction)reviewButtonDidTapped:(id)sender;
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender;
 
 @property (strong, nonatomic) TAPMessageModel *currentMessage;
 
@@ -37,7 +52,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
-    self.textLabel.text = NSLocalizedString(@"Do you mind leaving a review so that we can keep on improving our services 😊", @"");
+    self.titleLabel.text = NSLocalizedString(@"Do you mind leaving a review so that we can keep on improving our services 😊", @"");
     
     self.doneReviewView.clipsToBounds = YES;
     self.doneReviewView.layer.cornerRadius = 8.0f;
@@ -99,7 +114,7 @@
     NSString *activeUserID = currentActiveUser.userID;
     activeUserID = [TTLUtil nullToEmptyString:activeUserID];
     
-    NSString *messageUserID = message.user.userID;
+    NSString *messageUserID = message.user.xcUserID;
     messageUserID = [TTLUtil nullToEmptyString:messageUserID];
     
     if ([messageUserID isEqualToString:activeUserID]) {
@@ -108,15 +123,19 @@
         self.bubbleView.layer.cornerRadius = 8.0f;
         self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
         
-        self.bubbleView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorLeftBubbleBackground];
-        UIFont *bubbleLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontLeftBubbleMessageBody];
-        UIColor *bubbleLabelColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorLeftBubbleMessageBody];
-        self.textLabel.textColor = bubbleLabelColor;
-        self.textLabel.font = bubbleLabelFont;
+        self.bubbleView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorRightBubbleBackground];
+        UIFont *bubbleLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontRightBubbleMessageBody];
+        UIColor *bubbleLabelColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorRightBubbleMessageBody];
+        self.titleLabel.textColor = bubbleLabelColor;
+        self.titleLabel.font = bubbleLabelFont;
         
         self.reviewButtonViewHeightConstraint.constant = 0.0f;
         self.reviewButtonViewTopConstraint.constant = 0.0f;
         
+        self.bubbleViewLeadingConstraint.constant = 80.0f;
+        self.bubbleViewLeadingConstraint.active = YES;
+        self.bubbleViewTrailingConstraint.constant = 0.0f;
+        self.bubbleViewTrailingConstraint.active = NO;
     }
     else {
         //Message is from other user
@@ -124,15 +143,19 @@
         self.bubbleView.layer.cornerRadius = 8.0f;
         self.bubbleView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
         
-        self.bubbleView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorRightBubbleBackground];
-
-        UIFont *bubbleLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontRightBubbleMessageBody];
-        UIColor *bubbleLabelColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorRightBubbleMessageBody];
-        self.textLabel.textColor = bubbleLabelColor;
-        self.textLabel.font = bubbleLabelFont;
+        self.bubbleView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorLeftBubbleBackground];
+        UIFont *bubbleLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontLeftBubbleMessageBody];
+        UIColor *bubbleLabelColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorLeftBubbleMessageBody];
+        self.titleLabel.textColor = bubbleLabelColor;
+        self.titleLabel.font = bubbleLabelFont;
         
         self.reviewButtonViewHeightConstraint.constant = 48.0f;
         self.reviewButtonViewTopConstraint.constant = 10.0f;
+        
+        self.bubbleViewLeadingConstraint.constant = 0.0f;
+        self.bubbleViewLeadingConstraint.active = NO;
+        self.bubbleViewTrailingConstraint.constant = 80.0f;
+        self.bubbleViewTrailingConstraint.active = YES;
     }
 }
 
@@ -145,6 +168,10 @@
     if ([self.delegate respondsToSelector:@selector(reviewBubbleTableViewCellDidTappedReviewButtonWithMessage:)]) {
         [self.delegate reviewBubbleTableViewCellDidTappedReviewButtonWithMessage:self.currentMessage];
     }
+}
+
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender {
+
 }
 
 @end
