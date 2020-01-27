@@ -1,15 +1,15 @@
 //
-//  TTLReviewBubbleTableViewCell.m
+//  TTLDoneReviewBubbleTableViewCell.m
 //  TapTalkLive
 //
 //  Created by Dominic Vedericho on 23/01/20.
 //  Copyright © 2020 taptalk.io. All rights reserved.
 //
 
-#import "TTLReviewBubbleTableViewCell.h"
+#import "TTLDoneReviewBubbleTableViewCell.h"
 #import <TapTalk/TapUserModel.h>
 
-@interface TTLReviewBubbleTableViewCell ()
+@interface TTLDoneReviewBubbleTableViewCell ()
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UILabel *titleLabel;
@@ -28,7 +28,6 @@
 @property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
 
-
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderProfileImageButtonWidthConstraint;
@@ -46,7 +45,7 @@
 
 @end
 
-@implementation TTLReviewBubbleTableViewCell
+@implementation TTLDoneReviewBubbleTableViewCell
 #pragma mark - Lifecycle
 - (void)awakeFromNib {
     [super awakeFromNib];
@@ -94,8 +93,8 @@
     self.doneReviewIconImageView.image = checkIconImage;
     
     //Set view button to not review
-    self.doneReviewView.alpha = 0.0f;
-    self.notReviewView.alpha = 1.0f;
+    self.notReviewView.alpha = 0.0f;
+    self.doneReviewView.alpha = 1.0f;
 }
 
 - (void)prepareForReuse {
@@ -218,9 +217,7 @@
 }
 
 - (IBAction)reviewButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(reviewBubbleTableViewCellDidTappedReviewButtonWithMessage:)]) {
-        [self.delegate reviewBubbleTableViewCellDidTappedReviewButtonWithMessage:self.currentMessage];
-    }
+
 }
 
 - (IBAction)senderProfileImageButtonDidTapped:(id)sender {

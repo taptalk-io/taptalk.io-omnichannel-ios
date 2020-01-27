@@ -83,6 +83,9 @@
 		D7E4911523D368C60021F13D /* TTLPopUpInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7E4911323D368C60021F13D /* TTLPopUpInfoView.m */; };
 		D7E4911823D36EA40021F13D /* TTLKeyboardAccessoryView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7E4911623D36EA40021F13D /* TTLKeyboardAccessoryView.h */; };
 		D7E4911923D36EA40021F13D /* TTLKeyboardAccessoryView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7E4911723D36EA40021F13D /* TTLKeyboardAccessoryView.m */; };
+		D7F103AA23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7F103A723DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.m */; };
+		D7F103AB23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7F103A823DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.xib */; };
+		D7F103AC23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7F103A923DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -183,6 +186,9 @@
 		D7E4911323D368C60021F13D /* TTLPopUpInfoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLPopUpInfoView.m; sourceTree = "<group>"; };
 		D7E4911623D36EA40021F13D /* TTLKeyboardAccessoryView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLKeyboardAccessoryView.h; sourceTree = "<group>"; };
 		D7E4911723D36EA40021F13D /* TTLKeyboardAccessoryView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLKeyboardAccessoryView.m; sourceTree = "<group>"; };
+		D7F103A723DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLDoneReviewBubbleTableViewCell.m; sourceTree = "<group>"; };
+		D7F103A823DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLDoneReviewBubbleTableViewCell.xib; sourceTree = "<group>"; };
+		D7F103A923DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLDoneReviewBubbleTableViewCell.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -236,6 +242,9 @@
 				D7C55F5F23D9A33E008B4CC3 /* TTLReviewBubbleTableViewCell.h */,
 				D7C55F6023D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.m */,
 				D7C55F6123D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib */,
+				D7F103A923DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.h */,
+				D7F103A723DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.m */,
+				D7F103A823DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.xib */,
 				D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */,
 				D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */,
 				D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */,
@@ -418,6 +427,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D7485FAE23D2C00F001770FA /* TTLImageView.h in Headers */,
+				D7F103AC23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.h in Headers */,
 				D74C323123D2D2CB00626C9D /* TTLCustomTextFieldView.h in Headers */,
 				D74C324A23D3066F00626C9D /* TTLBaseModel.h in Headers */,
 				D7485FBD23D2C6C8001770FA /* TTLStyle.h in Headers */,
@@ -540,6 +550,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D7C55F6423D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib in Resources */,
+				D7F103AB23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.xib in Resources */,
 				D79EDBA423DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -627,6 +638,7 @@
 				D747615D23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.m in Sources */,
 				D72740D723D4C14D0073784E /* TTLCaseModel.m in Sources */,
 				D7485FAF23D2C00F001770FA /* TTLImageView.m in Sources */,
+				D7F103AA23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.m in Sources */,
 				D74C323623D3057800626C9D /* TTLTopicOptionTableViewCell.m in Sources */,
 				D74C323A23D3058A00626C9D /* TTLTopicListView.m in Sources */,
 				D7A96BBB23B9C8D600654C71 /* TTLBaseView.m in Sources */,

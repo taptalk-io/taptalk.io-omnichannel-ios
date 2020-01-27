@@ -125,13 +125,6 @@
     
     UINavigationController *topicListNavigationController = [[UINavigationController alloc] initWithRootViewController:topicListViewController];
     [self.navigationController presentViewController:topicListNavigationController animated:YES completion:nil];
-    
-    //DV Temp
-//    TTLRatingViewController *ratingViewController = [[TTLRatingViewController alloc] init];
-//    UINavigationController *ratingNavigationController = [[UINavigationController alloc] initWithRootViewController:ratingViewController];
-//    ratingNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-//    [self.navigationController presentViewController:ratingNavigationController animated:YES completion:nil];
-    //END DV Temp
 }
 
 #pragma mark TTLFormGrowingTextView

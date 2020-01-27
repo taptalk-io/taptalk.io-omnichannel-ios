@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TTLRatingViewController : TTLBaseViewController
 
+@property (strong, nonatomic) TTLCaseModel *currentCase;
+
 @end
 
 NS_ASSUME_NONNULL_END

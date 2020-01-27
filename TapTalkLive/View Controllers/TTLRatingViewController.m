@@ -16,6 +16,7 @@
 @property (nonatomic) BOOL isRatingStarTapped;
 @property (nonatomic) BOOL isKeyboardActive;
 @property (nonatomic) CGFloat keyboardHeight;
+@property (nonatomic) NSInteger starRatingValue;
 
 - (void)closeButtonDidTapped;
 - (void)firstStarRatingDidTapped;
@@ -39,7 +40,11 @@
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor clearColor];
 
+    _starRatingValue = 0;
+    
     self.ratingView.commentTextView.delegate = self;
+    self.ratingView.submitButtonView.delegate = self;
+    
     [self.ratingView.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.ratingView.starRating1Button addTarget:self action:@selector(firstStarRatingDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.ratingView.starRating2Button addTarget:self action:@selector(secondStarRatingDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -88,6 +93,29 @@
 #pragma mark TTLCustomButtonView
 - (void)customButtonViewDidTappedButton {
     //Submit button tapped
+    [self.view endEditing:YES];
+    [self.ratingView.submitButtonView setAsLoading:YES animated:YES];
+    
+    NSString *caseID = self.currentCase.caseID;
+    caseID = [TTLUtil nullToEmptyString:caseID];
+    
+    NSString *additionalNotes = [self.ratingView.commentTextView getText];
+    additionalNotes = [TTLUtil nullToEmptyString:additionalNotes];
+    
+    [TTLDataManager callAPIRateConversionWithCaseID:caseID rating:self.starRatingValue notes:additionalNotes success:^(BOOL isSuccess) {
+        [self.ratingView.submitButtonView setAsLoading:NO animated:YES];
+        
+        if (isSuccess) {
+            //Success
+            [self closeButtonDidTapped];
+        }
+        else {
+            //Failed
+        }
+    } failure:^(NSError * _Nonnull error) {
+        [self.ratingView.submitButtonView setAsLoading:NO animated:YES];
+    }];
+    
     
 }
 
@@ -101,7 +129,7 @@
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
     _isKeyboardActive = NO;
     _keyboardHeight = keyboardHeight;
-    self.ratingView.containerView.frame = CGRectMake(CGRectGetMinX(self.ratingView.containerView.frame), CGRectGetMinY(self.ratingView.containerView.frame), CGRectGetWidth(self.ratingView.containerView.frame), CGRectGetHeight(self.ratingView.containerView.frame));
+    self.ratingView.containerView.frame = CGRectMake(CGRectGetMinX(self.ratingView.containerView.frame), CGRectGetMinY(self.ratingView.containerView.frame) + keyboardHeight, CGRectGetWidth(self.ratingView.containerView.frame), CGRectGetHeight(self.ratingView.containerView.frame));
 }
 
 - (void)closeButtonDidTapped {
@@ -111,31 +139,36 @@
 
 - (void)firstStarRatingDidTapped {
     _isRatingStarTapped = YES;
-    [self.ratingView setStarRatingWithValue:1];
+    _starRatingValue = 1;
+    [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
 }
 
 - (void)secondStarRatingDidTapped {
     _isRatingStarTapped = YES;
-    [self.ratingView setStarRatingWithValue:2];
+    _starRatingValue = 2;
+    [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
 }
 
 - (void)thirdStarRatingDidTapped {
     _isRatingStarTapped = YES;
-    [self.ratingView setStarRatingWithValue:3];
+    _starRatingValue = 3;
+    [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
 }
 
 - (void)fourthStarRatingDidTapped {
     _isRatingStarTapped = YES;
-    [self.ratingView setStarRatingWithValue:4];
+    _starRatingValue = 4;
+    [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
 }
 
 - (void)fifthStarRatingDidTapped {
     _isRatingStarTapped = YES;
-    [self.ratingView setStarRatingWithValue:5];
+    _starRatingValue = 5;
+    [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
 }
 

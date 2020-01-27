@@ -124,6 +124,165 @@
     return [TTLUtil nullToEmptyString:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_REFRESH_TOKEN valid:nil]];
 }
 
++ (TTLCaseModel *)caseDataModelFromDictionary:(NSDictionary *)dictionary {
+    NSDictionary *caseDictionary = [TTLUtil nullToEmptyDictionary:dictionary];
+    
+    NSString *caseIDRaw = [caseDictionary objectForKey:@"id"];
+    caseIDRaw = [TTLUtil nullToEmptyString:caseIDRaw];
+    NSString *caseID = [NSString stringWithFormat:@"%li", (long)[caseIDRaw integerValue]];
+    
+    NSString *stringID = [caseDictionary objectForKey:@"stringID"];
+    stringID = [TTLUtil nullToEmptyString:stringID];
+    
+    NSString *userID = [caseDictionary objectForKey:@"userID"];
+    userID = [TTLUtil nullToEmptyString:userID];
+    
+    NSString *userFullName = [caseDictionary objectForKey:@"userFullName"];
+    userFullName = [TTLUtil nullToEmptyString:userFullName];
+    
+    NSString *topicIDRaw = [caseDictionary objectForKey:@"topicID"];
+    topicIDRaw = [TTLUtil nullToEmptyString:topicIDRaw];
+    NSString *topicID = [NSString stringWithFormat:@"%li", (long)[topicIDRaw integerValue]];
+    
+    NSString *topicName = [caseDictionary objectForKey:@"topicName"];
+    topicName = [TTLUtil nullToEmptyString:topicName];
+    
+    NSString *agentAccountIDRaw = [caseDictionary objectForKey:@"agentAccountID"];
+    agentAccountIDRaw = [TTLUtil nullToEmptyString:agentAccountIDRaw];
+    NSString *agentAccountID = [NSString stringWithFormat:@"%li", (long)[agentAccountIDRaw integerValue]];
+    
+    NSString *agentFullName = [caseDictionary objectForKey:@"agentFullName"];
+    agentFullName = [TTLUtil nullToEmptyString:agentFullName];
+    
+    NSString *tapTalkXCRoomID = [caseDictionary objectForKey:@"tapTalkXCRoomID"];
+    tapTalkXCRoomID = [TTLUtil nullToEmptyString:tapTalkXCRoomID];
+    
+    NSString *medium = [caseDictionary objectForKey:@"medium"];
+    medium = [TTLUtil nullToEmptyString:medium];
+    
+    NSString *firstMessage = [caseDictionary objectForKey:@"firstMessage"];
+    firstMessage = [TTLUtil nullToEmptyString:firstMessage];
+    
+    NSNumber *firstResponseTime = [caseDictionary objectForKey:@"firstResponseTime"];
+    firstResponseTime = [TTLUtil nullToEmptyNumber:firstResponseTime];
+    
+    NSString *firstResponseAgentAccountIDRaw = [caseDictionary objectForKey:@"firstResponseAgentAccountID"];
+    firstResponseAgentAccountIDRaw = [TTLUtil nullToEmptyString:firstResponseAgentAccountIDRaw];
+    NSString *firstResponseAgentAccountID = [NSString stringWithFormat:@"%li", (long)[firstResponseAgentAccountIDRaw integerValue]];
+    
+    NSString *firstResponseAgentFullName = [caseDictionary objectForKey:@"firstResponseAgentFullName"];
+    firstResponseAgentFullName = [TTLUtil nullToEmptyString:firstResponseAgentFullName];
+
+    BOOL isClosed = [[caseDictionary objectForKey:@"isClosed"] boolValue];
+    
+    NSNumber *closedTime = [caseDictionary objectForKey:@"closedTime"];
+    closedTime = [TTLUtil nullToEmptyNumber:closedTime];
+    
+    NSNumber *createdTime = [caseDictionary objectForKey:@"createdTime"];
+    createdTime = [TTLUtil nullToEmptyNumber:createdTime];
+    
+    NSNumber *updatedTime = [caseDictionary objectForKey:@"updatedTime"];
+    updatedTime = [TTLUtil nullToEmptyNumber:updatedTime];
+    
+    NSNumber *deletedTime = [caseDictionary objectForKey:@"deletedTime"];
+    deletedTime = [TTLUtil nullToEmptyNumber:deletedTime];
+    
+    TTLCaseModel *caseData = [TTLCaseModel new];
+    caseData.caseID = caseID;
+    caseData.stringID = stringID;
+    caseData.userID = userID;
+    caseData.userFullName = userFullName;
+    caseData.topicID = topicID;
+    caseData.topicName = topicName;
+    caseData.agentAccountID = agentAccountID;
+    caseData.agentFullName = agentFullName;
+    caseData.tapTalkXCRoomID = tapTalkXCRoomID;
+    caseData.medium = medium;
+    caseData.firstMessage = firstMessage;
+    caseData.firstResponseTime = firstResponseTime;
+    caseData.firstResponseAgentAccountID = firstResponseAgentAccountID;
+    caseData.firstResponseAgentFullName = firstResponseAgentFullName;
+    caseData.isClosed = isClosed;
+    caseData.closedTime = closedTime;
+    caseData.createdTime = createdTime;
+    caseData.updatedTime = updatedTime;
+    caseData.deletedTime = deletedTime;
+    
+    return caseData;
+}
+
++ (NSDictionary *)dictionaryFromCaseDataModel:(TTLCaseModel *)caseData {
+    
+    NSString *caseIDString = caseData.caseID;
+    caseIDString = [TTLUtil nullToEmptyString:caseIDString];
+    
+    NSString *stringID = caseData.stringID;
+    stringID = [TTLUtil nullToEmptyString:stringID];
+    
+    NSString *userID = caseData.userID;
+    userID = [TTLUtil nullToEmptyString:userID];
+    
+    NSString *userFullName = caseData.userFullName;
+    userFullName = [TTLUtil nullToEmptyString:userFullName];
+    
+    NSString *topicIDString = caseData.topicID;
+    topicIDString = [TTLUtil nullToEmptyString:topicIDString];
+    
+    NSString *topicName = caseData.topicName;
+    topicName = [TTLUtil nullToEmptyString:topicName];
+    
+    NSString *agentAccountIDString = caseData.agentAccountID;
+    agentAccountIDString = [TTLUtil nullToEmptyString:agentAccountIDString];
+    
+    NSString *agentFullName = caseData.agentFullName;
+    agentFullName = [TTLUtil nullToEmptyString:agentFullName];
+    
+    NSString *taptalkXCRoomID = caseData.tapTalkXCRoomID;
+    taptalkXCRoomID = [TTLUtil nullToEmptyString:taptalkXCRoomID];
+    
+    NSString *medium = caseData.medium;
+    medium = [TTLUtil nullToEmptyString:medium];
+
+    NSString *firstResponseAgentFullName = caseData.firstResponseAgentFullName;
+    firstResponseAgentFullName = [TTLUtil nullToEmptyString:firstResponseAgentFullName];
+    
+    NSString *firstMessage = caseData.firstMessage;
+    firstMessage = [TTLUtil nullToEmptyString:firstMessage];
+    
+    NSString *firstResponseAgentAccountIDString = caseData.firstResponseAgentAccountID;
+    firstResponseAgentAccountIDString = [TTLUtil nullToEmptyString:firstResponseAgentAccountIDString];
+
+    BOOL isClosed = caseData.isClosed;
+    NSNumber *firstResponseTimeNumber = caseData.firstResponseTime;
+    NSNumber *closedTimeNumber = caseData.closedTime;
+    NSNumber *createdTimeNumber = caseData.createdTime;
+    NSNumber *updatedTimeNumber = caseData.updatedTime;
+    NSNumber *deletedTimeNumber = caseData.deletedTime;
+    
+    NSMutableDictionary *resultDictionary = [[NSMutableDictionary alloc] init];
+    [resultDictionary setObject:[NSNumber numberWithInteger:[caseIDString integerValue]] forKey:@"id"];
+    [resultDictionary setObject:stringID forKey:@"stringID"];
+    [resultDictionary setObject:userID forKey:@"userID"];
+    [resultDictionary setObject:userFullName forKey:@"userFullName"];
+    [resultDictionary setObject:[NSNumber numberWithInteger:[topicIDString integerValue]] forKey:@"topicID"];
+    [resultDictionary setObject:topicName forKey:@"topicName"];
+    [resultDictionary setObject:[NSNumber numberWithInteger:[agentAccountIDString integerValue]] forKey:@"agentAccountID"];
+    [resultDictionary setObject:agentFullName forKey:@"agentFullName"];
+    [resultDictionary setObject:taptalkXCRoomID forKey:@"tapTalkXCRoomID"];
+    [resultDictionary setObject:medium forKey:@"medium"];
+    [resultDictionary setObject:firstMessage forKey:@"firstMessage"];
+    [resultDictionary setObject:[NSNumber numberWithLong:firstResponseTimeNumber] forKey:@"firstResponseTime"];
+    [resultDictionary setObject:[NSNumber numberWithInteger:[firstResponseAgentAccountIDString integerValue]] forKey:@"firstResponseAgentAccountID"];
+    [resultDictionary setObject:firstResponseAgentFullName forKey:@"firstResponseAgentFullName"];
+    [resultDictionary setObject:[NSNumber numberWithBool:isClosed] forKey:@"isClosed"];
+    [resultDictionary setObject:[NSNumber numberWithLong:closedTimeNumber] forKey:@"closedTime"];
+    [resultDictionary setObject:[NSNumber numberWithLong:createdTimeNumber] forKey:@"createdTime"];
+    [resultDictionary setObject:[NSNumber numberWithLong:updatedTimeNumber] forKey:@"updatedTime"];
+    [resultDictionary setObject:[NSNumber numberWithLong:deletedTimeNumber] forKey:@"deletedTime"];
+    
+    return resultDictionary;
+}
+
 #pragma mark - API Call
 + (void)callAPICreateUserWithFullName:(NSString *)fullName
                                 email:(NSString *)email
@@ -1364,7 +1523,7 @@
         }
         
         if ([self isDataEmpty:responseObject]) {
-            success(true);
+            success(false);
             return;
         }
         
@@ -1374,7 +1533,7 @@
         NSString *message = [dataDictionary objectForKey:@"message"];
         message = [TTLUtil nullToEmptyString:message];
         
-        BOOL isSuccess = [[dataDictionary objectForKey:@"isSuccess"] boolValue];
+        BOOL isSuccess = [[dataDictionary objectForKey:@"success"] boolValue];
     
         success(isSuccess);
         
@@ -1547,6 +1706,229 @@
         
         failure(localizedError);
 #endif
+    }];
+}
+
++ (void)callAPIGetServerTimeSuccess:(void (^)(NSTimeInterval serverTime))success
+                            failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TTLAPIManager sharedManager] urlForType:TTLAPIManagerTypeGetServerTime];
+    
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [[TTLNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TTLUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TTLUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TTLDataManager callAPIGetServerTimeSuccess:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success(0);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        dataDictionary = [TTLUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSDictionary *timestampDictionary = [dataDictionary objectForKey:@"timestamp"];
+        timestampDictionary = [TTLUtil nullToEmptyDictionary:timestampDictionary];
+        
+        NSString *timestampInSecondsRaw = [timestampDictionary objectForKey:@"seconds"];
+        timestampInSecondsRaw = [TTLUtil nullToEmptyString:timestampInSecondsRaw];
+        NSTimeInterval timestampInSeconds = [timestampInSecondsRaw longLongValue];
+        
+        success(timestampInSeconds);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TTLDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
+        
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPILogoutSuccess:(void (^)(BOOL isSuccess))success
+                     failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TTLAPIManager sharedManager] urlForType:TTLAPIManagerTypeLogout];
+        
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    [[TTLNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TTLUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TTLUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TTLDataManager callAPILogoutSuccess:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success(false);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        dataDictionary = [TTLUtil nullToEmptyDictionary:dataDictionary];
+    
+        NSString *message = [dataDictionary objectForKey:@"message"];
+        message = [TTLUtil nullToEmptyString:message];
+        
+        BOOL isSuccess = [[dataDictionary objectForKey:@"success"] boolValue];
+    
+        success(isSuccess);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TTLDataManager logErrorStringFromError:error];
+        
+#ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+#else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
+        
+        failure(localizedError);
+#endif
+    }];
+}
+
++ (void)callAPIRateConversionWithCaseID:(NSString *)caseID
+                                 rating:(NSInteger)rating
+                                  notes:(NSString *)notes
+                                success:(void (^)(BOOL isSuccess))success
+                                failure:(void (^)(NSError *error))failure {
+    NSString *requestURL = [[TTLAPIManager sharedManager] urlForType:TTLAPIManagerTypeRateConversation];
+        
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    NSInteger caseIDInteger = [caseID integerValue];
+    [parameterDictionary setObject:[NSNumber numberWithInteger:caseIDInteger] forKey:@"id"];
+    [parameterDictionary setObject:[NSNumber numberWithInteger:rating] forKey:@"rating"];
+    [parameterDictionary setObject:notes forKey:@"note"];
+    
+    [[TTLNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TTLUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TTLUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TTLDataManager callAPIRateConversionWithCaseID:caseID rating:rating notes:notes success:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success(false);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        dataDictionary = [TTLUtil nullToEmptyDictionary:dataDictionary];
+
+        NSString *message = [dataDictionary objectForKey:@"message"];
+        message = [TTLUtil nullToEmptyString:message];
+        
+        BOOL isSuccess = [[dataDictionary objectForKey:@"success"] boolValue];
+
+        success(isSuccess);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TTLDataManager logErrorStringFromError:error];
+        
+    #ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+    #else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedString(@"We are experiencing problem to connect to our server, please try again later...", @"") code:999 userInfo:@{@"message": NSLocalizedString(@"Failed to connect to our server, please try again later...", @"")}];
+        
+        failure(localizedError);
+    #endif
     }];
 }
 

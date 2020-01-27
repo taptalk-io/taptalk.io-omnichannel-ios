@@ -20,6 +20,8 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 
 @interface TapTalkLive : NSObject
 
+@property (weak, nonatomic) UIWindow *activeWindow;
+
 //Initalization
 + (TapTalkLive *_Nonnull)sharedInstance;
 
@@ -85,6 +87,24 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
  Called when the application throws the exception
  */
 - (void)handleException:(NSException * _Nonnull)exception;
+
+//==========================================================
+//                 Windows & View Controllers
+//==========================================================
+/**
+ Set current active window to TapTalkLive
+ */
+- (void)setCurrentActiveWindow:(UIWindow *)activeWindow;
+
+/**
+ Obtain current active navigation controller
+ */
+- (UINavigationController *)getCurrentTapTalkLiveActiveNavigationController;
+
+/**
+ Obtain current active view controller
+ */
+- (UIViewController *)getCurrentTapTalkLiveActiveViewController;
 
 //==========================================================
 //                   TapTalk Live View

@@ -10,8 +10,11 @@
 #import <CoreText/CoreText.h>
 #import <TapTalk/TapTalk.h>
 #import <TapTalk/TapUI.h>
+#import <TapTalk/TapUIChatViewController.h>
+#import "TTLReviewBubbleTableViewCell.h"
+#import "TTLRatingViewController.h"
 
-@interface TapTalkLive () <TapUIRoomListDelegate, TapUICustomKeyboardDelegate, TapUIChatRoomDelegate>
+@interface TapTalkLive () <TapUIRoomListDelegate, TapUICustomKeyboardDelegate, TapUIChatRoomDelegate, TTLReviewBubbleTableViewCellDelegate>
 
 @property (strong, nonatomic) TTLRoomListViewController *roomListViewController;
 @property (nonatomic) BOOL isDoneTapTalkInitialization;
@@ -38,6 +41,8 @@
     if (self) {
         //Set secret for NSSecureUserDefaults
         [NSUserDefaults setSecret:TTL_SECURE_KEY_NSUSERDEFAULTS];
+        
+        _activeWindow = [[UIWindow alloc] init];
         
         //DV Temp
 #ifdef STAGING
@@ -127,6 +132,7 @@
     //Add custom bubble cell
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];    
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLReviewBubbleTableViewCell" type:3003 delegate:self bundle:[TTLUtil currentBundle]];
+    [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLDoneReviewBubbleTableViewCell" type:3004 delegate:self bundle:[TTLUtil currentBundle]];
     
     //Set delegate for Room List TapTalk
     [[TapUI sharedInstance] setRoomListDelegate:self];
@@ -260,6 +266,7 @@ Obtain main view controller of TapTalk Live
                                recipient:(TAPUserModel * _Nullable)recipient
                             keyboardItem:(TAPCustomKeyboardItemModel * _Nonnull)keyboardItem {
   //Do an action when user taps a custom keyboard item
+    
     if ([keyboardItem.itemID isEqualToString:@"1"]) {
         //Mark as solved - close case
         NSString *formattedCaseID = room.xcRoomID;
@@ -273,14 +280,47 @@ Obtain main view controller of TapTalk Live
 #endif
         
         [TTLDataManager callAPICloseCaseWithCaseID:caseID success:^(BOOL isSuccess) {
-
+            //Hide keyboard and input view
+            UIViewController *activeViewController = [self getCurrentTapTalkLiveActiveViewController];
+            if ([activeViewController isKindOfClass:[TapUIChatViewController class]]) {
+                TapUIChatViewController *chatViewController = (TapUIChatViewController *)activeViewController;
+                [chatViewController hideTapTalkMessageComposerView];
+            }
         } failure:^(NSError * _Nonnull error) {
 
         }];
     }
 }
 
+#pragma mark - TapTalkLive Delegate
+#pragma mark TTLReviewBubbleTableViewCell
+- (void)reviewBubbleTableViewCellDidTappedReviewButtonWithMessage:(TAPMessageModel *)message {
+    UINavigationController *currentActiveNavigationController = [self getCurrentTapTalkLiveActiveNavigationController];
+    TTLCaseModel *currentCase = [TTLDataManager caseDataModelFromDictionary:message.data];
+
+    TTLRatingViewController *ratingViewController = [[TTLRatingViewController alloc] init];
+    ratingViewController.currentCase = currentCase;
+    UINavigationController *ratingNavigationController = [[UINavigationController alloc] initWithRootViewController:ratingViewController];
+    ratingNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [currentActiveNavigationController presentViewController:ratingNavigationController animated:YES completion:nil];
+}
+
 #pragma mark - Custom Method
+#pragma mark Windows & View Controllers
+- (void)setCurrentActiveWindow:(UIWindow *)activeWindow {
+    _activeWindow = activeWindow;
+    [[TapUI sharedInstance] activateInAppNotificationInWindow:self.activeWindow];
+}
+
+- (UINavigationController *)getCurrentTapTalkLiveActiveNavigationController {
+    return [[TapUI sharedInstance] getCurrentTapTalkActiveNavigationController];
+}
+
+- (UIViewController *)getCurrentTapTalkLiveActiveViewController {
+    return [[TapUI sharedInstance] getCurrentTapTalkActiveViewController];
+}
+
+#pragma mark Others
 - (void)loadCustomFontData {
     NSArray *fontArray = @[@"DMSans-Italic", @"PTRootUI-Regular", @"PTRootUI-Medium", @"PTRootUI-Bold"];
     

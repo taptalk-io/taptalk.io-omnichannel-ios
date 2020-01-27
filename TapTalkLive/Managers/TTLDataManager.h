@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSTimeInterval)getAccessTokenExpiryTime;
 + (void)setRefreshToken:(NSString *)refreshToken expiryDate:(NSTimeInterval)expiryDate;
 + (NSString *)getRefreshToken;
++ (TTLCaseModel *)caseDataModelFromDictionary:(NSDictionary *)dictionary;
++ (NSDictionary *)dictionaryFromCaseDataModel:(TTLCaseModel *)caseData;
 
 
 //API Call
@@ -57,8 +59,15 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)callAPIGetCaseDetailWithCaseID:(NSString *)caseID
                                success:(void (^)(TTLCaseModel *caseData))success
                                failure:(void (^)(NSError *error))failure;
-
-
++ (void)callAPIGetServerTimeSuccess:(void (^)(NSTimeInterval serverTime))success
+                            failure:(void (^)(NSError *error))failure;
++ (void)callAPILogoutSuccess:(void (^)(BOOL isSuccess))success
+                     failure:(void (^)(NSError *error))failure;
++ (void)callAPIRateConversionWithCaseID:(NSString *)caseID
+                                 rating:(NSInteger)rating
+                                  notes:(NSString *)notes
+                                success:(void (^)(BOOL isSuccess))success
+                                failure:(void (^)(NSError *error))failure;
 @end
 
 NS_ASSUME_NONNULL_END
