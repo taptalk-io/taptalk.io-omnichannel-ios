@@ -59,6 +59,8 @@
 		D785CF0123D171C200651638 /* TTLFormGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D785CEFF23D171C200651638 /* TTLFormGrowingTextView.m */; };
 		D79A7DA523D4C8CC00862E57 /* TTLTopicModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D79A7DA323D4C8CC00862E57 /* TTLTopicModel.h */; };
 		D79A7DA623D4C8CC00862E57 /* TTLTopicModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D79A7DA423D4C8CC00862E57 /* TTLTopicModel.m */; };
+		D79D999C23E014D500A08D49 /* TTLPopUpHandlerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D79D999A23E014D500A08D49 /* TTLPopUpHandlerViewController.h */; };
+		D79D999D23E014D500A08D49 /* TTLPopUpHandlerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D79D999B23E014D500A08D49 /* TTLPopUpHandlerViewController.m */; };
 		D79EDBA323DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */; };
 		D79EDBA423DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */; };
 		D79EDBA523DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */; };
@@ -154,6 +156,8 @@
 		D785CEFF23D171C200651638 /* TTLFormGrowingTextView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLFormGrowingTextView.m; sourceTree = "<group>"; };
 		D79A7DA323D4C8CC00862E57 /* TTLTopicModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLTopicModel.h; sourceTree = "<group>"; };
 		D79A7DA423D4C8CC00862E57 /* TTLTopicModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLTopicModel.m; sourceTree = "<group>"; };
+		D79D999A23E014D500A08D49 /* TTLPopUpHandlerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLPopUpHandlerViewController.h; sourceTree = "<group>"; };
+		D79D999B23E014D500A08D49 /* TTLPopUpHandlerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLPopUpHandlerViewController.m; sourceTree = "<group>"; };
 		D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLCaseCloseBubbleTableViewCell.h; sourceTree = "<group>"; };
 		D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLCaseCloseBubbleTableViewCell.xib; sourceTree = "<group>"; };
 		D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLCaseCloseBubbleTableViewCell.m; sourceTree = "<group>"; };
@@ -352,6 +356,8 @@
 				D74C324423D305C500626C9D /* TTLRatingViewController.m */,
 				D7E4910E23D368BB0021F13D /* TTLPopUpInfoViewController.h */,
 				D7E4910F23D368BB0021F13D /* TTLPopUpInfoViewController.m */,
+				D79D999A23E014D500A08D49 /* TTLPopUpHandlerViewController.h */,
+				D79D999B23E014D500A08D49 /* TTLPopUpHandlerViewController.m */,
 				D708887423D866AE009B591C /* TTLRoomListViewController.h */,
 				D708887523D866AE009B591C /* TTLRoomListViewController.m */,
 			);
@@ -450,6 +456,7 @@
 				D79EDBA323DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.h in Headers */,
 				D7054C7D23A0B14100B20950 /* TTLConfigs.h in Headers */,
 				D74C324123D305B400626C9D /* TTLRatingView.h in Headers */,
+				D79D999C23E014D500A08D49 /* TTLPopUpHandlerViewController.h in Headers */,
 				D747615C23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h in Headers */,
 				D74C322D23D2CF7200626C9D /* TTLCustomButtonView.h in Headers */,
 				D7A96BBA23B9C8D600654C71 /* TTLBaseView.h in Headers */,
@@ -614,6 +621,7 @@
 				D7E4911523D368C60021F13D /* TTLPopUpInfoView.m in Sources */,
 				D7E4911123D368BB0021F13D /* TTLPopUpInfoViewController.m in Sources */,
 				D708887723D866AE009B591C /* TTLRoomListViewController.m in Sources */,
+				D79D999D23E014D500A08D49 /* TTLPopUpHandlerViewController.m in Sources */,
 				D73506F023AB3F990076E7A6 /* TTLAPIManager.m in Sources */,
 				D7A96BD423BF16B900654C71 /* TTLCreateCaseView.m in Sources */,
 				D74C323223D2D2CB00626C9D /* TTLCustomTextFieldView.m in Sources */,

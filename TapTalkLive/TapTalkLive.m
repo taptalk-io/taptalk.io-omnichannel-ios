@@ -11,8 +11,11 @@
 #import <TapTalk/TapTalk.h>
 #import <TapTalk/TapUI.h>
 #import <TapTalk/TapUIChatViewController.h>
-#import "TTLReviewBubbleTableViewCell.h"
+
+#import "TTLPopUpHandlerViewController.h"
+#import "TTLPopUpInfoViewController.h"
 #import "TTLRatingViewController.h"
+#import "TTLReviewBubbleTableViewCell.h"
 
 @interface TapTalkLive () <TapUIRoomListDelegate, TapUICustomKeyboardDelegate, TapUIChatRoomDelegate, TTLReviewBubbleTableViewCellDelegate>
 
@@ -268,26 +271,14 @@ Obtain main view controller of TapTalk Live
   //Do an action when user taps a custom keyboard item
     
     if ([keyboardItem.itemID isEqualToString:@"1"]) {
-        //Mark as solved - close case
-        NSString *formattedCaseID = room.xcRoomID;
-        formattedCaseID = [TTLUtil nullToEmptyString:formattedCaseID];
-        
-        NSString *caseID = [formattedCaseID stringByReplacingOccurrencesOfString:@"case:" withString:@""];
-        caseID = [TTLUtil nullToEmptyString:caseID];
-        
-#ifdef DEBUG
-        NSLog(@"Close Case - Case ID: %@", caseID);
-#endif
-        
-        [TTLDataManager callAPICloseCaseWithCaseID:caseID success:^(BOOL isSuccess) {
-            //Hide keyboard and input view
-            UIViewController *activeViewController = [self getCurrentTapTalkLiveActiveViewController];
-            if ([activeViewController isKindOfClass:[TapUIChatViewController class]]) {
-                TapUIChatViewController *chatViewController = (TapUIChatViewController *)activeViewController;
-                [chatViewController hideTapTalkMessageComposerView];
-            }
-        } failure:^(NSError * _Nonnull error) {
-
+        TTLPopUpHandlerViewController *popupHandlerViewController = [[TTLPopUpHandlerViewController alloc] init];
+        popupHandlerViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+        popupHandlerViewController.room = room;
+        popupHandlerViewController.sender = sender;
+        popupHandlerViewController.recipient = recipient;
+        UIViewController *currentActiveController = [self getCurrentTapTalkLiveActiveViewController];
+        [currentActiveController presentViewController:popupHandlerViewController animated:NO completion:^{
+            [popupHandlerViewController showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Custom Keyboard - Close Case Tapped" title:NSLocalizedString(@"Warning", @"") detailInformation:NSLocalizedString(@"This case will be closed and you wont be able to further send messages or receive assistance regarding this case. Would you like to proceed?", @"") leftOptionButtonTitle:NSLocalizedString(@"Cancel", @"") singleOrRightOptionButtonTitle:NSLocalizedString(@"OK", @"")];
         }];
     }
 }

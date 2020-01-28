@@ -72,4 +72,9 @@ Initialize chat room with room data and scrolled to selected message
  */
 - (void)showTapTalkMessageComposerView;
 
+/**
+ hide input view / message composer view
+ */
+- (void)hideTapTalkMessageComposerView;
+
 @end
