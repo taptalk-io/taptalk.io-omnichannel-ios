@@ -300,7 +300,9 @@ Obtain main view controller of TapTalk Live
 #pragma mark Windows & View Controllers
 - (void)setCurrentActiveWindow:(UIWindow *)activeWindow {
     _activeWindow = activeWindow;
-    [[TapUI sharedInstance] activateInAppNotificationInWindow:self.activeWindow];
+    [[TapUI sharedInstance] setCurrentActiveWindow:self.activeWindow];
+    //Disable TapTalk In App Notification
+    [[TapUI sharedInstance] activateTapTalkInAppNotification:NO];
 }
 
 - (UINavigationController *)getCurrentTapTalkLiveActiveNavigationController {
