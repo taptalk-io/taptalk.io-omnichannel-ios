@@ -13,17 +13,20 @@
 typedef NS_ENUM(NSInteger, RoomType) {
     RoomTypePersonal = 1,
     RoomTypeGroup = 2,
-    RoomTypeChannel = 3
+    RoomTypeChannel = 3,
+    RoomTypeTransaction = 4
 };
 
 @interface TAPRoomModel : TAPBaseModel
 
 @property (nonatomic, strong) NSString *roomID;
+@property (nonatomic, strong) NSString *xcRoomID;
 @property (nonatomic, strong) NSString *name;
 @property (nonatomic, strong) TAPImageURLModel *imageURL;
 @property (nonatomic) RoomType type;
 @property (nonatomic, strong) NSString *color;
 @property (nonatomic) BOOL isDeleted;
+@property (nonatomic) BOOL isLocked;
 @property (strong, nonatomic) NSNumber *deleted;
 @property (strong, nonatomic) NSArray <TAPUserModel *> *participants;
 @property (strong, nonatomic) NSArray *admins;

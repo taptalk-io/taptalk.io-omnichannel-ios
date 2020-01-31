@@ -9,6 +9,7 @@
 #import "TAPYourChatBubbleTableViewCell.h"
 #import "TAPQuoteModel.h"
 #import "ZSWTappableLabel.h"
+#import "TAPProfileViewController.h"
 
 @interface TAPYourChatBubbleTableViewCell() <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate>
 
@@ -27,6 +28,9 @@
 @property (strong, nonatomic) IBOutlet UILabel *forwardFromLabel;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
+@property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
+@property (strong, nonatomic) IBOutlet UIView *senderInitialView;
+@property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
@@ -56,6 +60,7 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderProfileImageButtonWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
 
@@ -70,6 +75,7 @@
 - (void)handleBubbleViewLongPress:(UILongPressGestureRecognizer *)recognizer;
 
 - (IBAction)quoteButtonDidTapped:(id)sender;
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender;
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData;
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID;
@@ -252,6 +258,14 @@
     UIFont *senderNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleSenderName];
     UIColor *senderNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleSenderName];
     
+    UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+    UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+    
+    self.senderInitialLabel.textColor = initialNameLabelColor;
+    self.senderInitialLabel.font = initialNameLabelFont;
+    self.senderInitialView.layer.cornerRadius = CGRectGetWidth(self.senderInitialView.frame) / 2.0f;
+    self.senderInitialView.clipsToBounds = YES;
+    
     self.replyNameLabel.textColor = quoteTitleColor;
     self.replyNameLabel.font = quoteTitleFont;
     
@@ -350,23 +364,50 @@
     self.bubbleLabel.attributedText = attributedString;
     
     //CS NOTE - check chat room type, show sender info if group type
-    if (message.room.type == RoomTypeGroup) {
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
         [self showSenderInfo:YES];
         
-        if ([message.user.imageURL.thumbnail isEqualToString:@""]) {
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        NSString *thumbnailImageString = @"";
+        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:message.user.userID];
+        if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+            thumbnailImageString = obtainedUser.imageURL.thumbnail;
+            thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
         }
         else {
-            
-            if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
+            thumbnailImageString = message.user.imageURL.thumbnail;
+            thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
+        }
+        
+        NSString *fullNameString = @"";
+        if (obtainedUser != nil && ![obtainedUser.fullname isEqualToString:@""]) {
+            fullNameString = obtainedUser.fullname;
+            fullNameString = [TAPUtil nullToEmptyString:fullNameString];
+        }
+        else {
+            fullNameString = message.user.fullname;
+            fullNameString = [TAPUtil nullToEmptyString:fullNameString];
+        }
+        
+        if ([thumbnailImageString isEqualToString:@""]) {
+            //No photo found, get the initial
+            self.senderInitialView.alpha = 1.0f;
+            self.senderImageView.alpha = 0.0f;
+            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullNameString isGroup:NO];
+        }
+        else {
+
+            if(![self.currentProfileImageURLString isEqualToString:thumbnailImageString]) {
                 self.senderImageView.image = nil;
             }
             
-            [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
-            _currentProfileImageURLString = message.user.imageURL.thumbnail;
+            self.senderInitialView.alpha = 0.0f;
+            self.senderImageView.alpha = 1.0f;
+            [self.senderImageView setImageWithURLString:thumbnailImageString];
+            _currentProfileImageURLString = thumbnailImageString;
         }
         
-        self.senderNameLabel.text = message.user.fullname;
+        self.senderNameLabel.text = fullNameString;
     }
     else {
         [self showSenderInfo:NO];
@@ -491,6 +532,12 @@
     }
 }
 
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourChatBubbleDidTappedProfilePictureWithMessage:)]) {
+        [self.delegate yourChatBubbleDidTappedProfilePictureWithMessage:self.message];
+    }
+}
+
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
     if (show) {
         //check id message sender is equal to active user id, if yes change the title to "You"
@@ -592,7 +639,7 @@
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
-    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
         self.fileView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
@@ -609,7 +656,7 @@
     }
     
     //check id message sender is equal to active user id, if yes change the title to "You"
-    if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
+    if ([userID isEqualToString:[TAPDataManager getActiveUser].userID] && !([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"])) {
         self.quoteTitleLabel.text = NSLocalizedString(@"You", @"");
     }
     else {
@@ -630,12 +677,16 @@
     if (show) {
         self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 30.0f;
+        self.senderProfileImageButton.userInteractionEnabled = YES;
         self.senderNameHeightConstraint.constant = 18.0f;
         self.forwardTitleTopConstraint.constant = 0.0f;
     }
     else {
         self.senderImageViewWidthConstraint.constant = 0.0f;
         self.senderImageViewTrailingConstraint.constant = 0.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 0.0f;
+        self.senderProfileImageButton.userInteractionEnabled = NO;
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleTopConstraint.constant = 0.0f;
     }

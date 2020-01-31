@@ -3,14 +3,91 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		5314F77E53B8919667FE449B /* Pods_TapTalkLive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46DBEB46C573D319A2B455D9 /* Pods_TapTalkLive.framework */; };
+		D7054C7723A0B0BA00B20950 /* TapTalkLive.h in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7523A0B0BA00B20950 /* TapTalkLive.h */; };
+		D7054C7823A0B0BA00B20950 /* TapTalkLive.m in Sources */ = {isa = PBXBuildFile; fileRef = D7054C7623A0B0BA00B20950 /* TapTalkLive.m */; };
+		D7054C7B23A0B13B00B20950 /* TapTalkLive-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7A23A0B13B00B20950 /* TapTalkLive-Prefix.pch */; };
+		D7054C7D23A0B14100B20950 /* TTLConfigs.h in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7C23A0B14100B20950 /* TTLConfigs.h */; };
+		D708887623D866AE009B591C /* TTLRoomListViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D708887423D866AE009B591C /* TTLRoomListViewController.h */; };
+		D708887723D866AE009B591C /* TTLRoomListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D708887523D866AE009B591C /* TTLRoomListViewController.m */; };
+		D72740C823D4A9260073784E /* TTLUserModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D72740C623D4A9260073784E /* TTLUserModel.h */; };
+		D72740C923D4A9260073784E /* TTLUserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D72740C723D4A9260073784E /* TTLUserModel.m */; };
+		D72740D623D4C14D0073784E /* TTLCaseModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D72740D423D4C14D0073784E /* TTLCaseModel.h */; };
+		D72740D723D4C14D0073784E /* TTLCaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D72740D523D4C14D0073784E /* TTLCaseModel.m */; };
+		D73506F023AB3F990076E7A6 /* TTLAPIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D73506EE23AB3F970076E7A6 /* TTLAPIManager.m */; };
+		D73506F123AB3F990076E7A6 /* TTLAPIManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D73506EF23AB3F980076E7A6 /* TTLAPIManager.h */; };
+		D747615C23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h in Headers */ = {isa = PBXBuildFile; fileRef = D747615A23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h */; };
+		D747615D23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.m in Sources */ = {isa = PBXBuildFile; fileRef = D747615B23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.m */; };
+		D7485F9E23D1B277001770FA /* TTLBaseTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7485F9C23D1B277001770FA /* TTLBaseTableViewCell.h */; };
+		D7485F9F23D1B277001770FA /* TTLBaseTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7485F9D23D1B277001770FA /* TTLBaseTableViewCell.m */; };
+		D7485FA223D1B287001770FA /* TTLBaseCollectionViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7485FA023D1B287001770FA /* TTLBaseCollectionViewCell.h */; };
+		D7485FA323D1B287001770FA /* TTLBaseCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7485FA123D1B287001770FA /* TTLBaseCollectionViewCell.m */; };
+		D7485FA623D1B2C0001770FA /* TTLDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D7485FA423D1B2C0001770FA /* TTLDataManager.h */; };
+		D7485FA723D1B2C0001770FA /* TTLDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D7485FA523D1B2C0001770FA /* TTLDataManager.m */; };
+		D7485FAE23D2C00F001770FA /* TTLImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7485FAC23D2C00F001770FA /* TTLImageView.h */; };
+		D7485FAF23D2C00F001770FA /* TTLImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7485FAD23D2C00F001770FA /* TTLImageView.m */; };
+		D7485FB223D2C349001770FA /* TTLNetworkManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D7485FB023D2C349001770FA /* TTLNetworkManager.h */; };
+		D7485FB323D2C349001770FA /* TTLNetworkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D7485FB123D2C349001770FA /* TTLNetworkManager.m */; };
+		D7485FB623D2C35D001770FA /* TTLStyleManager.h in Headers */ = {isa = PBXBuildFile; fileRef = D7485FB423D2C35D001770FA /* TTLStyleManager.h */; };
+		D7485FB723D2C35D001770FA /* TTLStyleManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D7485FB523D2C35D001770FA /* TTLStyleManager.m */; };
+		D7485FBD23D2C6C8001770FA /* TTLStyle.h in Headers */ = {isa = PBXBuildFile; fileRef = D7485FBC23D2C6C8001770FA /* TTLStyle.h */; };
+		D74C322923D2CE1C00626C9D /* TTLImage.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C322723D2CE1C00626C9D /* TTLImage.h */; };
+		D74C322A23D2CE1C00626C9D /* TTLImage.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C322823D2CE1C00626C9D /* TTLImage.m */; };
+		D74C322D23D2CF7200626C9D /* TTLCustomButtonView.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C322B23D2CF7200626C9D /* TTLCustomButtonView.h */; };
+		D74C322E23D2CF7200626C9D /* TTLCustomButtonView.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C322C23D2CF7200626C9D /* TTLCustomButtonView.m */; };
+		D74C323123D2D2CB00626C9D /* TTLCustomTextFieldView.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C322F23D2D2CB00626C9D /* TTLCustomTextFieldView.h */; };
+		D74C323223D2D2CB00626C9D /* TTLCustomTextFieldView.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C323023D2D2CB00626C9D /* TTLCustomTextFieldView.m */; };
+		D74C323523D3057800626C9D /* TTLTopicOptionTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C323323D3057800626C9D /* TTLTopicOptionTableViewCell.h */; };
+		D74C323623D3057800626C9D /* TTLTopicOptionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C323423D3057800626C9D /* TTLTopicOptionTableViewCell.m */; };
+		D74C323923D3058A00626C9D /* TTLTopicListView.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C323723D3058A00626C9D /* TTLTopicListView.h */; };
+		D74C323A23D3058A00626C9D /* TTLTopicListView.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C323823D3058A00626C9D /* TTLTopicListView.m */; };
+		D74C323D23D3059600626C9D /* TTLTopicListViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C323B23D3059600626C9D /* TTLTopicListViewController.h */; };
+		D74C323E23D3059600626C9D /* TTLTopicListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C323C23D3059600626C9D /* TTLTopicListViewController.m */; };
+		D74C324123D305B400626C9D /* TTLRatingView.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C323F23D305B400626C9D /* TTLRatingView.h */; };
+		D74C324223D305B400626C9D /* TTLRatingView.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C324023D305B400626C9D /* TTLRatingView.m */; };
+		D74C324523D305C500626C9D /* TTLRatingViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C324323D305C500626C9D /* TTLRatingViewController.h */; };
+		D74C324623D305C500626C9D /* TTLRatingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C324423D305C500626C9D /* TTLRatingViewController.m */; };
+		D74C324A23D3066F00626C9D /* TTLBaseModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D74C324823D3066F00626C9D /* TTLBaseModel.h */; };
+		D74C324B23D3066F00626C9D /* TTLBaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D74C324923D3066F00626C9D /* TTLBaseModel.m */; };
+		D76D884B23C71B37009F87B8 /* TTLCreateCaseViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D76D884923C71B37009F87B8 /* TTLCreateCaseViewController.h */; };
+		D76D884C23C71B37009F87B8 /* TTLCreateCaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D76D884A23C71B37009F87B8 /* TTLCreateCaseViewController.m */; };
+		D785CF0023D171C200651638 /* TTLFormGrowingTextView.h in Headers */ = {isa = PBXBuildFile; fileRef = D785CEFE23D171C200651638 /* TTLFormGrowingTextView.h */; };
+		D785CF0123D171C200651638 /* TTLFormGrowingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D785CEFF23D171C200651638 /* TTLFormGrowingTextView.m */; };
+		D79A7DA523D4C8CC00862E57 /* TTLTopicModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D79A7DA323D4C8CC00862E57 /* TTLTopicModel.h */; };
+		D79A7DA623D4C8CC00862E57 /* TTLTopicModel.m in Sources */ = {isa = PBXBuildFile; fileRef = D79A7DA423D4C8CC00862E57 /* TTLTopicModel.m */; };
+		D79D999C23E014D500A08D49 /* TTLPopUpHandlerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D79D999A23E014D500A08D49 /* TTLPopUpHandlerViewController.h */; };
+		D79D999D23E014D500A08D49 /* TTLPopUpHandlerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D79D999B23E014D500A08D49 /* TTLPopUpHandlerViewController.m */; };
+		D79EDBA323DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */; };
+		D79EDBA423DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */; };
+		D79EDBA523DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */; };
 		D7A4EB5923A0A6F700011755 /* TapTalkLive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7A4EB4F23A0A6F600011755 /* TapTalkLive.framework */; };
 		D7A4EB5E23A0A6F700011755 /* TapTalkLiveTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A4EB5D23A0A6F700011755 /* TapTalkLiveTests.m */; };
-		D7A4EB6023A0A6F700011755 /* TapTalkLive.h in Headers */ = {isa = PBXBuildFile; fileRef = D7A4EB5223A0A6F600011755 /* TapTalkLive.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D7A96BBA23B9C8D600654C71 /* TTLBaseView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7A96BB823B9C8D600654C71 /* TTLBaseView.h */; };
+		D7A96BBB23B9C8D600654C71 /* TTLBaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A96BB923B9C8D600654C71 /* TTLBaseView.m */; };
+		D7A96BCB23B9C96A00654C71 /* TTLBaseViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D7A96BC923B9C96A00654C71 /* TTLBaseViewController.h */; };
+		D7A96BCC23B9C96A00654C71 /* TTLBaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A96BCA23B9C96A00654C71 /* TTLBaseViewController.m */; };
+		D7A96BCF23B9CA4A00654C71 /* TTLUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = D7A96BCD23B9CA4A00654C71 /* TTLUtil.h */; };
+		D7A96BD023B9CA4A00654C71 /* TTLUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A96BCE23B9CA4A00654C71 /* TTLUtil.m */; };
+		D7A96BD323BF16B900654C71 /* TTLCreateCaseView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7A96BD123BF16B900654C71 /* TTLCreateCaseView.h */; };
+		D7A96BD423BF16B900654C71 /* TTLCreateCaseView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7A96BD223BF16B900654C71 /* TTLCreateCaseView.m */; };
+		D7C55F6223D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7C55F5F23D9A33E008B4CC3 /* TTLReviewBubbleTableViewCell.h */; };
+		D7C55F6323D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7C55F6023D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.m */; };
+		D7C55F6423D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7C55F6123D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib */; };
+		D7E397AE23D4D9AF0028FC60 /* NSUserDefaults+DVSecureUserDefaults.h in Headers */ = {isa = PBXBuildFile; fileRef = D7E397AC23D4D9AA0028FC60 /* NSUserDefaults+DVSecureUserDefaults.h */; };
+		D7E397AF23D4D9AF0028FC60 /* NSUserDefaults+DVSecureUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = D7E397AD23D4D9AF0028FC60 /* NSUserDefaults+DVSecureUserDefaults.m */; };
+		D7E4911023D368BB0021F13D /* TTLPopUpInfoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D7E4910E23D368BB0021F13D /* TTLPopUpInfoViewController.h */; };
+		D7E4911123D368BB0021F13D /* TTLPopUpInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D7E4910F23D368BB0021F13D /* TTLPopUpInfoViewController.m */; };
+		D7E4911423D368C60021F13D /* TTLPopUpInfoView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7E4911223D368C60021F13D /* TTLPopUpInfoView.h */; };
+		D7E4911523D368C60021F13D /* TTLPopUpInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7E4911323D368C60021F13D /* TTLPopUpInfoView.m */; };
+		D7E4911823D36EA40021F13D /* TTLKeyboardAccessoryView.h in Headers */ = {isa = PBXBuildFile; fileRef = D7E4911623D36EA40021F13D /* TTLKeyboardAccessoryView.h */; };
+		D7E4911923D36EA40021F13D /* TTLKeyboardAccessoryView.m in Sources */ = {isa = PBXBuildFile; fileRef = D7E4911723D36EA40021F13D /* TTLKeyboardAccessoryView.m */; };
+		D7F103AA23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D7F103A723DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.m */; };
+		D7F103AB23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D7F103A823DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.xib */; };
+		D7F103AC23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D7F103A923DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,12 +104,95 @@
 		46DBEB46C573D319A2B455D9 /* Pods_TapTalkLive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TapTalkLive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		47C6BAE8C45228CC9E71B516 /* Pods-TapTalkLive.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.debug.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.debug.xcconfig"; sourceTree = "<group>"; };
 		D4DB80AC0E047821EE6C64EB /* Pods-TapTalkLive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.release.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.release.xcconfig"; sourceTree = "<group>"; };
+		D7054C7523A0B0BA00B20950 /* TapTalkLive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapTalkLive.h; sourceTree = "<group>"; };
+		D7054C7623A0B0BA00B20950 /* TapTalkLive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TapTalkLive.m; sourceTree = "<group>"; };
+		D7054C7A23A0B13B00B20950 /* TapTalkLive-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TapTalkLive-Prefix.pch"; sourceTree = "<group>"; };
+		D7054C7C23A0B14100B20950 /* TTLConfigs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLConfigs.h; sourceTree = "<group>"; };
+		D708887423D866AE009B591C /* TTLRoomListViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLRoomListViewController.h; sourceTree = "<group>"; };
+		D708887523D866AE009B591C /* TTLRoomListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLRoomListViewController.m; sourceTree = "<group>"; };
+		D71F79D423C6179A00D86AB2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D72740C623D4A9260073784E /* TTLUserModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLUserModel.h; sourceTree = "<group>"; };
+		D72740C723D4A9260073784E /* TTLUserModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLUserModel.m; sourceTree = "<group>"; };
+		D72740D423D4C14D0073784E /* TTLCaseModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLCaseModel.h; sourceTree = "<group>"; };
+		D72740D523D4C14D0073784E /* TTLCaseModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLCaseModel.m; sourceTree = "<group>"; };
+		D73506EE23AB3F970076E7A6 /* TTLAPIManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLAPIManager.m; sourceTree = "<group>"; };
+		D73506EF23AB3F980076E7A6 /* TTLAPIManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLAPIManager.h; sourceTree = "<group>"; };
+		D747615A23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLCustomDropDownTextFieldView.h; sourceTree = "<group>"; };
+		D747615B23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLCustomDropDownTextFieldView.m; sourceTree = "<group>"; };
+		D7485F9C23D1B277001770FA /* TTLBaseTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLBaseTableViewCell.h; sourceTree = "<group>"; };
+		D7485F9D23D1B277001770FA /* TTLBaseTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLBaseTableViewCell.m; sourceTree = "<group>"; };
+		D7485FA023D1B287001770FA /* TTLBaseCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLBaseCollectionViewCell.h; sourceTree = "<group>"; };
+		D7485FA123D1B287001770FA /* TTLBaseCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLBaseCollectionViewCell.m; sourceTree = "<group>"; };
+		D7485FA423D1B2C0001770FA /* TTLDataManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLDataManager.h; sourceTree = "<group>"; };
+		D7485FA523D1B2C0001770FA /* TTLDataManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLDataManager.m; sourceTree = "<group>"; };
+		D7485FAC23D2C00F001770FA /* TTLImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLImageView.h; sourceTree = "<group>"; };
+		D7485FAD23D2C00F001770FA /* TTLImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLImageView.m; sourceTree = "<group>"; };
+		D7485FB023D2C349001770FA /* TTLNetworkManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLNetworkManager.h; sourceTree = "<group>"; };
+		D7485FB123D2C349001770FA /* TTLNetworkManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLNetworkManager.m; sourceTree = "<group>"; };
+		D7485FB423D2C35D001770FA /* TTLStyleManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLStyleManager.h; sourceTree = "<group>"; };
+		D7485FB523D2C35D001770FA /* TTLStyleManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLStyleManager.m; sourceTree = "<group>"; };
+		D7485FBC23D2C6C8001770FA /* TTLStyle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLStyle.h; sourceTree = "<group>"; };
+		D74C322723D2CE1C00626C9D /* TTLImage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLImage.h; sourceTree = "<group>"; };
+		D74C322823D2CE1C00626C9D /* TTLImage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLImage.m; sourceTree = "<group>"; };
+		D74C322B23D2CF7200626C9D /* TTLCustomButtonView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLCustomButtonView.h; sourceTree = "<group>"; };
+		D74C322C23D2CF7200626C9D /* TTLCustomButtonView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLCustomButtonView.m; sourceTree = "<group>"; };
+		D74C322F23D2D2CB00626C9D /* TTLCustomTextFieldView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLCustomTextFieldView.h; sourceTree = "<group>"; };
+		D74C323023D2D2CB00626C9D /* TTLCustomTextFieldView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLCustomTextFieldView.m; sourceTree = "<group>"; };
+		D74C323323D3057800626C9D /* TTLTopicOptionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLTopicOptionTableViewCell.h; sourceTree = "<group>"; };
+		D74C323423D3057800626C9D /* TTLTopicOptionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLTopicOptionTableViewCell.m; sourceTree = "<group>"; };
+		D74C323723D3058A00626C9D /* TTLTopicListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLTopicListView.h; sourceTree = "<group>"; };
+		D74C323823D3058A00626C9D /* TTLTopicListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLTopicListView.m; sourceTree = "<group>"; };
+		D74C323B23D3059600626C9D /* TTLTopicListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLTopicListViewController.h; sourceTree = "<group>"; };
+		D74C323C23D3059600626C9D /* TTLTopicListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLTopicListViewController.m; sourceTree = "<group>"; };
+		D74C323F23D305B400626C9D /* TTLRatingView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLRatingView.h; sourceTree = "<group>"; };
+		D74C324023D305B400626C9D /* TTLRatingView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLRatingView.m; sourceTree = "<group>"; };
+		D74C324323D305C500626C9D /* TTLRatingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLRatingViewController.h; sourceTree = "<group>"; };
+		D74C324423D305C500626C9D /* TTLRatingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLRatingViewController.m; sourceTree = "<group>"; };
+		D74C324823D3066F00626C9D /* TTLBaseModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLBaseModel.h; sourceTree = "<group>"; };
+		D74C324923D3066F00626C9D /* TTLBaseModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLBaseModel.m; sourceTree = "<group>"; };
+		D76D884923C71B37009F87B8 /* TTLCreateCaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLCreateCaseViewController.h; sourceTree = "<group>"; };
+		D76D884A23C71B37009F87B8 /* TTLCreateCaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLCreateCaseViewController.m; sourceTree = "<group>"; };
+		D785CEFE23D171C200651638 /* TTLFormGrowingTextView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLFormGrowingTextView.h; sourceTree = "<group>"; };
+		D785CEFF23D171C200651638 /* TTLFormGrowingTextView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLFormGrowingTextView.m; sourceTree = "<group>"; };
+		D79A7DA323D4C8CC00862E57 /* TTLTopicModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLTopicModel.h; sourceTree = "<group>"; };
+		D79A7DA423D4C8CC00862E57 /* TTLTopicModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLTopicModel.m; sourceTree = "<group>"; };
+		D79D999A23E014D500A08D49 /* TTLPopUpHandlerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLPopUpHandlerViewController.h; sourceTree = "<group>"; };
+		D79D999B23E014D500A08D49 /* TTLPopUpHandlerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLPopUpHandlerViewController.m; sourceTree = "<group>"; };
+		D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLCaseCloseBubbleTableViewCell.h; sourceTree = "<group>"; };
+		D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLCaseCloseBubbleTableViewCell.xib; sourceTree = "<group>"; };
+		D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLCaseCloseBubbleTableViewCell.m; sourceTree = "<group>"; };
 		D7A4EB4F23A0A6F600011755 /* TapTalkLive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TapTalkLive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D7A4EB5223A0A6F600011755 /* TapTalkLive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TapTalkLive.h; sourceTree = "<group>"; };
 		D7A4EB5323A0A6F600011755 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D7A4EB5823A0A6F700011755 /* TapTalkLiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TapTalkLiveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D7A4EB5D23A0A6F700011755 /* TapTalkLiveTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TapTalkLiveTests.m; sourceTree = "<group>"; };
 		D7A4EB5F23A0A6F700011755 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D7A96BB823B9C8D600654C71 /* TTLBaseView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLBaseView.h; sourceTree = "<group>"; };
+		D7A96BB923B9C8D600654C71 /* TTLBaseView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLBaseView.m; sourceTree = "<group>"; };
+		D7A96BC923B9C96A00654C71 /* TTLBaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLBaseViewController.h; sourceTree = "<group>"; };
+		D7A96BCA23B9C96A00654C71 /* TTLBaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLBaseViewController.m; sourceTree = "<group>"; };
+		D7A96BCD23B9CA4A00654C71 /* TTLUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLUtil.h; sourceTree = "<group>"; };
+		D7A96BCE23B9CA4A00654C71 /* TTLUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLUtil.m; sourceTree = "<group>"; };
+		D7A96BD123BF16B900654C71 /* TTLCreateCaseView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLCreateCaseView.h; sourceTree = "<group>"; };
+		D7A96BD223BF16B900654C71 /* TTLCreateCaseView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLCreateCaseView.m; sourceTree = "<group>"; };
+		D7C55F5F23D9A33E008B4CC3 /* TTLReviewBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLReviewBubbleTableViewCell.h; sourceTree = "<group>"; };
+		D7C55F6023D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLReviewBubbleTableViewCell.m; sourceTree = "<group>"; };
+		D7C55F6123D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLReviewBubbleTableViewCell.xib; sourceTree = "<group>"; };
+		D7C714EF23D09F22005D3644 /* PTRootUI-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PTRootUI-Bold.ttf"; sourceTree = "<group>"; };
+		D7C714F023D09F22005D3644 /* PTRootUI-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PTRootUI-Light.ttf"; sourceTree = "<group>"; };
+		D7C714F123D09F22005D3644 /* PTRootUI-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PTRootUI-Regular.ttf"; sourceTree = "<group>"; };
+		D7C714F223D09F22005D3644 /* PTRootUI-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PTRootUI-Medium.ttf"; sourceTree = "<group>"; };
+		D7C714F323D09F23005D3644 /* DMSans-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSans-Italic.ttf"; sourceTree = "<group>"; };
+		D7E397AC23D4D9AA0028FC60 /* NSUserDefaults+DVSecureUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSUserDefaults+DVSecureUserDefaults.h"; sourceTree = "<group>"; };
+		D7E397AD23D4D9AF0028FC60 /* NSUserDefaults+DVSecureUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSUserDefaults+DVSecureUserDefaults.m"; sourceTree = "<group>"; };
+		D7E4910E23D368BB0021F13D /* TTLPopUpInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLPopUpInfoViewController.h; sourceTree = "<group>"; };
+		D7E4910F23D368BB0021F13D /* TTLPopUpInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLPopUpInfoViewController.m; sourceTree = "<group>"; };
+		D7E4911223D368C60021F13D /* TTLPopUpInfoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLPopUpInfoView.h; sourceTree = "<group>"; };
+		D7E4911323D368C60021F13D /* TTLPopUpInfoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLPopUpInfoView.m; sourceTree = "<group>"; };
+		D7E4911623D36EA40021F13D /* TTLKeyboardAccessoryView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TTLKeyboardAccessoryView.h; sourceTree = "<group>"; };
+		D7E4911723D36EA40021F13D /* TTLKeyboardAccessoryView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TTLKeyboardAccessoryView.m; sourceTree = "<group>"; };
+		D7F103A723DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLDoneReviewBubbleTableViewCell.m; sourceTree = "<group>"; };
+		D7F103A823DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLDoneReviewBubbleTableViewCell.xib; sourceTree = "<group>"; };
+		D7F103A923DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLDoneReviewBubbleTableViewCell.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +223,63 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		D7054C7923A0B10300B20950 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D7C714EE23D09F0F005D3644 /* Fonts */,
+				D71F79D423C6179A00D86AB2 /* Assets.xcassets */,
+				D7A4EB5323A0A6F600011755 /* Info.plist */,
+				D7054C7A23A0B13B00B20950 /* TapTalkLive-Prefix.pch */,
+				D7054C7C23A0B14100B20950 /* TTLConfigs.h */,
+				D7485FBC23D2C6C8001770FA /* TTLStyle.h */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D7485F9A23D1B238001770FA /* UITableViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				D7485F9C23D1B277001770FA /* TTLBaseTableViewCell.h */,
+				D7485F9D23D1B277001770FA /* TTLBaseTableViewCell.m */,
+				D74C323323D3057800626C9D /* TTLTopicOptionTableViewCell.h */,
+				D74C323423D3057800626C9D /* TTLTopicOptionTableViewCell.m */,
+				D7C55F5F23D9A33E008B4CC3 /* TTLReviewBubbleTableViewCell.h */,
+				D7C55F6023D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.m */,
+				D7C55F6123D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib */,
+				D7F103A923DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.h */,
+				D7F103A723DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.m */,
+				D7F103A823DF4541009653C6 /* TTLDoneReviewBubbleTableViewCell.xib */,
+				D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */,
+				D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */,
+				D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */,
+			);
+			path = UITableViewCells;
+			sourceTree = "<group>";
+		};
+		D7485F9B23D1B255001770FA /* UICollectionViewCells */ = {
+			isa = PBXGroup;
+			children = (
+				D7485FA023D1B287001770FA /* TTLBaseCollectionViewCell.h */,
+				D7485FA123D1B287001770FA /* TTLBaseCollectionViewCell.m */,
+			);
+			path = UICollectionViewCells;
+			sourceTree = "<group>";
+		};
+		D74C324723D3064900626C9D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D74C324823D3066F00626C9D /* TTLBaseModel.h */,
+				D74C324923D3066F00626C9D /* TTLBaseModel.m */,
+				D72740C623D4A9260073784E /* TTLUserModel.h */,
+				D72740C723D4A9260073784E /* TTLUserModel.m */,
+				D72740D423D4C14D0073784E /* TTLCaseModel.h */,
+				D72740D523D4C14D0073784E /* TTLCaseModel.m */,
+				D79A7DA323D4C8CC00862E57 /* TTLTopicModel.h */,
+				D79A7DA423D4C8CC00862E57 /* TTLTopicModel.m */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		D7A4EB4523A0A6F600011755 = {
 			isa = PBXGroup;
 			children = (
@@ -86,8 +303,14 @@
 		D7A4EB5123A0A6F600011755 /* TapTalkLive */ = {
 			isa = PBXGroup;
 			children = (
-				D7A4EB5223A0A6F600011755 /* TapTalkLive.h */,
-				D7A4EB5323A0A6F600011755 /* Info.plist */,
+				D7A96BBC23B9C90200654C71 /* Components */,
+				D7B1655323A3779D0086153C /* Managers */,
+				D74C324723D3064900626C9D /* Models */,
+				D7A96BAE23B9C66A00654C71 /* Views */,
+				D7A96BAF23B9C66F00654C71 /* View Controllers */,
+				D7054C7523A0B0BA00B20950 /* TapTalkLive.h */,
+				D7054C7623A0B0BA00B20950 /* TapTalkLive.m */,
+				D7054C7923A0B10300B20950 /* Supporting Files */,
 			);
 			path = TapTalkLive;
 			sourceTree = "<group>";
@@ -101,13 +324,104 @@
 			path = TapTalkLiveTests;
 			sourceTree = "<group>";
 		};
+		D7A96BAE23B9C66A00654C71 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D7485F9B23D1B255001770FA /* UICollectionViewCells */,
+				D7485F9A23D1B238001770FA /* UITableViewCells */,
+				D7A96BB823B9C8D600654C71 /* TTLBaseView.h */,
+				D7A96BB923B9C8D600654C71 /* TTLBaseView.m */,
+				D7A96BD123BF16B900654C71 /* TTLCreateCaseView.h */,
+				D7A96BD223BF16B900654C71 /* TTLCreateCaseView.m */,
+				D74C323723D3058A00626C9D /* TTLTopicListView.h */,
+				D74C323823D3058A00626C9D /* TTLTopicListView.m */,
+				D74C323F23D305B400626C9D /* TTLRatingView.h */,
+				D74C324023D305B400626C9D /* TTLRatingView.m */,
+				D7E4911223D368C60021F13D /* TTLPopUpInfoView.h */,
+				D7E4911323D368C60021F13D /* TTLPopUpInfoView.m */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		D7A96BAF23B9C66F00654C71 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				D7A96BC923B9C96A00654C71 /* TTLBaseViewController.h */,
+				D7A96BCA23B9C96A00654C71 /* TTLBaseViewController.m */,
+				D76D884923C71B37009F87B8 /* TTLCreateCaseViewController.h */,
+				D76D884A23C71B37009F87B8 /* TTLCreateCaseViewController.m */,
+				D74C323B23D3059600626C9D /* TTLTopicListViewController.h */,
+				D74C323C23D3059600626C9D /* TTLTopicListViewController.m */,
+				D74C324323D305C500626C9D /* TTLRatingViewController.h */,
+				D74C324423D305C500626C9D /* TTLRatingViewController.m */,
+				D7E4910E23D368BB0021F13D /* TTLPopUpInfoViewController.h */,
+				D7E4910F23D368BB0021F13D /* TTLPopUpInfoViewController.m */,
+				D79D999A23E014D500A08D49 /* TTLPopUpHandlerViewController.h */,
+				D79D999B23E014D500A08D49 /* TTLPopUpHandlerViewController.m */,
+				D708887423D866AE009B591C /* TTLRoomListViewController.h */,
+				D708887523D866AE009B591C /* TTLRoomListViewController.m */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		D7A96BBC23B9C90200654C71 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				D7E397AC23D4D9AA0028FC60 /* NSUserDefaults+DVSecureUserDefaults.h */,
+				D7E397AD23D4D9AF0028FC60 /* NSUserDefaults+DVSecureUserDefaults.m */,
+				D7A96BCD23B9CA4A00654C71 /* TTLUtil.h */,
+				D7A96BCE23B9CA4A00654C71 /* TTLUtil.m */,
+				D747615A23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h */,
+				D747615B23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.m */,
+				D785CEFE23D171C200651638 /* TTLFormGrowingTextView.h */,
+				D785CEFF23D171C200651638 /* TTLFormGrowingTextView.m */,
+				D7485FAC23D2C00F001770FA /* TTLImageView.h */,
+				D7485FAD23D2C00F001770FA /* TTLImageView.m */,
+				D74C322723D2CE1C00626C9D /* TTLImage.h */,
+				D74C322823D2CE1C00626C9D /* TTLImage.m */,
+				D74C322B23D2CF7200626C9D /* TTLCustomButtonView.h */,
+				D74C322C23D2CF7200626C9D /* TTLCustomButtonView.m */,
+				D74C322F23D2D2CB00626C9D /* TTLCustomTextFieldView.h */,
+				D74C323023D2D2CB00626C9D /* TTLCustomTextFieldView.m */,
+				D7E4911623D36EA40021F13D /* TTLKeyboardAccessoryView.h */,
+				D7E4911723D36EA40021F13D /* TTLKeyboardAccessoryView.m */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		D7B1655323A3779D0086153C /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				D73506EF23AB3F980076E7A6 /* TTLAPIManager.h */,
+				D73506EE23AB3F970076E7A6 /* TTLAPIManager.m */,
+				D7485FA423D1B2C0001770FA /* TTLDataManager.h */,
+				D7485FA523D1B2C0001770FA /* TTLDataManager.m */,
+				D7485FB023D2C349001770FA /* TTLNetworkManager.h */,
+				D7485FB123D2C349001770FA /* TTLNetworkManager.m */,
+				D7485FB423D2C35D001770FA /* TTLStyleManager.h */,
+				D7485FB523D2C35D001770FA /* TTLStyleManager.m */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		D7C714EE23D09F0F005D3644 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				D7C714F323D09F23005D3644 /* DMSans-Italic.ttf */,
+				D7C714EF23D09F22005D3644 /* PTRootUI-Bold.ttf */,
+				D7C714F023D09F22005D3644 /* PTRootUI-Light.ttf */,
+				D7C714F223D09F22005D3644 /* PTRootUI-Medium.ttf */,
+				D7C714F123D09F22005D3644 /* PTRootUI-Regular.ttf */,
+			);
+			name = Fonts;
+			sourceTree = "<group>";
+		};
 		F72F0E6ED74D376BF7E9E876 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
 				47C6BAE8C45228CC9E71B516 /* Pods-TapTalkLive.debug.xcconfig */,
 				D4DB80AC0E047821EE6C64EB /* Pods-TapTalkLive.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -118,7 +432,45 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D7A4EB6023A0A6F700011755 /* TapTalkLive.h in Headers */,
+				D7485FAE23D2C00F001770FA /* TTLImageView.h in Headers */,
+				D7F103AC23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.h in Headers */,
+				D74C323123D2D2CB00626C9D /* TTLCustomTextFieldView.h in Headers */,
+				D74C324A23D3066F00626C9D /* TTLBaseModel.h in Headers */,
+				D7485FBD23D2C6C8001770FA /* TTLStyle.h in Headers */,
+				D7485FB623D2C35D001770FA /* TTLStyleManager.h in Headers */,
+				D7A96BD323BF16B900654C71 /* TTLCreateCaseView.h in Headers */,
+				D7054C7723A0B0BA00B20950 /* TapTalkLive.h in Headers */,
+				D79A7DA523D4C8CC00862E57 /* TTLTopicModel.h in Headers */,
+				D74C322923D2CE1C00626C9D /* TTLImage.h in Headers */,
+				D7485FB223D2C349001770FA /* TTLNetworkManager.h in Headers */,
+				D72740D623D4C14D0073784E /* TTLCaseModel.h in Headers */,
+				D74C323D23D3059600626C9D /* TTLTopicListViewController.h in Headers */,
+				D785CF0023D171C200651638 /* TTLFormGrowingTextView.h in Headers */,
+				D7A96BCF23B9CA4A00654C71 /* TTLUtil.h in Headers */,
+				D7E397AE23D4D9AF0028FC60 /* NSUserDefaults+DVSecureUserDefaults.h in Headers */,
+				D7485FA223D1B287001770FA /* TTLBaseCollectionViewCell.h in Headers */,
+				D7E4911023D368BB0021F13D /* TTLPopUpInfoViewController.h in Headers */,
+				D7C55F6223D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.h in Headers */,
+				D7485FA623D1B2C0001770FA /* TTLDataManager.h in Headers */,
+				D7E4911423D368C60021F13D /* TTLPopUpInfoView.h in Headers */,
+				D79EDBA323DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.h in Headers */,
+				D7054C7D23A0B14100B20950 /* TTLConfigs.h in Headers */,
+				D74C324123D305B400626C9D /* TTLRatingView.h in Headers */,
+				D79D999C23E014D500A08D49 /* TTLPopUpHandlerViewController.h in Headers */,
+				D747615C23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h in Headers */,
+				D74C322D23D2CF7200626C9D /* TTLCustomButtonView.h in Headers */,
+				D7A96BBA23B9C8D600654C71 /* TTLBaseView.h in Headers */,
+				D74C323523D3057800626C9D /* TTLTopicOptionTableViewCell.h in Headers */,
+				D76D884B23C71B37009F87B8 /* TTLCreateCaseViewController.h in Headers */,
+				D7A96BCB23B9C96A00654C71 /* TTLBaseViewController.h in Headers */,
+				D7E4911823D36EA40021F13D /* TTLKeyboardAccessoryView.h in Headers */,
+				D72740C823D4A9260073784E /* TTLUserModel.h in Headers */,
+				D74C323923D3058A00626C9D /* TTLTopicListView.h in Headers */,
+				D7485F9E23D1B277001770FA /* TTLBaseTableViewCell.h in Headers */,
+				D708887623D866AE009B591C /* TTLRoomListViewController.h in Headers */,
+				D74C324523D305C500626C9D /* TTLRatingViewController.h in Headers */,
+				D7054C7B23A0B13B00B20950 /* TapTalkLive-Prefix.pch in Headers */,
+				D73506F123AB3F990076E7A6 /* TTLAPIManager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,7 +486,7 @@
 				D7A4EB4B23A0A6F600011755 /* Sources */,
 				D7A4EB4C23A0A6F600011755 /* Frameworks */,
 				D7A4EB4D23A0A6F600011755 /* Resources */,
-				BC6058F41B98B6C8C303962B /* [CP] Copy Pods Resources */,
+				A890B5D00AD8676854F04722 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -204,6 +556,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D7C55F6423D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib in Resources */,
+				D7F103AB23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.xib in Resources */,
+				D79EDBA423DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,7 +572,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		BC6058F41B98B6C8C303962B /* [CP] Copy Pods Resources */ = {
+		A890B5D00AD8676854F04722 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -263,6 +618,42 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D7E4911523D368C60021F13D /* TTLPopUpInfoView.m in Sources */,
+				D7E4911123D368BB0021F13D /* TTLPopUpInfoViewController.m in Sources */,
+				D708887723D866AE009B591C /* TTLRoomListViewController.m in Sources */,
+				D79D999D23E014D500A08D49 /* TTLPopUpHandlerViewController.m in Sources */,
+				D73506F023AB3F990076E7A6 /* TTLAPIManager.m in Sources */,
+				D7A96BD423BF16B900654C71 /* TTLCreateCaseView.m in Sources */,
+				D74C323223D2D2CB00626C9D /* TTLCustomTextFieldView.m in Sources */,
+				D72740C923D4A9260073784E /* TTLUserModel.m in Sources */,
+				D74C322E23D2CF7200626C9D /* TTLCustomButtonView.m in Sources */,
+				D7485FA323D1B287001770FA /* TTLBaseCollectionViewCell.m in Sources */,
+				D7485FB723D2C35D001770FA /* TTLStyleManager.m in Sources */,
+				D79A7DA623D4C8CC00862E57 /* TTLTopicModel.m in Sources */,
+				D7485FA723D1B2C0001770FA /* TTLDataManager.m in Sources */,
+				D7A96BCC23B9C96A00654C71 /* TTLBaseViewController.m in Sources */,
+				D79EDBA523DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m in Sources */,
+				D74C322A23D2CE1C00626C9D /* TTLImage.m in Sources */,
+				D74C324B23D3066F00626C9D /* TTLBaseModel.m in Sources */,
+				D76D884C23C71B37009F87B8 /* TTLCreateCaseViewController.m in Sources */,
+				D7E397AF23D4D9AF0028FC60 /* NSUserDefaults+DVSecureUserDefaults.m in Sources */,
+				D785CF0123D171C200651638 /* TTLFormGrowingTextView.m in Sources */,
+				D7485FB323D2C349001770FA /* TTLNetworkManager.m in Sources */,
+				D74C324623D305C500626C9D /* TTLRatingViewController.m in Sources */,
+				D74C323E23D3059600626C9D /* TTLTopicListViewController.m in Sources */,
+				D7485F9F23D1B277001770FA /* TTLBaseTableViewCell.m in Sources */,
+				D7054C7823A0B0BA00B20950 /* TapTalkLive.m in Sources */,
+				D747615D23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.m in Sources */,
+				D72740D723D4C14D0073784E /* TTLCaseModel.m in Sources */,
+				D7485FAF23D2C00F001770FA /* TTLImageView.m in Sources */,
+				D7F103AA23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.m in Sources */,
+				D74C323623D3057800626C9D /* TTLTopicOptionTableViewCell.m in Sources */,
+				D74C323A23D3058A00626C9D /* TTLTopicListView.m in Sources */,
+				D7A96BBB23B9C8D600654C71 /* TTLBaseView.m in Sources */,
+				D74C324223D305B400626C9D /* TTLRatingView.m in Sources */,
+				D7C55F6323D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.m in Sources */,
+				D7E4911923D36EA40021F13D /* TTLKeyboardAccessoryView.m in Sources */,
+				D7A96BD023B9CA4A00654C71 /* TTLUtil.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,6 +717,8 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TapTalk/Supporting Files/TapTalkLive-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -385,6 +778,8 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TapTalk/Supporting Files/TapTalkLive-Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -405,13 +800,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 47C6BAE8C45228CC9E71B516 /* Pods-TapTalkLive.debug.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = PA443D57Z2;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = TapTalkLive/Info.plist;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TapTalkLive/Supporting Files/TapTalkLive-Prefix.pch";
+				INFOPLIST_FILE = "TapTalkLive/Supporting Files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -429,13 +827,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D4DB80AC0E047821EE6C64EB /* Pods-TapTalkLive.release.xcconfig */;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = PA443D57Z2;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = TapTalkLive/Info.plist;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TapTalkLive/Supporting Files/TapTalkLive-Prefix.pch";
+				INFOPLIST_FILE = "TapTalkLive/Supporting Files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

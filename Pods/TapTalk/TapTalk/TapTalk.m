@@ -9,6 +9,7 @@
 #import "TapTalk.h"
 #import "TAPProfileViewController.h"
 #import <CoreText/CoreText.h>
+#import <CoreLocation/CoreLocation.h>
 
 @import AFNetworking;
 @import GooglePlaces;
@@ -18,6 +19,7 @@
 
 @property (nonatomic) TapTalkImplentationType implementationType;
 @property (nonatomic) BOOL isAutoConnectDisabled;
+@property (nonatomic) BOOL isGooglePlacesAPIInitialize;
 
 @property (strong, nonatomic) NSDictionary * _Nullable projectConfigsDictionary;
 @property (strong, nonatomic) NSDictionary * _Nullable coreConfigsDictionary;
@@ -57,6 +59,12 @@
         //Add notification manager delegate
         [TAPNotificationManager sharedManager].delegate = self;
         
+        //Init TapLocationManager when already authorized to obtain current location first
+        if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedAlways || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse) {
+            [TAPLocationManager sharedManager];
+        }
+        
+        
     }
     
     return self;
@@ -73,6 +81,12 @@
         [errorDictionary setObject:@"Invalid Auth Ticket" forKey:NSLocalizedDescriptionKey];
         NSError *error = [NSError errorWithDomain:@"io.TapTalk.framework.ErrorDomain" code:90005 userInfo:errorDictionary];
         failure(error);
+    }
+    
+    //Set RoomList to loading
+    BOOL isAuthenticated = [[TapTalk sharedInstance] isAuthenticated];
+    if (!isAuthenticated) {
+        [[TapUI sharedInstance].roomListViewController showLoadingSetupView];
     }
     
     [TAPDataManager callAPIGetAccessTokenWithAuthTicket:authTicket success:^{
@@ -153,12 +167,8 @@
     completion();
 }
 
-- (void)enableAutoConnect {
-    _isAutoConnectDisabled = NO;
-}
-
-- (void)disableAutoConnect {
-    _isAutoConnectDisabled = YES;
+- (void)setAutoConnectEnabled:(BOOL)enabled {
+    _isAutoConnectDisabled = !enabled;
 }
 
 - (BOOL)isAutoConnectEnabled {
@@ -278,10 +288,16 @@
 }
 
 - (void)application:(UIApplication *_Nonnull)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *_Nonnull)deviceToken {
-    NSString *pushToken = [deviceToken description];
-    pushToken = [pushToken stringByReplacingOccurrencesOfString:@"<" withString:@""];
-    pushToken = [pushToken stringByReplacingOccurrencesOfString:@">" withString:@""];
-    pushToken = [pushToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+    NSString *pushToken = [TAPUtil hexadecimalStringFromData:deviceToken];
+    if (IS_IOS_13_OR_ABOVE) {
+        pushToken = [pushToken stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+        pushToken = [pushToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+    }
+    else {
+        pushToken = [pushToken stringByReplacingOccurrencesOfString:@"<" withString:@""];
+        pushToken = [pushToken stringByReplacingOccurrencesOfString:@">" withString:@""];
+        pushToken = [pushToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+    }
     
     [[TAPNotificationManager sharedManager] setPushToken:pushToken];
 }
@@ -409,14 +425,19 @@
         
     }];
     
-    //Validate and refresh access token
-    [[TAPConnectionManager sharedManager] validateToken];
+//    //Validate and refresh access token
+//    [[TAPConnectionManager sharedManager] validateToken];
 }
 
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {
     //Google API Key
     [GMSPlacesClient provideAPIKey:apiKey];
     [GMSServices provideAPIKey:apiKey];
+    _isGooglePlacesAPIInitialize = YES;
+}
+
+- (BOOL)obtainGooglePlacesAPIInitializeState {
+    return self.isGooglePlacesAPIInitialize;
 }
 
 - (void)refreshActiveUser {
@@ -510,6 +531,9 @@
         
     }];
     
+    //Clear room list data
+    [[[TapUI sharedInstance] roomListViewController] clearAllData];
+    
     //Remove all preference
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACTIVE_USER];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_ACCESS_TOKEN];
@@ -525,7 +549,8 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_CONTACT_PERMISSION_ASKED];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_PROJECT_CONFIGS_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_DONE_FIRST_TIME_AUTO_SYNC_CONTACT];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_IGNORE_ADD_CONTACT_POPUP_DICTIONARY];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     //Clear Manager Data
@@ -559,13 +584,9 @@
     }
 }
 
-- (void)enableAutoContactSync {
-    [[NSUserDefaults standardUserDefaults] setSecureBool:NO forKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-- (void)disableAutoContactSync {
-    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
+- (void)setAutoContactSyncEnabled:(BOOL)enabled {
+    BOOL disabled = !enabled;
+    [[NSUserDefaults standardUserDefaults] setSecureBool:disabled forKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

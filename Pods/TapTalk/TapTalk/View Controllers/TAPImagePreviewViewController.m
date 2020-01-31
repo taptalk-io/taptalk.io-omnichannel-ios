@@ -709,7 +709,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)cancelButtonDidTapped {
     _showVideoPlayer = NO;
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:^{
+        if ([self.delegate respondsToSelector:@selector(imagePreviewCancelButtonDidTapped)]) {
+            [self.delegate imagePreviewCancelButtonDidTapped];
+        }
+    }];
 }
 
 - (void)morePictureButtonDidTapped {
@@ -740,7 +744,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -779,7 +783,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -816,7 +820,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             [self.delegate imagePreviewDidTapSendButtonWithData:self.mediaDataArray];
         }
         
-        [self dismissViewControllerAnimated:YES completion:nil];
+        [self dismissViewControllerAnimated:YES completion:^{
+            if ([self.delegate respondsToSelector:@selector(imagePreviewDidSendDataAndCompleteDismissView)]) {
+                [self.delegate imagePreviewDidSendDataAndCompleteDismissView];
+            }
+        }];
     }
 }
 

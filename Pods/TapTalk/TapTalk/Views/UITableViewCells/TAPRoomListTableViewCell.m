@@ -13,6 +13,8 @@
 
 @property (strong, nonatomic) UIView *bgView;
 @property (strong, nonatomic) UIView *typingView;
+@property (strong, nonatomic) UIView *initialNameView;
+@property (strong, nonatomic) UILabel *initialNameLabel;
 @property (strong, nonatomic) TAPImageView *profileImageView;
 @property (strong, nonatomic) UIImageView *typingAnimationImageView;
 @property (strong, nonatomic) UIImageView *expertIconImageView;
@@ -49,6 +51,20 @@
         
         CGFloat leftPadding = 16.0f;
         CGFloat rightPadding = 16.0f;
+        _initialNameView = [[UIView alloc] initWithFrame:CGRectMake(leftPadding, 8.0f, 52.0f, 52.0f)];
+        self.initialNameView.alpha = 0.0f;
+        self.initialNameView.layer.cornerRadius = CGRectGetHeight(self.initialNameView.frame) / 2.0f;
+        self.initialNameView.clipsToBounds = YES;
+        [self.bgView addSubview:self.initialNameView];
+        
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarMediumLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarMediumLabel];
+        _initialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.initialNameView.frame), CGRectGetHeight(self.initialNameView.frame))];
+        self.initialNameLabel.font = initialNameLabelFont;
+        self.initialNameLabel.textColor = initialNameLabelColor;
+        self.initialNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.initialNameView addSubview:self.initialNameLabel];
+        
         _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(leftPadding, 8.0f, 52.0f, 52.0f)];
         self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.profileImageView.backgroundColor = [UIColor clearColor];
@@ -169,19 +185,67 @@
     BOOL isGroup = NO;
     NSString *lastSender = @"";
     
-    NSString *profileImageURL = message.room.imageURL.thumbnail;
-    if ([[TAPGroupManager sharedManager] getRoomWithRoomID:message.room.roomID]) {
-        TAPRoomModel *room = [[TAPGroupManager sharedManager] getRoomWithRoomID:message.room.roomID];
-        profileImageURL = room.imageURL.thumbnail;
-    }
     NSInteger numberOfUnreadMessage = roomList.numberOfUnreadMessages;
     
     TAPRoomModel *currentRoom = message.room;
     
-    if (currentRoom.type == RoomTypeGroup || currentRoom.type == RoomTypeChannel) {
+    if (currentRoom.type == RoomTypeGroup || currentRoom.type == RoomTypeChannel ||  currentRoom.type == RoomTypeTransaction) {
         //Group / Channel
         isGroup = YES;
     }
+    
+    NSString *profileImageURL = @"";
+     NSString *roomName = @"";
+     if (message.room.type == RoomTypePersonal) {
+         NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:currentRoom.roomID];
+         TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+         if([message.room.deleted longValue] != 0) {
+             profileImageURL = @"";
+         }
+         else if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+             profileImageURL = obtainedUser.imageURL.thumbnail;
+             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+         }
+         else {
+             profileImageURL = message.room.imageURL.thumbnail;
+             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+         }
+         
+         if (obtainedUser != nil && obtainedUser.fullname != nil && [message.room.deleted longValue] == 0) {
+             roomName = obtainedUser.fullname;
+             roomName = [TAPUtil nullToEmptyString:roomName];
+         }
+         else {
+             roomName = message.room.name;
+             roomName = [TAPUtil nullToEmptyString:roomName];
+         }
+     }
+     else if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
+         TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:message.room.roomID];
+         NSString *groupProfileImageURL = obtainedRoom.imageURL.thumbnail;
+         groupProfileImageURL = [TAPUtil nullToEmptyString:groupProfileImageURL];
+         
+         NSString *groupRoomName = obtainedRoom.name;
+         groupRoomName = [TAPUtil nullToEmptyString:groupRoomName];
+         
+         if ([groupProfileImageURL isEqualToString:@""]) {
+             profileImageURL = message.room.imageURL.thumbnail;
+             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+         }
+         else {
+             profileImageURL = groupProfileImageURL;
+             profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+         }
+         
+         if ([groupRoomName isEqualToString:@""]) {
+             roomName = message.room.name;
+             roomName = [TAPUtil nullToEmptyString:roomName];
+         }
+         else {
+             roomName = groupRoomName;
+             roomName = [TAPUtil nullToEmptyString:roomName];
+         }
+     }
     
     if (isGroup) {
         TAPUserModel *currentActiveUser = [TAPDataManager getActiveUser];
@@ -192,9 +256,6 @@
             lastSender = message.user.fullname;
         }
     }
-    
-    NSString *roomName = currentRoom.name;
-    roomName = [TAPUtil nullToEmptyString:roomName];
     
     NSTimeInterval lastMessageTimeInterval = [message.created doubleValue] / 1000.0f; //change to second from milisecond
     NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
@@ -266,16 +327,16 @@
     self.messageStatusType = statusType;
     
     if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        if (isGroup) {
-            //Group or Channel
-            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultGroupAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        }
-        else {
-            //Personal
-            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];;
-        }
+
+        //No photo found, get the initial
+        self.initialNameView.alpha = 1.0f;
+        self.profileImageView.alpha = 0.0f;
+        self.initialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:roomName];
+        self.initialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:roomName isGroup:isGroup];
     }
     else {
+        self.initialNameView.alpha = 0.0f;
+        self.profileImageView.alpha = 1.0f;
         [self.profileImageView setImageWithURLString:profileImageURL];
     }
     
@@ -486,6 +547,11 @@
             CGFloat bubbleUnreadViewWidth = newNumberOfUnreadMessageLabelSize.width + 7.0f + 7.0f;
             CGFloat numberOfUnreadMessageLabelXPosition = 7.0f;
             
+            if(bubbleUnreadViewWidth < CGRectGetHeight(self.bubbleUnreadView.frame)) {
+                bubbleUnreadViewWidth = CGRectGetHeight(self.bubbleUnreadView.frame);
+                newNumberOfUnreadMessageLabelSize = CGSizeMake(bubbleUnreadViewWidth - 7.0f - 7.0f, newNumberOfUnreadMessageLabelSize.height);
+            }
+            
             self.numberOfUnreadMessageLabel.frame = CGRectMake(numberOfUnreadMessageLabelXPosition, CGRectGetMinY(self.numberOfUnreadMessageLabel.frame), newNumberOfUnreadMessageLabelSize.width, CGRectGetHeight(self.numberOfUnreadMessageLabel.frame));
             
             self.bubbleUnreadView.frame = CGRectMake(CGRectGetWidth(self.bgView.frame) - 16.0f - bubbleUnreadViewWidth, CGRectGetMinY(self.bubbleUnreadView.frame), bubbleUnreadViewWidth, CGRectGetHeight(self.bubbleUnreadView.frame));
@@ -495,9 +561,11 @@
     }
     
     if (isGroup) {
-        self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        self.expertIconImageView.alpha = 1.0f;
-        
+        if (message.room.type != RoomTypeTransaction) {
+            self.expertIconImageView.image = [UIImage imageNamed:@"TAPIconGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.expertIconImageView.alpha = 1.0f;
+        }
+            
         //Last Sender
         self.lastSenderLabel.alpha = 1.0f;
         self.lastSenderLabel.frame = CGRectMake(CGRectGetMinX(self.lastSenderLabel.frame), CGRectGetMaxY(self.roomNameLabel.frame), CGRectGetWidth(self.lastSenderLabel.frame), 16.0f);

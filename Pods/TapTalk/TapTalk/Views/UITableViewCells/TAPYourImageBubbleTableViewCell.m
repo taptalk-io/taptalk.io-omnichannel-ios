@@ -27,6 +27,9 @@
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
 @property (strong, nonatomic) IBOutlet UIButton *openImageButton;
 
+@property (strong, nonatomic) IBOutlet UIView *senderInitialView;
+@property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
+@property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
 
@@ -72,6 +75,7 @@
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderProfileImageButtonWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameTopConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderNameHeightConstraint;
 
@@ -108,6 +112,7 @@
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)quoteViewButtonDidTapped:(id)sender;
 - (IBAction)replyViewButtonDidTapped:(id)sender;
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender;
 - (void)getImageSizeFromImage:(UIImage *)image;
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width;
 - (void)showImageCaption:(BOOL)show;
@@ -334,6 +339,14 @@
     UIFont *senderNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleSenderName];
     UIColor *senderNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleSenderName];
     
+    UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+    UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+    
+    self.senderInitialLabel.textColor = initialNameLabelColor;
+    self.senderInitialLabel.font = initialNameLabelFont;
+    self.senderInitialView.layer.cornerRadius = CGRectGetWidth(self.senderInitialView.frame) / 2.0f;
+    self.senderInitialView.clipsToBounds = YES;
+
     self.replyNameLabel.textColor = quoteTitleColor;
     self.replyNameLabel.font = quoteTitleFont;
     
@@ -360,6 +373,12 @@
     
     self.senderNameLabel.font = senderNameLabelFont;
     self.senderNameLabel.textColor = senderNameLabelColor;
+}
+
+- (IBAction)senderProfileImageButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourImageBubbleDidTappedProfilePictureWithMessage:)]) {
+        [self.delegate yourImageBubbleDidTappedProfilePictureWithMessage:self.message];
+    }
 }
 
 - (IBAction)replyButtonDidTapped:(id)sender {
@@ -511,25 +530,54 @@
     }
     
     //CS NOTE - check chat room type, show sender info if group type
-    if (message.room.type == RoomTypeGroup) {
+    if (message.room.type == RoomTypeGroup || message.room.type == RoomTypeTransaction) {
         [self showSenderInfo:NO];
         //DV Note - Set sender image to show only sender image, because show sender info view yes will update quote view top constraint to 4.0f making white space in the top of the media
-        self.senderImageViewWidthConstraint.constant = 28.0f;
+        self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
-        [self.contentView layoutIfNeeded];
+        self.senderProfileImageButtonWidthConstraint.constant = 30.0f;
+        self.senderProfileImageButton.userInteractionEnabled = YES;
         
-        if ([message.user.imageURL.thumbnail isEqualToString:@""]) {
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        NSString *thumbnailImageString = @"";
+        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:message.user.userID];
+        if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+           thumbnailImageString = obtainedUser.imageURL.thumbnail;
+           thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
         }
         else {
-            if(![self.currentProfileImageURLString isEqualToString:message.user.imageURL.thumbnail]) {
+           thumbnailImageString = message.user.imageURL.thumbnail;
+           thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
+        }
+
+        NSString *fullNameString = @"";
+        if (obtainedUser != nil && ![obtainedUser.fullname isEqualToString:@""]) {
+           fullNameString = obtainedUser.fullname;
+           fullNameString = [TAPUtil nullToEmptyString:fullNameString];
+        }
+        else {
+           fullNameString = message.user.fullname;
+           fullNameString = [TAPUtil nullToEmptyString:fullNameString];
+        }
+
+        if ([thumbnailImageString isEqualToString:@""]) {
+            //No photo found, get the initial
+            self.senderInitialView.alpha = 1.0f;
+            self.senderImageView.alpha = 0.0f;
+            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullNameString isGroup:NO];
+        }
+        else {
+            if(![self.currentProfileImageURLString isEqualToString:thumbnailImageString]) {
                 self.senderImageView.image = nil;
             }
             
-            [self.senderImageView setImageWithURLString:message.user.imageURL.thumbnail];
-            _currentProfileImageURLString = message.user.imageURL.thumbnail;
+            self.senderInitialView.alpha = 0.0f;
+            self.senderImageView.alpha = 1.0f;
+            [self.senderImageView setImageWithURLString:thumbnailImageString];
+            _currentProfileImageURLString = thumbnailImageString;
         }
         
+        //DV Note - Set sender name to empty string because image and video bubble not showing sender name
         self.senderNameLabel.text = @"";
     }
     else {
@@ -756,7 +804,6 @@
 }
 
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width {
-    
     if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
         //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
         _cellWidth = self.maxWidth;
@@ -787,13 +834,20 @@
             
             imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
             _cellHeight = imageHeight;
+            
             if (imageHeight > self.maxHeight) {
                 imageHeight = self.maxHeight;
                 _cellHeight = imageHeight;
+                
+                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+                _cellWidth = imageWidth;
             }
             else if (imageHeight < self.minHeight) {
                 imageHeight = self.minHeight;
                 _cellHeight = imageHeight;
+                
+                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+                _cellWidth = imageWidth;
             }
         }
         else if (imageWidth < self.minWidth) {
@@ -802,13 +856,20 @@
             
             imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
             _cellHeight = imageHeight;
+            
             if (imageHeight > self.maxHeight) {
                 imageHeight = self.maxHeight;
                 _cellHeight = imageHeight;
+                
+                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+                _cellWidth = imageWidth;
             }
             else if (imageHeight < self.minHeight) {
                 imageHeight = self.minHeight;
                 _cellHeight = imageHeight;
+                
+                imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
+                _cellWidth = imageWidth;
             }
         }
     }
@@ -819,13 +880,20 @@
             
             imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
             _cellWidth = imageWidth;
+            
             if (imageWidth > self.maxWidth) {
                 imageWidth = self.maxWidth;
                 _cellWidth = imageWidth;
+
+                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+                _cellHeight = imageHeight;
             }
             else if (imageWidth < self.minWidth) {
                 imageWidth = self.minWidth;
                 _cellWidth = imageWidth;
+
+                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+                _cellHeight = imageHeight;
             }
         }
         else if (imageHeight < self.minHeight) {
@@ -834,13 +902,20 @@
             
             imageWidth = (imageHeight / previousImageHeight) * previousImageWidth;
             _cellWidth = imageWidth;
+            
             if (imageWidth > self.maxWidth) {
                 imageWidth = self.maxWidth;
                 _cellWidth = imageWidth;
+
+                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+                _cellHeight = imageHeight;
             }
             else if (imageWidth < self.minWidth) {
                 imageWidth = self.minWidth;
                 _cellWidth = imageWidth;
+
+                imageHeight = (imageWidth / previousImageWidth) * previousImageHeight;
+                _cellHeight = imageHeight;
             }
         }
     }
@@ -1057,7 +1132,7 @@
 }
 
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
-    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]]) {
+    if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
         self.fileView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
@@ -1108,15 +1183,19 @@
     if (show) {
         self.senderImageViewWidthConstraint.constant = 30.0f;
         self.senderImageViewTrailingConstraint.constant = 4.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 30.0f;
+        self.senderProfileImageButton.userInteractionEnabled = YES;
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelTopConstraint.constant = 0.0f;
         //DV Note - Uncomment this to show sender name label
-        //        self.senderNameHeightConstraint.constant = 18.0f;
-        //        self.forwardTitleLabelTopConstraint.constant = 4.0f;
+//        self.senderNameHeightConstraint.constant = 18.0f;
+//        self.forwardTitleLabelTopConstraint.constant = 4.0f;
     }
     else {
         self.senderImageViewWidthConstraint.constant = 0.0f;
         self.senderImageViewTrailingConstraint.constant = 0.0f;
+        self.senderProfileImageButtonWidthConstraint.constant = 0.0f;
+        self.senderProfileImageButton.userInteractionEnabled = NO;
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelTopConstraint.constant = 0.0f;
     }
@@ -1143,7 +1222,7 @@
         self.quoteViewTopConstraint.constant = 0.0f;
         self.forwardFromLabelTopConstraint.constant = 0.0f;
     }
-    [self.contentView layoutIfNeeded];
+    [self layoutIfNeeded];
 }
 
 @end

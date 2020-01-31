@@ -16,6 +16,8 @@
 @property (strong, nonatomic) TAPCreateGroupSubjectView *createGroupSubjectView;
 @property (strong, nonatomic) UITapGestureRecognizer *tapGestureRecognizer;
 @property (strong, nonatomic) UIImage *selectedImage;
+@property (nonatomic) BOOL isLoading;
+@property (strong, nonatomic) TAPRoomModel *roomModel;
 
 - (void)handleTap:(UITapGestureRecognizer *)tapGestureRecognizer;
 - (void)backButtonDidTapped;
@@ -67,6 +69,7 @@
         if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
             //CS TEMP - hide remove picture button as the API is not ready yet
             self.createGroupSubjectView.removePictureButton.alpha = 0.0f;
+            self.createGroupSubjectView.removePictureView.alpha = 0.0f;
         }
     }
     if (![TAPUtil isEmptyString:self.roomModel.name]) {
@@ -256,6 +259,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 #pragma mark TAPCustomTextFieldView
 - (BOOL)customTextFieldViewTextField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    newString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     self.roomModel.name = newString;
     
     if ([newString length] <= 0) {
@@ -302,9 +306,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     [picker dismissViewControllerAnimated:YES completion:^{
         if ([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:@"public.image"]) {
             //IMAGE TYPE
-            UIImage *selectedImage;
-            
-            selectedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
+            UIImage *selectedImage = [info valueForKey:UIImagePickerControllerOriginalImage];
             self.selectedImage = selectedImage;
             [self.createGroupSubjectView setGroupPictureImageViewWithImage:selectedImage];
             if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
@@ -333,6 +335,9 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     else if ([popupIdentifier isEqualToString:@"Error Update Group"]) {
         
     }
+    else if ([popupIdentifier isEqualToString:@"Error Create Group Name"]) {
+        
+    }
 }
 
 #pragma mark - Custom Method
@@ -342,27 +347,43 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
 }
 
+- (void)setRoomData:(TAPRoomModel *)room {
+    _roomModel = room;
+}
+
 - (void)createButtonDidTapped {
+    _isLoading = YES;
     [self.createGroupSubjectView.createButtonView setAsLoading:YES animated:YES];
     self.createGroupSubjectView.createButtonView.userInteractionEnabled = NO;
+    
+    NSString *groupName = self.createGroupSubjectView.groupNameTextField.textField.text;
+    groupName = [groupName stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    if ([groupName isEqualToString:@""]) {
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Create Group Name" title:NSLocalizedString(@"Failed", @"") detailInformation:@"Group name must be filled" leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        return;
+    }
+    
     if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeDefault) {
         NSMutableArray *userIDArray = [NSMutableArray array];
         for (TAPUserModel *user in self.selectedContactArray) {
             [userIDArray addObject:user.userID];
         }
         
-        [TAPDataManager callAPICreateRoomWithName:self.createGroupSubjectView.groupNameTextField.textField.text type:RoomTypeGroup userIDArray:userIDArray success:^(TAPRoomModel *room) {
+        [TAPDataManager callAPICreateRoomWithName:groupName type:RoomTypeGroup userIDArray:userIDArray success:^(TAPRoomModel *room) {
             
             if (self.selectedImage != nil) {
                 //has image, upload image
-                NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
-                
+                UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
+                NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
                 [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
 #ifdef DEBUG
                     NSLog(@"Success upload image");
 #endif
+                    
+                    _isLoading = NO;
+                    
                     //Update to group cache
                     TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
                     existingRoom.name = room.name;
@@ -377,9 +398,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
                     [self dismissViewControllerAnimated:NO completion:nil];
                     
-                    TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:room];
-                    obtainedChatViewController.hidesBottomBarWhenPushed = YES;
-                    [self.roomListViewController.navigationController pushViewController:obtainedChatViewController animated:YES];
+                    [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                        chatViewController.hidesBottomBarWhenPushed = YES;
+                        [self.roomListViewController.navigationController pushViewController:chatViewController animated:YES];
+                    }];
                     
                 } progressBlock:^(CGFloat progress, CGFloat total) {
                     
@@ -393,6 +415,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             }
             else {
                 //no image, open room
+                
+                _isLoading = NO;
                 [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                 self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                 
@@ -400,12 +424,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
                 
                 [self dismissViewControllerAnimated:NO completion:nil];
-                TAPChatViewController *obtainedChatViewController = [[TapUI sharedInstance] openRoomWithRoom:room];
-                obtainedChatViewController.hidesBottomBarWhenPushed = YES;
-                [self.roomListViewController.navigationController pushViewController:obtainedChatViewController animated:YES];
+                [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                    chatViewController.hidesBottomBarWhenPushed = YES;
+                    [self.roomListViewController.navigationController pushViewController:chatViewController animated:YES];
+                }];
             }
-            
         } failure:^(NSError *error) {
+            _isLoading = NO;
             [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
             self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -414,11 +439,12 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }];
     }
     else if (self.tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
-        if ([self.createGroupSubjectView.groupNameTextField.textField.text isEqualToString:self.roomModel.name]) {
+        if ([groupName isEqualToString:self.roomModel.name]) {
             //Group name not changing
             if (self.selectedImage != nil) {
                 //has image, upload image
-                NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
+                UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
+                NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
                 [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:self.roomModel.roomID completionBlock:^(TAPRoomModel *room) {
                     self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                     [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
@@ -434,6 +460,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     if (existingRoom != nil) {
                         [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:existingRoom];
                     }
+                    
+                    _isLoading = NO;
                     
                     //image uploaded
                     //dismiss view controller
@@ -455,6 +483,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             else {
                 //no image, dismiss view controller
                 //back to room detail
+                _isLoading = NO;
+                
                 if ([self.delegate respondsToSelector:@selector(createGroupSubjectViewControllerUpdatedRoom:)]) {
                     [self.delegate createGroupSubjectViewControllerUpdatedRoom:self.roomModel];
                 }
@@ -463,11 +493,11 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         else {
             //Group name change
-            [TAPDataManager callAPIUpdateRoomWithRoomID:self.roomModel.roomID roomName:self.createGroupSubjectView.groupNameTextField.textField.text success:^(TAPRoomModel *room) {
+            [TAPDataManager callAPIUpdateRoomWithRoomID:self.roomModel.roomID roomName:groupName success:^(TAPRoomModel *room) {
                 if (self.selectedImage != nil) {
                     //has image, upload image
-                    NSData *imageData = UIImageJPEGRepresentation(self.createGroupSubjectView.groupPictureImageView.image, 0.6);
-                    
+                    UIImage *imageToSend = [self rotateImage:self.createGroupSubjectView.groupPictureImageView.image];
+                    NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
                     [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                         self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                         [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
@@ -479,6 +509,8 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         existingRoom.isDeleted = room.isDeleted;
                         existingRoom.deleted = room.deleted;
                         existingRoom.imageURL = room.imageURL;
+                        
+                        _isLoading = NO;
                         
                         if (existingRoom != nil) {
                             [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:existingRoom];
@@ -494,6 +526,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     } progressBlock:^(CGFloat progress, CGFloat total) {
                         
                     } failureBlock:^(NSError *error) {
+                        _isLoading = NO;
                         self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                         [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                         NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -503,6 +536,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 }
                 else {
                     //no image, dismiss view controller
+                    _isLoading = NO;
                     
                     //Save to group preference
                     TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
@@ -523,6 +557,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     [self dismissViewControllerAnimated:YES completion:nil];
                 }
             } failure:^(NSError *error) {
+                _isLoading = NO;
                 [self.createGroupSubjectView.createButtonView setAsLoading:NO animated:YES];
                 self.createGroupSubjectView.createButtonView.userInteractionEnabled = YES;
                 NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -595,12 +630,17 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 }
 
 - (void)cancelButtonDidTapped {
+    if (self.isLoading) {
+        return;
+    }
+    
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)setTapCreateGroupSubjectControllerType:(TAPCreateGroupSubjectViewControllerType)tapCreateGroupSubjectControllerType {
     _tapCreateGroupSubjectControllerType = tapCreateGroupSubjectControllerType;
     if (tapCreateGroupSubjectControllerType == TAPCreateGroupSubjectViewControllerTypeUpdate) {
+        self.createGroupSubjectView.tapCreateGroupSubjectType = TAPCreateGroupSubjectViewTypeUpdate;
         [self.createGroupSubjectView setTapCreateGroupSubjectType:TAPCreateGroupSubjectViewTypeUpdate];
     }
 }
@@ -635,7 +675,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -666,7 +706,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //request
         [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self changeButtonDidTapped];
+                [self openGallery];
             });
         }];
     }
@@ -679,7 +719,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [alertController addAction:cancelAction];
         
         UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            if (IS_IOS_10_OR_ABOVE) {
+            if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
             else {
@@ -690,6 +730,28 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         
         [self presentViewController:alertController animated:YES completion:nil];
     }
+}
+
+- (UIImage*)rotateImage:(UIImage* )originalImage {
+    UIImageOrientation orientation = originalImage.imageOrientation;
+    UIGraphicsBeginImageContext(originalImage.size);
+    [originalImage drawAtPoint:CGPointMake(0, 0)];
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+     if (orientation == UIImageOrientationRight) {
+         CGContextRotateCTM (context, [self radians:90]);
+     } else if (orientation == UIImageOrientationLeft) {
+         CGContextRotateCTM (context, [self radians:90]);
+     } else if (orientation == UIImageOrientationDown) {
+         // NOTHING
+     } else if (orientation == UIImageOrientationUp) {
+         CGContextRotateCTM (context, [self radians:0]);
+     }
+      return UIGraphicsGetImageFromCurrentImageContext();
+}
+
+- (CGFloat)radians:(int)degree {
+    return (degree/180)*(22/7);
 }
 
 

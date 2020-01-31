@@ -1,0 +1,39 @@
+//
+//  TapTalkLive-Prefix.pch
+//  TapTalk.io
+//
+//  Created by Dominic Vedericho on 12/11/19.
+//  Copyright © 2019 TapTalk.io. All rights reserved.
+//
+
+#ifndef TapTalkLive_Prefix_pch
+#define TapTalkLive_Prefix_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#import "AFNetworkActivityIndicatorManager.h"
+#import "NSUserDefaults+DVSecureUserDefaults.h"
+#import "PodAsset.h"
+#import "TTLConfigs.h"
+#import "TTLStyle.h"
+#import "TapTalkLive.h"
+#import "TTLUtil.h"
+#import "TTLImageView.h"
+#import "TTLImage.h"
+#import "TTLCustomDropDownTextFieldView.h"
+#import "TTLFormGrowingTextView.h"
+#import "TTLCustomButtonView.h"
+#import "TTLStyleManager.h"
+#import "TTLAPIManager.h"
+#import "TTLDataManager.h"
+#import "TTLNetworkManager.h"
+#import "TTLUserModel.h"
+#import "TTLCaseModel.h"
+#import "TTLTopicModel.h"
+
+#endif /* TapTalkLive_Prefix_pch */
+
+
+
+

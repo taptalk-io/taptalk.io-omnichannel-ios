@@ -416,6 +416,20 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return formattedCurrencyString;
 }
 
++ (NSString *)hexadecimalStringFromData:(NSData *)data {
+  NSUInteger dataLength = data.length;
+  if (dataLength == 0) {
+    return nil;
+  }
+
+  const unsigned char *dataBuffer = (const unsigned char *)data.bytes;
+  NSMutableString *hexString  = [NSMutableString stringWithCapacity:(dataLength * 2)];
+  for (int i = 0; i < dataLength; ++i) {
+    [hexString appendFormat:@"%02x", dataBuffer[i]];
+  }
+  return [hexString copy];
+}
+
 #pragma mark - Location
 + (CGFloat)getDistanceFromLong:(double)longitude lat:(double)latitude andLong2:(double)longitude2 lat2:(double)latitude2 {
     CLLocation *locationA = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
@@ -922,6 +936,18 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     }
     
     return topPadding;
+}
+
+/**
+ Used to count top height gap when presenting view controller with modal presentation automatic
+ start usage from ios 13.0, since the presentation style is changing
+ */
++ (CGFloat)topGapPresentingViewController {
+    if (IS_IPHONE_5_5_INCH_AND_ABOVE) {
+        return 26.0f;
+    }
+    
+    return 36.0f;
 }
 
 + (void)performBlock:(void (^)())block

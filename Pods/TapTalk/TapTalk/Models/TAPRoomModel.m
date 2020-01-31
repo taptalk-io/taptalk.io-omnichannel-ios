@@ -70,11 +70,13 @@
 - (void)encodeWithCoder:(NSCoder *)encoder {
     //Encode properties, other class variables, etc
     [encoder encodeObject:self.roomID forKey:@"roomID"];
+    [encoder encodeObject:self.xcRoomID forKey:@"xcRoomID"];
     [encoder encodeObject:self.name forKey:@"name"];
     [encoder encodeObject:self.imageURL forKey:@"imageURL"];
     [encoder encodeInteger:self.type forKey:@"type"];
     [encoder encodeObject:self.color forKey:@"color"];
     [encoder encodeBool:self.isDeleted forKey:@"isDeleted"];
+    [encoder encodeBool:self.isDeleted forKey:@"isLocked"];
     [encoder encodeObject:self.deleted forKey:@"deleted"];
     [encoder encodeObject:self.participants forKey:@"participants"];
     [encoder encodeObject:self.admins forKey:@"admins"];
@@ -84,11 +86,13 @@
     if((self = [super init])) {
         //decode properties, other class vars
         self.roomID = [decoder decodeObjectForKey:@"roomID"];
+        self.xcRoomID = [decoder decodeObjectForKey:@"xcRoomID"];
         self.name = [decoder decodeObjectForKey:@"name"];
         self.imageURL = [decoder decodeObjectForKey:@"imageURL"];
         self.type = [decoder decodeIntegerForKey:@"type"];
         self.color = [decoder decodeObjectForKey:@"color"];
         self.isDeleted = [decoder decodeBoolForKey:@"isDeleted"];
+        self.isLocked = [decoder decodeBoolForKey:@"isLocked"];
         self.deleted = [decoder decodeObjectForKey:@"deleted"];
         self.participants = [decoder decodeObjectForKey:@"participants"];
         self.admins = [decoder decodeObjectForKey:@"admins"];

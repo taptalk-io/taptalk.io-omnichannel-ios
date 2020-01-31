@@ -9,8 +9,19 @@
 
 @interface TapUI ()
 
-@property (strong, nonatomic) TAPRoomListViewController *roomListViewController;
+@property (strong, nonatomic) TapUIRoomListViewController *roomListViewController;
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
+
+@property (nonatomic) BOOL isDisableActivateInAppNotification;
+@property (nonatomic) BOOL isLogoutButtonVisible;
+@property (nonatomic) BOOL isSearchBarRoomListViewHidden;
+@property (nonatomic) BOOL isLeftBarItemRoomListViewHidden;
+@property (nonatomic) BOOL isRightBarItemRoomListViewHidden;
+@property (nonatomic) BOOL isNewContactMenuButtonHidden;
+@property (nonatomic) BOOL isScanQRMenuButtonHidden;
+@property (nonatomic) BOOL isNewGroupMenuButtonHidden;
+@property (nonatomic) BOOL isProfileButtonInChatRoomHidden;
+@property (nonatomic) BOOL hideSetupLoadingViewFlow;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -33,7 +44,7 @@
     self = [super init];
     
     if (self) {
-        _roomListViewController = [[TAPRoomListViewController alloc] init];
+        _roomListViewController = [[TapUIRoomListViewController alloc] init];
         _customNotificationAlertViewController = [[TAPCustomNotificationAlertViewController alloc] init];
         _activeWindow = [[UIWindow alloc] init];
     }
@@ -42,7 +53,7 @@
 }
 
 #pragma mark - Property
-- (TAPRoomListViewController *)roomListViewController {
+- (TapUIRoomListViewController *)roomListViewController {
     return _roomListViewController;
 }
 
@@ -50,14 +61,18 @@
     return _customNotificationAlertViewController;
 }
 
-- (TAPCustomKeyboardManager *)customKeyboardManager {
-    return [TAPCustomKeyboardManager sharedManager];
-}
-
 #pragma mark - Custom Method
 //Windows & View Controllers
-- (void)activateInAppNotificationInWindow:(UIWindow *)activeWindow {
+- (void)setCurrentActiveWindow:(UIWindow *)activeWindow {
     _activeWindow = activeWindow;
+}
+
+- (void)activateTapTalkInAppNotification:(BOOL)activate {
+    _isDisableActivateInAppNotification = !activate;
+}
+
+- (BOOL)getTapTalkInAppNotificationActivationStatus {
+    return !self.isDisableActivateInAppNotification;
 }
 
 - (UINavigationController *)getCurrentTapTalkActiveNavigationController {
@@ -84,12 +99,15 @@
 }
 
 //Custom Bubble
-- (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate {
-    [[TAPCustomBubbleManager sharedManager] addCustomBubbleDataWithCellName:className type:type delegate:delegate];
+- (void)addCustomBubbleWithClassName:(NSString *)className type:(NSInteger)type delegate:(id)delegate bundle:(NSBundle *)bundle {
+    [[TAPCustomBubbleManager sharedManager] addCustomBubbleDataWithCellName:className type:type delegate:delegate bundle:bundle];
 }
 
+//Room List
+
 //Open Chat Room
-- (TAPChatViewController *)openRoomWithOtherUser:(TAPUserModel *)otherUser {
+- (void)createRoomWithOtherUser:(TAPUserModel *)otherUser
+                        success:(void (^)(TapUIChatViewController *chatViewController))success {
     TAPRoomModel *room = [TAPRoomModel createPersonalRoomIDWithOtherUser:otherUser];
     //    [[TAPChatManager sharedManager] openRoom:room]; //Called in ChatViewController willAppear
     
@@ -99,20 +117,21 @@
     //Save user to ContactManager Dictionary
     [[TAPContactManager sharedManager] addContactWithUserModel:otherUser saveToDatabase:NO];
     
-    TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
+    TapUIChatViewController *chatViewController = [[TapUIChatViewController alloc] initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]];
+    chatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     chatViewController.currentRoom = room;
     chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
-    return chatViewController;
+    success(chatViewController);
 }
 
-- (void)openRoomWithUserID:(NSString *)userID
-             prefilledText:(NSString *)prefilledText
-          customQuoteTitle:(nullable NSString *)customQuoteTitle
-        customQuoteContent:(nullable NSString *)customQuoteContent
- customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
-                  userInfo:(nullable NSDictionary *)userInfo
-                   success:(void (^)(TAPChatViewController *chatViewController))success
-                   failure:(void (^)(NSError *error))failure {
+- (void)createRoomWithUserID:(NSString *)userID
+               prefilledText:(NSString *)prefilledText
+            customQuoteTitle:(nullable NSString *)customQuoteTitle
+          customQuoteContent:(nullable NSString *)customQuoteContent
+   customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
+                    userInfo:(nullable NSDictionary *)userInfo
+                     success:(void (^)(TapUIChatViewController *chatViewController))success
+                     failure:(void (^)(NSError *error))failure {
     //Check is user exist in TapTalk database
     [TAPDataManager getDatabaseContactByUserID:userID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
         if (isContact) {
@@ -136,8 +155,9 @@
             }
             
             //Open room
-            TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:obtainedUser];
-            success(obtainedChatViewController);
+            [self createRoomWithOtherUser:obtainedUser success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                success(chatViewController);
+            }];
         }
         else {
             //User not in contact, call API to obtain user data
@@ -163,8 +183,10 @@
                 }
                 
                 //Open room
-                TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:user];
-                success(obtainedChatViewController);
+                [self createRoomWithOtherUser:user success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                    success(chatViewController);
+                }];
+                
                 
             } failure:^(NSError *error) {
                 NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
@@ -177,14 +199,14 @@
     }];
 }
 
-- (void)openRoomWithXCUserID:(NSString *)XCUserID
-               prefilledText:(NSString *)prefilledText
-            customQuoteTitle:(nullable NSString *)customQuoteTitle
-          customQuoteContent:(nullable NSString *)customQuoteContent
-   customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
-                    userInfo:(nullable NSDictionary *)userInfo
-                     success:(void (^)(TAPChatViewController *chatViewController))success
-                     failure:(void (^)(NSError *error))failure {
+- (void)createRoomWithXCUserID:(NSString *)XCUserID
+                 prefilledText:(NSString *)prefilledText
+              customQuoteTitle:(nullable NSString *)customQuoteTitle
+            customQuoteContent:(nullable NSString *)customQuoteContent
+     customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
+                      userInfo:(nullable NSDictionary *)userInfo
+                       success:(void (^)(TapUIChatViewController *chatViewController))success
+                       failure:(void (^)(NSError *error))failure {
     //Check is user exist in TapTalk database
     [TAPDataManager getDatabaseContactByXCUserID:XCUserID success:^(BOOL isContact, TAPUserModel *obtainedUser) {
         if (isContact) {
@@ -208,8 +230,9 @@
             }
             
             //Open room
-            TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:obtainedUser];
-            success(obtainedChatViewController);
+            [self createRoomWithOtherUser:obtainedUser success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                success(chatViewController);
+            }];
         }
         else {
             //User not in contact, call API to obtain user data
@@ -235,8 +258,9 @@
                 }
                 
                 //Open room
-                TAPChatViewController *obtainedChatViewController = [self openRoomWithOtherUser:user];
-                success(obtainedChatViewController);
+                [self createRoomWithOtherUser:user success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                    success(chatViewController);
+                }];
 
             } failure:^(NSError *error) {
                 NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
@@ -249,11 +273,12 @@
     }];
 }
 
-- (TAPChatViewController *)openRoomWithRoom:(TAPRoomModel *)room
-                           customQuoteTitle:(nullable NSString *)customQuoteTitle
-                         customQuoteContent:(nullable NSString *)customQuoteContent
-                  customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
-                                   userInfo:(nullable NSDictionary *)userInfo {
+- (void)createRoomWithRoom:(TAPRoomModel *)room
+          customQuoteTitle:(nullable NSString *)customQuoteTitle
+        customQuoteContent:(nullable NSString *)customQuoteContent
+ customQuoteImageURLString:(nullable NSString *)customQuoteImageURL
+                  userInfo:(nullable NSDictionary *)userInfo
+                   success:(void (^)(TapUIChatViewController *chatViewController))success {
     
     //Create quote model and set quote to chat
     if (![customQuoteTitle isEqualToString:@""] && customQuoteTitle != nil) {
@@ -266,23 +291,174 @@
     }
     
     //Open room
-    return [self openRoomWithRoom:room];
+    [self createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        success(chatViewController);
+    }];
 }
 
-- (TAPChatViewController *)openRoomWithRoom:(TAPRoomModel *)room {
-    return [self openRoomWithRoom:room scrollToMessageWithLocalID:nil];
+- (void)createRoomWithRoom:(TAPRoomModel *)room
+                   success:(void (^)(TapUIChatViewController *chatViewController))success {
+    [self createRoomWithRoom:room scrollToMessageWithLocalID:nil success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        success(chatViewController);
+    }];
 }
 
-- (TAPChatViewController *)openRoomWithRoom:(TAPRoomModel *)room
-                 scrollToMessageWithLocalID:(NSString *)messageLocalID {
+- (void)createRoomWithRoom:(TAPRoomModel *)room
+scrollToMessageWithLocalID:(NSString *)messageLocalID
+                   success:(void (^)(TapUIChatViewController *chatViewController))success {
     //Save all unsent message (in case user retrieve message on another room)
     [[TAPChatManager sharedManager] saveAllUnsentMessage];
     
-    TAPChatViewController *chatViewController = [[TAPChatViewController alloc] initWithNibName:@"TAPChatViewController" bundle:[TAPUtil currentBundle]];
+    TapUIChatViewController *chatViewController = [[TapUIChatViewController alloc] initWithNibName:@"TapUIChatViewController" bundle:[TAPUtil currentBundle]];
+    chatViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     chatViewController.currentRoom = room;
     chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
     chatViewController.scrollToMessageLocalIDString = messageLocalID;
-    return chatViewController;
+    success(chatViewController);
+}
+
+/**
+Show or hide logout button in MyAccount view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setLogoutButtonVisible:(BOOL)isVisible {
+    _isLogoutButtonVisible = isVisible;
+}
+
+/**
+Show or hide search bar view in the top of Room List view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setSearchBarInRoomListVisible:(BOOL)isVisible {
+    _isSearchBarRoomListViewHidden = !isVisible;
+}
+
+/**
+Show or hide left bar button item view in the top of Room List view (My Account Button)
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setMyAccountButtonInRoomListVisible:(BOOL)isVisible {
+    _isLeftBarItemRoomListViewHidden = !isVisible;
+}
+
+/**
+Show or hide right bar button item view in the top of Room List view (New Chat Button)
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewChatButtonInRoomListVisible:(BOOL)isVisible {
+    _isRightBarItemRoomListViewHidden = !isVisible;
+}
+
+/**
+Show or hide setup loading view flow of Room List view
+The default is false (showing), set the boolean to TRUE when you don't want to show setup loading view
+
+@param hide (BOOL) boolean to indicating show or not
+*/
+- (void)hideSetupLoadingFlowInSetupRoomListView:(BOOL)hide {
+    _hideSetupLoadingViewFlow = hide;
+}
+
+/**
+Show or hide add new contact option menu in NewChat view
+
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewContactMenuButtonVisible:(BOOL)isVisible {
+    _isNewContactMenuButtonHidden = !isVisible;
+}
+
+/**
+Show or hide scan QR code option menu in NewChat view
+
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setScanQRMenuButtonVisible:(BOOL)isVisible {
+    _isScanQRMenuButtonHidden = !isVisible;
+}
+/**
+Show or hide new group option menu in NewChat view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setNewGroupMenuButtonVisible:(BOOL)isVisible {
+    _isNewGroupMenuButtonHidden = !isVisible;
+}
+
+/**
+Show or hide profile button view in top right navigation in chat room view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setProfileButtonInChatRoomVisible:(BOOL)isVisible {
+    _isProfileButtonInChatRoomHidden = !isVisible;
+}
+
+/**
+Get current visibility state of logout button
+*/
+- (BOOL)getLogoutButtonVisibleState {
+    return self.isLogoutButtonVisible;
+}
+
+/**
+Get current visibility state of search bar view in the top of Room List view
+*/
+- (BOOL)getSearchBarInRoomListVisibleState {
+    return !self.isSearchBarRoomListViewHidden;
+}
+
+/**
+Get current visibility state of left bar button item view in the top of Room List view (My Account Button)
+*/
+- (BOOL)getMyAccountButtonInRoomListViewVisibleState {
+    return !self.isLeftBarItemRoomListViewHidden;
+}
+
+/**
+Get current visibility state of right bar button item view in the top of Room List view (New Chat Button)
+*/
+- (BOOL)getNewChatButtonInRoomListVisibleState {
+    return !self.isRightBarItemRoomListViewHidden;
+}
+
+/**
+Get current visibility state of add new contact menu option
+*/
+- (BOOL)getNewContactMenuButtonVisibleState {
+    return !self.isNewContactMenuButtonHidden;
+}
+
+/**
+Get current visibility state of scan QR code menu option
+*/
+- (BOOL)getScanQRMenuButtonVisibleState {
+    return !self.isScanQRMenuButtonHidden;
+}
+
+/**
+Get current visibility state of new group menu option
+*/
+- (BOOL)getNewGroupMenuButtonVisibleState {
+    return !self.isNewGroupMenuButtonHidden;
+}
+
+/**
+Get current visibility state of profile button in chat room
+*/
+- (BOOL)getProfileButtonInChatRoomVisibleState {
+    return !self.isProfileButtonInChatRoomHidden;
+}
+
+/**
+Get current visibility state of setup loading view flow in Room List vie
+*/
+- (BOOL)getSetupLoadingFlowHiddenState {
+    return self.hideSetupLoadingViewFlow;
 }
 
 @end
