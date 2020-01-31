@@ -3,8 +3,8 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.name         = "TapTalkLive"
-    s.version      = "0.0.1"
-    s.summary      = "TapTalk.io is a complete in-app chat SDK and messaging API. Its in-app chat feature give you and your user the best in-app chat experience, it provides you with UI Based implementation and code based implementation and fully customizable."
+    s.version      = "1.0"
+    s.summary      = "TapTalk.io Omnichannel Live Chat is a complete omnichannel live char customer service chat SDK and API. Its in-app chat feature give you and your user the best in-app chat experience, it provides you with UI Based implementation and code based implementation and fully customizable."
     s.homepage     = "https://taptalk.io"
 
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.source       = { :git => 'https://github.com/taptalk-io/taptalk.io-ios.git', :tag => s.version }
+    s.source       = { :git => 'https://github.com/taptalk-io/taptalk.io-omnichannel-ios.git', :tag => s.version }
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
