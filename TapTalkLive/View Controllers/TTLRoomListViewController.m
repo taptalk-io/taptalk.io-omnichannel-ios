@@ -8,6 +8,9 @@
 
 #import "TTLRoomListViewController.h"
 #import "TTLCreateCaseViewController.h"
+#import <TapTalk/TAPRoomListModel.h>
+#import <TapTalk/TapUIChatViewController.h>
+#import <TapTalk/TapUI.h>
 
 @interface TTLRoomListViewController ()
 
@@ -27,21 +30,22 @@
     [super viewWillAppear:animated];
 }
 
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
+#pragma mark - Delegates
+#pragma mark TableView
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    TAPRoomListModel *selectedRoomList = [self.roomListArray objectAtIndex:indexPath.row];
+    TAPMessageModel *selectedMessage = selectedRoomList.lastMessage;
+    TAPRoomModel *selectedRoom = selectedMessage.room;
+    
+    [[TapUI sharedInstance] createRoomWithRoom:selectedRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
+        chatViewController.delegate = self;
+        chatViewController.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:chatViewController animated:YES];
+    }];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-}
-    
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-}
-    
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-}
 
 #pragma mark - Custom Method
 - (void)openCreateCaseFormViewIfNeeded {
@@ -58,7 +62,6 @@
 }
 
 - (void)showCreateCaseFormView {
-    
     [self hideSetupView];
     
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];

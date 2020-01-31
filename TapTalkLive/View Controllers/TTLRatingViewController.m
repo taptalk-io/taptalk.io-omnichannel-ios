@@ -33,6 +33,10 @@
     [super loadView];
     _ratingView = [[TTLRatingView alloc] initWithFrame:[TTLBaseView frameWithoutNavigationBar]];
     [self.view addSubview:self.ratingView];
+    
+    self.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    self.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    self.view.alpha = 0.0f;
 }
 
 - (void)viewDidLoad {
@@ -56,6 +60,10 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES];
+    [UIView animateWithDuration:0.2f animations:^{
+        self.view.alpha = 1.0f;
+        [self.ratingView animateOpeningView];
+    }];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

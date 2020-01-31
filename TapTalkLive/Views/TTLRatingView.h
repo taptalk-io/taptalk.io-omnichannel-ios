@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)adjustGrowingContentViewWithAdditionalHeight:(CGFloat)additionalHeight;
 - (void)setCommentTextViewAsActive:(BOOL)active animated:(BOOL)animated;
 - (void)setSubmitButtonAsActive:(BOOL)active;
+- (void)animateOpeningView;
 
 @end
 

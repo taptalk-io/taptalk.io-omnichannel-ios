@@ -107,6 +107,14 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 - (UIViewController *)getCurrentTapTalkLiveActiveViewController;
 
 //==========================================================
+//                  General Setup & Methods
+//==========================================================
+/**
+ Set Google Places API Key to pick and obtain location when send location chat
+ */
+- (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey;
+
+//==========================================================
 //                   TapTalk Live View
 //==========================================================
 /**
@@ -131,5 +139,6 @@ Called to show TapTalk Live view with push animation
 Obtain main view controller of TapTalk Live
 */
 - (TTLRoomListViewController *_Nonnull)getTapTalkLiveViewMainController;
+
 
 @end

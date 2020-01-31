@@ -151,9 +151,9 @@
         if (IS_IPHONE_X_FAMILY) {
             bottomGap = 32.0f;
         }
-        self.containerView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.submitButtonView.frame) - bottomGap, CGRectGetWidth(self.containerView.frame), CGRectGetMaxY(self.submitButtonView.frame) + bottomGap);
+        self.containerView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetHeight([UIScreen mainScreen].bounds), CGRectGetWidth(self.containerView.frame), CGRectGetMaxY(self.submitButtonView.frame) + bottomGap);
         CAShapeLayer *containerViewLayer = [CAShapeLayer layer];
-        containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.containerView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerTopRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
+        containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.containerView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerTopRight cornerRadii:(CGSize){8.0, 8.0}].CGPath;
         self.containerView.layer.mask = containerViewLayer;
     }
     
@@ -161,6 +161,15 @@
 }
 
 #pragma mark - Custom Method
+- (void)animateOpeningView {
+    [UIView animateWithDuration:0.2f animations:^{
+        CGFloat bottomGap = 16.0f;
+        if (IS_IPHONE_X_FAMILY) {
+            bottomGap = 32.0f;
+        }
+        self.containerView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.submitButtonView.frame) - bottomGap, CGRectGetWidth(self.containerView.frame), CGRectGetMaxY(self.submitButtonView.frame) + bottomGap);
+    } completion:nil];
+}
 - (void)setStarRatingWithValue:(NSInteger)starValue {
     TTLImage *starRatingInactiveImage = [TTLImage imageNamed:@"TTLIconStarInactive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     TTLImage *starRatingActiveImage = [TTLImage imageNamed:@"TTLIconStarActive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];

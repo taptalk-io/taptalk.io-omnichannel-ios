@@ -51,9 +51,9 @@
 #ifdef STAGING
         [[TTLNetworkManager sharedManager] setSecretKey:@""];
 #elif DEV
-        [[TTLNetworkManager sharedManager] setSecretKey:@"8916d032524deb06e6d1b6ed5e6839abe08553c9bc117ce0e156a04ad946a882"];
+        [[TTLNetworkManager sharedManager] setSecretKey:@"1c1d49913ae6f3d088b4c04c8f646b468546442190c330eac58589fbb40c4002"];
 #else
-        [[TTLNetworkManager sharedManager] setSecretKey:@"8916d032524deb06e6d1b6ed5e6839abe08553c9bc117ce0e156a04ad946a882"];
+        [[TTLNetworkManager sharedManager] setSecretKey:@"1c1d49913ae6f3d088b4c04c8f646b468546442190c330eac58589fbb40c4002"];
 #endif
         //END DV Temp
         
@@ -128,9 +128,6 @@
     
     //Hide my account in TapTalk Chat in chat room view
     [[TapUI sharedInstance] setMyAccountButtonInRoomListVisible:NO];
-    
-    //Initialize Google Places API Key
-    [[TapTalk sharedInstance] initializeGooglePlacesAPIKey:@"AIzaSyD0NlVEN0mdU9mLp05ZnTc_EEATMzFzvuc"];
     
     //Add custom bubble cell
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];    
@@ -293,7 +290,7 @@ Obtain main view controller of TapTalk Live
     ratingViewController.currentCase = currentCase;
     UINavigationController *ratingNavigationController = [[UINavigationController alloc] initWithRootViewController:ratingViewController];
     ratingNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-    [currentActiveNavigationController presentViewController:ratingNavigationController animated:YES completion:nil];
+    [currentActiveNavigationController presentViewController:ratingNavigationController animated:NO completion:nil];
 }
 
 #pragma mark - Custom Method
@@ -311,6 +308,11 @@ Obtain main view controller of TapTalk Live
 
 - (UIViewController *)getCurrentTapTalkLiveActiveViewController {
     return [[TapUI sharedInstance] getCurrentTapTalkActiveViewController];
+}
+
+#pragma mark General Setup & Methods
+- (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {
+    [[TapTalk sharedInstance] initializeGooglePlacesAPIKey:apiKey];
 }
 
 #pragma mark Others
