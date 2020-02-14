@@ -66,13 +66,13 @@
     self.titleLabel.textColor = formLabelColor;
     [self addSubview:self.titleLabel];
 
-    _containerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 66.0f)];
+    _containerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 72.0f)];
     self.containerView.backgroundColor = [UIColor whiteColor];
     self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
     self.containerView.layer.cornerRadius = 8.0f;
     self.containerView.layer.borderWidth = 1.0f;
     
-    _shadowView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.containerView.frame), 66.0f)];
+    _shadowView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.containerView.frame), 72.0f)];
     self.shadowView.backgroundColor = [UIColor whiteColor];
     self.shadowView.layer.cornerRadius = 8.0f;
     self.shadowView.layer.shadowRadius = 5.0f;
@@ -96,7 +96,7 @@
         NSTextStorage *textStorage = [[NSTextStorage alloc] init];
         NSLayoutManager *layoutManager = [NSLayoutManager new];
         [textStorage addLayoutManager:layoutManager];
-        NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:self.bounds.size];
+        NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeMake(CGRectGetWidth(self.containerView.frame) - 16.0f - 16.0f, CGRectGetHeight(self.containerView.frame) - 16.0f - 16.0f)];
         [layoutManager addTextContainer:textContainer];
         
         UIFont *textViewFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
@@ -117,7 +117,7 @@
         self.textView.keyboardAppearance = UIKeyboardAppearanceDefault;
         self.textView.returnKeyType = UIReturnKeyDefault;
         self.textView.inputView.autoresizingMask = YES;
-        
+            
         [self.containerView addSubview:self.textView];
     }
     
@@ -128,7 +128,7 @@
     [self.containerView addSubview:self.placeholderLabel];
     
     if (self.minimumHeight == 0.0f) {
-        self.minimumHeight = 34.0f;
+        self.minimumHeight = 40.0f;
     }
     
     if (self.maximumHeight == 0.0f) {
@@ -250,7 +250,7 @@
 }
 
 - (void)checkHeight {
-    CGSize contentSize = [self.textView sizeThatFits:CGSizeMake(CGRectGetWidth(self.frame), MAXFLOAT)];
+    CGSize contentSize = [self.textView sizeThatFits:CGSizeMake(CGRectGetWidth(self.containerView.frame) - 16.0f - 16.0f, MAXFLOAT)];
     
     self.textView.textContainer.size = CGSizeMake(self.textView.textContainer.size.width, contentSize.height);
     

@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, TTLCreateCaseViewControllerType) {
     TTLCreateCaseViewControllerTypeDefault = 0,
-    TTLCreateCaseViewControllerTypeWithCloseButton = 1
+    TTLCreateCaseViewControllerTypeDefaultWithCloseButton = 1,
+    TTLCreateCaseViewControllerTypeAlreadyLogin = 2
 };
 
 @interface TTLCreateCaseViewController : TTLBaseViewController

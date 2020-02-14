@@ -244,7 +244,7 @@ Obtain main view controller of TapTalk Live
   currentShownNavigationController:(UINavigationController *)currentNavigationController {
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
     createCaseViewController.previousNavigationController = currentNavigationController;
-    [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeWithCloseButton];
+    [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeAlreadyLogin];
     createCaseViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     UINavigationController *createCaseNavigationController = [[UINavigationController alloc] initWithRootViewController:createCaseViewController];
     createCaseNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
