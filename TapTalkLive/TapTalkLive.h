@@ -110,6 +110,12 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 //                  General Setup & Methods
 //==========================================================
 /**
+ Initialize app to TapTalk.io Omnichannel by providing app key secret, url, and implementation type
+ */
+- (void)initWithSecretKey:(NSString *_Nonnull)secretKey
+             apiURLString:(NSString *_Nonnull)apiURLString;
+
+/**
  Set Google Places API Key to pick and obtain location when send location chat
  */
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey;

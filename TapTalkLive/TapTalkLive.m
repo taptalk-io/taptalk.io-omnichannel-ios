@@ -47,61 +47,11 @@
         
         _activeWindow = [[UIWindow alloc] init];
         
-        //DV Temp
-#ifdef STAGING
-        [[TTLNetworkManager sharedManager] setSecretKey:@""];
-#elif DEV
-        [[TTLNetworkManager sharedManager] setSecretKey:@"1c1d49913ae6f3d088b4c04c8f646b468546442190c330eac58589fbb40c4002"];
-#else
-        [[TTLNetworkManager sharedManager] setSecretKey:@"1c1d49913ae6f3d088b4c04c8f646b468546442190c330eac58589fbb40c4002"];
-#endif
-        //END DV Temp
-        
         //Hide setup loading view flow in room list
         [[TapUI sharedInstance] hideSetupLoadingFlowInSetupRoomListView:YES];
         
         //Init TTLRoomListViewController
         _roomListViewController = [[TTLRoomListViewController alloc] init];
-                
-        //Call API project configs
-        [TTLDataManager callAPIGetTapTalkLiveProjectConfigsSuccess:^(NSDictionary * _Nonnull tapTalkConfigsDictionary) {
-            //Obtain TapTalk.io Chat SDK credential configs
-            NSString *tapTalkAPIURLString = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_TAPTALK_API_URL valid:nil];
-            tapTalkAPIURLString = [TTLUtil nullToEmptyString:tapTalkAPIURLString];
-            NSString *tapTalkAppKeyIDString = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_ID valid:nil];
-            tapTalkAppKeyIDString = [TTLUtil nullToEmptyString:tapTalkAppKeyIDString];
-            NSString *tapTalkAppKeySecretString = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_SECRET valid:nil];
-            tapTalkAppKeySecretString = [TTLUtil nullToEmptyString:tapTalkAppKeySecretString];
-            
-            //Init TapTalk.io Chat SDK
-            [[TapTalk sharedInstance] initWithAppKeyID:tapTalkAppKeyIDString appKeySecret:tapTalkAppKeySecretString apiURLString:tapTalkAPIURLString implementationType:TapTalkImplentationTypeCombine];
-            
-            _isDoneTapTalkInitialization = YES;
-            
-            //Try to connect to TapTalk.io
-            [[TapTalk sharedInstance] connectWithSuccess:^{
-                
-            } failure:^(NSError * _Nonnull error) {
-                
-            }];
-            
-        } failure:^(NSError * _Nonnull error) {
-            //Failed get project configs
-        }];
-        
-        //Call API get case list
-        [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
-            BOOL isContainCaseList = NO;
-            if ([caseListArray count] > 0) {
-                isContainCaseList = YES;
-            }
-            
-            [[NSUserDefaults standardUserDefaults] setSecureBool:isContainCaseList forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            
-        } failure:^(NSError * _Nonnull error) {
-            //Failed get case list
-        }];
     }
     
     return self;
@@ -311,6 +261,56 @@ Obtain main view controller of TapTalk Live
 }
 
 #pragma mark General Setup & Methods
+/**
+ Initialize app to TapTalk.io Omnichannel by providing app key secret, url, and implementation type
+ */
+- (void)initWithSecretKey:(NSString *_Nonnull)secretKey
+             apiURLString:(NSString *_Nonnull)apiURLString {
+    
+    [[TTLNetworkManager sharedManager] setSecretKey:secretKey];
+    [[TTLAPIManager sharedManager] setBaseAPIURLString:apiURLString];
+    
+    //Call API project configs
+    [TTLDataManager callAPIGetTapTalkLiveProjectConfigsSuccess:^(NSDictionary * _Nonnull tapTalkConfigsDictionary) {
+        //Obtain TapTalk.io Chat SDK credential configs
+        NSString *tapTalkAPIURLString = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_TAPTALK_API_URL valid:nil];
+        tapTalkAPIURLString = [TTLUtil nullToEmptyString:tapTalkAPIURLString];
+        NSString *tapTalkAppKeyIDString = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_ID valid:nil];
+        tapTalkAppKeyIDString = [TTLUtil nullToEmptyString:tapTalkAppKeyIDString];
+        NSString *tapTalkAppKeySecretString = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_SECRET valid:nil];
+        tapTalkAppKeySecretString = [TTLUtil nullToEmptyString:tapTalkAppKeySecretString];
+        
+        //Init TapTalk.io Chat SDK
+        [[TapTalk sharedInstance] initWithAppKeyID:tapTalkAppKeyIDString appKeySecret:tapTalkAppKeySecretString apiURLString:tapTalkAPIURLString implementationType:TapTalkImplentationTypeCombine];
+        
+        _isDoneTapTalkInitialization = YES;
+        
+        //Try to connect to TapTalk.io
+        [[TapTalk sharedInstance] connectWithSuccess:^{
+            
+        } failure:^(NSError * _Nonnull error) {
+            
+        }];
+        
+    } failure:^(NSError * _Nonnull error) {
+        //Failed get project configs
+    }];
+    
+    //Call API get case list
+    [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
+        BOOL isContainCaseList = NO;
+        if ([caseListArray count] > 0) {
+            isContainCaseList = YES;
+        }
+        
+        [[NSUserDefaults standardUserDefaults] setSecureBool:isContainCaseList forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+    } failure:^(NSError * _Nonnull error) {
+        //Failed get case list
+    }];
+}
+
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {
     [[TapTalk sharedInstance] initializeGooglePlacesAPIKey:apiKey];
 }
