@@ -12,6 +12,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger,TTLCreateCaseViewType) {
+    TTLCreateCaseViewTypeDefault = 0,
+    TTLCreateCaseViewTypeNewMessage = 1
+};
+
 @interface TTLCreateCaseView : TTLBaseView
 
 @property (strong, nonatomic) UIScrollView *scrollView;
@@ -23,6 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) TTLKeyboardAccessoryView *keyboardAccessoryView;
 @property (strong, nonatomic) UIButton *closeButton;
 @property (strong, nonatomic) TTLImageView *closeImageView;
+@property (strong, nonatomic) UIButton *leftCloseButton;
+@property (strong, nonatomic) TTLImageView *leftCloseImageView;
+@property (nonatomic) TTLCreateCaseViewType createCaseViewType;
 
 - (void)setMessageTextViewAsActive:(BOOL)active animated:(BOOL)animated;
 - (void)adjustGrowingContentView;
@@ -30,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showUserDataForm:(BOOL)isShow;
 - (void)showCloseButton:(BOOL)isShow;
 - (void)showCreateCaseButtonAsLoading:(BOOL)loading;
+- (void)setCreateCaseViewType:(TTLCreateCaseViewType)createCaseViewType;
 
 
 @end
