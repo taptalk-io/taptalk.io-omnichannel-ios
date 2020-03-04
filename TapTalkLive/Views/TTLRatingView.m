@@ -128,11 +128,11 @@
         self.subtitleLabel.font = subtitleLabelFont;
         self.subtitleLabel.textColor = subtitleLabelColor;
         self.subtitleLabel.textAlignment = NSTextAlignmentCenter;
-        self.subtitleLabel.text = NSLocalizedString(@"", @"");
+        self.subtitleLabel.text = @"";
         [self.containerView addSubview:self.subtitleLabel];
         
         _commentTextView = [[TTLFormGrowingTextView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.subtitleLabel.frame) + 16.0f, CGRectGetWidth(self.containerView.frame), 0.0f)];
-        [self.commentTextView setTtlFormGrowingTextViewType:TTLFormGrowingTextViewTypeMessage];
+        [self.commentTextView setTtlFormGrowingTextViewType:TTLFormGrowingTextViewTypeComment];
         [self.commentTextView showTitleLabel:NO];
         self.commentTextView.frame = CGRectMake(CGRectGetMinX(self.commentTextView.frame), CGRectGetMinY(self.commentTextView.frame), CGRectGetWidth(self.commentTextView.frame), [self.commentTextView getHeight]);
         [self.commentTextView setPlaceholderText:NSLocalizedString(@"Leave a comment", @"")];
@@ -238,7 +238,7 @@
             self.starRating3ImageView.image = starRatingInactiveImage;
             self.starRating4ImageView.image = starRatingInactiveImage;
             self.starRating5ImageView.image = starRatingInactiveImage;
-            self.subtitleLabel.text = NSLocalizedString(@"", @"");
+            self.subtitleLabel.text = @"";
             break;
             }
     }

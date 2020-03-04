@@ -332,7 +332,7 @@
     }
     else {
         [self.myAccountView.usernameTextField setAsError:NO animated:YES];
-        [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.myAccountView.usernameTextField setErrorInfoText:@""];
         [self.myAccountView refreshViewPosition];
         if (![TAPUtil isEmptyString:username]) {
             [self checkUsernameAPI:username];
@@ -355,7 +355,7 @@
     }
     else {
         [self.myAccountView.fullNameTextField setAsError:NO animated:YES];
-        [self.myAccountView.fullNameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.myAccountView.fullNameTextField setErrorInfoText:@""];
         [self.myAccountView refreshViewPosition];
         _isFullNameValid = YES;
     }
@@ -374,7 +374,7 @@
             }
             else {
                 [self.myAccountView.usernameTextField setAsError:NO animated:YES];
-                [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+                [self.myAccountView.usernameTextField setErrorInfoText:@""];
                 [self.myAccountView refreshViewPosition];
                 _isUsernameValid = YES;
             }
@@ -408,7 +408,7 @@
     }
     else {
         [self.myAccountView.emailTextField setAsError:NO animated:YES];
-        [self.myAccountView.emailTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.myAccountView.emailTextField setErrorInfoText:@""];
         [self.myAccountView refreshViewPosition];
         _isEmailValid = YES;
     }

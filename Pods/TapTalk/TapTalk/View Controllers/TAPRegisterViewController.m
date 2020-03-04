@@ -101,7 +101,7 @@
     else if (textField == self.registerView.passwordTextField.textField) {
         if ([TAPUtil isEmptyString:string] && [self.registerView.passwordTextField.textField isSecureTextEntry] && self.passwordTextFieldJustEndEditing) {
             [self.registerView.passwordTextField setAsError:NO animated:YES];
-            [self.registerView.passwordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+            [self.registerView.passwordTextField setErrorInfoText:@""];
             [self.registerView refreshViewPosition];
             _isPasswordValid = YES;
         }
@@ -113,7 +113,7 @@
         }
         else {
             [self.registerView.passwordTextField setAsError:NO animated:YES];
-            [self.registerView.passwordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+            [self.registerView.passwordTextField setErrorInfoText:@""];
             [self.registerView refreshViewPosition];
             _isPasswordValid = YES;
         }
@@ -128,7 +128,7 @@
             }
             else {
                 [self.registerView.retypePasswordTextField setAsError:NO animated:YES];
-                [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+                [self.registerView.retypePasswordTextField setErrorInfoText:@"")];
                 [self.registerView refreshViewPosition];
                 _isPasswordValid = YES;
             }
@@ -143,7 +143,7 @@
         }
         else {
             [self.registerView.retypePasswordTextField setAsError:NO animated:YES];
-            [self.registerView.retypePasswordTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+            [self.registerView.retypePasswordTextField setErrorInfoText:@""];
             [self.registerView refreshViewPosition];
         }
     }
@@ -344,7 +344,7 @@
     }
     else {
         [self.registerView.usernameTextField setAsError:NO animated:YES];
-        [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.registerView.usernameTextField setErrorInfoText:@""];
         [self.registerView refreshViewPosition];
         if (![TAPUtil isEmptyString:username]) {
             [self checkUsernameAPI:username];
@@ -367,7 +367,7 @@
     }
     else {
         [self.registerView.fullNameTextField setAsError:NO animated:YES];
-        [self.registerView.fullNameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.registerView.fullNameTextField setErrorInfoText:@""];
         [self.registerView refreshViewPosition];
         _isFullNameValid = YES;
     }
@@ -386,7 +386,7 @@
             }
             else {
                 [self.registerView.usernameTextField setAsError:NO animated:YES];
-                [self.registerView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+                [self.registerView.usernameTextField setErrorInfoText:@""];
                 [self.registerView refreshViewPosition];
                 _isUsernameValid = YES;
             }
@@ -421,7 +421,7 @@
     }
     else {
         [self.registerView.emailTextField setAsError:NO animated:YES];
-        [self.registerView.emailTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.registerView.emailTextField setErrorInfoText:@""];
         [self.registerView refreshViewPosition];
         _isEmailValid = YES;
     }

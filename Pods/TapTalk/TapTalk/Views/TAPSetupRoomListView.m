@@ -141,7 +141,7 @@
     }
     else if (type == TAPSetupRoomListViewTypeFailed) {
         self.titleFirstLoadLabel.text = NSLocalizedString(@"Setup failed", @"");
-        self.descriptionFirstLoadLabel.text = NSLocalizedString(@"", @"");
+        self.descriptionFirstLoadLabel.text = @"";
         self.firstLoadImageView.image = [UIImage imageNamed:@"TAPIconLoaderSuccess" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.firstLoadImageView.image = [self.firstLoadImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconRoomListSetUpFailure]];
         self.firstLoadCenterIconImageView.image = [UIImage imageNamed:@"TAPIconSetupFailed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];

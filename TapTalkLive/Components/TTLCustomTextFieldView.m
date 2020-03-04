@@ -187,7 +187,7 @@
         [self setInfoDescriptionText:NSLocalizedString(@"Username is always required.\nMust be between 4-32 characters.\nCan only contain a-z, 0-9, underscores, and dot.\nCan't start with number or underscore or dot.\nCan't end with underscore or dot.\nCan't contain consecutive underscores, consecutive dot, underscore followed with dot, and otherwise.", @"")];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"e.g user_1234", @"");
+        self.textField.placeholder = NSLocalizedString(@"Enter username", @"");
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         self.containerView.alpha = 1.0f;
@@ -198,7 +198,7 @@
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"e.g user_1234", @"");
+        self.textField.placeholder = NSLocalizedString(@"Enter username", @"");
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         self.containerView.alpha = 1.0f;
@@ -219,7 +219,7 @@
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeEmailAddress;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        self.textField.placeholder = NSLocalizedString(@"e.g example@work.com", @"");;
+        self.textField.placeholder = NSLocalizedString(@"Enter email address", @"");
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
     }
@@ -229,7 +229,7 @@
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeEmailAddress;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        self.textField.placeholder = NSLocalizedString(@"e.g example@work.com", @"");;
+        self.textField.placeholder = NSLocalizedString(@"Enter email address", @"");
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
     }
