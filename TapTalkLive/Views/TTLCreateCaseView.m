@@ -165,6 +165,13 @@
         containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.formContainerView.bounds byRoundingCorners: UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
         self.formContainerView.layer.mask = containerViewLayer;
         self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame));
+        
+        
+        //DV Temp
+        //DV Note - 21 Feb 2020
+        //Hide taptalk logo until user can upload their brand logo and change
+        self.logoImageView.alpha = 0.0f;
+        //END DV Temp
     }
     
     return self;

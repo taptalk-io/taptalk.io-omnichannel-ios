@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TTLCaseListViewController : TTLBaseViewController
 
+- (void)openCreateCaseFormViewIfNeeded;
+
 @end
 
 NS_ASSUME_NONNULL_END

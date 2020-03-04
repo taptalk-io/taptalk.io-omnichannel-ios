@@ -285,6 +285,9 @@ Obtain main view controller of TapTalk Live
         
         _isDoneTapTalkInitialization = YES;
         
+        //Set hide TapTalk delivery status
+        [[TapUI sharedInstance] setHideReadStatus:YES];
+        
         //Try to connect to TapTalk.io
         [[TapTalk sharedInstance] connectWithSuccess:^{
             
