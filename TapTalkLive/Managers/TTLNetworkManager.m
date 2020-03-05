@@ -115,8 +115,8 @@ static const NSInteger kAPITimeOut = 60;
     if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
-        
-        NSString *errorMessage = NSLocalizedString(@"It appears you don't have internet connection, please try again later...", @"");
+    
+        NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"It appears you don't have internet connection, please try again later...", nil, [TTLUtil currentBundle], @"");
         NSError *error = [NSError errorWithDomain:errorMessage code:199 userInfo:@{@"message": errorMessage}];
         
         failure (nil, error);
@@ -152,7 +152,7 @@ static const NSInteger kAPITimeOut = 60;
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
-        NSString *errorMessage = NSLocalizedString(@"It appears you don't have internet connection, please try again later...", @"");
+        NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"It appears you don't have internet connection, please try again later...", nil, [TTLUtil currentBundle], @"");
         NSError *error = [NSError errorWithDomain:errorMessage code:199 userInfo:@{@"message": errorMessage}];
         
         failure (nil, error);
@@ -300,7 +300,7 @@ static const NSInteger kAPITimeOut = 60;
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
-        NSString *errorMessage = NSLocalizedString(@"It appears you don't have internet connection, please try again later...", @"");
+        NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"It appears you don't have internet connection, please try again later...", nil, [TTLUtil currentBundle], @"");
         NSError *error = [NSError errorWithDomain:errorMessage code:199 userInfo:@{@"message": errorMessage}];
         
         failure (nil, error);
@@ -341,7 +341,7 @@ refreshToken:(NSString *)refreshToken
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
-        NSString *errorMessage = NSLocalizedString(@"It appears you don't have internet connection, please try again later...", @"");
+        NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"It appears you don't have internet connection, please try again later...", nil, [TTLUtil currentBundle], @"");
         NSError *error = [NSError errorWithDomain:errorMessage code:199 userInfo:@{@"message": errorMessage}];
         
         failure (nil, error);

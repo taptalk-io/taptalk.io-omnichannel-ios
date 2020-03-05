@@ -128,7 +128,7 @@
             }
             else {
                 [self.registerView.retypePasswordTextField setAsError:NO animated:YES];
-                [self.registerView.retypePasswordTextField setErrorInfoText:@"")];
+                [self.registerView.retypePasswordTextField setErrorInfoText:@""];
                 [self.registerView refreshViewPosition];
                 _isPasswordValid = YES;
             }

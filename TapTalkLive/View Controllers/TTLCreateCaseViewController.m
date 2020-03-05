@@ -170,27 +170,27 @@
     if ([currentAccessToken isEqualToString:@""] || [currentActiveUserID isEqualToString:@""]) {
         if ([self.obtainedFullNameString isEqualToString:@""]) {
             //Validation failed - show error full name must be filled
-            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Full Name" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please enter your name", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Full Name" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please enter your name", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }
         else if ([self.obtainedEmailString isEqualToString:@""]) {
             //Validation failed - show error email must be filled
-            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please enter your email", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please enter your email", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
 
         }
         else if (!isEmailValid) {
             //Validation failed - show error invalid email format
-            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email Format" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Email address format is invalid", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email Format" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Email address format is invalid", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
         }
     }
 
     if (!self.isTopicSelected) {
         //Validation failed - show error topic must be selected
-        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Topic" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please select your topic", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Topic" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please select your topic", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
 
     }
     else if ([self.obtainedMessageString isEqualToString:@""]) {
         //Validation failed - show error message must be filled
-        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Message" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Please enter your message", @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Message" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please enter your message", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
 
     }
     else {

@@ -207,7 +207,7 @@ Obtain main view controller of TapTalk Live
   //Set custom keyboard option items
     TTLImage *checkListImage = [UIImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
     checkListImage = [checkListImage setImageTintColor:[TTLUtil getColor:@"191919"]];
-    TAPCustomKeyboardItemModel *customKeyboardItem = [TAPCustomKeyboardItemModel createCustomKeyboardItemWithImage:checkListImage itemName:NSLocalizedString(@"Mark as solved", @"") itemID:@"1"];
+    TAPCustomKeyboardItemModel *customKeyboardItem = [TAPCustomKeyboardItemModel createCustomKeyboardItemWithImage:checkListImage itemName:NSLocalizedStringFromTableInBundle(@"Mark as solved", nil, [TTLUtil currentBundle], @"") itemID:@"1"];
     return @[customKeyboardItem];
 }
 
@@ -225,7 +225,10 @@ Obtain main view controller of TapTalk Live
         popupHandlerViewController.recipient = recipient;
         UIViewController *currentActiveController = [self getCurrentTapTalkLiveActiveViewController];
         [currentActiveController presentViewController:popupHandlerViewController animated:NO completion:^{
-            [popupHandlerViewController showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Custom Keyboard - Close Case Tapped" title:NSLocalizedString(@"Warning", @"") detailInformation:NSLocalizedString(@"This case will be closed and you wont be able to further send messages or receive assistance regarding this case. Would you like to proceed?", @"") leftOptionButtonTitle:NSLocalizedString(@"Cancel", @"") singleOrRightOptionButtonTitle:NSLocalizedString(@"OK", @"")];
+            
+            
+            
+            [popupHandlerViewController showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Custom Keyboard - Close Case Tapped" title:NSLocalizedStringFromTableInBundle(@"Warning", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"This case will be closed and you wont be able to further send messages or receive assistance regarding this case. Would you like to proceed?", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TTLUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TTLUtil currentBundle], @"")];
         }];
     }
 }

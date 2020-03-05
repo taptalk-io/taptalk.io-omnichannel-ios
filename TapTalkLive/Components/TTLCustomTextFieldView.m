@@ -174,41 +174,41 @@
 - (void)setTtlCustomTextFieldViewType:(TTLCustomTextFieldViewType)ttlCustomTextFieldViewType {
     _ttlCustomTextFieldViewType = ttlCustomTextFieldViewType;
     if (ttlCustomTextFieldViewType == TTLCustomTextFieldViewTypeFullName) {
-        self.titleLabel.text = NSLocalizedString(@"Full Name", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Full Name", nil, [TTLUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Full name", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Full Name", nil, [TTLUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
     }
     else if (ttlCustomTextFieldViewType == TTLCustomTextFieldViewTypeUsername) {
-        self.titleLabel.text = NSLocalizedString(@"Username", @"");
-        [self setInfoDescriptionText:NSLocalizedString(@"Username is always required.\nMust be between 4-32 characters.\nCan only contain a-z, 0-9, underscores, and dot.\nCan't start with number or underscore or dot.\nCan't end with underscore or dot.\nCan't contain consecutive underscores, consecutive dot, underscore followed with dot, and otherwise.", @"")];
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Username", nil, [TTLUtil currentBundle], @"");
+        [self setInfoDescriptionText:NSLocalizedStringFromTableInBundle(@"Username is always required.\nMust be between 4-32 characters.\nCan only contain a-z, 0-9, underscores, and dot.\nCan't start with number or underscore or dot.\nCan't end with underscore or dot.\nCan't contain consecutive underscores, consecutive dot, underscore followed with dot, and otherwise.", nil, [TTLUtil currentBundle], @"")];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Enter username", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter username", nil, [TTLUtil currentBundle], @"");
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
     }
     else if (ttlCustomTextFieldViewType == TTLCustomTextFieldViewTypeUsernameWithoutDescription) {
-        self.titleLabel.text = NSLocalizedString(@"Username", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Username", nil, [TTLUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Enter username", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter username", nil, [TTLUtil currentBundle], @"");
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
     }
     else if (ttlCustomTextFieldViewType == TTLCustomTextFieldViewTypeEmailOptional) {
-        self.titleLabel.text = NSLocalizedString(@"Email Address Optional", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Email Address Optional", nil, [TTLUtil currentBundle], @"");
         
         UIFont *formDescriptionFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormDescriptionLabel];
-        NSString *optionalString = NSLocalizedString(@"Optional", @"");
+        NSString *optionalString = NSLocalizedStringFromTableInBundle(@"Optional", nil, [TTLUtil currentBundle], @"");
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:self.titleLabel.text];
         [attributedString addAttribute:NSFontAttributeName
                                             value:formDescriptionFont
@@ -219,55 +219,55 @@
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeEmailAddress;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        self.textField.placeholder = NSLocalizedString(@"Enter email address", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter email address", nil, [TTLUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
     }
     else if (ttlCustomTextFieldViewType == TTLCustomTextFieldViewTypeEmail) {
-        self.titleLabel.text = NSLocalizedString(@"Email Address", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Email Address", nil, [TTLUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeEmailAddress;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        self.textField.placeholder = NSLocalizedString(@"Enter email address", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter email address", nil, [TTLUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
     }
     else if (ttlCustomTextFieldViewType == TTLCustomTextFieldViewTypePasswordOptional) {
-        self.titleLabel.text = NSLocalizedString(@"Password Optional", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Password Optional", nil, [TTLUtil currentBundle], @"");
         
         UIFont *formDescriptionFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormDescriptionLabel];
-        NSString *optionalString = NSLocalizedString(@"Optional", @"");
+        NSString *optionalString = NSLocalizedStringFromTableInBundle(@"Optional", nil, [TTLUtil currentBundle], @"");
         NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:self.titleLabel.text];
         [attributedString addAttribute:NSFontAttributeName
                                  value:formDescriptionFont
                                  range:[self.titleLabel.text rangeOfString:optionalString]];
         self.titleLabel.attributedText = attributedString;
-        
-        [self setInfoDescriptionText:NSLocalizedString(@"Password must contain at least one lowercase, uppercase, special character, and a number.", @"")];
+    
+        [self setInfoDescriptionText:NSLocalizedStringFromTableInBundle(@"Password must contain at least one lowercase, uppercase, special character, and a number.", nil, [TTLUtil currentBundle], @"")];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Insert Password", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Insert Password", nil, [TTLUtil currentBundle], @"");
         self.textField.secureTextEntry = YES;
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:YES];
     }
     else if (ttlCustomTextFieldViewType == TTLCustomTextFieldViewTypeReTypePassword) {
-        self.titleLabel.text = NSLocalizedString(@"Retype Password", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Retype Password", nil, [TTLUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Retype Password", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Retype Password", nil, [TTLUtil currentBundle], @"");
         self.textField.secureTextEntry = YES;
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:YES];
     }
     else if (ttlCustomTextFieldViewType == TTLCustomTextFieldViewTypeGroupName) {
-        self.titleLabel.text = NSLocalizedString(@"Group Name", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Group Name", nil, [TTLUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedString(@"Insert Name", @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Insert Name", nil, [TTLUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
     }

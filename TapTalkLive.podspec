@@ -56,7 +56,8 @@ Pod::Spec.new do |s|
             'Pod/**/*.{png,jpeg,jpg,xcassets,ttf,otf,caf}',
             'TapTalkLive/**/*.xib',
             'TapTalkLive/**/*.storyboard',
-            'TapTalkLive/**/*.{png,jpeg,jpg,xcassets,ttf,otf,caf}'
+            'TapTalkLive/**/*.{png,jpeg,jpg,xcassets,ttf,otf,caf}',
+            'TapTalkLive/*.lproj/*.strings'
         ]
     }
 
