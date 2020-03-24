@@ -152,7 +152,7 @@
         [self.navigationItem setTitleView:self.searchBarView];
     }
     else {
-        self.title = NSLocalizedString(@"Chats", @"");
+        self.title = NSLocalizedStringFromTableInBundle(@"Chats", nil, [TAPUtil currentBundle], @"");
     }
     
     self.roomListView.roomListTableView.delegate = self;
@@ -431,7 +431,7 @@
         UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
         UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
         _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 51.0f, 40.0f)];
-        [self.rightBarButton setTitle:@"Cancel" forState:UIControlStateNormal];
+        [self.rightBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
         [self.rightBarButton setTitleColor:searchBarCancelColor forState:UIControlStateNormal];
         self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
         self.rightBarButton.titleLabel.font = searchBarCancelFont;
@@ -736,6 +736,7 @@
             [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
         } failure:^(NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                self.isShouldNotLoadFromAPI = NO;
                 [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeFailed];
                 [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeFailed];
             });
@@ -771,7 +772,7 @@
         });
         
     } failure:^(NSError *error) {
-        
+        self.isShouldNotLoadFromAPI = NO;
     }];
 }
 
