@@ -6,11 +6,13 @@
 //  Copyright © 2020 taptalk.io. All rights reserved.
 //
 
-#import <TapTalk/TapTalk.h>
+#import "TTLBaseView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TTLCaseListView : TAPBaseView
+@interface TTLCaseListView : TTLBaseView
+
+@property (strong, nonatomic) UIButton *closeButton;
 
 @end
 

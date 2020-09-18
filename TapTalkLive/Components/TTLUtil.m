@@ -664,18 +664,6 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
        rangeResult = NO;
     }
     
-    //Check first char is lowercaseString
-    NSCharacterSet * lowercaseCharacterSet = [NSCharacterSet lowercaseLetterCharacterSet];
-    NSString *firstCharacter = @"";
-    if ([candidate length] > 0) {
-        firstCharacter = [NSString stringWithFormat: @"%C", [candidate characterAtIndex:0]];
-    }
-    NSRange lowercaseRange = [firstCharacter rangeOfCharacterFromSet:lowercaseCharacterSet] ;
-    BOOL firstCharResult = YES;
-    if (lowercaseRange.location == NSNotFound) {
-        firstCharResult = NO;
-    }
-    
     //Check last character is in the range a-z or 0-9
     NSCharacterSet * lastCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"abcdefghijklmnopqrstuvwxyz1234567890"];
     NSString *lastCharacter = @"";
@@ -693,7 +681,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         consecutiveResult = NO;
     }
 
-    if (!rangeResult || !firstCharResult || !lastCharResult || !consecutiveResult) {
+    if (!rangeResult || !lastCharResult || !consecutiveResult) {
         return NO;
     }
     

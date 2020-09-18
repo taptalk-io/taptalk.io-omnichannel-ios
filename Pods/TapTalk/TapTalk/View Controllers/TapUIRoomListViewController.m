@@ -61,8 +61,19 @@
 #pragma mark - Lifecycle
 - (void)loadView {
     [super loadView];
-    _roomListView = [[TAPRoomListView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
-    [self.view addSubview:self.roomListView];
+    
+    BOOL isShowMyAccountInChatRoom = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
+    BOOL isShowSearchBarInChatRoom = [[TapUI sharedInstance] getSearchBarInRoomListVisibleState];
+    BOOL isShowNewChatButtonInChatRoom = [[TapUI sharedInstance] getNewChatButtonInRoomListVisibleState];
+    if (!isShowMyAccountInChatRoom && !isShowSearchBarInChatRoom && !isShowNewChatButtonInChatRoom) {
+        //hide navigation bar
+        _roomListView = [[TAPRoomListView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
+        [self.view addSubview:self.roomListView];
+    }
+    else {
+        _roomListView = [[TAPRoomListView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
+        [self.view addSubview:self.roomListView];
+    }
     
     if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerLoadView)]) {
         [self.lifecycleDelegate TapUIRoomListViewControllerLoadView];
@@ -86,74 +97,79 @@
     [self.setupRoomListView setNotShowingLoadingFlow:isHide];
     
     [self.roomListView.startChatNoChatsButton addTarget:self action:@selector(openNewChatViewController) forControlEvents:UIControlEventTouchDown];
-    
-    //LeftBarButton
-    _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-    
-    _leftBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
-    self.leftBarInitialNameView.alpha = 0.0f;
-    self.leftBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameView.frame) / 2.0f;
-    self.leftBarInitialNameView.clipsToBounds = YES;
-    [self.leftBarButton addSubview:self.leftBarInitialNameView];
-    
-    UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
-    UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
-    _leftBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftBarInitialNameView.frame), CGRectGetHeight(self.leftBarInitialNameView.frame))];
-    self.leftBarInitialNameLabel.font = initialNameLabelFont;
-    self.leftBarInitialNameLabel.textColor = initialNameLabelColor;
-    self.leftBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
-    [self.leftBarInitialNameView addSubview:self.leftBarInitialNameLabel];
-    
-    _leftBarInitialNameButton = [[UIButton alloc] initWithFrame:self.leftBarInitialNameView.frame];
-    self.leftBarInitialNameButton.alpha = 0.0f;
-    self.leftBarInitialNameButton.userInteractionEnabled = NO;
-    self.leftBarInitialNameButton.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameButton.frame) / 2.0f;
-    [self.leftBarInitialNameButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.leftBarInitialNameView addSubview:self.leftBarInitialNameButton];
-    
-    _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
-    self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds) / 2.0f;
-    self.profileImageView.clipsToBounds = YES;
-    self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
-    [self.leftBarButton addSubview:self.profileImageView];
-    
-        [self.leftBarButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
-    
-    //Only show when is visible
+   
+    //======================================================== Navigation Bar ========================================================
     BOOL isShowMyAccountInChatRoom = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
-    if (isShowMyAccountInChatRoom) {
-        [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-    }
-    
-    //RightBarButton
-    UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
-
-    _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-    self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
-    [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
-    [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
-    
-    //Only show when is visible
-    BOOL isShowNewChatButtonInChatRoom = [[TapUI sharedInstance] getNewChatButtonInRoomListVisibleState];
-    if (isShowNewChatButtonInChatRoom) {
-        [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
-    }
-    
-    //TitleView
-    _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 118.0f, 30.0f)];
-    self.searchBarView.searchTextField.delegate = self;
-    
-    //Only show when is visible
     BOOL isShowSearchBarInChatRoom = [[TapUI sharedInstance] getSearchBarInRoomListVisibleState];
-    if (isShowSearchBarInChatRoom) {
-        [self.navigationItem setTitleView:self.searchBarView];
-    }
-    else {
-        self.title = NSLocalizedStringFromTableInBundle(@"Chats", nil, [TAPUtil currentBundle], @"");
-    }
+    BOOL isShowNewChatButtonInChatRoom = [[TapUI sharedInstance] getNewChatButtonInRoomListVisibleState];
+   
+   if (isShowMyAccountInChatRoom || isShowSearchBarInChatRoom || isShowNewChatButtonInChatRoom) {
+       //LeftBarButton
+       _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+
+       _leftBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
+       self.leftBarInitialNameView.alpha = 0.0f;
+       self.leftBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameView.frame) / 2.0f;
+       self.leftBarInitialNameView.clipsToBounds = YES;
+       [self.leftBarButton addSubview:self.leftBarInitialNameView];
+       
+       UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+       UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+       _leftBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftBarInitialNameView.frame), CGRectGetHeight(self.leftBarInitialNameView.frame))];
+       self.leftBarInitialNameLabel.font = initialNameLabelFont;
+       self.leftBarInitialNameLabel.textColor = initialNameLabelColor;
+       self.leftBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
+       [self.leftBarInitialNameView addSubview:self.leftBarInitialNameLabel];
+       
+       _leftBarInitialNameButton = [[UIButton alloc] initWithFrame:self.leftBarInitialNameView.frame];
+       self.leftBarInitialNameButton.alpha = 0.0f;
+       self.leftBarInitialNameButton.userInteractionEnabled = NO;
+       self.leftBarInitialNameButton.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameButton.frame) / 2.0f;
+       [self.leftBarInitialNameButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+       [self.leftBarInitialNameView addSubview:self.leftBarInitialNameButton];
+       
+       _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
+       self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds) / 2.0f;
+       self.profileImageView.clipsToBounds = YES;
+       self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
+       [self.leftBarButton addSubview:self.profileImageView];
+       
+           [self.leftBarButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+       UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
+       
+       //Only show when is visible
+       if (isShowMyAccountInChatRoom) {
+           [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
+       }
+       
+       //RightBarButton
+       UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+       rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
+
+       _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+       self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
+       [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
+       [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+       UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
+       
+       //Only show when is visible
+       if (isShowNewChatButtonInChatRoom) {
+           [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
+       }
+       
+       //TitleView
+       _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 118.0f, 30.0f)];
+       self.searchBarView.searchTextField.delegate = self;
+       
+       //Only show when is visible
+       if (isShowSearchBarInChatRoom) {
+           [self.navigationItem setTitleView:self.searchBarView];
+       }
+       else {
+           self.title = NSLocalizedStringFromTableInBundle(@"Chats", nil, [TAPUtil currentBundle], @"");
+       }
+   }
+   //====================================================== End Navigation Bar ======================================================
     
     self.roomListView.roomListTableView.delegate = self;
     self.roomListView.roomListTableView.dataSource = self;
@@ -194,7 +210,17 @@
         [self.lifecycleDelegate TapUIRoomListViewControllerViewWillAppear];
     }
     
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
+    //Check show navigation bar of not
+    BOOL isShowMyAccountInChatRoom = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
+    BOOL isShowSearchBarInChatRoom = [[TapUI sharedInstance] getSearchBarInRoomListVisibleState];
+    BOOL isShowNewChatButtonInChatRoom = [[TapUI sharedInstance] getNewChatButtonInRoomListVisibleState];
+    if (!isShowMyAccountInChatRoom && !isShowSearchBarInChatRoom && !isShowNewChatButtonInChatRoom) {
+        //Hide Navigation Bar
+        [self.navigationController setNavigationBarHidden:YES animated:YES];
+    }
+    else {
+        [self.navigationController setNavigationBarHidden:NO animated:YES];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -1221,3 +1247,4 @@
 }
 
 @end
+

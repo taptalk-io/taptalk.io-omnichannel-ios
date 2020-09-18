@@ -50,8 +50,9 @@
         //Hide setup loading view flow in room list
         [[TapUI sharedInstance] hideSetupLoadingFlowInSetupRoomListView:YES];
         
-        //Init TTLRoomListViewController
+//        Init TTLRoomListViewController
         _roomListViewController = [[TTLRoomListViewController alloc] init];
+//        _roomListViewController = [[TapUI sharedInstance] roomListViewController];
     }
     
     return self;
@@ -76,8 +77,10 @@
     //Hide profile button in TapTalk Chat in chat room view
     [[TapUI sharedInstance] setProfileButtonInChatRoomVisible:NO];
     
-    //Hide my account in TapTalk Chat in chat room view
+    //Hide my account, search bar, and new chat button in TapTalk Chat in chat room view
+    [[TapUI sharedInstance] setSearchBarInRoomListVisible:NO];
     [[TapUI sharedInstance] setMyAccountButtonInRoomListVisible:NO];
+    [[TapUI sharedInstance] setNewChatButtonInRoomListVisible:NO];
     
     //Add custom bubble cell
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];    

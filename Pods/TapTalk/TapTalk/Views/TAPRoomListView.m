@@ -81,4 +81,8 @@
     }
 }
 
+- (void)setInitialYPositionOfTableView:(CGFloat)initialYPosition {
+    self.roomListTableView.frame = CGRectMake(CGRectGetMinX(self.roomListTableView.frame), initialYPosition, CGRectGetWidth(self.roomListTableView.frame), CGRectGetHeight(self.bgView.frame) - initialYPosition);
+}
+
 @end

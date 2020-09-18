@@ -1975,6 +1975,18 @@
             return color;
             break;
         }
+        case TTLComponentColorChatRoomBackground:
+        {
+            UIColor *color = [TTLUtil getColor:TTL_DEFAULT_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
+        case TTLComponentColorRoomListBackground:
+        {
+            UIColor *color = [TTLUtil getColor:TTL_DEFAULT_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
         case TTLComponentColorRoomListUnreadBadgeBackground:
         {
             UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
