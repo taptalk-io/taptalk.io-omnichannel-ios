@@ -31,15 +31,15 @@ PODS:
   - SDWebImage/Core (5.10.0)
   - SocketRocket (0.5.1)
   - TapTalk (1.2.2):
-    - AFNetworking (~> 4.0.0)
+    - AFNetworking
     - GoogleMaps
     - GooglePlaces
-    - JSONModel (~> 1.1)
+    - JSONModel
     - PodAsset
-    - Realm (= 3.13.1)
+    - Realm
     - SDWebImage
     - SocketRocket
-    - ZSWTappableLabel (~> 2.0)
+    - ZSWTappableLabel
   - ZSWTappableLabel (2.0)
 
 DEPENDENCIES:
@@ -68,7 +68,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   TapTalk:
-    :commit: 0b6cd965704c3bc1d7d73520d39c13ebf2f2ea96
+    :commit: 77ff3adfb12af18020977538fad50ab3731f5c42
     :git: https://github.com/alfian0/taptalk.io-ios.git
 
 SPEC CHECKSUMS:
@@ -80,7 +80,7 @@ SPEC CHECKSUMS:
   Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
   SDWebImage: 9169792e9eec3e45bba2a0c02f74bf8bd922d1ee
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
-  TapTalk: c16b436890cdb2e255528bc2ed62ced6ebfbc964
+  TapTalk: f64450e231ec0424cc59d28fb3e84506816b6886
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
 PODFILE CHECKSUM: a26251602a040e408ac75d68d79ea085a21bda1c
