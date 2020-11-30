@@ -38,7 +38,7 @@ Pod::Spec.new do |s|
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.dependency "TapTalk"
+    s.dependency "TapTalk", "~> 1.2.2"
     s.dependency "AFNetworking"
     s.dependency "JSONModel"
     s.dependency "SDWebImage"
