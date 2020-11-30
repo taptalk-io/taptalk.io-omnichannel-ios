@@ -5,9 +5,9 @@ use_frameworks!
 
 def tapTalkLive_pods
   pod 'TapTalk'
-  pod 'AFNetworking', '~> 3.1.0'
-  pod 'JSONModel', '~> 1.1'
-  pod 'SDWebImage', '4.4.2'
+  pod 'AFNetworking'
+  pod 'JSONModel'
+  pod 'SDWebImage'
   pod 'PodAsset'
 end
 
