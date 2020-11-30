@@ -4,7 +4,7 @@ inhibit_all_warnings!
 use_frameworks!
 
 def tapTalkLive_pods
-  pod 'TapTalk'
+  pod 'TapTalk', :git => 'https://github.com/alfian0/taptalk.io-ios.git'
   pod 'AFNetworking'
   pod 'JSONModel'
   pod 'SDWebImage'
