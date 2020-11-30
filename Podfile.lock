@@ -47,7 +47,7 @@ DEPENDENCIES:
   - JSONModel
   - PodAsset
   - SDWebImage
-  - TapTalk
+  - TapTalk (~> 1.2.2)
 
 SPEC REPOS:
   trunk:
@@ -74,6 +74,6 @@ SPEC CHECKSUMS:
   TapTalk: c16b436890cdb2e255528bc2ed62ced6ebfbc964
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: 448ffe52d5f6653e1b6e47567a778563e6dcdc32
+PODFILE CHECKSUM: 559bf96c1843dff2e1dc4f52715de65e926f702a
 
 COCOAPODS: 1.9.3

@@ -121,7 +121,7 @@ static const NSInteger kAPITimeOut = 60;
     }
     
     [[self defaultManager] GET:urlString
-                    parameters:parameters
+                    parameters:parameters headers: nil
                       progress:^(NSProgress * _Nonnull downloadProgress) {
                           progress(downloadProgress);
                       }
@@ -157,7 +157,7 @@ static const NSInteger kAPITimeOut = 60;
     }
     
     [[self defaultManager] POST:urlString
-                     parameters:parameters
+                     parameters:parameters headers: nil
                        progress:^(NSProgress * _Nonnull uploadProgress) {
                            progress(uploadProgress);
                        }
@@ -187,7 +187,7 @@ static const NSInteger kAPITimeOut = 60;
     }
     
     [[self defaultManager] PUT:urlString
-                    parameters:parameters
+                    parameters:parameters headers: nil
                        success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                            success(task, (NSDictionary *)responseObject);
                        }
@@ -214,7 +214,7 @@ static const NSInteger kAPITimeOut = 60;
     }
     
     [[self defaultManager] DELETE:urlString
-                       parameters:parameters
+                       parameters:parameters headers: nil
                           success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                               success(task, (NSDictionary *)responseObject);
     }
@@ -309,7 +309,7 @@ static const NSInteger kAPITimeOut = 60;
     [manager.requestSerializer setValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     
     [manager POST:urlString
-                     parameters:parameters
+                     parameters:parameters headers: nil
                        progress:^(NSProgress * _Nonnull uploadProgress) {
                            progress(uploadProgress);
                        }
@@ -350,7 +350,7 @@ refreshToken:(NSString *)refreshToken
     [manager.requestSerializer setValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     
     [manager POST:urlString
-       parameters:parameters
+       parameters:parameters headers: nil
          progress:^(NSProgress * _Nonnull uploadProgress) {
              progress(uploadProgress);
          }
