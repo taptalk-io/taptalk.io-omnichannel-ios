@@ -4,7 +4,7 @@ inhibit_all_warnings!
 use_frameworks!
 
 def tapTalkLive_pods
-  pod 'TapTalk', "~> 1.2.2"
+  pod 'TapTalk'
   pod 'AFNetworking'
   pod 'JSONModel'
   pod 'SDWebImage'
