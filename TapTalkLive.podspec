@@ -38,9 +38,9 @@ Pod::Spec.new do |s|
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.dependency "TapTalk", "~> 1.2.2"
-    s.dependency "AFNetworking"
-    s.dependency "JSONModel"
+    s.dependency "TapTalk", :git => 'https://github.com/alfian0/taptalk.io-ios.git', :commit => 'aca841546c2981d2c08cf539734b8cb1380679ab'
+    s.dependency "AFNetworking", '~> 4.0.0'
+    s.dependency "JSONModel", '~> 1.1'
     s.dependency "SDWebImage"
     s.dependency "PodAsset"
 

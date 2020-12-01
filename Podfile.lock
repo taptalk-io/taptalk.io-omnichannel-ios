@@ -31,23 +31,23 @@ PODS:
   - SDWebImage/Core (5.10.0)
   - SocketRocket (0.5.1)
   - TapTalk (1.2.2):
-    - AFNetworking
+    - AFNetworking (~> 4.0.0)
     - GoogleMaps
     - GooglePlaces
-    - JSONModel
+    - JSONModel (~> 1.1)
     - PodAsset
-    - Realm
+    - Realm (= 3.13.1)
     - SDWebImage
     - SocketRocket
-    - ZSWTappableLabel
+    - ZSWTappableLabel (~> 2.0)
   - ZSWTappableLabel (2.0)
 
 DEPENDENCIES:
-  - AFNetworking
-  - JSONModel
+  - AFNetworking (~> 4.0.0)
+  - JSONModel (~> 1.1)
   - PodAsset
   - SDWebImage
-  - TapTalk (from `https://github.com/alfian0/taptalk.io-ios.git`)
+  - TapTalk (from `https://github.com/alfian0/taptalk.io-ios.git`, commit `aca841546c2981d2c08cf539734b8cb1380679ab`)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -64,11 +64,12 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   TapTalk:
+    :commit: aca841546c2981d2c08cf539734b8cb1380679ab
     :git: https://github.com/alfian0/taptalk.io-ios.git
 
 CHECKOUT OPTIONS:
   TapTalk:
-    :commit: c98638bb6a232162461b7792acbbfe5663158b3f
+    :commit: aca841546c2981d2c08cf539734b8cb1380679ab
     :git: https://github.com/alfian0/taptalk.io-ios.git
 
 SPEC CHECKSUMS:
@@ -80,9 +81,9 @@ SPEC CHECKSUMS:
   Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
   SDWebImage: 9169792e9eec3e45bba2a0c02f74bf8bd922d1ee
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
-  TapTalk: f64450e231ec0424cc59d28fb3e84506816b6886
+  TapTalk: c16b436890cdb2e255528bc2ed62ced6ebfbc964
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: a26251602a040e408ac75d68d79ea085a21bda1c
+PODFILE CHECKSUM: 82dd4effd05b5c8b67b6dd707a49beb27f55f31e
 
 COCOAPODS: 1.10.0
