@@ -66,11 +66,6 @@ EXTERNAL SOURCES:
   TapTalk:
     :git: https://github.com/alfian0/taptalk.io-ios.git
 
-CHECKOUT OPTIONS:
-  TapTalk:
-    :commit: 77ff3adfb12af18020977538fad50ab3731f5c42
-    :git: https://github.com/alfian0/taptalk.io-ios.git
-
 SPEC CHECKSUMS:
   AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
   GoogleMaps: b7f7fc569a9b354a3af0d9729dbec40957b7d41e
