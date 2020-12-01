@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.source       = { :git => 'https://github.com/taptalk-io/taptalk.io-omnichannel-ios.git', :tag => s.version }
+    s.source       = { :git => 'https://github.com/alfian0/taptalk.io-omnichannel-ios.git', :commit => 'f1e7add51c722bb64c9e325cee0ed3b8b0f110e2' }
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
@@ -38,7 +38,7 @@ Pod::Spec.new do |s|
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.dependency "TapTalk", :git => 'https://github.com/alfian0/taptalk.io-ios.git', :commit => 'aca841546c2981d2c08cf539734b8cb1380679ab'
+    s.dependency "TapTalk"
     s.dependency "AFNetworking", '~> 4.0.0'
     s.dependency "JSONModel", '~> 1.1'
     s.dependency "SDWebImage"
