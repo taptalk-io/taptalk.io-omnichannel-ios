@@ -113,32 +113,37 @@
     switch (defaultFontType) {
         case TTLDefaultFontItalic:
         {
-            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_ITALIC size:[UIFont systemFontSize]];
+            UIFont *font = [UIFont italicSystemFontOfSize:[UIFont systemFontSize]];
+//            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_ITALIC size:[UIFont systemFontSize]];
             return font;
             break;
         }
         case TTLDefaultFontRegular:
         {
-            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_REGULAR size:[UIFont systemFontSize]];
+            UIFont *font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
+//            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_REGULAR size:[UIFont systemFontSize]];
             return font;
             break;
         }
         case TTLDefaultFontMedium:
         {
-            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_MEDIUM size:[UIFont systemFontSize]];
+            UIFont *font = [UIFont systemFontOfSize:[UIFont systemFontSize] weight:UIFontWeightMedium];
+//            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_MEDIUM size:[UIFont systemFontSize]];
             return font;
             break;
         }
         case TTLDefaultFontBold:
         {
-            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:[UIFont systemFontSize]];
+            UIFont *font = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
+//            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:[UIFont systemFontSize]];
             return font;
             break;
         }
         default:
         {
             //Set default font to prevent crash
-            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_REGULAR size:[UIFont systemFontSize]];
+            UIFont *font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
+//            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_REGULAR size:[UIFont systemFontSize]];
             return font;
             break;
         }
