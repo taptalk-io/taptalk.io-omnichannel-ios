@@ -14,6 +14,8 @@
 
 @interface TTLRoomListViewController ()
 
+- (void)closeButtonDidTapped;
+
 @end
 
 @implementation TTLRoomListViewController
@@ -24,6 +26,26 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    TTLImage *buttonImage = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    buttonImage = [buttonImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconNavigationBarCloseButton]];
+    UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+    button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
+    [button setImage:buttonImage forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    [self.navigationItem setLeftBarButtonItem:barButtonItem];
+    
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:)]) {
+        //Show Close Button
+        button.alpha = 1.0f;
+        button.userInteractionEnabled = YES;
+    }
+    else {
+        button.alpha = 0.0f;
+        button.userInteractionEnabled = NO;
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -72,6 +94,14 @@
     createCaseNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [createCaseNavigationController setNavigationBarHidden:YES animated:YES];
     [self.navigationController presentViewController:createCaseNavigationController animated:YES completion:nil];
+}
+
+
+- (void)closeButtonDidTapped {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:)]) {
+        [tapTalkLiveDelegate didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:self.navigationController];
+    }
 }
 
 @end

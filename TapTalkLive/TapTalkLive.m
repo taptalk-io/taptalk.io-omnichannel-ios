@@ -80,10 +80,10 @@
     //Hide my account, search bar, and new chat button in TapTalk Chat in chat room view
     [[TapUI sharedInstance] setSearchBarInRoomListVisible:NO];
     [[TapUI sharedInstance] setMyAccountButtonInRoomListVisible:NO];
-    [[TapUI sharedInstance] setNewChatButtonInRoomListVisible:NO];
+    [[TapUI sharedInstance] setNewChatButtonInRoomListVisible:YES];
     
     //Add custom bubble cell
-    [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];    
+    [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLReviewBubbleTableViewCell" type:3003 delegate:self bundle:[TTLUtil currentBundle]];
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLDoneReviewBubbleTableViewCell" type:3004 delegate:self bundle:[TTLUtil currentBundle]];
     
@@ -155,6 +155,7 @@ Called to show TapTalk Live view with present animation
     
     UINavigationController *roomListNavigationController = [[UINavigationController alloc] initWithRootViewController:roomListViewController];
     roomListNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [roomListNavigationController setNavigationBarHidden:YES animated:NO];
     [navigationController presentViewController:roomListNavigationController animated:animated completion:^{
     }];
 }
@@ -268,11 +269,14 @@ Obtain main view controller of TapTalk Live
 
 #pragma mark General Setup & Methods
 /**
- Initialize app to TapTalk.io Omnichannel by providing app key secret, url, and implementation type
+ Initialize app to TapTalk.io Omnichannel by providing app key secret
  */
-- (void)initWithSecretKey:(NSString *_Nonnull)secretKey
-             apiURLString:(NSString *_Nonnull)apiURLString {
-    
+- (void)initWithSecretKey:(NSString *_Nonnull)secretKey {
+
+    //DV NOTE
+    NSString *apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
+//    https://taplive-api-dev.taptalk.io/api/visitor
+
     [[TTLNetworkManager sharedManager] setSecretKey:secretKey];
     [[TTLAPIManager sharedManager] setBaseAPIURLString:apiURLString];
     
