@@ -33,6 +33,8 @@
 @property (strong, nonatomic) UIButton *leftBarButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
 
+@property (strong, nonatomic) NSMutableDictionary *unreadMentionDictionary;
+
 @property (nonatomic) NSInteger firstUnreadProcessCount;
 @property (nonatomic) NSInteger firstUnreadTotalCount;
 
@@ -61,23 +63,25 @@
 #pragma mark - Lifecycle
 - (void)loadView {
     [super loadView];
-    
     BOOL isShowMyAccountInChatRoom = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
     BOOL isShowSearchBarInChatRoom = [[TapUI sharedInstance] getSearchBarInRoomListVisibleState];
     BOOL isShowNewChatButtonInChatRoom = [[TapUI sharedInstance] getNewChatButtonInRoomListVisibleState];
     if (!isShowMyAccountInChatRoom && !isShowSearchBarInChatRoom && !isShowNewChatButtonInChatRoom) {
         //hide navigation bar
         _roomListView = [[TAPRoomListView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
+        CGFloat topBarGap = [TAPUtil currentDeviceStatusBarHeight];
+        [self.roomListView setInitialYPositionOfTableView:topBarGap];
         [self.view addSubview:self.roomListView];
     }
     else {
         _roomListView = [[TAPRoomListView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
         [self.view addSubview:self.roomListView];
     }
-    
+
     if ([self.lifecycleDelegate respondsToSelector:@selector(TapUIRoomListViewControllerLoadView)]) {
         [self.lifecycleDelegate TapUIRoomListViewControllerLoadView];
     }
+
 }
 
 - (void)viewDidLoad {
@@ -91,85 +95,81 @@
     _setupRoomListView = [[TAPSetupRoomListView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
     [self.navigationController.view addSubview:self.setupRoomListView];
     [self.navigationController.view bringSubviewToFront:self.setupRoomListView];
-    
-    //Check need to hide setup loading view or not
-    BOOL isHide = [[TapUI sharedInstance] getSetupLoadingFlowHiddenState];
-    [self.setupRoomListView setNotShowingLoadingFlow:isHide];
-    
+        
     [self.roomListView.startChatNoChatsButton addTarget:self action:@selector(openNewChatViewController) forControlEvents:UIControlEventTouchDown];
-   
-    //======================================================== Navigation Bar ========================================================
+    
+ //======================================================== Navigation Bar ========================================================
     BOOL isShowMyAccountInChatRoom = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
     BOOL isShowSearchBarInChatRoom = [[TapUI sharedInstance] getSearchBarInRoomListVisibleState];
     BOOL isShowNewChatButtonInChatRoom = [[TapUI sharedInstance] getNewChatButtonInRoomListVisibleState];
-   
-   if (isShowMyAccountInChatRoom || isShowSearchBarInChatRoom || isShowNewChatButtonInChatRoom) {
-       //LeftBarButton
-       _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+    
+    if (isShowMyAccountInChatRoom || isShowSearchBarInChatRoom || isShowNewChatButtonInChatRoom) {
+        //LeftBarButton
+        _leftBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
 
-       _leftBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
-       self.leftBarInitialNameView.alpha = 0.0f;
-       self.leftBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameView.frame) / 2.0f;
-       self.leftBarInitialNameView.clipsToBounds = YES;
-       [self.leftBarButton addSubview:self.leftBarInitialNameView];
-       
-       UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
-       UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
-       _leftBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftBarInitialNameView.frame), CGRectGetHeight(self.leftBarInitialNameView.frame))];
-       self.leftBarInitialNameLabel.font = initialNameLabelFont;
-       self.leftBarInitialNameLabel.textColor = initialNameLabelColor;
-       self.leftBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
-       [self.leftBarInitialNameView addSubview:self.leftBarInitialNameLabel];
-       
-       _leftBarInitialNameButton = [[UIButton alloc] initWithFrame:self.leftBarInitialNameView.frame];
-       self.leftBarInitialNameButton.alpha = 0.0f;
-       self.leftBarInitialNameButton.userInteractionEnabled = NO;
-       self.leftBarInitialNameButton.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameButton.frame) / 2.0f;
-       [self.leftBarInitialNameButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-       [self.leftBarInitialNameView addSubview:self.leftBarInitialNameButton];
-       
-       _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
-       self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds) / 2.0f;
-       self.profileImageView.clipsToBounds = YES;
-       self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
-       [self.leftBarButton addSubview:self.profileImageView];
-       
-           [self.leftBarButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-       UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
-       
-       //Only show when is visible
-       if (isShowMyAccountInChatRoom) {
-           [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
-       }
-       
-       //RightBarButton
-       UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-       rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
+        _leftBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
+        self.leftBarInitialNameView.alpha = 0.0f;
+        self.leftBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameView.frame) / 2.0f;
+        self.leftBarInitialNameView.clipsToBounds = YES;
+        [self.leftBarButton addSubview:self.leftBarInitialNameView];
+        
+        UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
+        UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
+        _leftBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftBarInitialNameView.frame), CGRectGetHeight(self.leftBarInitialNameView.frame))];
+        self.leftBarInitialNameLabel.font = initialNameLabelFont;
+        self.leftBarInitialNameLabel.textColor = initialNameLabelColor;
+        self.leftBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self.leftBarInitialNameView addSubview:self.leftBarInitialNameLabel];
+        
+        _leftBarInitialNameButton = [[UIButton alloc] initWithFrame:self.leftBarInitialNameView.frame];
+        self.leftBarInitialNameButton.alpha = 0.0f;
+        self.leftBarInitialNameButton.userInteractionEnabled = NO;
+        self.leftBarInitialNameButton.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameButton.frame) / 2.0f;
+        [self.leftBarInitialNameButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.leftBarInitialNameView addSubview:self.leftBarInitialNameButton];
+        
+        _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
+        self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds) / 2.0f;
+        self.profileImageView.clipsToBounds = YES;
+        self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
+        [self.leftBarButton addSubview:self.profileImageView];
+        
+            [self.leftBarButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarButton];
+        
+        //Only show when is visible
+        if (isShowMyAccountInChatRoom) {
+            [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
+        }
+        
+        //RightBarButton
+        UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
 
-       _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-       self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
-       [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
-       [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-       UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
-       
-       //Only show when is visible
-       if (isShowNewChatButtonInChatRoom) {
-           [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
-       }
-       
-       //TitleView
-       _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 118.0f, 30.0f)];
-       self.searchBarView.searchTextField.delegate = self;
-       
-       //Only show when is visible
-       if (isShowSearchBarInChatRoom) {
-           [self.navigationItem setTitleView:self.searchBarView];
-       }
-       else {
-           self.title = NSLocalizedStringFromTableInBundle(@"Chats", nil, [TAPUtil currentBundle], @"");
-       }
-   }
-   //====================================================== End Navigation Bar ======================================================
+        _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
+        self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
+        [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
+        [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
+        
+        //Only show when is visible
+        if (isShowNewChatButtonInChatRoom) {
+            [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
+        }
+        
+        //TitleView
+        _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 118.0f, 30.0f)];
+        self.searchBarView.searchTextField.delegate = self;
+        
+        //Only show when is visible
+        if (isShowSearchBarInChatRoom) {
+            [self.navigationItem setTitleView:self.searchBarView];
+        }
+        else {
+            self.title = NSLocalizedStringFromTableInBundle(@"Chats", nil, [TAPUtil currentBundle], @"");
+        }
+    }
+    //====================================================== End Navigation Bar ======================================================
     
     self.roomListView.roomListTableView.delegate = self;
     self.roomListView.roomListTableView.dataSource = self;
@@ -177,6 +177,7 @@
     
     _roomListArray = [NSMutableArray array];
     _roomListDictionary = [NSMutableDictionary dictionary];
+    _unreadMentionDictionary = [NSMutableDictionary dictionary];
     
     _connectionStatusViewController = [[TAPConnectionStatusViewController alloc] init];
     [self addChildViewController:self.connectionStatusViewController];
@@ -532,12 +533,18 @@
 #pragma mark TapUIChatViewController
 - (void)chatViewControllerShouldUpdateUnreadBubbleForRoomID:(NSString *)roomID {
     NSInteger readCount = [[TAPMessageStatusManager sharedManager] getReadCountAndClearDictionaryForRoomID:roomID];
+    NSInteger readMentionCount = [[TAPMessageStatusManager sharedManager] getReadMentionCountAndClearDictionaryForRoomID:roomID];
     
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
     roomList.numberOfUnreadMessages = roomList.numberOfUnreadMessages - readCount;
+    roomList.numberOfUnreadMentions = roomList.numberOfUnreadMentions - readMentionCount;
     
     if(roomList.numberOfUnreadMessages < 0) {
         roomList.numberOfUnreadMessages = 0;
+    }
+    
+    if(roomList.numberOfUnreadMentions < 0) {
+        roomList.numberOfUnreadMentions = 0;
     }
     
     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
@@ -546,9 +553,10 @@
 }
 
 - (void)chatViewControllerShouldClearUnreadBubbleForRoomID:(NSString *)roomID {
-    //Force mark unread bubble to 0
+    //Force mark unread bubble and unread mention to 0
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
     roomList.numberOfUnreadMessages = 0;
+    roomList.numberOfUnreadMentions = 0;
         
     NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
@@ -699,9 +707,9 @@
             [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeFailed];
             [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeFailed];
             
-            NSLog(@"****************************************************/n/n/n");
+            NSLog(@"****************************************************\n\n\n");
             NSLog(@"TapTalk.io - Could not find active user data. Please make sure the client app is authenticated.");
-            NSLog(@"/n/n/n****************************************************");
+            NSLog(@"\n\n\n****************************************************");
         }
         
         return; //User not logged in
@@ -913,10 +921,12 @@
             
             //Handle room insert
             if([insertIndexArray count] > 0) {
-                [self.roomListView.roomListTableView beginUpdates];
-                [self.roomListView.roomListTableView insertRowsAtIndexPaths:insertIndexArray withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self.roomListView.roomListTableView endUpdates];
-                [self.roomListView.roomListTableView scrollsToTop];
+                [self.roomListView.roomListTableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:insertIndexArray withRowAnimation:UITableViewRowAnimationAutomatic];
+                } completion:^(BOOL finished) {
+                    [self.roomListView.roomListTableView scrollsToTop];
+                }];
             }
             
             //Handle room move
@@ -926,9 +936,11 @@
                     NSInteger newIndex = [moveToIndexArray objectAtIndex:count];
 
                     [self updateCellDataAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] updateUnreadBubble:NO];
-                    [self.roomListView.roomListTableView beginUpdates];
-                    [self.roomListView.roomListTableView moveRowAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] toIndexPath:[NSIndexPath indexPathForRow:newIndex inSection:0]];
-                    [self.roomListView.roomListTableView endUpdates];
+                    [self.roomListView.roomListTableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [self.roomListView.roomListTableView moveRowAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] toIndexPath:[NSIndexPath indexPathForRow:newIndex inSection:0]];
+                    } completion:^(BOOL finished) {
+                    }];
                 }
             }
             
@@ -948,9 +960,11 @@
                     //Data not exist, delete cell
                     NSInteger oldIndex = [oldRoomListArray indexOfObject:oldRoomList];
                     [oldRoomListArray removeObjectAtIndex:oldIndex];
-                    [self.roomListView.roomListTableView beginUpdates];
-                    [self.roomListView.roomListTableView deleteRowsAtIndexPaths:[NSIndexPath indexPathForRow:oldIndex inSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-                    [self.roomListView.roomListTableView endUpdates];
+                    [self.roomListView.roomListTableView performBatchUpdates:^{
+                        //changing beginUpdates and endUpdates with this because of deprecation
+                        [self.roomListView.roomListTableView deleteRowsAtIndexPaths:[NSIndexPath indexPathForRow:oldIndex inSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    } completion:^(BOOL finished) {
+                    }];
                 }
             }
         }
@@ -978,6 +992,7 @@
         
         _firstUnreadProcessCount = 0;
         _firstUnreadTotalCount = [roomListLocalArray count];
+        NSMutableDictionary *unreadMentionDataDictionary = [NSMutableDictionary dictionary];
         
         for (TAPRoomListModel *roomList in roomListLocalArray) {
             TAPMessageModel *messageData = roomList.lastMessage;
@@ -985,29 +1000,47 @@
             NSString *roomIDString = roomData.roomID;
             roomIDString = [TAPUtil nullToEmptyString:roomIDString];
             
-            [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomIDString activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
-                //Set number of unread messages to array and dictionary
-                NSInteger numberOfUnreadMessages = [unreadMessages count];
-                TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomIDString];
-                roomList.numberOfUnreadMessages = numberOfUnreadMessages;
+            NSString *usernameString = [TAPDataManager getActiveUser].username;
+            usernameString = [TAPUtil nullToEmptyString:usernameString];
+            NSString *activeUserID = [TAPDataManager getActiveUser].userID;
+            activeUserID = [TAPUtil nullToEmptyString:activeUserID];
+            
+            [TAPDataManager getDatabaseUnreadMentionsInRoomWithUsername:usernameString roomID:roomIDString activeUserID:activeUserID success:^(NSArray *unreadMentionMessages) {
+                NSInteger totalUnreadMention = [unreadMentionMessages count];
+                [unreadMentionDataDictionary setObject:[NSNumber numberWithInteger:totalUnreadMention] forKey:roomIDString];
                 
-                if(roomList.numberOfUnreadMessages < 0) {
-                    roomList.numberOfUnreadMessages = 0;
-                }
-                
-                _firstUnreadProcessCount++;
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if(self.firstUnreadProcessCount >= self.firstUnreadTotalCount) {
-                        [self getAndUpdateNumberOfUnreadToDelegate];
+                [TAPDataManager getDatabaseUnreadMessagesInRoomWithRoomID:roomIDString activeUserID:[TAPChatManager sharedManager].activeUser.userID success:^(NSArray *unreadMessages) {
+                    //Set number of unread messages to array and dictionary
+                    NSInteger numberOfUnreadMessages = [unreadMessages count];
+                    NSInteger numberOfUnreadMentions = [[unreadMentionDataDictionary objectForKey:roomIDString] integerValue];
+                    TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomIDString];
+                    roomList.numberOfUnreadMessages = numberOfUnreadMessages;
+                    roomList.numberOfUnreadMentions = numberOfUnreadMentions;
+                    
+                    if(roomList.numberOfUnreadMessages < 0) {
+                        roomList.numberOfUnreadMessages = 0;
                     }
                     
-                    NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
-                    NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
-                    [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
-                });
-            } failure:^(NSError *error) {
+                    if(roomList.numberOfUnreadMentions < 0) {
+                        roomList.numberOfUnreadMentions = 0;
+                    }
+                    
+                    _firstUnreadProcessCount++;
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        if(self.firstUnreadProcessCount >= self.firstUnreadTotalCount) {
+                            [self getAndUpdateNumberOfUnreadToDelegate];
+                        }
+                        
+                        NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+                        NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+                        [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+                    });
+                } failure:^(NSError *error) {
 
+                }];
+            } failure:^(NSError *error) {
+                
             }];
         }
         
@@ -1067,6 +1100,11 @@
             if (![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID] && isNewMessage) {
                 //Message from other recipient, increment number of unread message
                 roomList.numberOfUnreadMessages++;
+                
+                BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+                if (hasMention) {
+                    roomList.numberOfUnreadMentions++;
+                }
             }
 
             NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
@@ -1078,9 +1116,11 @@
                 //Move cell to top
                 [self.roomListArray removeObject:roomList];
                 [self.roomListArray insertObject:roomList atIndex:0];
-                [self.roomListView.roomListTableView beginUpdates];
-                [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-                [self.roomListView.roomListTableView endUpdates];
+                [self.roomListView.roomListTableView performBatchUpdates:^{
+                    //changing beginUpdates and endUpdates with this because of deprecation
+                    [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                } completion:^(BOOL finished) {
+                }];
             }
         }
     }
@@ -1097,17 +1137,28 @@
         if (![message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
             //Message from other recipient, set unread as 1
             newRoomList.numberOfUnreadMessages = 1;
+            
+            BOOL hasMention = [TAPUtil isActiveUserMentionedWithMessage:message activeUser:[TAPDataManager getActiveUser]];
+            if (hasMention) {
+                newRoomList.numberOfUnreadMentions = 1;
+            }
+            else {
+                newRoomList.numberOfUnreadMentions = 0;
+            }
         }
         else {
             //Current user send new message, set unread to 0
             newRoomList.numberOfUnreadMessages = 0;
+            newRoomList.numberOfUnreadMentions = 0;
         }
         
         [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
-        [self.roomListView.roomListTableView beginUpdates];
-        [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.roomListView.roomListTableView endUpdates];
-        [self.roomListView showNoChatsView:NO];
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+            //changing beginUpdates and endUpdates with this because of deprecation
+            [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        } completion:^(BOOL finished) {
+            [self.roomListView showNoChatsView:NO];
+        }];
     }
     
     [self getAndUpdateNumberOfUnreadToDelegate];
@@ -1247,4 +1298,3 @@
 }
 
 @end
-

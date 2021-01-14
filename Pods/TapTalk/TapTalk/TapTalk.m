@@ -20,6 +20,7 @@
 @property (nonatomic) TapTalkImplentationType implementationType;
 @property (nonatomic) BOOL isAutoConnectDisabled;
 @property (nonatomic) BOOL isGooglePlacesAPIInitialize;
+@property (strong, nonatomic) NSString *clientCustomUserAgent;
 
 @property (strong, nonatomic) NSDictionary * _Nullable projectConfigsDictionary;
 @property (strong, nonatomic) NSDictionary * _Nullable coreConfigsDictionary;
@@ -52,6 +53,7 @@
         _projectConfigsDictionary = [[NSDictionary alloc] init];
         _coreConfigsDictionary = [[NSDictionary alloc] init];
         _customConfigsDictionary = [[NSDictionary alloc] init];
+        _clientCustomUserAgent = @"";
         
         //Set secret for NSSecureUserDefaults
         [NSUserDefaults setSecret:TAP_SECURE_KEY_NSUSERDEFAULTS];
@@ -241,6 +243,9 @@
     //Remove all read count on MessageStatusManager because the room list is reloaded from database
     [[TAPMessageStatusManager sharedManager] clearReadCountDictionary];
     
+    //Remove all read mention count on MessageStatusManager because the room list is reloaded from database
+    [[TAPMessageStatusManager sharedManager] clearReadMentionCountDictionary];
+    
     if (self.implementationType != TapTalkImplentationTypeCore) {
         //Call to run room list view controller sequence
         //Only run when using TAPUI or both implementation
@@ -392,7 +397,7 @@
 - (void)notificationManagerDidHandleTappedNotificationWithMessage:(TAPMessageModel *)message {
     
     //Save user to ContactManager Dictionary
-    [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO];
+    [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO saveActiveUser:NO];
     
     UIViewController *currentActiveController = nil;
     if (self.implementationType != TapTalkImplentationTypeCore) {
@@ -471,6 +476,16 @@
 
 - (void)updateUnreadBadgeCount {
     [[TAPNotificationManager sharedManager] updateApplicationBadgeCount];
+}
+
+//==========================================================
+//                 Language & Localization
+//==========================================================
+/**
+ Setup TapTalk.io main language (default is English)
+ */
+- (void)setupTapTalkMainLanguageWithType:(TAPLanguageType)languageType {
+    [TAPLanguageManager saveLanguageByType:languageType];
 }
 
 //Other
@@ -566,6 +581,7 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_IS_CONTACT_SYNC_ALLOWED_BY_USER];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_USER_IGNORE_ADD_CONTACT_POPUP_DICTIONARY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_GOOGLE_PLACES_TOKEN];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     //Clear Manager Data
@@ -575,6 +591,19 @@
     [[TAPFileDownloadManager sharedManager] clearFileDownloadManagerData];
     [[TAPFileUploadManager sharedManager] clearFileUploadManagerData];
     [[TAPMessageStatusManager sharedManager] clearMessageStatusManagerData];
+}
+
+/**
+ Set custom User-Agent key as a header parameter for an API request
+ Note: By default, we will pass "ios" as User-Agent key
+ */
+- (void)setTapTalkUserAgent:(NSString *)userAgent {
+    _clientCustomUserAgent = userAgent;
+}
+
+
+- (NSString *)getTapTalkUserAgent {
+    return self.clientCustomUserAgent;
 }
 
 - (TAPUserModel *_Nonnull)getTapTalkActiveUser {

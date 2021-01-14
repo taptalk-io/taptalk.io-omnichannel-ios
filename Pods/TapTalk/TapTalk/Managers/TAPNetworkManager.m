@@ -64,6 +64,12 @@ static const NSInteger kAPITimeOut = 60;
 
 #pragma mark - Custom Method
 - (AFHTTPSessionManager *)defaultManager {
+    
+    NSString *clientUserAgent = [[TapTalk sharedInstance] getTapTalkUserAgent];
+    if ([clientUserAgent isEqualToString:@""] || clientUserAgent == nil) {
+        clientUserAgent = @"ios";
+    }
+    
     NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
@@ -76,7 +82,7 @@ static const NSInteger kAPITimeOut = 60;
     [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
     [manager.requestSerializer setValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"SDK-Version"];
-    [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"User-Agent"];
+    [manager.requestSerializer setValue:clientUserAgent forHTTPHeaderField:@"User-Agent"];
     
     [manager.requestSerializer setTimeoutInterval:kAPITimeOut];
     
@@ -124,6 +130,7 @@ static const NSInteger kAPITimeOut = 60;
     
     [[self defaultManager] GET:urlString
                     parameters:parameters
+                       headers:[NSDictionary dictionary]
                       progress:^(NSProgress * _Nonnull downloadProgress) {
                           progress(downloadProgress);
                       }
@@ -160,6 +167,7 @@ static const NSInteger kAPITimeOut = 60;
     
     [[self defaultManager] POST:urlString
                      parameters:parameters
+                        headers:[NSDictionary dictionary]
                        progress:^(NSProgress * _Nonnull uploadProgress) {
                            progress(uploadProgress);
                        }
@@ -190,6 +198,7 @@ static const NSInteger kAPITimeOut = 60;
     
     [[self defaultManager] PUT:urlString
                     parameters:parameters
+                    headers:[NSDictionary dictionary]
                        success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                            success(task, (NSDictionary *)responseObject);
                        }
@@ -217,6 +226,7 @@ static const NSInteger kAPITimeOut = 60;
     
     [[self defaultManager] DELETE:urlString
                        parameters:parameters
+                          headers:[NSDictionary dictionary]
                           success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                               success(task, (NSDictionary *)responseObject);
     }
@@ -299,16 +309,17 @@ static const NSInteger kAPITimeOut = 60;
     [manager.requestSerializer setValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     
     [manager POST:urlString
-                     parameters:parameters
-                       progress:^(NSProgress * _Nonnull uploadProgress) {
-                           progress(uploadProgress);
-                       }
-                        success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                            success(task, (NSDictionary *)responseObject);
-                        }
-                        failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                            failure(task, error);
-                        }];
+       parameters:parameters
+          headers:[NSDictionary dictionary]
+         progress:^(NSProgress * _Nonnull uploadProgress) {
+           progress(uploadProgress);
+         }
+          success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+            success(task, (NSDictionary *)responseObject);
+         }
+          failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+            failure(task, error);
+    }];
 }
 
 - (void)post:(NSString *)urlString
@@ -341,6 +352,7 @@ refreshToken:(NSString *)refreshToken
     
     [manager POST:urlString
        parameters:parameters
+          headers:[NSDictionary dictionary]
          progress:^(NSProgress * _Nonnull uploadProgress) {
              progress(uploadProgress);
          }

@@ -1,18 +1,18 @@
 PODS:
-  - AFNetworking (3.1.0):
-    - AFNetworking/NSURLSession (= 3.1.0)
-    - AFNetworking/Reachability (= 3.1.0)
-    - AFNetworking/Security (= 3.1.0)
-    - AFNetworking/Serialization (= 3.1.0)
-    - AFNetworking/UIKit (= 3.1.0)
-  - AFNetworking/NSURLSession (3.1.0):
+  - AFNetworking (4.0.1):
+    - AFNetworking/NSURLSession (= 4.0.1)
+    - AFNetworking/Reachability (= 4.0.1)
+    - AFNetworking/Security (= 4.0.1)
+    - AFNetworking/Serialization (= 4.0.1)
+    - AFNetworking/UIKit (= 4.0.1)
+  - AFNetworking/NSURLSession (4.0.1):
     - AFNetworking/Reachability
     - AFNetworking/Security
     - AFNetworking/Serialization
-  - AFNetworking/Reachability (3.1.0)
-  - AFNetworking/Security (3.1.0)
-  - AFNetworking/Serialization (3.1.0)
-  - AFNetworking/UIKit (3.1.0):
+  - AFNetworking/Reachability (4.0.1)
+  - AFNetworking/Security (4.0.1)
+  - AFNetworking/Serialization (4.0.1)
+  - AFNetworking/UIKit (4.0.1):
     - AFNetworking/NSURLSession
   - GoogleMaps (4.1.0):
     - GoogleMaps/Maps (= 4.1.0)
@@ -30,8 +30,8 @@ PODS:
     - SDWebImage/Core (= 4.4.2)
   - SDWebImage/Core (4.4.2)
   - SocketRocket (0.5.1)
-  - TapTalk (1.1.11):
-    - AFNetworking (~> 3.1.0)
+  - TapTalk (1.2.2):
+    - AFNetworking (~> 4.0.0)
     - GoogleMaps
     - GooglePlaces
     - JSONModel (~> 1.1)
@@ -43,7 +43,7 @@ PODS:
   - ZSWTappableLabel (2.0)
 
 DEPENDENCIES:
-  - AFNetworking (~> 3.1.0)
+  - AFNetworking
   - JSONModel (~> 1.1)
   - PodAsset
   - SDWebImage (= 4.4.2)
@@ -63,7 +63,7 @@ SPEC REPOS:
     - ZSWTappableLabel
 
 SPEC CHECKSUMS:
-  AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
+  AFNetworking: 7864c38297c79aaca1500c33288e429c3451fdce
   GoogleMaps: 008e2c80e38605b56b560e8deb73d4194ff30bef
   GooglePlaces: a058b776259c13e1323c9ff135549cb1b13ad8e7
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
@@ -71,9 +71,9 @@ SPEC CHECKSUMS:
   Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
-  TapTalk: ebc7f53dc2c97d26d57e2886f3a3a138afd1e155
+  TapTalk: c16b436890cdb2e255528bc2ed62ced6ebfbc964
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: ec12c457943e797d58d8cc5074224e79e4384a71
+PODFILE CHECKSUM: 6ea7e14db6aadfa830ebc1e9afd0b01decb2c0c1
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.10.1
