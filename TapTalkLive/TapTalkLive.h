@@ -18,8 +18,23 @@ FOUNDATION_EXPORT double TapTalkLiveVersionNumber;
 //! Project version string for TapTalkLive.
 FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 
+@protocol TapTalkLiveDelegate <NSObject>
+
+/**
+ Called when user tapped the close button in create case view
+*/
+- (void)didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped the close button in case list view
+*/
+- (void)didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:(UINavigationController *)navigationController;
+
+@end
+
 @interface TapTalkLive : NSObject
 
+@property (weak, nonatomic) id<TapTalkLiveDelegate> _Nullable delegate;
 @property (weak, nonatomic) UIWindow *activeWindow;
 
 //Initalization
@@ -110,15 +125,24 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 //                  General Setup & Methods
 //==========================================================
 /**
- Initialize app to TapTalk.io Omnichannel by providing app key secret, url, and implementation type
+ Initialize app to TapTalk.io Omnichannel by providing app key secret
  */
-- (void)initWithSecretKey:(NSString *_Nonnull)secretKey
-             apiURLString:(NSString *_Nonnull)apiURLString;
+- (void)initWithSecretKey:(NSString *_Nonnull)secretKey;
 
 /**
  Set Google Places API Key to pick and obtain location when send location chat
  */
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey;
+
+/**
+ Trigger when user click close button from create case form
+ */
+- (void)didCloseCreateCaseViewController;
+
+/**
+ Trigger when user click close button from case list form
+ */
+- (void)didCloseCaseListViewController;
 
 //==========================================================
 //                   TapTalk Live View

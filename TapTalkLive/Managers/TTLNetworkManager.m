@@ -64,11 +64,13 @@ static const NSInteger kAPITimeOut = 60;
 
 #pragma mark - Custom Method
 - (AFHTTPSessionManager *)defaultManager {
+    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
     [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [manager.requestSerializer setValue:self.secretKey forHTTPHeaderField:@"Secret-Key"];
+    [manager.requestSerializer setValue:bundleIdentifier forHTTPHeaderField:@"App-Identifier"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] identifierForVendor].UUIDString forHTTPHeaderField:@"Device-Identifier"];
     [manager.requestSerializer setValue:[[UIDevice currentDevice] model] forHTTPHeaderField:@"Device-Model"];
     [manager.requestSerializer setValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
@@ -113,8 +115,8 @@ static const NSInteger kAPITimeOut = 60;
     if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
-        
-        NSString *errorMessage = NSLocalizedString(@"It appears you don't have internet connection, please try again later...", @"");
+    
+        NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"It appears you don't have internet connection, please try again later...", nil, [TTLUtil currentBundle], @"");
         NSError *error = [NSError errorWithDomain:errorMessage code:199 userInfo:@{@"message": errorMessage}];
         
         failure (nil, error);
@@ -150,7 +152,7 @@ static const NSInteger kAPITimeOut = 60;
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
-        NSString *errorMessage = NSLocalizedString(@"It appears you don't have internet connection, please try again later...", @"");
+        NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"It appears you don't have internet connection, please try again later...", nil, [TTLUtil currentBundle], @"");
         NSError *error = [NSError errorWithDomain:errorMessage code:199 userInfo:@{@"message": errorMessage}];
         
         failure (nil, error);
@@ -298,7 +300,7 @@ static const NSInteger kAPITimeOut = 60;
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
-        NSString *errorMessage = NSLocalizedString(@"It appears you don't have internet connection, please try again later...", @"");
+        NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"It appears you don't have internet connection, please try again later...", nil, [TTLUtil currentBundle], @"");
         NSError *error = [NSError errorWithDomain:errorMessage code:199 userInfo:@{@"message": errorMessage}];
         
         failure (nil, error);
@@ -339,7 +341,7 @@ refreshToken:(NSString *)refreshToken
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
-        NSString *errorMessage = NSLocalizedString(@"It appears you don't have internet connection, please try again later...", @"");
+        NSString *errorMessage = NSLocalizedStringFromTableInBundle(@"It appears you don't have internet connection, please try again later...", nil, [TTLUtil currentBundle], @"");
         NSError *error = [NSError errorWithDomain:errorMessage code:199 userInfo:@{@"message": errorMessage}];
         
         failure (nil, error);

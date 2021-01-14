@@ -14,7 +14,7 @@
 @import GooglePlaces;
 @import GoogleMaps;
 
-@interface TAPPickLocationViewController () <TAPLocationSearchBarViewDelegate, MKMapViewDelegate, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate>
+@interface TAPPickLocationViewController () <TAPLocationSearchBarViewDelegate, MKMapViewDelegate, UITableViewDelegate, UITableViewDataSource, UIGestureRecognizerDelegate, TAPCustomButtonViewDelegate>
 
 @property (strong, nonatomic) TAPPickLocationView *pickLocationView;
 
@@ -43,7 +43,7 @@
 #pragma mark - Lifecycle
 - (void)loadView {
     [super loadView];
-    self.title = NSLocalizedString(@"Send Location", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"Send Location", nil, [TAPUtil currentBundle], @"");
     
     _pickLocationView = [[TAPPickLocationView alloc] initWithFrame:[TAPBaseView frameWithNavigationBar]];
     [self.view addSubview:self.pickLocationView];
@@ -67,9 +67,9 @@
     
     self.pickLocationView.mapView.delegate = self;
     self.pickLocationView.searchTableView.delegate = self;
-    
+    self.pickLocationView.sendLocationButton.delegate = self;
+
     [self.pickLocationView.goToCurrentLocationButton addTarget:self action:@selector(goToCurrentLocation) forControlEvents:UIControlEventTouchUpInside];
-    [self.pickLocationView.pinLocationButton addTarget:self action:@selector(setLocationButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     [self.pickLocationView setAsLoading:YES];
     _searchResultArray = [NSMutableArray array];
@@ -285,20 +285,31 @@
                  _selectedPostalCode = currentPostalCode;
                  [self.pickLocationView setAsLoading:NO];
                  [self.pickLocationView setAddress:currentLocation];
+                 [self.pickLocationView.sendLocationButton setAsActiveState:YES animated:YES];
              }
              else {
                  //Location not found
                  [self.pickLocationView setAsLoading:YES];
-                 [self.pickLocationView setAddress:NSLocalizedString(@"Location not found", @"")];
+                 [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
+                 [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
              }
          }
          else {
              //Location not found
              [self.pickLocationView setAsLoading:YES];
-             [self.pickLocationView setAddress:NSLocalizedString(@"Location not found", @"")];
+             [self.pickLocationView setAddress:NSLocalizedStringFromTableInBundle(@"Location not found", nil, [TAPUtil currentBundle], @"")];
+             [self.pickLocationView.sendLocationButton setAsActiveState:NO animated:YES];
          }
      }];
+}
+
+#pragma mark - TAPCustomButtonView
+- (void)customButtonViewDidTappedButton {
+    if ([self.delegate respondsToSelector:@selector(pickLocationViewControllerSetLocationWithLatitude:longitude:address:postalCode:)]) {
+        [self.delegate pickLocationViewControllerSetLocationWithLatitude:self.selectedLocationCoordinate.latitude longitude:self.selectedLocationCoordinate.longitude address:self.selectedLocationAddress postalCode:self.selectedPostalCode];
+    }
     
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - LocationManager Method
@@ -318,12 +329,12 @@
 #pragma mark - Custom Method
 - (void)checkLocationPermission {
     if([TAPLocationManager authorizationStatus] == kCLAuthorizationStatusDenied || [TAPLocationManager authorizationStatus] == kCLAuthorizationStatusRestricted) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Location Disabled", @"") message:NSLocalizedString(@"Please allow Location Services to Continue", @"") preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedStringFromTableInBundle(@"Location Disabled", nil, [TAPUtil currentBundle], @"") message:NSLocalizedStringFromTableInBundle(@"Please allow Location Services to Continue", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             
         }];
-        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Go to Settings", @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Go to Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
             if (url != nil) {
                 if(IS_IOS_11_OR_ABOVE) {

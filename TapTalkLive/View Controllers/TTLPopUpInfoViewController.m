@@ -90,14 +90,14 @@
     _detailInformation = detailInfo;
     
     if (leftOptionTitle == nil) {
-        _leftOptionButtonString = NSLocalizedString(@"Cancel", @"");
+        _leftOptionButtonString = NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TTLUtil currentBundle], @"");
     }
     else {
         _leftOptionButtonString = leftOptionTitle;
     }
     
     if (singleOrRightOptionTitle == nil) {
-        _singleOrRightOptionButtonString = NSLocalizedString(@"OK", @"");
+        _singleOrRightOptionButtonString = NSLocalizedStringFromTableInBundle(@"OK", nil, [TTLUtil currentBundle], @"");
     }
     else {
         _singleOrRightOptionButtonString = singleOrRightOptionTitle;

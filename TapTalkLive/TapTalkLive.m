@@ -50,8 +50,9 @@
         //Hide setup loading view flow in room list
         [[TapUI sharedInstance] hideSetupLoadingFlowInSetupRoomListView:YES];
         
-        //Init TTLRoomListViewController
+//        Init TTLRoomListViewController
         _roomListViewController = [[TTLRoomListViewController alloc] init];
+//        _roomListViewController = [[TapUI sharedInstance] roomListViewController];
     }
     
     return self;
@@ -76,11 +77,13 @@
     //Hide profile button in TapTalk Chat in chat room view
     [[TapUI sharedInstance] setProfileButtonInChatRoomVisible:NO];
     
-    //Hide my account in TapTalk Chat in chat room view
+    //Hide my account, search bar, and new chat button in TapTalk Chat in chat room view
+    [[TapUI sharedInstance] setSearchBarInRoomListVisible:NO];
     [[TapUI sharedInstance] setMyAccountButtonInRoomListVisible:NO];
+    [[TapUI sharedInstance] setNewChatButtonInRoomListVisible:YES];
     
     //Add custom bubble cell
-    [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];    
+    [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLReviewBubbleTableViewCell" type:3003 delegate:self bundle:[TTLUtil currentBundle]];
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLDoneReviewBubbleTableViewCell" type:3004 delegate:self bundle:[TTLUtil currentBundle]];
     
@@ -152,6 +155,7 @@ Called to show TapTalk Live view with present animation
     
     UINavigationController *roomListNavigationController = [[UINavigationController alloc] initWithRootViewController:roomListViewController];
     roomListNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [roomListNavigationController setNavigationBarHidden:YES animated:NO];
     [navigationController presentViewController:roomListNavigationController animated:animated completion:^{
     }];
 }
@@ -207,7 +211,7 @@ Obtain main view controller of TapTalk Live
   //Set custom keyboard option items
     TTLImage *checkListImage = [UIImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
     checkListImage = [checkListImage setImageTintColor:[TTLUtil getColor:@"191919"]];
-    TAPCustomKeyboardItemModel *customKeyboardItem = [TAPCustomKeyboardItemModel createCustomKeyboardItemWithImage:checkListImage itemName:NSLocalizedString(@"Mark as solved", @"") itemID:@"1"];
+    TAPCustomKeyboardItemModel *customKeyboardItem = [TAPCustomKeyboardItemModel createCustomKeyboardItemWithImage:checkListImage itemName:NSLocalizedStringFromTableInBundle(@"Mark as solved", nil, [TTLUtil currentBundle], @"") itemID:@"1"];
     return @[customKeyboardItem];
 }
 
@@ -225,7 +229,10 @@ Obtain main view controller of TapTalk Live
         popupHandlerViewController.recipient = recipient;
         UIViewController *currentActiveController = [self getCurrentTapTalkLiveActiveViewController];
         [currentActiveController presentViewController:popupHandlerViewController animated:NO completion:^{
-            [popupHandlerViewController showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Custom Keyboard - Close Case Tapped" title:NSLocalizedString(@"Warning", @"") detailInformation:NSLocalizedString(@"This case will be closed and you wont be able to further send messages or receive assistance regarding this case. Would you like to proceed?", @"") leftOptionButtonTitle:NSLocalizedString(@"Cancel", @"") singleOrRightOptionButtonTitle:NSLocalizedString(@"OK", @"")];
+            
+            
+            
+            [popupHandlerViewController showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Custom Keyboard - Close Case Tapped" title:NSLocalizedStringFromTableInBundle(@"Warning", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"This case will be closed and you wont be able to further send messages or receive assistance regarding this case. Would you like to proceed?", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TTLUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TTLUtil currentBundle], @"")];
         }];
     }
 }
@@ -262,11 +269,14 @@ Obtain main view controller of TapTalk Live
 
 #pragma mark General Setup & Methods
 /**
- Initialize app to TapTalk.io Omnichannel by providing app key secret, url, and implementation type
+ Initialize app to TapTalk.io Omnichannel by providing app key secret
  */
-- (void)initWithSecretKey:(NSString *_Nonnull)secretKey
-             apiURLString:(NSString *_Nonnull)apiURLString {
-    
+- (void)initWithSecretKey:(NSString *_Nonnull)secretKey {
+
+    //DV NOTE
+    NSString *apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
+//    https://taplive-api-dev.taptalk.io/api/visitor
+
     [[TTLNetworkManager sharedManager] setSecretKey:secretKey];
     [[TTLAPIManager sharedManager] setBaseAPIURLString:apiURLString];
     
@@ -284,6 +294,9 @@ Obtain main view controller of TapTalk Live
         [[TapTalk sharedInstance] initWithAppKeyID:tapTalkAppKeyIDString appKeySecret:tapTalkAppKeySecretString apiURLString:tapTalkAPIURLString implementationType:TapTalkImplentationTypeCombine];
         
         _isDoneTapTalkInitialization = YES;
+        
+        //Set hide TapTalk delivery status
+        [[TapUI sharedInstance] setHideReadStatus:YES];
         
         //Try to connect to TapTalk.io
         [[TapTalk sharedInstance] connectWithSuccess:^{

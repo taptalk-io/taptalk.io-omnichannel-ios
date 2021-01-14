@@ -317,10 +317,10 @@
     _ttlFormGrowingTextViewType = ttlFormGrowingTextViewType;
     
     if (self.ttlFormGrowingTextViewType == TTLFormGrowingTextViewTypeMessage) {
-        self.titleLabel.text = NSLocalizedString(@"Message", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Message", nil, [TTLUtil currentBundle], @"");
     }
     else if (self.ttlFormGrowingTextViewType == TTLFormGrowingTextViewTypeComment) {
-        self.titleLabel.text = NSLocalizedString(@"Comment", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Comment", nil, [TTLUtil currentBundle], @"");
     }
 }
 

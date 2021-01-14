@@ -28,7 +28,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     [self showCustomCloseButton];
-    self.title = NSLocalizedString(@"Select Topic", @"");
+    self.title = NSLocalizedStringFromTableInBundle(@"Select Topic", nil, [TTLUtil currentBundle], @"");
 
     self.topicListView.tableView.delegate = self;
     self.topicListView.tableView.dataSource = self;

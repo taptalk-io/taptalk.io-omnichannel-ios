@@ -88,7 +88,7 @@
         [self.headerView addSubview:self.leftCloseButton];
         
         _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(12.0f, CGRectGetMaxY(self.logoImageView.frame) + 16.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 12.0f - 12.0f, 36.0f)];
-        self.titleLabel.text = NSLocalizedString(@"Need help with anything?", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Need help with anything?", nil, [TTLUtil currentBundle], @"");
         UIFont *obtainedTitleLabelFont = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
         obtainedTitleLabelFont = [obtainedTitleLabelFont fontWithSize:24.0f];
         self.titleLabel.font = obtainedTitleLabelFont;
@@ -97,7 +97,7 @@
         
         _subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.titleLabel.frame), 48.0f)];
         self.subtitleLabel.numberOfLines = 0;
-        self.subtitleLabel.text = NSLocalizedString(@"Please fill out the form below before you leave a message", @"");
+        self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Please fill out the form below before you leave a message", nil, [TTLUtil currentBundle], @"");
         UIFont *obtainedSubtitleLabelFont = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
         obtainedSubtitleLabelFont = [obtainedSubtitleLabelFont fontWithSize:16.0f];
         self.subtitleLabel.font = obtainedSubtitleLabelFont;
@@ -143,20 +143,20 @@
         [self.messageTextView setTtlFormGrowingTextViewType:TTLFormGrowingTextViewTypeMessage];
         [self.messageTextView showTitleLabel:YES];
         self.messageTextView.frame = CGRectMake(CGRectGetMinX(self.messageTextView.frame), CGRectGetMinY(self.messageTextView.frame), CGRectGetWidth(self.messageTextView.frame), [self.messageTextView getHeight]);
-        [self.messageTextView setPlaceholderText:NSLocalizedString(@"Type message here", @"")];
+        [self.messageTextView setPlaceholderText: NSLocalizedStringFromTableInBundle(@"Type message here", nil, [TTLUtil currentBundle], @"")];
         [self.messageTextView setPlaceholderColor:[TTLUtil getColor:@"C7C7CD"]];
         UIFont *textFieldFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormTextField];
         [self.messageTextView setPlaceholderFont:textFieldFont];
         [self.formContainerView addSubview:self.messageTextView];
         
         _keyboardAccessoryView = [[TTLKeyboardAccessoryView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 44.0f)];
-        [self.keyboardAccessoryView setHeaderKeyboardButtonTitleWithText:NSLocalizedString(@"DONE", @"")];
+        [self.keyboardAccessoryView setHeaderKeyboardButtonTitleWithText:NSLocalizedStringFromTableInBundle(@"DONE", nil, [TTLUtil currentBundle], @"")];
         self.messageTextView.textView.inputAccessoryView = self.keyboardAccessoryView;
         
         _createCaseButtonView = [[TTLCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.messageTextView.frame) + 24.0f, CGRectGetWidth(self.formContainerView.frame), 48.0f)];
         [self.createCaseButtonView setCustomButtonViewStyleType:TTLCustomButtonViewStyleTypeWithIcon];
         [self.createCaseButtonView setCustomButtonViewType:TTLCustomButtonViewTypeInactive];
-        [self.createCaseButtonView setButtonWithTitle:NSLocalizedString(@"Send Message", @"") andIcon:@"TTLIconSend" iconPosition:TTLCustomButtonViewIconPosititonLeft];
+        [self.createCaseButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TTLUtil currentBundle], @"") andIcon:@"TTLIconSend" iconPosition:TTLCustomButtonViewIconPosititonLeft];
         [self.createCaseButtonView setAsActiveState:YES animated:NO];
         [self.formContainerView addSubview:self.createCaseButtonView];
         
@@ -165,6 +165,13 @@
         containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.formContainerView.bounds byRoundingCorners: UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
         self.formContainerView.layer.mask = containerViewLayer;
         self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame));
+        
+        
+        //DV Temp
+        //DV Note - 21 Feb 2020
+        //Hide taptalk logo until user can upload their brand logo and change
+        self.logoImageView.alpha = 0.0f;
+        //END DV Temp
     }
     
     return self;
@@ -272,7 +279,7 @@
         self.leftCloseImageView.alpha = 0.0f;
         
         self.titleLabel.frame = CGRectMake(12.0f, CGRectGetMaxY(self.logoImageView.frame) + 16.0f, CGRectGetWidth(self.titleLabel.frame), CGRectGetHeight(self.titleLabel.frame));
-        self.titleLabel.text = NSLocalizedString(@"Need help with anything?", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Need help with anything?", nil, [TTLUtil currentBundle], @"");
         self.subtitleLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.titleLabel.frame), 48.0f);
         self.headerView.frame = CGRectMake(CGRectGetMinX(self.headerView.frame), CGRectGetMinY(self.headerView.frame), CGRectGetWidth(self.headerView.frame), CGRectGetMaxY(self.subtitleLabel.frame));
              
@@ -308,7 +315,7 @@
         self.leftCloseImageView.alpha = 1.0f;
         
         self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.leftCloseImageView.frame) + 12.0f, CGRectGetMinY(self.leftCloseImageView.frame) - 6.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetMaxX(self.leftCloseImageView.frame) - 12.0f - 12.0f, CGRectGetHeight(self.titleLabel.frame));
-        self.titleLabel.text = NSLocalizedString(@"New message", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"New message", nil, [TTLUtil currentBundle], @"");
         
         self.subtitleLabel.frame = CGRectMake(CGRectGetMinX(self.subtitleLabel.frame), CGRectGetMaxY(self.titleLabel.frame), CGRectGetWidth(self.subtitleLabel.frame), 0.0f);
          self.headerView.frame = CGRectMake(CGRectGetMinX(self.headerView.frame), CGRectGetMinY(self.headerView.frame), CGRectGetWidth(self.headerView.frame), CGRectGetMaxY(self.subtitleLabel.frame));

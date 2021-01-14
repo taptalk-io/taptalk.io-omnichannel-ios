@@ -59,7 +59,7 @@
         self.titleLabel.font = titleLabelFont;
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
-        self.titleLabel.text = NSLocalizedString(@"Leave a review", @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Leave a review", nil, [TTLUtil currentBundle], @"");
         [self.containerView addSubview:self.titleLabel];
         
         //DV Note
@@ -128,14 +128,14 @@
         self.subtitleLabel.font = subtitleLabelFont;
         self.subtitleLabel.textColor = subtitleLabelColor;
         self.subtitleLabel.textAlignment = NSTextAlignmentCenter;
-        self.subtitleLabel.text = NSLocalizedString(@"", @"");
+        self.subtitleLabel.text = @"";
         [self.containerView addSubview:self.subtitleLabel];
         
         _commentTextView = [[TTLFormGrowingTextView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.subtitleLabel.frame) + 16.0f, CGRectGetWidth(self.containerView.frame), 0.0f)];
-        [self.commentTextView setTtlFormGrowingTextViewType:TTLFormGrowingTextViewTypeMessage];
+        [self.commentTextView setTtlFormGrowingTextViewType:TTLFormGrowingTextViewTypeComment];
         [self.commentTextView showTitleLabel:NO];
         self.commentTextView.frame = CGRectMake(CGRectGetMinX(self.commentTextView.frame), CGRectGetMinY(self.commentTextView.frame), CGRectGetWidth(self.commentTextView.frame), [self.commentTextView getHeight]);
-        [self.commentTextView setPlaceholderText:NSLocalizedString(@"Leave a comment", @"")];
+        [self.commentTextView setPlaceholderText:NSLocalizedStringFromTableInBundle(@"Leave a comment", nil, [TTLUtil currentBundle], @"")];
         [self.commentTextView setPlaceholderColor:[TTLUtil getColor:@"C7C7CD"]];
         UIFont *textFieldFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormTextField];
         [self.commentTextView setPlaceholderFont:textFieldFont];
@@ -144,7 +144,7 @@
         _submitButtonView = [[TTLCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.commentTextView.frame) + 24.0f, CGRectGetWidth(self.containerView.frame), 48.0f)];
         [self.submitButtonView setCustomButtonViewStyleType:TTLCustomButtonViewStyleTypePlain];
         [self.submitButtonView setCustomButtonViewType:TTLCustomButtonViewTypeInactive];
-        [self.submitButtonView setButtonWithTitle:NSLocalizedString(@"Submit Review", @"")];
+        [self.submitButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Submit Review", nil, [TTLUtil currentBundle], @"")];
         [self.containerView addSubview:self.submitButtonView];
         
         CGFloat bottomGap = 16.0f;
@@ -183,7 +183,7 @@
             self.starRating3ImageView.image = starRatingInactiveImage;
             self.starRating4ImageView.image = starRatingInactiveImage;
             self.starRating5ImageView.image = starRatingInactiveImage;
-            self.subtitleLabel.text = NSLocalizedString(@"Horrible", @"");
+            self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Horrible", nil, [TTLUtil currentBundle], @"");
             break;
         }
         case 2:
@@ -194,7 +194,7 @@
             self.starRating3ImageView.image = starRatingInactiveImage;
             self.starRating4ImageView.image = starRatingInactiveImage;
             self.starRating5ImageView.image = starRatingInactiveImage;
-            self.subtitleLabel.text = NSLocalizedString(@"Not good", @"");
+            self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Not good", nil, [TTLUtil currentBundle], @"");
             break;
         }
         case 3:
@@ -205,7 +205,7 @@
             self.starRating3ImageView.image = starRatingActiveImage;
             self.starRating4ImageView.image = starRatingInactiveImage;
             self.starRating5ImageView.image = starRatingInactiveImage;
-            self.subtitleLabel.text = NSLocalizedString(@"Okay", @"");
+            self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Okay", nil, [TTLUtil currentBundle], @"");
             break;
         }
         case 4:
@@ -216,7 +216,7 @@
             self.starRating3ImageView.image = starRatingActiveImage;
             self.starRating4ImageView.image = starRatingActiveImage;
             self.starRating5ImageView.image = starRatingInactiveImage;
-            self.subtitleLabel.text = NSLocalizedString(@"Good", @"");
+            self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Good", nil, [TTLUtil currentBundle], @"");
             break;
         }
         case 5:
@@ -227,7 +227,7 @@
             self.starRating3ImageView.image = starRatingActiveImage;
             self.starRating4ImageView.image = starRatingActiveImage;
             self.starRating5ImageView.image = starRatingActiveImage;
-            self.subtitleLabel.text = NSLocalizedString(@"Excellent", @"");
+            self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Excellent", nil, [TTLUtil currentBundle], @"");
             break;
         }
         default:
@@ -238,7 +238,7 @@
             self.starRating3ImageView.image = starRatingInactiveImage;
             self.starRating4ImageView.image = starRatingInactiveImage;
             self.starRating5ImageView.image = starRatingInactiveImage;
-            self.subtitleLabel.text = NSLocalizedString(@"", @"");
+            self.subtitleLabel.text = @"";
             break;
             }
     }

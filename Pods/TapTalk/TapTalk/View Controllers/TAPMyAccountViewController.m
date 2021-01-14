@@ -268,7 +268,7 @@
                     [self.myAccountView animateProgressUploadingImageWithProgress:progress total:total];
                 } failureBlock:^(NSError *error) {
                     //Show error, retry or skip popup
-                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Account" title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Cancel"];
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Account" title:NSLocalizedStringFromTableInBundle(@"Failed to upload image", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"An error occurred while uploading your profile picture, would you like to try again?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Retry", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")];
                     
                     [self.myAccountView setAsLoading:NO];
                 }];
@@ -320,19 +320,19 @@
     NSString *username = self.lastCheckUsernameString;
     if (![TAPUtil validateUsername:username] && ![TAPUtil isEmptyString:username]) {
         [self.myAccountView.usernameTextField setAsError:YES animated:YES];
-        [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedString(@"Invalid Username", @"")];
+        [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Invalid Username", nil, [TAPUtil currentBundle], @"")];
         [self.myAccountView refreshViewPosition];
         _isUsernameValid = NO;
     }
     else if (([username length] < 4 || [username length] > 32) && ![TAPUtil isEmptyString:username]) {
         [self.myAccountView.usernameTextField setAsError:YES animated:YES];
-        [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedString(@"Username's length must be 4-32 characters", @"")];
+        [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Username's length must be 4-32 characters", nil, [TAPUtil currentBundle], @"")];
         [self.myAccountView refreshViewPosition];
         _isUsernameValid = NO;
     }
     else {
         [self.myAccountView.usernameTextField setAsError:NO animated:YES];
-        [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.myAccountView.usernameTextField setErrorInfoText:@""];
         [self.myAccountView refreshViewPosition];
         if (![TAPUtil isEmptyString:username]) {
             [self checkUsernameAPI:username];
@@ -349,13 +349,13 @@
     NSString *fullName = self.lastCheckFullNameString;
     if (![TAPUtil isAlphabetCharactersOnlyFromText:fullName] && ![TAPUtil isEmptyString:fullName]) {
         [self.myAccountView.fullNameTextField setAsError:YES animated:YES];
-        [self.myAccountView.fullNameTextField setErrorInfoText:NSLocalizedString(@"Invalid Full Name", @"")];
+        [self.myAccountView.fullNameTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Invalid Full Name", nil, [TAPUtil currentBundle], @"")];
         [self.myAccountView refreshViewPosition];
         _isFullNameValid = NO;
     }
     else {
         [self.myAccountView.fullNameTextField setAsError:NO animated:YES];
-        [self.myAccountView.fullNameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.myAccountView.fullNameTextField setErrorInfoText:@""];
         [self.myAccountView refreshViewPosition];
         _isFullNameValid = YES;
     }
@@ -368,13 +368,13 @@
         if ([checkedUsername isEqualToString:self.myAccountView.usernameTextField.textField.text]) {
             if (isExists) {
                 [self.myAccountView.usernameTextField setAsError:YES animated:YES];
-                [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedString(@"Username already exists", @"")];
+                [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Username already exists", nil, [TAPUtil currentBundle], @"")];
                 [self.myAccountView refreshViewPosition];
                 _isUsernameValid = NO;
             }
             else {
                 [self.myAccountView.usernameTextField setAsError:NO animated:YES];
-                [self.myAccountView.usernameTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+                [self.myAccountView.usernameTextField setErrorInfoText:@""];
                 [self.myAccountView refreshViewPosition];
                 _isUsernameValid = YES;
             }
@@ -402,13 +402,13 @@
     NSString *email = self.lastCheckEmailString;
     if (![TAPUtil validateEmail:email] && ![TAPUtil isEmptyString:email]) {
         [self.myAccountView.emailTextField setAsError:YES animated:YES];
-        [self.myAccountView.emailTextField setErrorInfoText:NSLocalizedString(@"Invalid email address", @"")];
+        [self.myAccountView.emailTextField setErrorInfoText:NSLocalizedStringFromTableInBundle(@"Invalid email address", nil, [TAPUtil currentBundle], @"")];
         [self.myAccountView refreshViewPosition];
         _isEmailValid = NO;
     }
     else {
         [self.myAccountView.emailTextField setAsError:NO animated:YES];
-        [self.myAccountView.emailTextField setErrorInfoText:NSLocalizedString(@"", @"")];
+        [self.myAccountView.emailTextField setErrorInfoText:@""];
         [self.myAccountView refreshViewPosition];
         _isEmailValid = YES;
     }
@@ -424,21 +424,21 @@
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     UIAlertAction *cameraAction = [UIAlertAction
-                                   actionWithTitle:@"Camera"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Camera", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleDefault
                                    handler:^(UIAlertAction * action) {
                                        [self openCamera];
                                    }];
     
     UIAlertAction *galleryAction = [UIAlertAction
-                                    actionWithTitle:@"Gallery"
+                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Gallery", nil, [TAPUtil currentBundle], @"")
                                     style:UIAlertActionStyleDefault
                                     handler:^(UIAlertAction * action) {
                                         [self openGallery];
                                     }];
     
     UIAlertAction *cancelAction = [UIAlertAction
-                                   actionWithTitle:@"Cancel"
+                                   actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
@@ -496,12 +496,12 @@
     else {
         //No permission. Trying to normally request it
         NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
         [alertController addAction:cancelAction];
         
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
@@ -540,12 +540,12 @@
     else {
         //No permission. Trying to normally request it
         NSString *accessDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSPhotoLibraryUsageDescription"];
-        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:@"To give permissions tap on 'Change Settings' button" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController * alertController = [UIAlertController alertControllerWithTitle:accessDescription message:NSLocalizedStringFromTableInBundle(@"To give permissions tap on 'Change Settings' button", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
         
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleCancel handler:nil];
         [alertController addAction:cancelAction];
         
-        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:@"Change Settings" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction *settingsAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"Change Settings", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             if (IS_IOS_11_OR_ABOVE) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:[NSDictionary dictionary] completionHandler:nil];
             }
@@ -588,7 +588,7 @@
 }
 
 - (void)logoutButtonDidTapped {
-    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Logout" title:NSLocalizedString(@"Log Out", @"") detailInformation:NSLocalizedString(@"Are you sure you want to log out?", @"") leftOptionButtonTitle:@"Cancel" singleOrRightOptionButtonTitle:@"Logout"];
+    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Logout" title:NSLocalizedStringFromTableInBundle(@"Logout", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Are you sure you want to log out?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Logout", nil, [TAPUtil currentBundle], @"")];
 }
 
 - (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
@@ -608,20 +608,14 @@
             [self.delegate myAccountViewControllerDidTappedLogoutButton];
         }
         
-            [[TapTalk sharedInstance] logoutAndClearAllTapTalkDataWithSuccess:^{
-                [self dismissViewControllerAnimated:NO completion:nil];
-                [self.myAccountView showLogoutLoadingView:NO];
-                
-                id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
-                if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
-                    [tapTalkDelegate userLogout];
-                }
-
-            } failure:^(NSError *error) {
-                //Show alert
-                [self.myAccountView showLogoutLoadingView:NO];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Logout" title:NSLocalizedString(@"Error", @"") detailInformation:NSLocalizedString(@"Something went wrong, please try again.", @"") leftOptionButtonTitle:@"" singleOrRightOptionButtonTitle:@"OK"];
-            }];
+        [[TapTalk sharedInstance] logoutAndClearAllTapTalkData];
+        [self dismissViewControllerAnimated:NO completion:nil];
+        [self.myAccountView showLogoutLoadingView:NO];
+        
+        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+        if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
+            [tapTalkDelegate userLogout];
+        }
     }
 }
 
@@ -642,7 +636,7 @@
             } failureBlock:^(NSError *error) {
                 //Show error, retry or skip popup
                 
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Account" title:NSLocalizedString(@"Failed to upload image", @"") detailInformation:NSLocalizedString(@"An error occurred while uploading your profile picture, would you like to try again?", @"") leftOptionButtonTitle:@"Retry" singleOrRightOptionButtonTitle:@"Cancel"];
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Error Upload Profile Image In Account" title:NSLocalizedStringFromTableInBundle(@"Failed to upload image", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"An error occurred while uploading your profile picture, would you like to try again?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Retry", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")];
                 
                 [self.myAccountView setAsLoading:NO];
             }];

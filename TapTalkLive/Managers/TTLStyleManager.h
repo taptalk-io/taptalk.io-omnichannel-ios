@@ -59,6 +59,8 @@ typedef NS_ENUM(NSInteger, TTLComponentColor) {
     TTLComponentColorTableViewSectionIndex,
     TTLComponentColorSearchBarBorderActive,
     TTLComponentColorSearchBarBorderInactive,
+    TTLComponentColorChatRoomBackground,
+    TTLComponentColorRoomListBackground,
     TTLComponentColorRoomListUnreadBadgeBackground,
     TTLComponentColorRoomListUnreadBadgeInactiveBackground,
     TTLComponentColorChatRoomUnreadBadgeBackground,

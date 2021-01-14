@@ -8,7 +8,6 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-#import "TAPLoginViewController.h"
 #import "TapUIRoomListViewController.h"
 #import "TAPProfileViewController.h"
 #import "TAPCustomNotificationAlertViewController.h"
@@ -397,6 +396,21 @@ Show or hide profile button view in top right navigation in chat room view
 Get current visibility state of profile button in chat room
 */
 - (BOOL)getProfileButtonInChatRoomVisibleState;
+
+//==========================================================
+//                        Others
+//==========================================================
+/**
+Show or hide read status (green double checklist icon when read)
+ 
+@param hideReadStatus (BOOL) boolean to indicating is hide or not
+*/
+- (void)setHideReadStatus:(BOOL)hideReadStatus;
+
+/**
+Get current state of hide read status
+*/
+- (BOOL)getReadStatusHiddenState;
 
 @end
 
