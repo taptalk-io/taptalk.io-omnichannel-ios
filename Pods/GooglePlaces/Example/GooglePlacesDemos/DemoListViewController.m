@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All rights reserved.
+ * Copyright 2016 Google LLC. All rights reserved.
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
@@ -16,6 +16,7 @@
 #import "GooglePlacesDemos/DemoListViewController.h"
 
 #import <GooglePlaces/GooglePlaces.h>
+
 
 // The cell reuse identifier we are going to use.
 static NSString *const kCellIdentifier = @"DemoCellIdentifier";
@@ -116,7 +117,15 @@ static const CGFloat kEdgeBuffer = 8;
 - (void)setUpEditSelectionsUI {
   // Initialize the place fields selection UI.
   UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.frame];
+#if defined(__IPHONE_13_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0)
+  if (@available(iOS 13.0, *)) {
+    scrollView.backgroundColor = [UIColor systemBackgroundColor];
+  } else {
+    scrollView.backgroundColor = [UIColor whiteColor];
+  }
+#else
   scrollView.backgroundColor = [UIColor whiteColor];
+#endif  // defined(__IPHONE_13_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
 
   // Add heading for the autocomplete type filters.
   _nextSelectionYPos = [UIApplication sharedApplication].statusBarFrame.size.height;
@@ -148,10 +157,11 @@ static const CGFloat kEdgeBuffer = 8;
 
   // Set up the individual place fields that we can request.
   _nextSelectionYPos += kSelectionHeight;
-  for (NSUInteger placeField = GMSPlaceFieldName; placeField <= GMSPlaceFieldUTCOffsetMinutes;
+  for (NSUInteger placeField = GMSPlaceFieldName; placeField <= GMSPlaceFieldBusinessStatus;
        placeField <<= 1) {
     [scrollView addSubview:[self selectionButtonForPlaceField:(GMSPlaceField)placeField]];
   }
+
 
   // Add the close button to dismiss the selection UI.
   UIButton *close =
@@ -237,6 +247,7 @@ static const CGFloat kEdgeBuffer = 8;
     @(GMSPlaceFieldAddressComponents) : @"Address Components",
     @(GMSPlaceFieldPhotos) : @"Photos",
     @(GMSPlaceFieldUTCOffsetMinutes) : @"UTC Offset Minutes",
+    @(GMSPlaceFieldBusinessStatus) : @"Business Status",
   };
   UIButton *selectionButton = [self selectionButtonForTitle:fieldsMapping[@(placeField)]];
   UISwitch *selectionSwitch = [self switchFromButton:selectionButton];
