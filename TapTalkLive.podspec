@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.name         = "TapTalkLive"
-    s.version      = "1.0.1"
+    s.version      = "1.0.2"
     s.summary      = "TapTalk.io Omnichannel Live Chat is a complete omnichannel live char customer service chat SDK and API. Its in-app chat feature give you and your user the best in-app chat experience, it provides you with UI Based implementation and code based implementation and fully customizable."
     s.homepage     = "https://taptalk.io"
 
@@ -14,7 +14,8 @@ Pod::Spec.new do |s|
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.authors = { 'Ritchie Nathaniel' => 'ritchie@taptalk.io',
-                  'Dominic Vedericho' => 'dominic@taptalk.io' }
+                  'Dominic Vedericho' => 'dominic@taptalk.io'
+                  'Kevin Reynaldo' => 'kevin@taptalk.io' }
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
