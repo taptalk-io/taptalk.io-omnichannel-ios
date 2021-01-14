@@ -60,6 +60,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorSearchBarBorderActive,
     TAPComponentColorSearchBarBorderInactive,
     TAPComponentColorChatRoomBackground,
+    TAPComponentColorRoomListBackground,
     TAPComponentColorQuoteLayoutDecorationBackground,
     TAPComponentColorLeftBubbleBackground,
     TAPComponentColorRightBubbleBackground,
@@ -109,6 +110,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconActionSheetCopy, //Action Sheet
     TAPComponentColorIconActionSheetOpen, //Action Sheet
     TAPComponentColorIconActionSheetSMS, //Action Sheet
+    TAPComponentColorIconActionSheetSendMessage, //Action Sheet
+    TAPComponentColorIconActionSheetViewProfile, //Action Sheet
     TAPComponentColorIconActionSheetCall, //Action Sheet
     TAPComponentColorIconActionSheetReply, //Action Sheet
     TAPComponentColorIconActionSheetForward, //Action Sheet
@@ -424,6 +427,8 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontRoomAvatarMediumLabel,
     TAPComponentFontRoomAvatarLargeLabel,
     TAPComponentFontRoomAvatarExtraLargeLabel,
+    TAPComponentFontMentionListNameLabel,
+    TAPComponentFontMentionListUsernameLabel,
 };
 
 @interface TAPStyleManager : NSObject

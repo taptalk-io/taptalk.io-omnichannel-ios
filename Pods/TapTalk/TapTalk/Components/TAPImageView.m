@@ -39,8 +39,8 @@
 
 - (void)initialization {
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
-    imageCache.config.maxCacheSize = kMaxDiskCountLimit;
-    imageCache.config.maxCacheAge = kMaxCacheAge;
+    imageCache.config.maxDiskAge = kMaxDiskCountLimit;
+    imageCache.config.maxDiskSize = kMaxCacheAge;
 //    imageCache.maxCacheSize = kMaxDiskCountLimit;
 //    imageCache.maxCacheAge = kMaxCacheAge;
     
@@ -104,6 +104,10 @@
             });
         }
         else {
+            if (![urlString hasPrefix:@"http"]) {
+                //Do not load url when url is fileID type
+                return;
+            }
             NSURL *imageURL = [NSURL URLWithString:urlString];
             
             SDWebImageDownloader *imageDownloader = [SDWebImageDownloader sharedDownloader];
