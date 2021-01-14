@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.authors = { 'Ritchie Nathaniel' => 'ritchie@taptalk.io',
-                  'Dominic Vedericho' => 'dominic@taptalk.io'
+                  'Dominic Vedericho' => 'dominic@taptalk.io',
                   'Kevin Reynaldo' => 'kevin@taptalk.io' }
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
