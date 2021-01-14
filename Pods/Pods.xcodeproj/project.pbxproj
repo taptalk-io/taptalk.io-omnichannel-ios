@@ -16,6 +16,7 @@
 				D42315111F400C0605ACCD6B5CAF2178 /* PBXTargetDependency */,
 			);
 			name = GooglePlaces;
+			productName = GooglePlaces;
 		};
 		E5B4BBC6DD552AC8943C7E22772FC1D3 /* GoogleMaps */ = {
 			isa = PBXAggregateTarget;
@@ -25,6 +26,7 @@
 			dependencies = (
 			);
 			name = GoogleMaps;
+			productName = GoogleMaps;
 		};
 /* End PBXAggregateTarget section */
 
@@ -938,13 +940,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		005DFD1C197AFCD28AEC56B931DA8BD7 /* sync_user.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = sync_user.cpp; path = Realm/ObjectStore/src/sync/sync_user.cpp; sourceTree = "<group>"; };
+		005DFD1C197AFCD28AEC56B931DA8BD7 /* sync_user.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = sync_user.cpp; path = Realm/ObjectStore/src/sync/sync_user.cpp; sourceTree = "<group>"; };
 		00BA6803894C902111D21701D4098FCA /* Base64.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Base64.h; path = TapTalk/Components/Base64.h; sourceTree = "<group>"; };
 		00DD5A286F899EDAAFFB80CEC57BD194 /* ZSWTappableLabel-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ZSWTappableLabel-Info.plist"; sourceTree = "<group>"; };
 		0135AD47140781817C7B0465A7DCC5D1 /* RLMProperty.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMProperty.h; path = include/RLMProperty.h; sourceTree = "<group>"; };
-		0182AD69DF5DAB78C8CD9E0DE4AD84AC /* PTRootUI-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "PTRootUI-Bold.ttf"; path = "TapTalk/Supporting Files/Fonts/PTRootUI-Bold.ttf"; sourceTree = "<group>"; };
-		019B4E64A316AB4BCB272C1E4BCB941F /* RLMRealm.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMRealm.mm; path = Realm/RLMRealm.mm; sourceTree = "<group>"; };
-		019DBE4B003BC9224E2BCD6D21E38D89 /* RLMMigration.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMMigration.mm; path = Realm/RLMMigration.mm; sourceTree = "<group>"; };
+		0182AD69DF5DAB78C8CD9E0DE4AD84AC /* PTRootUI-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "PTRootUI-Bold.ttf"; path = "TapTalk/Supporting Files/Fonts/PTRootUI-Bold.ttf"; sourceTree = "<group>"; };
+		019B4E64A316AB4BCB272C1E4BCB941F /* RLMRealm.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMRealm.mm; path = Realm/RLMRealm.mm; sourceTree = "<group>"; };
+		019DBE4B003BC9224E2BCD6D21E38D89 /* RLMMigration.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMMigration.mm; path = Realm/RLMMigration.mm; sourceTree = "<group>"; };
 		024034D1E17A10F65C61DEEA21DE9297 /* TAPGradientView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPGradientView.h; path = TapTalk/Components/TAPGradientView.h; sourceTree = "<group>"; };
 		02807F8BEABF972654A8E36304012671 /* TAPNumericKeyboardAccessoryView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPNumericKeyboardAccessoryView.m; path = TapTalk/Components/TAPNumericKeyboardAccessoryView.m; sourceTree = "<group>"; };
 		02DEDF7AB9C454C9386C1AB1738800DA /* SDWebImageImageIOCoder.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SDWebImageImageIOCoder.h; path = SDWebImage/SDWebImageImageIOCoder.h; sourceTree = "<group>"; };
@@ -952,14 +954,14 @@
 		031B070E015FBA694ECD0C4B4CAD9B46 /* TAPMyChatBubbleTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPMyChatBubbleTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPMyChatBubbleTableViewCell.m; sourceTree = "<group>"; };
 		0358DC7B7F8CE428E88F7582E761633E /* TAPCreateGroupSubjectViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCreateGroupSubjectViewController.m; path = "TapTalk/View Controllers/TAPCreateGroupSubjectViewController.m"; sourceTree = "<group>"; };
 		040F392054DD37BD98576B8BE061755D /* TAPForwardListViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPForwardListViewController.h; path = "TapTalk/View Controllers/TAPForwardListViewController.h"; sourceTree = "<group>"; };
-		0496D99FC1B3EC208DD43C8597E91C1E /* RLMObjectStore.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMObjectStore.mm; path = Realm/RLMObjectStore.mm; sourceTree = "<group>"; };
+		0496D99FC1B3EC208DD43C8597E91C1E /* RLMObjectStore.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMObjectStore.mm; path = Realm/RLMObjectStore.mm; sourceTree = "<group>"; };
 		0504C9F3FCEB0FFBAD8789B369B42942 /* NSError+RLMSync.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSError+RLMSync.m"; path = "Realm/NSError+RLMSync.m"; sourceTree = "<group>"; };
 		05132A128C3B1E5CCF3088075A2F96DC /* ResourceBundle-TapTalk-TapTalk-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "ResourceBundle-TapTalk-TapTalk-Info.plist"; sourceTree = "<group>"; };
 		05263354ED560FF0C1ED58D7B4DCDCB9 /* TAPContactCollectionViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPContactCollectionViewCell.m; path = TapTalk/Views/UICollectionViewCells/TAPContactCollectionViewCell.m; sourceTree = "<group>"; };
 		05313699F7AC2FD75AE996E4F9CC9E25 /* SDWebImage.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = SDWebImage.modulemap; sourceTree = "<group>"; };
 		05463C13FF74A87F69B2A5DCE949AD5B /* TAPCustomNotificationAlertView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCustomNotificationAlertView.m; path = TapTalk/Views/TAPCustomNotificationAlertView.m; sourceTree = "<group>"; };
-		0580EB3F59A190F65153156D531D61F7 /* TapTalk.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = TapTalk.bundle; path = "TapTalk-TapTalk.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
-		058582C4055CADE84F5A94C2A9BA3901 /* collection_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = collection_notifier.cpp; path = Realm/ObjectStore/src/impl/collection_notifier.cpp; sourceTree = "<group>"; };
+		0580EB3F59A190F65153156D531D61F7 /* TapTalk.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TapTalk.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		058582C4055CADE84F5A94C2A9BA3901 /* collection_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = collection_notifier.cpp; path = Realm/ObjectStore/src/impl/collection_notifier.cpp; sourceTree = "<group>"; };
 		05E761CE2328F790BD4E53DC57EBDEE8 /* TAPBlockedListViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPBlockedListViewController.h; path = "TapTalk/View Controllers/TAPBlockedListViewController.h"; sourceTree = "<group>"; };
 		060D3F8602F63D850C39E9560674BC61 /* PodAsset.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PodAsset.xcconfig; sourceTree = "<group>"; };
 		062DAD74209A8C5CED5B7030F8310B85 /* NSImage+WebCache.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSImage+WebCache.h"; path = "SDWebImage/NSImage+WebCache.h"; sourceTree = "<group>"; };
@@ -972,7 +974,7 @@
 		09A459783372FCECBC908FF1CAE090A8 /* TAPMediaDetailPreviewViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPMediaDetailPreviewViewController.m; path = "TapTalk/View Controllers/TAPMediaDetailPreviewViewController.m"; sourceTree = "<group>"; };
 		09C90246B2466D1C994DD5E935959EE8 /* AFURLSessionManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = AFURLSessionManager.m; path = AFNetworking/AFURLSessionManager.m; sourceTree = "<group>"; };
 		09EF42C9895A1E8D5979FAFD991997C0 /* TAPSearchBarView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPSearchBarView.h; path = TapTalk/Components/TAPSearchBarView.h; sourceTree = "<group>"; };
-		0A074C2ED05CFF691E6E2ABC8D5B55A5 /* RLMRealm+Sync.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = "RLMRealm+Sync.mm"; path = "Realm/RLMRealm+Sync.mm"; sourceTree = "<group>"; };
+		0A074C2ED05CFF691E6E2ABC8D5B55A5 /* RLMRealm+Sync.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = "RLMRealm+Sync.mm"; path = "Realm/RLMRealm+Sync.mm"; sourceTree = "<group>"; };
 		0AF74CFB3C80690E803B72079F5F54C6 /* TAPPickLocationViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPPickLocationViewController.h; path = "TapTalk/View Controllers/TAPPickLocationViewController.h"; sourceTree = "<group>"; };
 		0B251F851728B63EDBA4B99477B83743 /* TAPNetworkManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPNetworkManager.h; path = TapTalk/Managers/TAPNetworkManager.h; sourceTree = "<group>"; };
 		0BB1D23777A3A53D54BD09618148B7C3 /* TAPAddNewContactView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPAddNewContactView.h; path = TapTalk/Views/TAPAddNewContactView.h; sourceTree = "<group>"; };
@@ -988,8 +990,8 @@
 		0F9198D935B006A629147792221C5C17 /* SDImageCache.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SDImageCache.h; path = SDWebImage/SDImageCache.h; sourceTree = "<group>"; };
 		1077EC38C0BB464E4F9AD8B95F527788 /* TAPMessageStatusManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPMessageStatusManager.m; path = TapTalk/Managers/TAPMessageStatusManager.m; sourceTree = "<group>"; };
 		1127C1F30786CBBC5A27BDF0D4E1044E /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = "TapTalk/Supporting Files/Assets.xcassets"; sourceTree = "<group>"; };
-		114BAD4284156B37955F57E2BF0011C2 /* PodAsset.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = PodAsset.framework; path = PodAsset.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		11B8436490363EBC9634192B488F359D /* collection_change_builder.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = collection_change_builder.cpp; path = Realm/ObjectStore/src/impl/collection_change_builder.cpp; sourceTree = "<group>"; };
+		114BAD4284156B37955F57E2BF0011C2 /* PodAsset.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PodAsset.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		11B8436490363EBC9634192B488F359D /* collection_change_builder.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = collection_change_builder.cpp; path = Realm/ObjectStore/src/impl/collection_change_builder.cpp; sourceTree = "<group>"; };
 		11E9FBCF90DDD493CF86D652E77AF2D2 /* TAPBaseTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPBaseTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPBaseTableViewCell.m; sourceTree = "<group>"; };
 		121C937608A3A8EE7D5389CD641EEA16 /* TAPCustomGrowingTextView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCustomGrowingTextView.m; path = TapTalk/Components/TAPCustomGrowingTextView.m; sourceTree = "<group>"; };
 		12547448CBAA9D8DD395B546900EE565 /* TAPNewChatOptionTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPNewChatOptionTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPNewChatOptionTableViewCell.h; sourceTree = "<group>"; };
@@ -1007,16 +1009,16 @@
 		16790D81DBE1FEC8906DA2ADC45F3467 /* TAPGradientView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPGradientView.m; path = TapTalk/Components/TAPGradientView.m; sourceTree = "<group>"; };
 		172D1A45D34E5FE8C3196C84BA8CAA6A /* JSONValueTransformer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = JSONValueTransformer.h; path = JSONModel/JSONModelTransformations/JSONValueTransformer.h; sourceTree = "<group>"; };
 		178D4A1C0F1C6E345C09C150BC8700E1 /* TAPPickLocationView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPPickLocationView.h; path = TapTalk/Views/LocationView/TAPPickLocationView.h; sourceTree = "<group>"; };
-		17BAA635B5AC9DB93B505FD9D04C9CBA /* RLMResults.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMResults.mm; path = Realm/RLMResults.mm; sourceTree = "<group>"; };
+		17BAA635B5AC9DB93B505FD9D04C9CBA /* RLMResults.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMResults.mm; path = Realm/RLMResults.mm; sourceTree = "<group>"; };
 		1831F9361208AE22C07D6F05594F55D0 /* TAPRoomModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPRoomModel.m; path = TapTalk/Models/TAPRoomModel.m; sourceTree = "<group>"; };
 		18833B92C1E003D7F24378B2886D6994 /* TAPPhotoAlbumListViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPPhotoAlbumListViewController.h; path = "TapTalk/View Controllers/TAPPhotoAlbumListViewController.h"; sourceTree = "<group>"; };
 		1994E5C0FFDDD14BBB018EE2386A5B06 /* TAPContactLoadingTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPContactLoadingTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPContactLoadingTableViewCell.h; sourceTree = "<group>"; };
 		1A1D08305FD1D6EE71427B609148CD95 /* RLMSyncConfiguration.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMSyncConfiguration.h; path = include/RLMSyncConfiguration.h; sourceTree = "<group>"; };
 		1A1F1C32EA56BD3EAB90C02A77B48E28 /* TAPContactRealmModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPContactRealmModel.m; path = TapTalk/Models/RealmModels/TAPContactRealmModel.m; sourceTree = "<group>"; };
-		1A9F6BD8B1E6CBF93A8E1BB4ED3B5BCE /* RLMAnalytics.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMAnalytics.mm; path = Realm/RLMAnalytics.mm; sourceTree = "<group>"; };
-		1ABD296A185C90BA5DCA32BA05E2CE1D /* thread_safe_reference.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = thread_safe_reference.cpp; path = Realm/ObjectStore/src/thread_safe_reference.cpp; sourceTree = "<group>"; };
+		1A9F6BD8B1E6CBF93A8E1BB4ED3B5BCE /* RLMAnalytics.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMAnalytics.mm; path = Realm/RLMAnalytics.mm; sourceTree = "<group>"; };
+		1ABD296A185C90BA5DCA32BA05E2CE1D /* thread_safe_reference.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = thread_safe_reference.cpp; path = Realm/ObjectStore/src/thread_safe_reference.cpp; sourceTree = "<group>"; };
 		1ACEBE08B454A225524EF9F2CF004E5E /* TAPGrowingTextView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPGrowingTextView.h; path = TapTalk/Components/TAPGrowingTextView.h; sourceTree = "<group>"; };
-		1AD188EA0B961CB8888262ACB640EAEE /* placeholder.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = placeholder.cpp; path = Realm/ObjectStore/src/placeholder.cpp; sourceTree = "<group>"; };
+		1AD188EA0B961CB8888262ACB640EAEE /* placeholder.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = placeholder.cpp; path = Realm/ObjectStore/src/placeholder.cpp; sourceTree = "<group>"; };
 		1B0957680B1E7284CE3FE2C5C5F89F47 /* TAPDataMediaModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPDataMediaModel.h; path = TapTalk/Models/TAPDataMediaModel.h; sourceTree = "<group>"; };
 		1B43A47D53FF4A43EC2AAA73A42A6940 /* RLMArray_Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMArray_Private.h; path = include/RLMArray_Private.h; sourceTree = "<group>"; };
 		1B95CB39D8223793D9796D315556AA4F /* GoogleMaps.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GoogleMaps.framework; path = Maps/Frameworks/GoogleMaps.framework; sourceTree = "<group>"; };
@@ -1028,21 +1030,21 @@
 		1DCDB907C6C64AA85739061FF70D260D /* RLMObjectBase_Dynamic.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMObjectBase_Dynamic.h; path = include/RLMObjectBase_Dynamic.h; sourceTree = "<group>"; };
 		1E0ECCB8F35902118A880B487750FA36 /* TAPProductListBubbleTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPProductListBubbleTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPProductListBubbleTableViewCell.h; sourceTree = "<group>"; };
 		1E4CA845F42B7A77169C68507AF05029 /* TAPPopUpInfoViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPPopUpInfoViewController.m; path = "TapTalk/View Controllers/TAPPopUpInfoViewController.m"; sourceTree = "<group>"; };
-		1E764F6AA663D7DFF9E174F370E15ADC /* RLMObject.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMObject.mm; path = Realm/RLMObject.mm; sourceTree = "<group>"; };
+		1E764F6AA663D7DFF9E174F370E15ADC /* RLMObject.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMObject.mm; path = Realm/RLMObject.mm; sourceTree = "<group>"; };
 		1E7CF9C91284D1F1373CE99BDA1CDC91 /* RLMConstants.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RLMConstants.m; path = Realm/RLMConstants.m; sourceTree = "<group>"; };
 		1EBCDDB206D8671BA55DBBD37AEEDCB9 /* TAPProductListBubbleTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPProductListBubbleTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPProductListBubbleTableViewCell.m; sourceTree = "<group>"; };
 		1EEB74DF8614CF18BF38592C18AF2A57 /* TapTalk-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "TapTalk-Info.plist"; sourceTree = "<group>"; };
 		1F48A298D3872002CB959E098060C74D /* TAPBaseModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPBaseModel.m; path = TapTalk/Models/TAPBaseModel.m; sourceTree = "<group>"; };
 		1FAC93C20BD0AB56B688D414DA18847B /* TAPScanQRCodePopupView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPScanQRCodePopupView.m; path = TapTalk/Views/TAPScanQRCodePopupView.m; sourceTree = "<group>"; };
 		2095324983E7445CCD7D821D8EBBD63A /* TAPEncryptorManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPEncryptorManager.h; path = TapTalk/Managers/TAPEncryptorManager.h; sourceTree = "<group>"; };
-		20ACC2091C87A8E2F2DFFA6114A39D1D /* RLMRealmUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMRealmUtil.mm; path = Realm/RLMRealmUtil.mm; sourceTree = "<group>"; };
-		20D16E394F1C8E75F007E053EC5A0121 /* RLMSyncPermissionResults.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSyncPermissionResults.mm; path = Realm/RLMSyncPermissionResults.mm; sourceTree = "<group>"; };
+		20ACC2091C87A8E2F2DFFA6114A39D1D /* RLMRealmUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMRealmUtil.mm; path = Realm/RLMRealmUtil.mm; sourceTree = "<group>"; };
+		20D16E394F1C8E75F007E053EC5A0121 /* RLMSyncPermissionResults.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncPermissionResults.mm; path = Realm/RLMSyncPermissionResults.mm; sourceTree = "<group>"; };
 		21A0E6530963932A7BBAD465C9DA2606 /* SDWebImageDownloaderOperation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SDWebImageDownloaderOperation.h; path = SDWebImage/SDWebImageDownloaderOperation.h; sourceTree = "<group>"; };
 		21AA74FEFEE4375DE4A6625D137B77C4 /* TAPMyFileBubbleTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPMyFileBubbleTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPMyFileBubbleTableViewCell.m; sourceTree = "<group>"; };
 		22504763166751D412F21457B6F095C2 /* TapUIRoomListViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TapUIRoomListViewController.h; path = "TapTalk/View Controllers/TapUIRoomListViewController.h"; sourceTree = "<group>"; };
 		227F9EB27AE6F995DCCE461C2E0D9AA7 /* TAPRecentSearchTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPRecentSearchTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPRecentSearchTableViewCell.h; sourceTree = "<group>"; };
 		23F45BD8EC39E234C992460C4A615AD0 /* SDWebImageCoderHelper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SDWebImageCoderHelper.h; path = SDWebImage/SDWebImageCoderHelper.h; sourceTree = "<group>"; };
-		244F52D1834AC510A9B3D05852C2FD0C /* RLMListBase.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMListBase.mm; path = Realm/RLMListBase.mm; sourceTree = "<group>"; };
+		244F52D1834AC510A9B3D05852C2FD0C /* RLMListBase.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMListBase.mm; path = Realm/RLMListBase.mm; sourceTree = "<group>"; };
 		247461BC9C0F7DB12DE885E47EE9C39A /* TAPBlockedListView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPBlockedListView.m; path = TapTalk/Views/TAPBlockedListView.m; sourceTree = "<group>"; };
 		248C3CE7DBD5E534D24F1645490734ED /* TAPRoomListTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPRoomListTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPRoomListTableViewCell.h; sourceTree = "<group>"; };
 		24CF67916BDFEFCC6B3F20040DA7CE43 /* TAPYourVideoBubbleTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPYourVideoBubbleTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPYourVideoBubbleTableViewCell.h; sourceTree = "<group>"; };
@@ -1062,7 +1064,7 @@
 		27E0FEC71CB2E06B02C9CE6213F18BEB /* TAPRoomModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPRoomModel.h; path = TapTalk/Models/TAPRoomModel.h; sourceTree = "<group>"; };
 		2846408C83810760FC8C4D614A676B9B /* SDWebImage-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SDWebImage-dummy.m"; sourceTree = "<group>"; };
 		287433663A4C81D489143D5B767FF844 /* TAPPhotoAlbumListItemTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPPhotoAlbumListItemTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPPhotoAlbumListItemTableViewCell.h; sourceTree = "<group>"; };
-		28FC106CF0D57A36E5F10298E2FDF162 /* sync_config.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = sync_config.cpp; path = Realm/ObjectStore/src/sync/sync_config.cpp; sourceTree = "<group>"; };
+		28FC106CF0D57A36E5F10298E2FDF162 /* sync_config.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = sync_config.cpp; path = Realm/ObjectStore/src/sync/sync_config.cpp; sourceTree = "<group>"; };
 		291A0FCFDECA00FAA5B6376A08AC7ACE /* TAPPinLocationView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPPinLocationView.h; path = TapTalk/Views/LocationView/TAPPinLocationView.h; sourceTree = "<group>"; };
 		2992AC6854838223A5354FF421E2E32E /* TAPCountryPickerViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCountryPickerViewController.h; path = "TapTalk/View Controllers/TAPCountryPickerViewController.h"; sourceTree = "<group>"; };
 		29D963BB987E28EF74C18131060B42D7 /* TAPImageSelectCollectionViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPImageSelectCollectionViewCell.h; path = TapTalk/Views/UICollectionViewCells/TAPImageSelectCollectionViewCell.h; sourceTree = "<group>"; };
@@ -1086,19 +1088,19 @@
 		3667172D492D8AF5D8548A6C486353AD /* TAPGroupTargetModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPGroupTargetModel.h; path = TapTalk/Models/TAPGroupTargetModel.h; sourceTree = "<group>"; };
 		36972A2BD5F843C435359F56BAE6EC97 /* TAPKeyboardViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPKeyboardViewController.h; path = "TapTalk/View Controllers/TAPKeyboardViewController.h"; sourceTree = "<group>"; };
 		3721388854025018F68982E96A2FCED5 /* TAPAddNewChatView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPAddNewChatView.m; path = TapTalk/Views/TAPAddNewChatView.m; sourceTree = "<group>"; };
-		376DACC8B725CCD3BC176DD1B5705C20 /* DMSans-Italic.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "DMSans-Italic.ttf"; path = "TapTalk/Supporting Files/Fonts/DMSans-Italic.ttf"; sourceTree = "<group>"; };
+		376DACC8B725CCD3BC176DD1B5705C20 /* DMSans-Italic.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "DMSans-Italic.ttf"; path = "TapTalk/Supporting Files/Fonts/DMSans-Italic.ttf"; sourceTree = "<group>"; };
 		3780EBCBC87F8855C88645EA7A491379 /* SDWebImageTransition.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImageTransition.m; path = SDWebImage/SDWebImageTransition.m; sourceTree = "<group>"; };
 		379CB569359672642DD557716E01F013 /* TAPBaseModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPBaseModel.h; path = TapTalk/Models/TAPBaseModel.h; sourceTree = "<group>"; };
 		37D8E26DE98624CEB256C2FE738CC753 /* AFNetworkActivityIndicatorManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = AFNetworkActivityIndicatorManager.m; path = "UIKit+AFNetworking/AFNetworkActivityIndicatorManager.m"; sourceTree = "<group>"; };
-		3816721ED6535C41AF2C3B1996011643 /* partial_sync.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = partial_sync.cpp; path = Realm/ObjectStore/src/sync/partial_sync.cpp; sourceTree = "<group>"; };
-		384A28611355FA77A22D16F9A42D9716 /* RLMQueryUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMQueryUtil.mm; path = Realm/RLMQueryUtil.mm; sourceTree = "<group>"; };
+		3816721ED6535C41AF2C3B1996011643 /* partial_sync.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = partial_sync.cpp; path = Realm/ObjectStore/src/sync/partial_sync.cpp; sourceTree = "<group>"; };
+		384A28611355FA77A22D16F9A42D9716 /* RLMQueryUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMQueryUtil.mm; path = Realm/RLMQueryUtil.mm; sourceTree = "<group>"; };
 		38E277C9D83705027BFA7053E07CBE9E /* UIView+WebCacheOperation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIView+WebCacheOperation.m"; path = "SDWebImage/UIView+WebCacheOperation.m"; sourceTree = "<group>"; };
 		38F5698E6801D8547E3F9BD6F2E9C144 /* Pods-TapTalkLive-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-TapTalkLive-dummy.m"; sourceTree = "<group>"; };
 		39098DB2A0FE74CBD6D47608C082A73A /* TAPPinLocationSearchResultTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPPinLocationSearchResultTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPPinLocationSearchResultTableViewCell.h; sourceTree = "<group>"; };
 		39B9DDB2B8F70004D0C05058A99517F6 /* NSData+CommonCrypto.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSData+CommonCrypto.h"; path = "TapTalk/Components/AESCrypt/NSData+CommonCrypto.h"; sourceTree = "<group>"; };
 		3A22C7B3F64E3CBB9BF174E288C84837 /* TAPCoreErrorManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCoreErrorManager.h; path = TapTalk/Managers/TAPCoreManager/TAPCoreErrorManager.h; sourceTree = "<group>"; };
 		3A3432527F23207BFB4B6DE6FAF42835 /* TAPLocationSearchBarView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPLocationSearchBarView.m; path = TapTalk/Components/TAPLocationSearchBarView.m; sourceTree = "<group>"; };
-		3A7F775008B3D5D45BC86BC152DFA0BC /* PTRootUI-Medium.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "PTRootUI-Medium.ttf"; path = "TapTalk/Supporting Files/Fonts/PTRootUI-Medium.ttf"; sourceTree = "<group>"; };
+		3A7F775008B3D5D45BC86BC152DFA0BC /* PTRootUI-Medium.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "PTRootUI-Medium.ttf"; path = "TapTalk/Supporting Files/Fonts/PTRootUI-Medium.ttf"; sourceTree = "<group>"; };
 		3A841611B6CF5B2A2ED0CAD7D81BCCD9 /* TAPYourImageBubbleTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPYourImageBubbleTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPYourImageBubbleTableViewCell.h; sourceTree = "<group>"; };
 		3A8B3D1DDECEF8CE78BAEB1D5EB9A2B5 /* UIRefreshControl+AFNetworking.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIRefreshControl+AFNetworking.h"; path = "UIKit+AFNetworking/UIRefreshControl+AFNetworking.h"; sourceTree = "<group>"; };
 		3ACF7DC29244E19A8CB6FD91E6C2BCF3 /* TAPSystemMessageTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPSystemMessageTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPSystemMessageTableViewCell.h; sourceTree = "<group>"; };
@@ -1114,13 +1116,13 @@
 		3E87A6714B83BE961ADA6F1CE3B8AE87 /* SDWebImageFrame.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImageFrame.m; path = SDWebImage/SDWebImageFrame.m; sourceTree = "<group>"; };
 		3ECECADF18F799387D7CE2BC43693B77 /* Pods-TapTalkLive.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Pods-TapTalkLive.modulemap"; sourceTree = "<group>"; };
 		3F0512B8804CFC3556411E3EA80780E0 /* TAPRoomListView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPRoomListView.h; path = TapTalk/Views/TAPRoomListView.h; sourceTree = "<group>"; };
-		3F33F51B35E28E59F1D8EE3F297DF632 /* RLMSyncSubscription.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSyncSubscription.mm; path = Realm/RLMSyncSubscription.mm; sourceTree = "<group>"; };
+		3F33F51B35E28E59F1D8EE3F297DF632 /* RLMSyncSubscription.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncSubscription.mm; path = Realm/RLMSyncSubscription.mm; sourceTree = "<group>"; };
 		3FDF999E315494118AE6DAF04F529869 /* TAPCoreRoomListManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCoreRoomListManager.h; path = TapTalk/Managers/TAPCoreManager/TAPCoreRoomListManager.h; sourceTree = "<group>"; };
 		409CF6CC20314F41A7F749A17A5067B3 /* RLMArray.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMArray.h; path = include/RLMArray.h; sourceTree = "<group>"; };
-		41C73E8692241A6DAC42578372366DE2 /* collection_notifications.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = collection_notifications.cpp; path = Realm/ObjectStore/src/collection_notifications.cpp; sourceTree = "<group>"; };
+		41C73E8692241A6DAC42578372366DE2 /* collection_notifications.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = collection_notifications.cpp; path = Realm/ObjectStore/src/collection_notifications.cpp; sourceTree = "<group>"; };
 		425F37E4C9A0B7C180434C4CE2350B9C /* TAPRecentSearchTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPRecentSearchTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPRecentSearchTableViewCell.m; sourceTree = "<group>"; };
 		42A01FF02E22365640EA62ADCAE0674D /* TAPCustomButtonView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCustomButtonView.h; path = TapTalk/Components/TAPCustomButtonView.h; sourceTree = "<group>"; };
-		42A4DA5422EB98E195727587DE9AF855 /* index_set.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = index_set.cpp; path = Realm/ObjectStore/src/index_set.cpp; sourceTree = "<group>"; };
+		42A4DA5422EB98E195727587DE9AF855 /* index_set.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = index_set.cpp; path = Realm/ObjectStore/src/index_set.cpp; sourceTree = "<group>"; };
 		433D610CD5EB0ECDBC9FC82DEEF3FBD2 /* TAPOldDataManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPOldDataManager.h; path = TapTalk/Managers/TAPOldDataManager.h; sourceTree = "<group>"; };
 		44607D4A9E92C9356A07E2454B6F58DD /* PodAsset-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PodAsset-prefix.pch"; sourceTree = "<group>"; };
 		44635F4DBB4FEDB858A63E801817F361 /* TAPDataMediaModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPDataMediaModel.m; path = TapTalk/Models/TAPDataMediaModel.m; sourceTree = "<group>"; };
@@ -1132,7 +1134,7 @@
 		45CC00FF095FBF87481C0650582F4E0A /* AFURLResponseSerialization.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = AFURLResponseSerialization.m; path = AFNetworking/AFURLResponseSerialization.m; sourceTree = "<group>"; };
 		460DE4E916A8F4C355A80ECF1EF35DCB /* AFURLResponseSerialization.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AFURLResponseSerialization.h; path = AFNetworking/AFURLResponseSerialization.h; sourceTree = "<group>"; };
 		4698701FF01719D79266EE8E114A1388 /* TAPContactCacheManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPContactCacheManager.h; path = TapTalk/Managers/TAPContactCacheManager.h; sourceTree = "<group>"; };
-		46A042A7430E344EAC46D262C1A22442 /* PTRootUI-Light.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "PTRootUI-Light.ttf"; path = "TapTalk/Supporting Files/Fonts/PTRootUI-Light.ttf"; sourceTree = "<group>"; };
+		46A042A7430E344EAC46D262C1A22442 /* PTRootUI-Light.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "PTRootUI-Light.ttf"; path = "TapTalk/Supporting Files/Fonts/PTRootUI-Light.ttf"; sourceTree = "<group>"; };
 		46A775396286CC787DF9680D9C73554D /* SDWebImage-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SDWebImage-prefix.pch"; sourceTree = "<group>"; };
 		46C169A2B18BC91D0E7AD4675E7F9DFA /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
 		47135EE0F7E7FA97308F9B495D2EE79C /* TAPBlockedListView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPBlockedListView.h; path = TapTalk/Views/TAPBlockedListView.h; sourceTree = "<group>"; };
@@ -1149,18 +1151,18 @@
 		4B2DAC35062785F057D988DE50D69BA5 /* SDWebImageOperation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SDWebImageOperation.h; path = SDWebImage/SDWebImageOperation.h; sourceTree = "<group>"; };
 		4B3B622FA2653BB13E1939B3CDA018A4 /* SDWebImageGIFCoder.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImageGIFCoder.m; path = SDWebImage/SDWebImageGIFCoder.m; sourceTree = "<group>"; };
 		4BC97030D69114F04103CD141EC3881F /* TAPUtil.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPUtil.h; path = TapTalk/Components/TAPUtil.h; sourceTree = "<group>"; };
-		4BD45DF8F966C7199988E9BC60C5765D /* RLMSyncUser.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSyncUser.mm; path = Realm/RLMSyncUser.mm; sourceTree = "<group>"; };
+		4BD45DF8F966C7199988E9BC60C5765D /* RLMSyncUser.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncUser.mm; path = Realm/RLMSyncUser.mm; sourceTree = "<group>"; };
 		4BD9B258FA0FA906061B3343016AC840 /* TAPScanQRCodePopupViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPScanQRCodePopupViewController.m; path = "TapTalk/View Controllers/TAPScanQRCodePopupViewController.m"; sourceTree = "<group>"; };
 		4C03973EAE60E835FD67DF4DDA83EAAE /* RLMJSONModels.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RLMJSONModels.m; path = Realm/RLMJSONModels.m; sourceTree = "<group>"; };
 		4C0E731B8031F3E8D64B30012BDA4A7A /* TAPRoomListModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPRoomListModel.m; path = TapTalk/Models/TAPRoomListModel.m; sourceTree = "<group>"; };
 		4C397D3BC2056D9B3FED6A549BD4A86F /* TAPConnectionStatusView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPConnectionStatusView.h; path = TapTalk/Components/TAPConnectionStatusView.h; sourceTree = "<group>"; };
-		4CEDF73F6D5E5A81B1B24BD15FD3722D /* primitive_list_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = primitive_list_notifier.cpp; path = Realm/ObjectStore/src/impl/primitive_list_notifier.cpp; sourceTree = "<group>"; };
+		4CEDF73F6D5E5A81B1B24BD15FD3722D /* primitive_list_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = primitive_list_notifier.cpp; path = Realm/ObjectStore/src/impl/primitive_list_notifier.cpp; sourceTree = "<group>"; };
 		4D1DA968F13BFA0736B6DA9BE37025CB /* TapTalk.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TapTalk.m; path = TapTalk/TapTalk.m; sourceTree = "<group>"; };
 		4D754022B03A2980ED6857F95EC311B8 /* TAPSearchResultMessageTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPSearchResultMessageTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPSearchResultMessageTableViewCell.h; sourceTree = "<group>"; };
 		4D86386298903175A5B99B3BD572A6D8 /* TAPYourChatDeletedBubbleTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPYourChatDeletedBubbleTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPYourChatDeletedBubbleTableViewCell.m; sourceTree = "<group>"; };
 		4D960E58F0550D1E5EABDB6AEE24EA21 /* TAPNewChatBlockedContactsTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPNewChatBlockedContactsTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPNewChatBlockedContactsTableViewCell.m; sourceTree = "<group>"; };
 		4DF195F077F01512DED8EC6C72E24CB8 /* TAPCoreConfigsModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCoreConfigsModel.m; path = TapTalk/Models/TAPCoreConfigsModel.m; sourceTree = "<group>"; };
-		4E27D9528F4CBF68DA6E2A14AF2FD38F /* RLMSchema.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSchema.mm; path = Realm/RLMSchema.mm; sourceTree = "<group>"; };
+		4E27D9528F4CBF68DA6E2A14AF2FD38F /* RLMSchema.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSchema.mm; path = Realm/RLMSchema.mm; sourceTree = "<group>"; };
 		4F41A44EE6A790755D69DE3D518632D1 /* TAPProductListCollectionViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPProductListCollectionViewCell.xib; path = TapTalk/Views/UICollectionViewCells/TAPProductListCollectionViewCell.xib; sourceTree = "<group>"; };
 		4F7C513D5B79826038C77FC0B300C18A /* TAPLocationManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPLocationManager.m; path = TapTalk/Managers/TAPLocationManager.m; sourceTree = "<group>"; };
 		50C7C82BE6429004C870FEF956E557EA /* TAPCountryPickerTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCountryPickerTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPCountryPickerTableViewCell.h; sourceTree = "<group>"; };
@@ -1174,7 +1176,7 @@
 		590B5DDCA75E5DA8E6BE75D227C4B598 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = "<group>"; };
 		5932F6EAE7AC5A28A453C037737717D9 /* UIActivityIndicatorView+AFNetworking.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIActivityIndicatorView+AFNetworking.h"; path = "UIKit+AFNetworking/UIActivityIndicatorView+AFNetworking.h"; sourceTree = "<group>"; };
 		59524C4DF62B239178F525A91694614C /* TAPCoreRoomListManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCoreRoomListManager.m; path = TapTalk/Managers/TAPCoreManager/TAPCoreRoomListManager.m; sourceTree = "<group>"; };
-		5A71FA48730FC3D86F19CEC679B2A8C8 /* uuid.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = uuid.cpp; path = Realm/ObjectStore/src/util/uuid.cpp; sourceTree = "<group>"; };
+		5A71FA48730FC3D86F19CEC679B2A8C8 /* uuid.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = uuid.cpp; path = Realm/ObjectStore/src/util/uuid.cpp; sourceTree = "<group>"; };
 		5AB641A889E282FF96DAD42E35E563D8 /* Pods-TapTalkLive-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-TapTalkLive-Info.plist"; sourceTree = "<group>"; };
 		5B36DC673523B61046FF259227321066 /* TAPImagePreviewViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPImagePreviewViewController.m; path = "TapTalk/View Controllers/TAPImagePreviewViewController.m"; sourceTree = "<group>"; };
 		5B58EF856542A173AEFDDE8BF73173D8 /* TAPForwardFromModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPForwardFromModel.h; path = TapTalk/Models/TAPForwardFromModel.h; sourceTree = "<group>"; };
@@ -1211,8 +1213,8 @@
 		65AFA2C81E605E2BCCDB086BA0380508 /* SocketRocket-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SocketRocket-umbrella.h"; sourceTree = "<group>"; };
 		65DBD75087360119ABA1C9372AC61EE0 /* TAPOnlineStatusModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPOnlineStatusModel.h; path = TapTalk/Models/TAPOnlineStatusModel.h; sourceTree = "<group>"; };
 		665C762A6DE35CB12B025AA133E8CD2B /* UIImageView+AFNetworking.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIImageView+AFNetworking.h"; path = "UIKit+AFNetworking/UIImageView+AFNetworking.h"; sourceTree = "<group>"; };
-		6700FDDC40F5D615F11ABE39B0EE6FAF /* RLMSyncSession.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSyncSession.mm; path = Realm/RLMSyncSession.mm; sourceTree = "<group>"; };
-		67499118505E4637FA39197AA37819F0 /* shared_realm.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = shared_realm.cpp; path = Realm/ObjectStore/src/shared_realm.cpp; sourceTree = "<group>"; };
+		6700FDDC40F5D615F11ABE39B0EE6FAF /* RLMSyncSession.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncSession.mm; path = Realm/RLMSyncSession.mm; sourceTree = "<group>"; };
+		67499118505E4637FA39197AA37819F0 /* shared_realm.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = shared_realm.cpp; path = Realm/ObjectStore/src/shared_realm.cpp; sourceTree = "<group>"; };
 		6762C1169257A4186A10D91BF2CFFBEA /* TAPContactCollectionViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPContactCollectionViewCell.h; path = TapTalk/Views/UICollectionViewCells/TAPContactCollectionViewCell.h; sourceTree = "<group>"; };
 		680FEBF65BED96B7EC6DD8040D9E5EE8 /* JSONModel-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "JSONModel-dummy.m"; sourceTree = "<group>"; };
 		6862C16A465D2B18BA94A52159DA4F3E /* TAPCustomButtonView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCustomButtonView.m; path = TapTalk/Components/TAPCustomButtonView.m; sourceTree = "<group>"; };
@@ -1225,7 +1227,7 @@
 		6A55D257A97000E137D5297CFAEBFF94 /* RLMSyncUser.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMSyncUser.h; path = include/RLMSyncUser.h; sourceTree = "<group>"; };
 		6A6D218E3534F3C55448B365A0F06898 /* TAPQuoteModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPQuoteModel.m; path = TapTalk/Models/TAPQuoteModel.m; sourceTree = "<group>"; };
 		6A8025E9BCB4CC5D3950A4C503749AAF /* TAPLoadMoreBubbleTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPLoadMoreBubbleTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPLoadMoreBubbleTableViewCell.m; sourceTree = "<group>"; };
-		6A9CF77F7E698AA8C3F8FA83FAA75997 /* RLMUpdateChecker.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMUpdateChecker.mm; path = Realm/RLMUpdateChecker.mm; sourceTree = "<group>"; };
+		6A9CF77F7E698AA8C3F8FA83FAA75997 /* RLMUpdateChecker.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMUpdateChecker.mm; path = Realm/RLMUpdateChecker.mm; sourceTree = "<group>"; };
 		6B1A04E295F6A68D3F63E4B1BF46920D /* SocketRocket-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SocketRocket-dummy.m"; sourceTree = "<group>"; };
 		6B3A122179561B7E2142B0829BE39D8E /* SDWebImageCodersManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImageCodersManager.m; path = SDWebImage/SDWebImageCodersManager.m; sourceTree = "<group>"; };
 		6B825E424009CAF432046F11A91496ED /* AFNetworking-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "AFNetworking-dummy.m"; sourceTree = "<group>"; };
@@ -1243,19 +1245,19 @@
 		6F248D15AB0A29EB2EB7163F666D0DF3 /* TAPGroupManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPGroupManager.h; path = TapTalk/Managers/TAPGroupManager.h; sourceTree = "<group>"; };
 		6F6CB501D6BAB6499BD6F6D8BD2F2D70 /* RLMObjectSchema_Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMObjectSchema_Private.h; path = include/RLMObjectSchema_Private.h; sourceTree = "<group>"; };
 		6FBFFA751F9B2BCC0BDF680A2699809C /* TAPMyLocationBubbleTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPMyLocationBubbleTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPMyLocationBubbleTableViewCell.m; sourceTree = "<group>"; };
-		6FE54E988CE12C249D105E3E62625D2E /* RLMSyncConfiguration.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSyncConfiguration.mm; path = Realm/RLMSyncConfiguration.mm; sourceTree = "<group>"; };
+		6FE54E988CE12C249D105E3E62625D2E /* RLMSyncConfiguration.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncConfiguration.mm; path = Realm/RLMSyncConfiguration.mm; sourceTree = "<group>"; };
 		6FF97007E96799798F5912AB65924E31 /* TAPPinLocationView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPPinLocationView.m; path = TapTalk/Views/LocationView/TAPPinLocationView.m; sourceTree = "<group>"; };
-		7012E81A7EE46842B45FA0D87F02AC6F /* object_store.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = object_store.cpp; path = Realm/ObjectStore/src/object_store.cpp; sourceTree = "<group>"; };
+		7012E81A7EE46842B45FA0D87F02AC6F /* object_store.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = object_store.cpp; path = Realm/ObjectStore/src/object_store.cpp; sourceTree = "<group>"; };
 		701CC58FB44735253A51B4CC96D8B6F8 /* TAPPhotoAlbumListView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPPhotoAlbumListView.m; path = TapTalk/Views/TAPPhotoAlbumListView.m; sourceTree = "<group>"; };
 		70C6E14738CD85FE14166998518E26AC /* TAPUnreadMessagesBubbleTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPUnreadMessagesBubbleTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPUnreadMessagesBubbleTableViewCell.h; sourceTree = "<group>"; };
-		714590FE92A026EA1996C0EE8529EAF5 /* object.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = object.cpp; path = Realm/ObjectStore/src/object.cpp; sourceTree = "<group>"; };
+		714590FE92A026EA1996C0EE8529EAF5 /* object.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = object.cpp; path = Realm/ObjectStore/src/object.cpp; sourceTree = "<group>"; };
 		71757F030CF0292647CA0BCAACDD789F /* ZSWTappableLabel.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = ZSWTappableLabel.modulemap; sourceTree = "<group>"; };
 		71D0D10FBCDFF05190C4AF3E3F41A79C /* JSONModel-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "JSONModel-prefix.pch"; sourceTree = "<group>"; };
 		71EFDF7469C1C4AFC9791AF4BD9FB2E2 /* NSString+Base64.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSString+Base64.m"; path = "TapTalk/Components/AESCrypt/NSString+Base64.m"; sourceTree = "<group>"; };
 		71F13F9FE16E2736CF736B8E717342F9 /* TAPImageView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPImageView.m; path = TapTalk/Components/TAPImageView.m; sourceTree = "<group>"; };
 		722B97E186C725297B1999B2D25C9754 /* JSONModel.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = JSONModel.modulemap; sourceTree = "<group>"; };
 		7260402E81DB03187FB06385523FC326 /* RLMSyncCredentials.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMSyncCredentials.h; path = include/RLMSyncCredentials.h; sourceTree = "<group>"; };
-		72800AC01F6E4AC84195651A5657A77A /* PTRootUI-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; name = "PTRootUI-Regular.ttf"; path = "TapTalk/Supporting Files/Fonts/PTRootUI-Regular.ttf"; sourceTree = "<group>"; };
+		72800AC01F6E4AC84195651A5657A77A /* PTRootUI-Regular.ttf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "PTRootUI-Regular.ttf"; path = "TapTalk/Supporting Files/Fonts/PTRootUI-Regular.ttf"; sourceTree = "<group>"; };
 		72B71B94DDFFCF1D6CAF4A37D9D045B1 /* TAPCustomNavigationController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCustomNavigationController.m; path = "TapTalk/View Controllers/TAPCustomNavigationController.m"; sourceTree = "<group>"; };
 		72D502CE8102DD07FD4B71B1A460F015 /* TAPSystemMessageTableViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPSystemMessageTableViewCell.xib; path = TapTalk/Views/UITableViewCells/TAPSystemMessageTableViewCell.xib; sourceTree = "<group>"; };
 		73AD1EC041F3A5C7C5D9AD488A0AF7EB /* RLMMigration.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMMigration.h; path = include/RLMMigration.h; sourceTree = "<group>"; };
@@ -1273,7 +1275,7 @@
 		78FAF7C3BABFBC5F307C20356BFCE90B /* RLMSyncPermission.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMSyncPermission.h; path = include/RLMSyncPermission.h; sourceTree = "<group>"; };
 		790BB22732C431D085A3E6A43B792F46 /* TAPImageSelectCollectionViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPImageSelectCollectionViewCell.m; path = TapTalk/Views/UICollectionViewCells/TAPImageSelectCollectionViewCell.m; sourceTree = "<group>"; };
 		791DF79AB035BBCFBAD69A9A711A5268 /* SDWebImageCoderHelper.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImageCoderHelper.m; path = SDWebImage/SDWebImageCoderHelper.m; sourceTree = "<group>"; };
-		793341FFD1C03AAE6D3D490074FEF4E6 /* moselo-notification.caf */ = {isa = PBXFileReference; includeInIndex = 1; name = "moselo-notification.caf"; path = "TapTalk/Supporting Files/moselo-notification.caf"; sourceTree = "<group>"; };
+		793341FFD1C03AAE6D3D490074FEF4E6 /* moselo-notification.caf */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file; name = "moselo-notification.caf"; path = "TapTalk/Supporting Files/moselo-notification.caf"; sourceTree = "<group>"; };
 		7936FFF0535EE15C4233920E6D1CCDA3 /* TAPCoreConfigsModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCoreConfigsModel.h; path = TapTalk/Models/TAPCoreConfigsModel.h; sourceTree = "<group>"; };
 		79BA488816AEC2570A7313BE80EBFEB5 /* TapTalk-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "TapTalk-umbrella.h"; sourceTree = "<group>"; };
 		7A0A49D30385BA8B2037E3B549F488A5 /* UIKit+AFNetworking.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIKit+AFNetworking.h"; path = "UIKit+AFNetworking/UIKit+AFNetworking.h"; sourceTree = "<group>"; };
@@ -1294,27 +1296,27 @@
 		812A1CE9AECF77FC9C9811FBBC8C64CC /* AFImageDownloader.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = AFImageDownloader.m; path = "UIKit+AFNetworking/AFImageDownloader.m"; sourceTree = "<group>"; };
 		818DBCF8313458E4156F2AE66B8B46A2 /* JSONModelClassProperty.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = JSONModelClassProperty.m; path = JSONModel/JSONModel/JSONModelClassProperty.m; sourceTree = "<group>"; };
 		819183B6FD22E5861EBAAF62FBC99709 /* UIView+WebCacheOperation.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIView+WebCacheOperation.h"; path = "SDWebImage/UIView+WebCacheOperation.h"; sourceTree = "<group>"; };
-		819243F06DAC8E2D78CD315FE4A17AC0 /* RLMSyncSessionRefreshHandle.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSyncSessionRefreshHandle.mm; path = Realm/RLMSyncSessionRefreshHandle.mm; sourceTree = "<group>"; };
+		819243F06DAC8E2D78CD315FE4A17AC0 /* RLMSyncSessionRefreshHandle.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncSessionRefreshHandle.mm; path = Realm/RLMSyncSessionRefreshHandle.mm; sourceTree = "<group>"; };
 		81D3CE5E92F96C927DEA0CAF6C6D647F /* TAPImageURLModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPImageURLModel.h; path = TapTalk/Models/TAPImageURLModel.h; sourceTree = "<group>"; };
 		8274A01EE7075A0047E919D45926DDE4 /* SDWebImageManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImageManager.m; path = SDWebImage/SDWebImageManager.m; sourceTree = "<group>"; };
-		82A9B8F71DB842BE7B98457F6E6F757C /* RLMSyncUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSyncUtil.mm; path = Realm/RLMSyncUtil.mm; sourceTree = "<group>"; };
+		82A9B8F71DB842BE7B98457F6E6F757C /* RLMSyncUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncUtil.mm; path = Realm/RLMSyncUtil.mm; sourceTree = "<group>"; };
 		82CF704635FE99CEFE9DCF760F059FD8 /* UIImageView+WebCache.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIImageView+WebCache.h"; path = "SDWebImage/UIImageView+WebCache.h"; sourceTree = "<group>"; };
 		8323C9CEED7C1845BF2158BE5CAF6685 /* TAPNotificationManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPNotificationManager.h; path = TapTalk/Managers/TAPNotificationManager.h; sourceTree = "<group>"; };
 		8353F004F641368169A2664208846429 /* TAPNewChatAddNewContactTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPNewChatAddNewContactTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPNewChatAddNewContactTableViewCell.m; sourceTree = "<group>"; };
 		83AF8525A6967E87392D9A6E3C06C230 /* Pods-TapTalkLive-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-TapTalkLive-acknowledgements.markdown"; sourceTree = "<group>"; };
-		83FDA3D1A54AA79B0C6E177FED62E24B /* RLMOptionalBase.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMOptionalBase.mm; path = Realm/RLMOptionalBase.mm; sourceTree = "<group>"; };
+		83FDA3D1A54AA79B0C6E177FED62E24B /* RLMOptionalBase.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMOptionalBase.mm; path = Realm/RLMOptionalBase.mm; sourceTree = "<group>"; };
 		845581AECD94FCEB0BB3A0873E73488E /* TAPNewChatAddNewContactTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPNewChatAddNewContactTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPNewChatAddNewContactTableViewCell.h; sourceTree = "<group>"; };
 		84E22B0FBF56251AA2B51393E65E4499 /* TAPBaseMyBubbleTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPBaseMyBubbleTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPBaseMyBubbleTableViewCell.h; sourceTree = "<group>"; };
 		8519DA9DD68186C34416FAA1CF4E0E21 /* RLMOptionalBase.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMOptionalBase.h; path = include/RLMOptionalBase.h; sourceTree = "<group>"; };
-		8531EDD90FB795B96E67D96FB2D47288 /* system_configuration.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = system_configuration.cpp; path = Realm/ObjectStore/src/sync/impl/apple/system_configuration.cpp; sourceTree = "<group>"; };
+		8531EDD90FB795B96E67D96FB2D47288 /* system_configuration.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = system_configuration.cpp; path = Realm/ObjectStore/src/sync/impl/apple/system_configuration.cpp; sourceTree = "<group>"; };
 		856274836B6EE5899D54EF40AD530029 /* TAPSearchResultChatTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPSearchResultChatTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPSearchResultChatTableViewCell.h; sourceTree = "<group>"; };
 		8575388216A9E7D9F9C59C9C5EFADFFC /* TAPScanQRCodePopupViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPScanQRCodePopupViewController.h; path = "TapTalk/View Controllers/TAPScanQRCodePopupViewController.h"; sourceTree = "<group>"; };
-		85A01882ED06DFEA2E0CE78BCDB204A7 /* SocketRocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SocketRocket.framework; path = SocketRocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		85A01882ED06DFEA2E0CE78BCDB204A7 /* SocketRocket.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SocketRocket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		85E2E643EE072676FE87F7FB2DF4939E /* RLMSchema.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMSchema.h; path = include/RLMSchema.h; sourceTree = "<group>"; };
 		861173682A7E33A9672B3DC8FD39B49D /* PodAsset-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "PodAsset-dummy.m"; sourceTree = "<group>"; };
 		8667C49F60D67ADE358BEDE88F4670CD /* JSONModel-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "JSONModel-Info.plist"; sourceTree = "<group>"; };
 		878CF9DCA3F40C3BC7AA67CEB6568A5A /* TAPMediaDetailPreviewView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPMediaDetailPreviewView.h; path = TapTalk/Views/TAPMediaDetailPreviewView.h; sourceTree = "<group>"; };
-		87CBE2DBAC50C8292B93C94886D1B113 /* results.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = results.cpp; path = Realm/ObjectStore/src/results.cpp; sourceTree = "<group>"; };
+		87CBE2DBAC50C8292B93C94886D1B113 /* results.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = results.cpp; path = Realm/ObjectStore/src/results.cpp; sourceTree = "<group>"; };
 		887F81EF53CF49CC9DB63C79FF694264 /* NSData+CommonCrypto.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSData+CommonCrypto.m"; path = "TapTalk/Components/AESCrypt/NSData+CommonCrypto.m"; sourceTree = "<group>"; };
 		88D0938222B43DA9E6E22AC16F90A30D /* GoogleMaps.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GoogleMaps.xcconfig; sourceTree = "<group>"; };
 		8968D3739F2C29CFE7913663403514D9 /* JSONModelError.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = JSONModelError.h; path = JSONModel/JSONModel/JSONModelError.h; sourceTree = "<group>"; };
@@ -1332,20 +1334,20 @@
 		8BD20E6F1FE1B42AF57276A4D22AF7EE /* JSONValueTransformer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = JSONValueTransformer.m; path = JSONModel/JSONModelTransformations/JSONValueTransformer.m; sourceTree = "<group>"; };
 		8CE22ADD804D0365133CDEE5C1BBB2E0 /* SDWebImageCompat.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SDWebImageCompat.h; path = SDWebImage/SDWebImageCompat.h; sourceTree = "<group>"; };
 		8EC7A8E323D8DB92F1BB6CFA1DA121D1 /* NSData+ImageContentType.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSData+ImageContentType.h"; path = "SDWebImage/NSData+ImageContentType.h"; sourceTree = "<group>"; };
-		8F185CCCCCC79DD42949BD911C917441 /* schema.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = schema.cpp; path = Realm/ObjectStore/src/schema.cpp; sourceTree = "<group>"; };
+		8F185CCCCCC79DD42949BD911C917441 /* schema.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = schema.cpp; path = Realm/ObjectStore/src/schema.cpp; sourceTree = "<group>"; };
 		8F586CCD4C6A2BBF96E9C4901B70EB29 /* TAPContactLoadingTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPContactLoadingTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPContactLoadingTableViewCell.m; sourceTree = "<group>"; };
 		8F6312FDDDE19D0FBCF47BDA11455E7F /* TAPBaseMyBubbleTableViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPBaseMyBubbleTableViewCell.xib; path = TapTalk/Views/UITableViewCells/TAPBaseMyBubbleTableViewCell.xib; sourceTree = "<group>"; };
-		8F9260DAB7E2360B8C5ECB9ECC9BF278 /* RLMRealmConfiguration.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMRealmConfiguration.mm; path = Realm/RLMRealmConfiguration.mm; sourceTree = "<group>"; };
+		8F9260DAB7E2360B8C5ECB9ECC9BF278 /* RLMRealmConfiguration.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMRealmConfiguration.mm; path = Realm/RLMRealmConfiguration.mm; sourceTree = "<group>"; };
 		8F9F0428C277627D0B7D5121CC3DB836 /* RLMCollection_Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMCollection_Private.h; path = include/RLMCollection_Private.h; sourceTree = "<group>"; };
 		90523B726F4464CD28FA72BB9B069AD6 /* UIImage+ForceDecode.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIImage+ForceDecode.m"; path = "SDWebImage/UIImage+ForceDecode.m"; sourceTree = "<group>"; };
 		90669106846C47CDA9F946D4709FB1B7 /* RLMObject_Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMObject_Private.h; path = include/RLMObject_Private.h; sourceTree = "<group>"; };
 		914AD838F29BDD863EF9C448C5EE28F1 /* UIImageView+HighlightedWebCache.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIImageView+HighlightedWebCache.m"; path = "SDWebImage/UIImageView+HighlightedWebCache.m"; sourceTree = "<group>"; };
 		91996D852919450DF5263DFEC8018A49 /* TAPConnectionStatusView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPConnectionStatusView.m; path = TapTalk/Components/TAPConnectionStatusView.m; sourceTree = "<group>"; };
 		91B9CB855134F5E0042C09C6DD75F7C4 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
-		921BE4A82C4A7A5C72A0C6F8B8FEF200 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		921BE4A82C4A7A5C72A0C6F8B8FEF200 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		92357CE4B0EEBEED10676AAF2760F4C9 /* TAPRoomListModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPRoomListModel.h; path = TapTalk/Models/TAPRoomListModel.h; sourceTree = "<group>"; };
 		9238EC24D04F10412F7AB5C417202D28 /* SDWebImagePrefetcher.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImagePrefetcher.m; path = SDWebImage/SDWebImagePrefetcher.m; sourceTree = "<group>"; };
-		926B9A863AAD1961B44C636553B18E0E /* RLMNetworkClient.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMNetworkClient.mm; path = Realm/RLMNetworkClient.mm; sourceTree = "<group>"; };
+		926B9A863AAD1961B44C636553B18E0E /* RLMNetworkClient.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMNetworkClient.mm; path = Realm/RLMNetworkClient.mm; sourceTree = "<group>"; };
 		92BF1A5D2CCF93D8F1880A1AA109FD09 /* TAPProfileCollectionViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPProfileCollectionViewCell.m; path = TapTalk/Views/UICollectionViewCells/TAPProfileCollectionViewCell.m; sourceTree = "<group>"; };
 		93A1F1DDC024079E050212CAD9EB8B9D /* GooglePlaces.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GooglePlaces.framework; path = Frameworks/GooglePlaces.framework; sourceTree = "<group>"; };
 		93CC113AE492BD2BDF70F1108549D3C6 /* TAPScanQRCodePopupView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPScanQRCodePopupView.h; path = TapTalk/Views/TAPScanQRCodePopupView.h; sourceTree = "<group>"; };
@@ -1353,10 +1355,10 @@
 		946DABAE24A08F17321240774076A3A4 /* TAPAddNewContactViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPAddNewContactViewController.h; path = "TapTalk/View Controllers/TAPAddNewContactViewController.h"; sourceTree = "<group>"; };
 		94AA69CF56382F3EDE4A91412AA3C2FA /* AFHTTPSessionManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AFHTTPSessionManager.h; path = AFNetworking/AFHTTPSessionManager.h; sourceTree = "<group>"; };
 		94CFAB0E478F4349545780E0C2C04F56 /* TAPPhotoAlbumListItemTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPPhotoAlbumListItemTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPPhotoAlbumListItemTableViewCell.m; sourceTree = "<group>"; };
-		94F95FFC70FA9CCF09D3D394F5C24511 /* ZSWTappableLabel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = ZSWTappableLabel.framework; path = ZSWTappableLabel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		94F95FFC70FA9CCF09D3D394F5C24511 /* ZSWTappableLabel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZSWTappableLabel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		950ADC28111A0E9D0C8029512428F9FE /* TAPImageSelectViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPImageSelectViewController.m; path = "TapTalk/View Controllers/TAPImageSelectViewController.m"; sourceTree = "<group>"; };
 		95579DD60A386E74BC5CF6DF01EAFA7B /* TapTalk-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "TapTalk-dummy.m"; sourceTree = "<group>"; };
-		956F6E4B91C7ABF69AE3A8D8466C28AB /* object_schema.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = object_schema.cpp; path = Realm/ObjectStore/src/object_schema.cpp; sourceTree = "<group>"; };
+		956F6E4B91C7ABF69AE3A8D8466C28AB /* object_schema.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = object_schema.cpp; path = Realm/ObjectStore/src/object_schema.cpp; sourceTree = "<group>"; };
 		95924D12595E2DE6F8742FF615657606 /* TAPKeyboardTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPKeyboardTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPKeyboardTableViewCell.m; sourceTree = "<group>"; };
 		965154BD9E7B1D514FFE1E29A3E8DDF1 /* TAPCustomNotificationAlertViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCustomNotificationAlertViewController.h; path = "TapTalk/View Controllers/TAPCustomNotificationAlertViewController.h"; sourceTree = "<group>"; };
 		9659C331F1F68A75052CB02B76664449 /* TapTalk.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TapTalk.h; path = TapTalk/TapTalk.h; sourceTree = "<group>"; };
@@ -1368,36 +1370,36 @@
 		97690318F1E353CE9FAF0F9DB97F4B83 /* TAPRecentSearchRealmModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPRecentSearchRealmModel.m; path = TapTalk/Models/RealmModels/TAPRecentSearchRealmModel.m; sourceTree = "<group>"; };
 		9806F6FBC5E57889D2E9B20ADE6416CB /* RLMRealmConfiguration.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMRealmConfiguration.h; path = include/RLMRealmConfiguration.h; sourceTree = "<group>"; };
 		9821BE1D7460BF022B5818CA55473123 /* TAPRecentSearchModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPRecentSearchModel.h; path = TapTalk/Models/TAPRecentSearchModel.h; sourceTree = "<group>"; };
-		982D32D94318CF958C41EE410BBA1081 /* RLMSyncPermission.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSyncPermission.mm; path = Realm/RLMSyncPermission.mm; sourceTree = "<group>"; };
+		982D32D94318CF958C41EE410BBA1081 /* RLMSyncPermission.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncPermission.mm; path = Realm/RLMSyncPermission.mm; sourceTree = "<group>"; };
 		99CFA893BD7121DE127350469FD25F78 /* ZSWTappableLabel.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = ZSWTappableLabel.xcconfig; sourceTree = "<group>"; };
-		9A5CB116E9B1340DD98CEA6364F76DCB /* list.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = list.cpp; path = Realm/ObjectStore/src/list.cpp; sourceTree = "<group>"; };
+		9A5CB116E9B1340DD98CEA6364F76DCB /* list.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = list.cpp; path = Realm/ObjectStore/src/list.cpp; sourceTree = "<group>"; };
 		9ACBBFC75AE229932E9D567FABC8F2C1 /* TAPProfileViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPProfileViewController.m; path = "TapTalk/View Controllers/TAPProfileViewController.m"; sourceTree = "<group>"; };
 		9B30484BC0EAA546D61882E7648D2E34 /* TAPYourLocationBubbleTableViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPYourLocationBubbleTableViewCell.xib; path = TapTalk/Views/UITableViewCells/TAPYourLocationBubbleTableViewCell.xib; sourceTree = "<group>"; };
-		9B53986E95E511FBCECD985091EF88B9 /* RLMAccessor.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMAccessor.mm; path = Realm/RLMAccessor.mm; sourceTree = "<group>"; };
+		9B53986E95E511FBCECD985091EF88B9 /* RLMAccessor.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMAccessor.mm; path = Realm/RLMAccessor.mm; sourceTree = "<group>"; };
 		9BB75670392E393519CBE96CEEA26578 /* Pods-TapTalkLive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-TapTalkLive.release.xcconfig"; sourceTree = "<group>"; };
 		9BC49E0A6781C8DFA05BD3F77A2995BC /* RLMCollection.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMCollection.h; path = include/RLMCollection.h; sourceTree = "<group>"; };
 		9C6AE51FE71C0AA75BD23C145E3B9C22 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk/System/Library/Frameworks/CFNetwork.framework; sourceTree = DEVELOPER_DIR; };
 		9CD4016A246803EAEB640AB04B38C798 /* TAPCustomKeyboardItemModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCustomKeyboardItemModel.h; path = TapTalk/Models/TAPCustomKeyboardItemModel.h; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9DBDF86833D2D4C15A97FA4EC495AB9B /* AESCrypt.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AESCrypt.h; path = TapTalk/Components/AESCrypt/AESCrypt.h; sourceTree = "<group>"; };
 		9DFCF58CB0380DF723A8A8FBDBCD12E0 /* TAPProductModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPProductModel.h; path = TapTalk/Models/TAPProductModel.h; sourceTree = "<group>"; };
 		9EA5398E23D51ED7306598A280CF30F5 /* TAPLoadingTableViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPLoadingTableViewCell.xib; path = TapTalk/Views/UITableViewCells/TAPLoadingTableViewCell.xib; sourceTree = "<group>"; };
-		9EB8D0FFE846519EDBFEA2F40041F215 /* sync_file.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = sync_file.cpp; path = Realm/ObjectStore/src/sync/impl/sync_file.cpp; sourceTree = "<group>"; };
+		9EB8D0FFE846519EDBFEA2F40041F215 /* sync_file.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = sync_file.cpp; path = Realm/ObjectStore/src/sync/impl/sync_file.cpp; sourceTree = "<group>"; };
 		9EE95D4AAD51B2DB7CDA73A580D12660 /* SDWebImageTransition.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SDWebImageTransition.h; path = SDWebImage/SDWebImageTransition.h; sourceTree = "<group>"; };
 		9F09B370678347164275425F364997CB /* NSButton+WebCache.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSButton+WebCache.m"; path = "SDWebImage/NSButton+WebCache.m"; sourceTree = "<group>"; };
 		9F26E270D0E61788180DB17485FC6A0B /* TAPPopUpInfoViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPPopUpInfoViewController.h; path = "TapTalk/View Controllers/TAPPopUpInfoViewController.h"; sourceTree = "<group>"; };
 		9F7ED673955E834B71EFEF999DE2F16F /* SDImageCacheConfig.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDImageCacheConfig.m; path = SDWebImage/SDImageCacheConfig.m; sourceTree = "<group>"; };
-		A046D253BCB1F285C32DD42F65A4D714 /* RLMPredicateUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMPredicateUtil.mm; path = Realm/RLMPredicateUtil.mm; sourceTree = "<group>"; };
+		A046D253BCB1F285C32DD42F65A4D714 /* RLMPredicateUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMPredicateUtil.mm; path = Realm/RLMPredicateUtil.mm; sourceTree = "<group>"; };
 		A0A117C60743C3C78467AE9128902113 /* PodAsset.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = PodAsset.h; path = Pod/Classes/PodAsset.h; sourceTree = "<group>"; };
-		A189C214E34ACF9A2FFD7D86F1CB9F4E /* RLMCollection.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMCollection.mm; path = Realm/RLMCollection.mm; sourceTree = "<group>"; };
+		A189C214E34ACF9A2FFD7D86F1CB9F4E /* RLMCollection.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMCollection.mm; path = Realm/RLMCollection.mm; sourceTree = "<group>"; };
 		A1AC4B4840293048B72E88D1711A35BB /* SDWebImageCompat.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImageCompat.m; path = SDWebImage/SDWebImageCompat.m; sourceTree = "<group>"; };
 		A1AE454E725C6D34D52A8B6CB8377E04 /* TAPImagePreviewView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPImagePreviewView.h; path = TapTalk/Views/TAPImagePreviewView.h; sourceTree = "<group>"; };
 		A2EEBD22605F821CA77901C08856E2BE /* AFAutoPurgingImageCache.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = AFAutoPurgingImageCache.h; path = "UIKit+AFNetworking/AFAutoPurgingImageCache.h"; sourceTree = "<group>"; };
 		A31D2C18BB4F491561823776C577FD5C /* SDWebImageDownloaderOperation.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDWebImageDownloaderOperation.m; path = SDWebImage/SDWebImageDownloaderOperation.m; sourceTree = "<group>"; };
 		A41A553F4A2E13EB1211BA8B39EBDEFC /* TAPSearchBarView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPSearchBarView.m; path = TapTalk/Components/TAPSearchBarView.m; sourceTree = "<group>"; };
-		A43E2FF8FCC34F115C34EC4C57BC4609 /* sync_permission.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = sync_permission.cpp; path = Realm/ObjectStore/src/sync/sync_permission.cpp; sourceTree = "<group>"; };
+		A43E2FF8FCC34F115C34EC4C57BC4609 /* sync_permission.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = sync_permission.cpp; path = Realm/ObjectStore/src/sync/sync_permission.cpp; sourceTree = "<group>"; };
 		A4E4C1B4B9129E74045FC28BF8D914E0 /* TAPBaseXIBTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPBaseXIBTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPBaseXIBTableViewCell.m; sourceTree = "<group>"; };
-		A4FA15D44DF6BAC7550EDEED10862AA3 /* AFNetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = AFNetworking.framework; path = AFNetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4FA15D44DF6BAC7550EDEED10862AA3 /* AFNetworking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AFNetworking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A55DD64B611F0957AA074D8D088FA118 /* Realm.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Realm.modulemap; sourceTree = "<group>"; };
 		A6976CEBA5CF47FADCE704F7CA803AA5 /* TAPYourLocationBubbleTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPYourLocationBubbleTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPYourLocationBubbleTableViewCell.m; sourceTree = "<group>"; };
 		A69BDC011C9AA50A9F3AB784A1D96FA7 /* AFSecurityPolicy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = AFSecurityPolicy.m; path = AFNetworking/AFSecurityPolicy.m; sourceTree = "<group>"; };
@@ -1408,15 +1410,15 @@
 		A7D3F78F041E2A5E17AC0AC8CE704840 /* TAPBaseTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPBaseTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPBaseTableViewCell.h; sourceTree = "<group>"; };
 		A7DE349EEEDC60BD7B2E2489440269F2 /* TAPSearchView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPSearchView.h; path = TapTalk/Views/TAPSearchView.h; sourceTree = "<group>"; };
 		A890ED372C1AB168227A08A7606A1F53 /* RLMObjectBase_Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMObjectBase_Private.h; path = include/RLMObjectBase_Private.h; sourceTree = "<group>"; };
-		A8BEBC472AE5E6EE5F76B88094B67016 /* RLMObjectBase.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMObjectBase.mm; path = Realm/RLMObjectBase.mm; sourceTree = "<group>"; };
-		AADA934B921C627A21ABCDF07DF6BDFC /* object_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = object_notifier.cpp; path = Realm/ObjectStore/src/impl/object_notifier.cpp; sourceTree = "<group>"; };
+		A8BEBC472AE5E6EE5F76B88094B67016 /* RLMObjectBase.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMObjectBase.mm; path = Realm/RLMObjectBase.mm; sourceTree = "<group>"; };
+		AADA934B921C627A21ABCDF07DF6BDFC /* object_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = object_notifier.cpp; path = Realm/ObjectStore/src/impl/object_notifier.cpp; sourceTree = "<group>"; };
 		AADDBF5A0FA138C60140B5089913A00D /* UIImage+Color.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIImage+Color.h"; path = "TapTalk/Components/UIImage+Color.h"; sourceTree = "<group>"; };
 		AB3DC21F70DCB941B1A581BF674DC3AD /* TAPMyImageBubbleTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPMyImageBubbleTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPMyImageBubbleTableViewCell.h; sourceTree = "<group>"; };
 		AB948888A30D0FD11D64446B847DB6C6 /* TAPContactRealmModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPContactRealmModel.h; path = TapTalk/Models/RealmModels/TAPContactRealmModel.h; sourceTree = "<group>"; };
 		ABA4979F6B5DCF4FE80838669DE54F4B /* TAPForwardFromModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPForwardFromModel.m; path = TapTalk/Models/TAPForwardFromModel.m; sourceTree = "<group>"; };
 		AC14B19F3924F632C8FEB26344099A4A /* SDWebImage.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SDWebImage.xcconfig; sourceTree = "<group>"; };
 		ACFF50987F450F093A2FA9F50163EEE4 /* TAPMyFileBubbleTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPMyFileBubbleTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPMyFileBubbleTableViewCell.h; sourceTree = "<group>"; };
-		AD29095511E59E27E506BBA6FA478E2E /* keychain_helper.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = keychain_helper.cpp; path = Realm/ObjectStore/src/impl/apple/keychain_helper.cpp; sourceTree = "<group>"; };
+		AD29095511E59E27E506BBA6FA478E2E /* keychain_helper.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = keychain_helper.cpp; path = Realm/ObjectStore/src/impl/apple/keychain_helper.cpp; sourceTree = "<group>"; };
 		AD6D216AB20242FC70E7D393CFF4DC93 /* UIRefreshControl+AFNetworking.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIRefreshControl+AFNetworking.m"; path = "UIKit+AFNetworking/UIRefreshControl+AFNetworking.m"; sourceTree = "<group>"; };
 		ADADC4C29E7A41487DB9410C0A5A0555 /* TapUI.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TapUI.m; path = TapTalk/TapUI.m; sourceTree = "<group>"; };
 		ADF55ECF3D39D58685D3A7751FBC857D /* UIButton+AFNetworking.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIButton+AFNetworking.m"; path = "UIKit+AFNetworking/UIButton+AFNetworking.m"; sourceTree = "<group>"; };
@@ -1424,12 +1426,12 @@
 		AF1CE5502C68467DDAB5A6E457B46B2B /* TAPCreateGroupView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCreateGroupView.m; path = TapTalk/Views/TAPCreateGroupView.m; sourceTree = "<group>"; };
 		AF8CAE12B56B5818513D10F228F7D0C4 /* RLMRealm+Sync.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "RLMRealm+Sync.h"; path = "include/RLMRealm+Sync.h"; sourceTree = "<group>"; };
 		B081DA6C8BBF7749D5964819AE0A1B8B /* SDImageCache.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDImageCache.m; path = SDWebImage/SDImageCache.m; sourceTree = "<group>"; };
-		B0B214D775196BA7CA8E17E53048A493 /* SDWebImage.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SDWebImage.framework; path = SDWebImage.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B0B214D775196BA7CA8E17E53048A493 /* SDWebImage.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SDWebImage.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B217E7225FB374C63DB60D2AA2F5FBFD /* UIProgressView+AFNetworking.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIProgressView+AFNetworking.m"; path = "UIKit+AFNetworking/UIProgressView+AFNetworking.m"; sourceTree = "<group>"; };
-		B270047D7A629CEB7237C48A1A1F7E44 /* RLMThreadSafeReference.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMThreadSafeReference.mm; path = Realm/RLMThreadSafeReference.mm; sourceTree = "<group>"; };
+		B270047D7A629CEB7237C48A1A1F7E44 /* RLMThreadSafeReference.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMThreadSafeReference.mm; path = Realm/RLMThreadSafeReference.mm; sourceTree = "<group>"; };
 		B31F36EEBE3590FE24467306D3FD7DF1 /* TAPSearchView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPSearchView.m; path = TapTalk/Views/TAPSearchView.m; sourceTree = "<group>"; };
 		B38FB7CD36DED3DE8B98DA9C29549618 /* TAPYourVideoBubbleTableViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPYourVideoBubbleTableViewCell.xib; path = TapTalk/Views/UITableViewCells/TAPYourVideoBubbleTableViewCell.xib; sourceTree = "<group>"; };
-		B3A4375F7165BE23BC19CF0C16DAA1AF /* RLMProperty.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMProperty.mm; path = Realm/RLMProperty.mm; sourceTree = "<group>"; };
+		B3A4375F7165BE23BC19CF0C16DAA1AF /* RLMProperty.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMProperty.mm; path = Realm/RLMProperty.mm; sourceTree = "<group>"; };
 		B4F947AA1C70842B594EE94CF46D4919 /* TAPGroupModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPGroupModel.m; path = TapTalk/Models/TAPGroupModel.m; sourceTree = "<group>"; };
 		B505C5EF65B20C33605F77C202394B17 /* TAPQuoteModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPQuoteModel.h; path = TapTalk/Models/TAPQuoteModel.h; sourceTree = "<group>"; };
 		B5225F423516D07817520E0C5D88E51E /* TAPSystemMessageTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPSystemMessageTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPSystemMessageTableViewCell.m; sourceTree = "<group>"; };
@@ -1442,13 +1444,13 @@
 		B7543E93B86F094DD53519D797F0E75A /* TAPMyFileBubbleTableViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPMyFileBubbleTableViewCell.xib; path = TapTalk/Views/UITableViewCells/TAPMyFileBubbleTableViewCell.xib; sourceTree = "<group>"; };
 		B7A942EE189D6F001C70D548D9F6EA16 /* UIButton+AFNetworking.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIButton+AFNetworking.h"; path = "UIKit+AFNetworking/UIButton+AFNetworking.h"; sourceTree = "<group>"; };
 		B7D2EC1A3E9821E1D0660B6FC5AC4805 /* TAPMyChatDeletedBubbleTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPMyChatDeletedBubbleTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPMyChatDeletedBubbleTableViewCell.h; sourceTree = "<group>"; };
-		B847D1264B962E3896627809C5D4653A /* realm_coordinator.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = realm_coordinator.cpp; path = Realm/ObjectStore/src/impl/realm_coordinator.cpp; sourceTree = "<group>"; };
+		B847D1264B962E3896627809C5D4653A /* realm_coordinator.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = realm_coordinator.cpp; path = Realm/ObjectStore/src/impl/realm_coordinator.cpp; sourceTree = "<group>"; };
 		B88A12B44D263E563E79CCE2D7700179 /* TAPDataManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPDataManager.m; path = TapTalk/Managers/TAPDataManager.m; sourceTree = "<group>"; };
-		B89F61C46DDB8EA303CBB7C6091A5CD6 /* list_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = list_notifier.cpp; path = Realm/ObjectStore/src/impl/list_notifier.cpp; sourceTree = "<group>"; };
+		B89F61C46DDB8EA303CBB7C6091A5CD6 /* list_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = list_notifier.cpp; path = Realm/ObjectStore/src/impl/list_notifier.cpp; sourceTree = "<group>"; };
 		BA255070FBBE5CF970B96BE03B272239 /* TAPLoadMoreBubbleTableViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPLoadMoreBubbleTableViewCell.xib; path = TapTalk/Views/UITableViewCells/TAPLoadMoreBubbleTableViewCell.xib; sourceTree = "<group>"; };
 		BA4FBEA86320A8C5FADA95CCC725A8E3 /* NSError+RLMSync.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSError+RLMSync.h"; path = "include/NSError+RLMSync.h"; sourceTree = "<group>"; };
 		BAA4971697B7D9C43AE2C205037B200A /* TAPContactManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPContactManager.m; path = TapTalk/Managers/TAPContactManager.m; sourceTree = "<group>"; };
-		BAACA1BF7AB3DD28402C4F9A7C2FD104 /* JSONModel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = JSONModel.framework; path = JSONModel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BAACA1BF7AB3DD28402C4F9A7C2FD104 /* JSONModel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = JSONModel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC35CF2ED2212F4F50444DADA0642856 /* UIButton+WebCache.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIButton+WebCache.h"; path = "SDWebImage/UIButton+WebCache.h"; sourceTree = "<group>"; };
 		BC555084AD6493DD23036D360FB3A28F /* TAPMessageRealmModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPMessageRealmModel.h; path = TapTalk/Models/RealmModels/TAPMessageRealmModel.h; sourceTree = "<group>"; };
 		BCE7CA8EAE9725DA129157C14B238DA3 /* TAPBaseXIBRotatedTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPBaseXIBRotatedTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPBaseXIBRotatedTableViewCell.h; sourceTree = "<group>"; };
@@ -1458,7 +1460,7 @@
 		BE7713F7B32E6441C6B5AAE7F1F91BA9 /* TAPNotificationManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPNotificationManager.m; path = TapTalk/Managers/TAPNotificationManager.m; sourceTree = "<group>"; };
 		BF24BF845B15EFDC501269E4295D6E36 /* TAPUnreadMessagesBubbleTableViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPUnreadMessagesBubbleTableViewCell.xib; path = TapTalk/Views/UITableViewCells/TAPUnreadMessagesBubbleTableViewCell.xib; sourceTree = "<group>"; };
 		BF291B20821F554FC2FE52BF5CF6E2C9 /* UIImage+Color.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIImage+Color.m"; path = "TapTalk/Components/UIImage+Color.m"; sourceTree = "<group>"; };
-		BF580D7E7AA20DDB638C28F88DD6E52F /* RLMRealmConfiguration+Sync.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = "RLMRealmConfiguration+Sync.mm"; path = "Realm/RLMRealmConfiguration+Sync.mm"; sourceTree = "<group>"; };
+		BF580D7E7AA20DDB638C28F88DD6E52F /* RLMRealmConfiguration+Sync.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = "RLMRealmConfiguration+Sync.mm"; path = "Realm/RLMRealmConfiguration+Sync.mm"; sourceTree = "<group>"; };
 		BFAAFE86FA4A4B43D897C173C7BD0390 /* UIImage+MultiFormat.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIImage+MultiFormat.h"; path = "SDWebImage/UIImage+MultiFormat.h"; sourceTree = "<group>"; };
 		BFB0D97B452E7F11B022EF13D4A93969 /* TAPBaseView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPBaseView.h; path = TapTalk/Views/TAPBaseView.h; sourceTree = "<group>"; };
 		BFDC79C834046AA86818C7FB115D178F /* TAPPlainInfoLabelTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPPlainInfoLabelTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPPlainInfoLabelTableViewCell.m; sourceTree = "<group>"; };
@@ -1466,7 +1468,7 @@
 		C07056E8241E008E6A2318D869C44492 /* UIButton+WebCache.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIButton+WebCache.m"; path = "SDWebImage/UIButton+WebCache.m"; sourceTree = "<group>"; };
 		C0B85AE3775D7CB83D25228356B3C550 /* TAPAddNewChatViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPAddNewChatViewController.h; path = "TapTalk/View Controllers/TAPAddNewChatViewController.h"; sourceTree = "<group>"; };
 		C0EA3D747E7D1CC0248CF43F974B1AFB /* TAPOldDataManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPOldDataManager.m; path = TapTalk/Managers/TAPOldDataManager.m; sourceTree = "<group>"; };
-		C197A1EB6EB650474F8C51644A92D746 /* sync_session.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = sync_session.cpp; path = Realm/ObjectStore/src/sync/sync_session.cpp; sourceTree = "<group>"; };
+		C197A1EB6EB650474F8C51644A92D746 /* sync_session.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = sync_session.cpp; path = Realm/ObjectStore/src/sync/sync_session.cpp; sourceTree = "<group>"; };
 		C2B21C8A13B36CF939D8789C648EABBD /* TAPContactTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPContactTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPContactTableViewCell.h; sourceTree = "<group>"; };
 		C2BEE64A7D5C0B0C8A441C697149FEAB /* ZSWTappableLabel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = ZSWTappableLabel.h; path = ZSWTappableLabel/ZSWTappableLabel.h; sourceTree = "<group>"; };
 		C326498F2D5504F1B028AD61600396B3 /* TAPYourVideoBubbleTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPYourVideoBubbleTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPYourVideoBubbleTableViewCell.m; sourceTree = "<group>"; };
@@ -1483,7 +1485,7 @@
 		C6A519EFE62BF6459A366D7E10DCCB97 /* JSONModel.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = JSONModel.xcconfig; sourceTree = "<group>"; };
 		C7072E1F36D7691C2CA1075B9A482689 /* TAPReplyToModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPReplyToModel.h; path = TapTalk/Models/TAPReplyToModel.h; sourceTree = "<group>"; };
 		C7160B20366A45B0AD6AE1D1694F50FC /* TAPCustomTextView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCustomTextView.h; path = TapTalk/Components/TAPCustomTextView.h; sourceTree = "<group>"; };
-		C8EC8BBFC41BFE2B82E4C04431F55D9C /* RLMArray.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMArray.mm; path = Realm/RLMArray.mm; sourceTree = "<group>"; };
+		C8EC8BBFC41BFE2B82E4C04431F55D9C /* RLMArray.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMArray.mm; path = Realm/RLMArray.mm; sourceTree = "<group>"; };
 		C95B90C2B6C8DC219EE64C35CE077A58 /* TAPStyleManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPStyleManager.h; path = TapTalk/Managers/TAPStyleManager.h; sourceTree = "<group>"; };
 		C9B8399B713277442464CD22F41053D2 /* TAPGroupModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPGroupModel.h; path = TapTalk/Models/TAPGroupModel.h; sourceTree = "<group>"; };
 		C9F1972393A99B64F953F396F4F0B04F /* TAPNewChatOptionTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPNewChatOptionTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPNewChatOptionTableViewCell.m; sourceTree = "<group>"; };
@@ -1497,9 +1499,9 @@
 		CC5BB22E65F93DA0D78AC0BA8F604314 /* JSONAPI.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = JSONAPI.h; path = JSONModel/JSONModelNetworking/JSONAPI.h; sourceTree = "<group>"; };
 		CC5DDE018062A67C8FD99AF815B51CFE /* TAPSetupRoomListView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPSetupRoomListView.h; path = TapTalk/Views/TAPSetupRoomListView.h; sourceTree = "<group>"; };
 		CCB8694D47AFC06E045B362E12C347F7 /* NSString+Base64.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSString+Base64.h"; path = "TapTalk/Components/AESCrypt/NSString+Base64.h"; sourceTree = "<group>"; };
-		CD12D10237453788F289CF1B7033FA65 /* work_queue.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = work_queue.cpp; path = Realm/ObjectStore/src/sync/impl/work_queue.cpp; sourceTree = "<group>"; };
+		CD12D10237453788F289CF1B7033FA65 /* work_queue.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = work_queue.cpp; path = Realm/ObjectStore/src/sync/impl/work_queue.cpp; sourceTree = "<group>"; };
 		CD6914C1C337B9D1E6CC358F5CEF9B2B /* Realm.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Realm.xcconfig; sourceTree = "<group>"; };
-		CDBA6969A944B08D138DBCFDE626FB41 /* sync_manager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = sync_manager.cpp; path = Realm/ObjectStore/src/sync/sync_manager.cpp; sourceTree = "<group>"; };
+		CDBA6969A944B08D138DBCFDE626FB41 /* sync_manager.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = sync_manager.cpp; path = Realm/ObjectStore/src/sync/sync_manager.cpp; sourceTree = "<group>"; };
 		CE0D096DC63EAC2DF1E1814ECA0A2BFA /* JSONModelError.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = JSONModelError.m; path = JSONModel/JSONModel/JSONModelError.m; sourceTree = "<group>"; };
 		CE354BF9A11644D48FAC86C5B219BFC4 /* TAPMyLocationBubbleTableViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPMyLocationBubbleTableViewCell.h; path = TapTalk/Views/UITableViewCells/TAPMyLocationBubbleTableViewCell.h; sourceTree = "<group>"; };
 		CE7756F5E56AC7404EB878B166308F19 /* TAPSearchResultChatTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPSearchResultChatTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPSearchResultChatTableViewCell.m; sourceTree = "<group>"; };
@@ -1510,14 +1512,14 @@
 		CFB7E34374135A96F0EB58B8CADA949E /* JSONHTTPClient.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = JSONHTTPClient.m; path = JSONModel/JSONModelNetworking/JSONHTTPClient.m; sourceTree = "<group>"; };
 		CFD02965A2D213DDA65F17E3996990CE /* TAPContactTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPContactTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPContactTableViewCell.m; sourceTree = "<group>"; };
 		CFD80B476DA254445995162CF4D6300C /* TAPBaseViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPBaseViewController.m; path = "TapTalk/View Controllers/TAPBaseViewController.m"; sourceTree = "<group>"; };
-		CFF0FB4D918B743657C3C67F0AE43B35 /* sync_metadata.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = sync_metadata.cpp; path = Realm/ObjectStore/src/sync/impl/sync_metadata.cpp; sourceTree = "<group>"; };
+		CFF0FB4D918B743657C3C67F0AE43B35 /* sync_metadata.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = sync_metadata.cpp; path = Realm/ObjectStore/src/sync/impl/sync_metadata.cpp; sourceTree = "<group>"; };
 		D045C1B36E97FF7CB8BB8227D4F3E296 /* TAPDataFileModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPDataFileModel.h; path = TapTalk/Models/TAPDataFileModel.h; sourceTree = "<group>"; };
 		D09BEDC3228A8E43CDDCA78CF87AE51A /* TAPCoreChatRoomManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCoreChatRoomManager.m; path = TapTalk/Managers/TAPCoreManager/TAPCoreChatRoomManager.m; sourceTree = "<group>"; };
 		D0E0BE65C05CFFFD03FAB7464B83701E /* RLMObject.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMObject.h; path = include/RLMObject.h; sourceTree = "<group>"; };
 		D10066088BC05A32044A093BD3B79EEC /* TAPAddNewContactView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPAddNewContactView.m; path = TapTalk/Views/TAPAddNewContactView.m; sourceTree = "<group>"; };
 		D1130E893D577587A023BDD2CD79C1DC /* TAPWebViewViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPWebViewViewController.m; path = "TapTalk/View Controllers/TAPWebViewViewController.m"; sourceTree = "<group>"; };
 		D1782DFF4F529DA036D75E6F3AD1D17C /* AESCrypt.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = AESCrypt.m; path = TapTalk/Components/AESCrypt/AESCrypt.m; sourceTree = "<group>"; };
-		D1ECE3A1233609CC8A38C6292CCA096C /* binding_callback_thread_observer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = binding_callback_thread_observer.cpp; path = Realm/ObjectStore/src/binding_callback_thread_observer.cpp; sourceTree = "<group>"; };
+		D1ECE3A1233609CC8A38C6292CCA096C /* binding_callback_thread_observer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = binding_callback_thread_observer.cpp; path = Realm/ObjectStore/src/binding_callback_thread_observer.cpp; sourceTree = "<group>"; };
 		D1F04867EAE35659A42387333B6C3AF3 /* TAPImageSelectViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPImageSelectViewController.h; path = "TapTalk/View Controllers/TAPImageSelectViewController.h"; sourceTree = "<group>"; };
 		D2CB21A34CD6CDF075D7D2CB45B4897F /* JSONModelLib.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = JSONModelLib.h; path = JSONModel/JSONModelLib.h; sourceTree = "<group>"; };
 		D3F393915D3AB7ED281D745CA3235E92 /* TAPBlockedListViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPBlockedListViewController.m; path = "TapTalk/View Controllers/TAPBlockedListViewController.m"; sourceTree = "<group>"; };
@@ -1527,7 +1529,7 @@
 		D49E8F9D6478330B5EC78CFF457410A7 /* TAPLoadingTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPLoadingTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPLoadingTableViewCell.m; sourceTree = "<group>"; };
 		D4BC99EDE4B3BF95675F0AE7AC4EEEA8 /* PodAsset-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "PodAsset-umbrella.h"; sourceTree = "<group>"; };
 		D50F052544AA488CA0D2C7B2D4A8C173 /* TAPMessageRealmModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPMessageRealmModel.m; path = TapTalk/Models/RealmModels/TAPMessageRealmModel.m; sourceTree = "<group>"; };
-		D59C6987B31976F837DD5E0903E6B8AA /* TapTalk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = TapTalk.framework; path = TapTalk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D59C6987B31976F837DD5E0903E6B8AA /* TapTalk.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TapTalk.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E5D438456ECD57D4C09E7922E87209 /* TAPImagePreviewCollectionViewCell.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPImagePreviewCollectionViewCell.h; path = TapTalk/Views/UICollectionViewCells/TAPImagePreviewCollectionViewCell.h; sourceTree = "<group>"; };
 		D64DEFE80CDD64717C97877239B29CD8 /* TapUIRoomListViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TapUIRoomListViewController.m; path = "TapTalk/View Controllers/TapUIRoomListViewController.m"; sourceTree = "<group>"; };
 		D6B43C5E42D349554921F27105E82CD9 /* TAPScanQRCodeView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPScanQRCodeView.m; path = TapTalk/Views/TAPScanQRCodeView.m; sourceTree = "<group>"; };
@@ -1535,8 +1537,8 @@
 		D9721959109581FEEFEA582206F651D8 /* TAPMyVideoBubbleTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPMyVideoBubbleTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPMyVideoBubbleTableViewCell.m; sourceTree = "<group>"; };
 		D9862BD143DA54E2B283DBBB5D3EBB5F /* TAPRoomListTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPRoomListTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPRoomListTableViewCell.m; sourceTree = "<group>"; };
 		D99BE01555E57C8865675746A8E67E5C /* SocketRocket.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SocketRocket.h; path = SocketRocket/SocketRocket.h; sourceTree = "<group>"; };
-		D9DE6EDE1EBAE37FB4CB67C253D0B8E5 /* RLMUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMUtil.mm; path = Realm/RLMUtil.mm; sourceTree = "<group>"; };
-		DA37D2897EA7F12A913B1B64C06E24BA /* external_commit_helper.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = external_commit_helper.cpp; path = Realm/ObjectStore/src/impl/apple/external_commit_helper.cpp; sourceTree = "<group>"; };
+		D9DE6EDE1EBAE37FB4CB67C253D0B8E5 /* RLMUtil.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMUtil.mm; path = Realm/RLMUtil.mm; sourceTree = "<group>"; };
+		DA37D2897EA7F12A913B1B64C06E24BA /* external_commit_helper.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = external_commit_helper.cpp; path = Realm/ObjectStore/src/impl/apple/external_commit_helper.cpp; sourceTree = "<group>"; };
 		DA3811F20C8F087D7221066F823CA409 /* TAPYourImageBubbleTableViewCell.xib */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = file.xib; name = TAPYourImageBubbleTableViewCell.xib; path = TapTalk/Views/UITableViewCells/TAPYourImageBubbleTableViewCell.xib; sourceTree = "<group>"; };
 		DA54D3CD2E7CF1D1DC3DEE11A9362D27 /* TAPCountryPickerTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCountryPickerTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPCountryPickerTableViewCell.m; sourceTree = "<group>"; };
 		DB02FF4A9989481E6B2F0E06951E2A04 /* TAPUserRoleModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPUserRoleModel.h; path = TapTalk/Models/TAPUserRoleModel.h; sourceTree = "<group>"; };
@@ -1544,7 +1546,7 @@
 		DBC951DCFE432507535F6D7595609C07 /* JSONHTTPClient.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = JSONHTTPClient.h; path = JSONModel/JSONModelNetworking/JSONHTTPClient.h; sourceTree = "<group>"; };
 		DC1DC48974A0E9499C21B15D5FB5C1C4 /* AFNetworking-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AFNetworking-prefix.pch"; sourceTree = "<group>"; };
 		DC5F2CC2EA6090F8F377B07EEC8BC825 /* TAPAddNewChatViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPAddNewChatViewController.m; path = "TapTalk/View Controllers/TAPAddNewChatViewController.m"; sourceTree = "<group>"; };
-		DCF34C00E2D00D1FBC4EA0C341A5659C /* weak_realm_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = weak_realm_notifier.cpp; path = Realm/ObjectStore/src/impl/weak_realm_notifier.cpp; sourceTree = "<group>"; };
+		DCF34C00E2D00D1FBC4EA0C341A5659C /* weak_realm_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = weak_realm_notifier.cpp; path = Realm/ObjectStore/src/impl/weak_realm_notifier.cpp; sourceTree = "<group>"; };
 		DD2EAF6FE81FD96836A36CE6D2FD255F /* Localizable.strings */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = Localizable.strings; path = id.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DD61E67DF5D57B8EE8BB2DD80B0B361A /* TapTalk-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "TapTalk-prefix.pch"; sourceTree = "<group>"; };
 		DDD6E6A7CA31D57F29F38086A93A9D92 /* PodAsset-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "PodAsset-Info.plist"; sourceTree = "<group>"; };
@@ -1552,14 +1554,14 @@
 		DE92547B9F2E84621B3674B7540DAEC3 /* GooglePlaces.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = GooglePlaces.xcconfig; sourceTree = "<group>"; };
 		DF0E4127516DB8FE441F333965C753C1 /* TAPConnectionStatusViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPConnectionStatusViewController.m; path = "TapTalk/View Controllers/TAPConnectionStatusViewController.m"; sourceTree = "<group>"; };
 		DFC853F79EFE05A188DE3635FEF45E64 /* TAPForwardListViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPForwardListViewController.m; path = "TapTalk/View Controllers/TAPForwardListViewController.m"; sourceTree = "<group>"; };
-		DFD8D26B331B541C5089A59BF452D3AC /* network_reachability_observer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = network_reachability_observer.cpp; path = Realm/ObjectStore/src/sync/impl/apple/network_reachability_observer.cpp; sourceTree = "<group>"; };
+		DFD8D26B331B541C5089A59BF452D3AC /* network_reachability_observer.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = network_reachability_observer.cpp; path = Realm/ObjectStore/src/sync/impl/apple/network_reachability_observer.cpp; sourceTree = "<group>"; };
 		DFEFE2FD5D67B3A4B9C45C423A825242 /* TAPMyAccountView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPMyAccountView.h; path = TapTalk/Views/TAPMyAccountView.h; sourceTree = "<group>"; };
 		DFF259F3BAF4659BA1A8E81AA08B3141 /* TAPCustomPhoneNumberPickerView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCustomPhoneNumberPickerView.m; path = TapTalk/Components/TAPCustomPhoneNumberPickerView.m; sourceTree = "<group>"; };
 		E12A6041FA973C9B7072E6926388E84E /* RLMSyncUtil_Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMSyncUtil_Private.h; path = include/RLMSyncUtil_Private.h; sourceTree = "<group>"; };
 		E1FD2718C4A37C0849CD288915E10B9E /* UIProgressView+AFNetworking.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIProgressView+AFNetworking.h"; path = "UIKit+AFNetworking/UIProgressView+AFNetworking.h"; sourceTree = "<group>"; };
 		E27FA2D3515F3CE1500922F74BE12CA7 /* SDWebImage-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "SDWebImage-Info.plist"; sourceTree = "<group>"; };
 		E2A7679A58FE2F17324D7CC07DADA64B /* RLMSyncConfiguration_Private.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = RLMSyncConfiguration_Private.h; path = include/RLMSyncConfiguration_Private.h; sourceTree = "<group>"; };
-		E30EFF21C576D65D3B8A22661975B6B6 /* transact_log_handler.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = transact_log_handler.cpp; path = Realm/ObjectStore/src/impl/transact_log_handler.cpp; sourceTree = "<group>"; };
+		E30EFF21C576D65D3B8A22661975B6B6 /* transact_log_handler.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = transact_log_handler.cpp; path = Realm/ObjectStore/src/impl/transact_log_handler.cpp; sourceTree = "<group>"; };
 		E351332752D2FB9AF7C6F2CFA363BD6F /* SocketRocket.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = SocketRocket.modulemap; sourceTree = "<group>"; };
 		E3A4203E155F46A391F5B0F22B784DE6 /* TapTalk.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = TapTalk.xcconfig; sourceTree = "<group>"; };
 		E419A78BD7E184C32CBBEDE33BC10F03 /* TAPDataManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPDataManager.h; path = TapTalk/Managers/TAPDataManager.h; sourceTree = "<group>"; };
@@ -1567,7 +1569,7 @@
 		E487E90C92DBED585F29A1869C1FAE73 /* TAPLeftCustomNavigationButton.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPLeftCustomNavigationButton.h; path = TapTalk/Views/NavigationView/TAPLeftCustomNavigationButton.h; sourceTree = "<group>"; };
 		E59D1698FB8E421D7FC508912725F745 /* TAPBaseXIBRotatedTableViewCell.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPBaseXIBRotatedTableViewCell.m; path = TapTalk/Views/UITableViewCells/TAPBaseXIBRotatedTableViewCell.m; sourceTree = "<group>"; };
 		E5D25F325BE9FE55A664995FF4C3F10A /* GooglePlaces.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = GooglePlaces.bundle; path = Frameworks/GooglePlaces.framework/Resources/GooglePlaces.bundle; sourceTree = "<group>"; };
-		E63659C85E3DA4FF8B3EE1CDCA950F10 /* results_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; name = results_notifier.cpp; path = Realm/ObjectStore/src/impl/results_notifier.cpp; sourceTree = "<group>"; };
+		E63659C85E3DA4FF8B3EE1CDCA950F10 /* results_notifier.cpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.cpp; name = results_notifier.cpp; path = Realm/ObjectStore/src/impl/results_notifier.cpp; sourceTree = "<group>"; };
 		E700439AAB2567C917EE84CB31A8C8E6 /* TAPCountryModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCountryModel.h; path = TapTalk/Models/TAPCountryModel.h; sourceTree = "<group>"; };
 		E73B478E90273937D859A4C90D788480 /* SDWebImage-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "SDWebImage-umbrella.h"; sourceTree = "<group>"; };
 		E75B8E09E88CF680AB8A05562303D6F7 /* TAPCustomNotificationAlertViewController.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCustomNotificationAlertViewController.m; path = "TapTalk/View Controllers/TAPCustomNotificationAlertViewController.m"; sourceTree = "<group>"; };
@@ -1581,7 +1583,7 @@
 		EBDB787B3F7C1F160E5859DC05B8ABD3 /* TAPBaseViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPBaseViewController.h; path = "TapTalk/View Controllers/TAPBaseViewController.h"; sourceTree = "<group>"; };
 		EBDC0C08946FDB791D7E4B638E1F83E0 /* UIImageView+HighlightedWebCache.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIImageView+HighlightedWebCache.h"; path = "SDWebImage/UIImageView+HighlightedWebCache.h"; sourceTree = "<group>"; };
 		EC4401039195280113887BB0D3592B7B /* TAPProfileView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPProfileView.m; path = TapTalk/Views/TAPProfileView.m; sourceTree = "<group>"; };
-		ECAE701B1F79A9115B5CA1F6D91558F3 /* RLMSyncManager.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMSyncManager.mm; path = Realm/RLMSyncManager.mm; sourceTree = "<group>"; };
+		ECAE701B1F79A9115B5CA1F6D91558F3 /* RLMSyncManager.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncManager.mm; path = Realm/RLMSyncManager.mm; sourceTree = "<group>"; };
 		ED1C58ECDF559130985BAD96404F5F40 /* TAPCustomNotificationAlertView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCustomNotificationAlertView.h; path = TapTalk/Views/TAPCustomNotificationAlertView.h; sourceTree = "<group>"; };
 		ED85455BCD5F134B107C14AF4A300FC8 /* ZSWTappableLabel-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "ZSWTappableLabel-dummy.m"; sourceTree = "<group>"; };
 		ED8ED20822DA28E96FD72E5455D127E9 /* SocketRocket-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "SocketRocket-Info.plist"; sourceTree = "<group>"; };
@@ -1593,7 +1595,7 @@
 		EFF09E21BA1BFA2C771BC9B406A68391 /* TAPCreateGroupSubjectView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCreateGroupSubjectView.h; path = TapTalk/Views/TAPCreateGroupSubjectView.h; sourceTree = "<group>"; };
 		F1CD225E4FAEAE9514BA55BA0871721A /* TAPGrowingTextView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPGrowingTextView.m; path = TapTalk/Components/TAPGrowingTextView.m; sourceTree = "<group>"; };
 		F1D37D6F2752F7BC23B1215FA18D9FFB /* AFNetworking-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AFNetworking-umbrella.h"; sourceTree = "<group>"; };
-		F24AD81B23E2566F7CA47ABAC2873DAC /* RLMClassInfo.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMClassInfo.mm; path = Realm/RLMClassInfo.mm; sourceTree = "<group>"; };
+		F24AD81B23E2566F7CA47ABAC2873DAC /* RLMClassInfo.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMClassInfo.mm; path = Realm/RLMClassInfo.mm; sourceTree = "<group>"; };
 		F2DBCA4E42C9B1CB708B17DF99EDC03F /* UIImageView+AFNetworking.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "UIImageView+AFNetworking.m"; path = "UIKit+AFNetworking/UIImageView+AFNetworking.m"; sourceTree = "<group>"; };
 		F2F875139178F166CA67CDF305186565 /* TAPCreateGroupViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPCreateGroupViewController.h; path = "TapTalk/View Controllers/TAPCreateGroupViewController.h"; sourceTree = "<group>"; };
 		F33AF0BD7BE5C7360D699260E7B5B442 /* JSONModelClassProperty.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = JSONModelClassProperty.h; path = JSONModel/JSONModel/JSONModelClassProperty.h; sourceTree = "<group>"; };
@@ -1611,7 +1613,7 @@
 		F6A8E65A1A68B97E817FB27867CEAA8F /* GoogleMaps.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = "wrapper.plug-in"; name = GoogleMaps.bundle; path = Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle; sourceTree = "<group>"; };
 		F6AE8648BDF1BE4FBF8142EADADA50D2 /* GoogleMapsCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GoogleMapsCore.framework; path = Maps/Frameworks/GoogleMapsCore.framework; sourceTree = "<group>"; };
 		F764DC9701374218698E4937816BE04C /* TAPCoreMessageManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCoreMessageManager.m; path = TapTalk/Managers/TAPCoreManager/TAPCoreMessageManager.m; sourceTree = "<group>"; };
-		F7B56966531AA7520722B6251B1B0D3A /* RLMObjectSchema.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMObjectSchema.mm; path = Realm/RLMObjectSchema.mm; sourceTree = "<group>"; };
+		F7B56966531AA7520722B6251B1B0D3A /* RLMObjectSchema.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMObjectSchema.mm; path = Realm/RLMObjectSchema.mm; sourceTree = "<group>"; };
 		F7CA785F3DD39CF7A873641D4E02B3AC /* ZSWTappableLabel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = ZSWTappableLabel.m; path = ZSWTappableLabel/ZSWTappableLabel.m; sourceTree = "<group>"; };
 		F83F3CA294096B63349C5F6965C56C19 /* TAPUserModel.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPUserModel.h; path = TapTalk/Models/TAPUserModel.h; sourceTree = "<group>"; };
 		F8553C2F68B3818120045F802047C67E /* TAPRecentSearchModel.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPRecentSearchModel.m; path = TapTalk/Models/TAPRecentSearchModel.m; sourceTree = "<group>"; };
@@ -1620,7 +1622,7 @@
 		F9F4A2F96682E8067705EEBBC81EE558 /* TAPCountryPickerView.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = TAPCountryPickerView.m; path = TapTalk/Views/TAPCountryPickerView.m; sourceTree = "<group>"; };
 		FA0923D1AC9B5765707E47C3CFED3EF4 /* UIWebView+AFNetworking.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "UIWebView+AFNetworking.h"; path = "UIKit+AFNetworking/UIWebView+AFNetworking.h"; sourceTree = "<group>"; };
 		FA3992373BE5651736CBC48D3AD071F5 /* JSONKeyMapper.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = JSONKeyMapper.h; path = JSONModel/JSONModelTransformations/JSONKeyMapper.h; sourceTree = "<group>"; };
-		FA5A0730572C63FBEC827F3D22BB92D6 /* Pods_TapTalkLive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_TapTalkLive.framework; path = "Pods-TapTalkLive.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA5A0730572C63FBEC827F3D22BB92D6 /* Pods_TapTalkLive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TapTalkLive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA5ED9A47AF1F9BBDC8183113D23D773 /* AFHTTPSessionManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = AFHTTPSessionManager.m; path = AFNetworking/AFHTTPSessionManager.m; sourceTree = "<group>"; };
 		FA6AD7D2D4A308162469D2917C8C1EC3 /* TAPLocationManager.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPLocationManager.h; path = TapTalk/Managers/TAPLocationManager.h; sourceTree = "<group>"; };
 		FB737698622910A0722FC76527D72523 /* TAPForwardListView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPForwardListView.h; path = TapTalk/Views/TAPForwardListView.h; sourceTree = "<group>"; };
@@ -1628,8 +1630,8 @@
 		FD9A0EE8DCB4DE2A8AB17EFEE802A1B0 /* SDAnimatedImageRep.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = SDAnimatedImageRep.m; path = SDWebImage/SDAnimatedImageRep.m; sourceTree = "<group>"; };
 		FDEBBC5B343C1FD6A072F637A5F8C362 /* TAPImageSelectView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TAPImageSelectView.h; path = TapTalk/Views/TAPImageSelectView.h; sourceTree = "<group>"; };
 		FE7D4ED809BAF0975FCCEDD571037452 /* TapUIChatViewController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = TapUIChatViewController.h; path = "TapTalk/View Controllers/TapUIChatViewController.h"; sourceTree = "<group>"; };
-		FEC5E2ABB7E03DE97E1257EEB6FB342B /* RLMManagedArray.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMManagedArray.mm; path = Realm/RLMManagedArray.mm; sourceTree = "<group>"; };
-		FF8E4419DD106F5EDA14702B98F15E19 /* RLMObservation.mm */ = {isa = PBXFileReference; includeInIndex = 1; name = RLMObservation.mm; path = Realm/RLMObservation.mm; sourceTree = "<group>"; };
+		FEC5E2ABB7E03DE97E1257EEB6FB342B /* RLMManagedArray.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMManagedArray.mm; path = Realm/RLMManagedArray.mm; sourceTree = "<group>"; };
+		FF8E4419DD106F5EDA14702B98F15E19 /* RLMObservation.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMObservation.mm; path = Realm/RLMObservation.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1742,7 +1744,6 @@
 				EE3481D4AF339F0BDE9093A76C01142E /* Support Files */,
 				663297DF02F415585D76642D564542DB /* UIKit */,
 			);
-			name = AFNetworking;
 			path = AFNetworking;
 			sourceTree = "<group>";
 		};
@@ -2097,7 +2098,6 @@
 				E7D5B794E164FF1291A8C0CE7575D3B7 /* Resources */,
 				4F971D38825409A767B1CDB85D0D2848 /* Support Files */,
 			);
-			name = TapTalk;
 			path = TapTalk;
 			sourceTree = "<group>";
 		};
@@ -2130,7 +2130,6 @@
 				BC07ACFC14D9210314EB5A048DC8776B /* Core */,
 				BB59DF7972A581968E24FB80D94F8349 /* Support Files */,
 			);
-			name = SDWebImage;
 			path = SDWebImage;
 			sourceTree = "<group>";
 		};
@@ -2234,7 +2233,6 @@
 				B6C7A1E228762214FC8648A70735156D /* Headers */,
 				1C6424E8EC166931DB0369BCD0A011BF /* Support Files */,
 			);
-			name = Realm;
 			path = Realm;
 			sourceTree = "<group>";
 		};
@@ -2258,7 +2256,6 @@
 				48EC40ED167C56C7E8533B1251D4843F /* Resources */,
 				681840BFA3E9CCB08FE8DB0B972DBC90 /* Support Files */,
 			);
-			name = GooglePlaces;
 			path = GooglePlaces;
 			sourceTree = "<group>";
 		};
@@ -2285,7 +2282,6 @@
 				F7CA785F3DD39CF7A873641D4E02B3AC /* ZSWTappableLabel.m */,
 				CD50558FD2BAF887146071FF28B6C7A2 /* Support Files */,
 			);
-			name = ZSWTappableLabel;
 			path = ZSWTappableLabel;
 			sourceTree = "<group>";
 		};
@@ -2430,7 +2426,6 @@
 				696012D12E60C44BFD89D9659AA78369 /* SRWebSocket.m */,
 				D608127F5ACAC6EF84C7AB3392291B85 /* Support Files */,
 			);
-			name = SocketRocket;
 			path = SocketRocket;
 			sourceTree = "<group>";
 		};
@@ -2525,7 +2520,6 @@
 				0D72E5F824BBCA7E8031E9BB229D787F /* PodAsset.m */,
 				16E32AE52EC66DF13048F9341A5FA82C /* Support Files */,
 			);
-			name = PodAsset;
 			path = PodAsset;
 			sourceTree = "<group>";
 		};
@@ -2699,7 +2693,6 @@
 				8BD20E6F1FE1B42AF57276A4D22AF7EE /* JSONValueTransformer.m */,
 				40EA04B0C9B78C17FFE592A7393BE914 /* Support Files */,
 			);
-			name = JSONModel;
 			path = JSONModel;
 			sourceTree = "<group>";
 		};
@@ -2762,7 +2755,6 @@
 				136F751635D8481011A28D7A1E97A758 /* Maps */,
 				8891B3921C4859C92DD640A143875C2B /* Support Files */,
 			);
-			name = GoogleMaps;
 			path = GoogleMaps;
 			sourceTree = "<group>";
 		};
@@ -3346,6 +3338,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				id,
 			);
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
 			productRefGroup = 73C9383589EDE2FEE2BE11247CD5E654 /* Products */;
