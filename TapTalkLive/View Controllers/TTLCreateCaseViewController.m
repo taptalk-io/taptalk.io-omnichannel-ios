@@ -77,13 +77,13 @@
         [self.createCaseView setCreateCaseViewType:TTLCreateCaseViewTypeDefault];
         
         id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
-        if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
-            //Show Close Button
+//        if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
+//            //Show Close Button
             [self.createCaseView showCloseButton:YES];
-        }
-        else {
-            [self.createCaseView showCloseButton:NO];
-        }
+//        }
+//        else {
+//            [self.createCaseView showCloseButton:NO];
+//        }
     }
 
     _topicListDataArray = [[NSArray alloc] init];
@@ -106,7 +106,7 @@
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-//    [self.view endEditing:YES];
+    [self.view endEditing:YES];
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
@@ -223,6 +223,7 @@
 }
 
 #pragma mark - Custom Method
+
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
     [super keyboardWillShowWithHeight:keyboardHeight];
     [UIView animateWithDuration:0.2f animations:^{
@@ -251,6 +252,13 @@
         [tapTalkLiveDelegate didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:self.navigationController];
     }
     else {
+        if (self.closeRoomListWhenCreateCaseIsClosed) {
+            UIViewController *vc = self.presentingViewController;
+            while (vc.presentingViewController) {
+                vc = vc.presentingViewController;
+            }
+            [vc dismissViewControllerAnimated:YES completion:nil];
+        }
         [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
@@ -427,14 +435,14 @@
         [self.createCaseView showCloseButton:NO];
     }
     else {
-        id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
-        if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
+//        id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+//        if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
             //Show Close Button
             [self.createCaseView showCloseButton:YES];
-        }
-        else {
-            [self.createCaseView showCloseButton:NO];
-        }
+//        }
+//        else {
+//            [self.createCaseView showCloseButton:NO];
+//        }
     }
 }
 
