@@ -26,9 +26,9 @@ PODS:
   - Realm (3.13.1):
     - Realm/Headers (= 3.13.1)
   - Realm/Headers (3.13.1)
-  - SDWebImage (4.4.2):
-    - SDWebImage/Core (= 4.4.2)
-  - SDWebImage/Core (4.4.2)
+  - SDWebImage (5.10.2):
+    - SDWebImage/Core (= 5.10.2)
+  - SDWebImage/Core (5.10.2)
   - SocketRocket (0.5.1)
   - TapTalk (1.2.2):
     - AFNetworking (~> 4.0.0)
@@ -46,7 +46,7 @@ DEPENDENCIES:
   - AFNetworking
   - JSONModel (~> 1.1)
   - PodAsset
-  - SDWebImage (= 4.4.2)
+  - SDWebImage
   - TapTalk
 
 SPEC REPOS:
@@ -69,11 +69,11 @@ SPEC CHECKSUMS:
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
   PodAsset: 161b57cdf4d7307b0fb652cccab32fa8d5dc580b
   Realm: 50071da38fe079e0735e47c9f2eae738c68c5996
-  SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
+  SDWebImage: b969dcfc02c40a5da71eac0b03b8f1a0c794a86f
   SocketRocket: d57c7159b83c3c6655745cd15302aa24b6bae531
   TapTalk: c16b436890cdb2e255528bc2ed62ced6ebfbc964
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: 6ea7e14db6aadfa830ebc1e9afd0b01decb2c0c1
+PODFILE CHECKSUM: b550fa92cf86c8f2117b96ac03ba5d84ed060a75
 
 COCOAPODS: 1.10.1

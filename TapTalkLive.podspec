@@ -13,9 +13,7 @@ Pod::Spec.new do |s|
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.authors = { 'Ritchie Nathaniel' => 'ritchie@taptalk.io',
-                  'Dominic Vedericho' => 'dominic@taptalk.io',
-                  'Kevin Reynaldo' => 'kevin@taptalk.io' }
+    s.authors = { 'TapTalk.io' => 'hello@taptalk.io' }
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
@@ -42,7 +40,7 @@ Pod::Spec.new do |s|
     s.dependency "TapTalk"
     s.dependency "AFNetworking"
     s.dependency "JSONModel", "~> 1.1"
-    s.dependency "SDWebImage", "4.4.2"
+    s.dependency "SDWebImage"
     s.dependency "PodAsset"
 
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

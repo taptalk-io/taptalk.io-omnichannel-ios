@@ -7,7 +7,7 @@ def tapTalkLive_pods
   pod 'TapTalk'
   pod 'AFNetworking'
   pod 'JSONModel', '~> 1.1'
-  pod 'SDWebImage', '4.4.2'
+  pod 'SDWebImage'
   pod 'PodAsset'
 end
 
