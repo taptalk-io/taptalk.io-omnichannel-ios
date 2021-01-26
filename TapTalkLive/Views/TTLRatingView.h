@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) TTLFormGrowingTextView *commentTextView;
 @property (strong, nonatomic) TTLCustomButtonView *submitButtonView;
 @property (strong, nonatomic) UIView *containerView;
+@property (strong, nonatomic) UIButton *backgroundDismissButton;
 @property (strong, nonatomic) UIButton *closeButton;
 @property (strong, nonatomic) UIButton *starRating1Button;
 @property (strong, nonatomic) UIButton *starRating2Button;

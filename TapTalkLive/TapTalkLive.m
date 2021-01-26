@@ -274,8 +274,8 @@ Obtain main view controller of TapTalk Live
 - (void)initWithSecretKey:(NSString *_Nonnull)secretKey {
 
     //DV NOTE
-    NSString *apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
-//    https://taplive-api-dev.taptalk.io/api/visitor
+//    NSString *apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
+    NSString *apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor";
 
     [[TTLNetworkManager sharedManager] setSecretKey:secretKey];
     [[TTLAPIManager sharedManager] setBaseAPIURLString:apiURLString];

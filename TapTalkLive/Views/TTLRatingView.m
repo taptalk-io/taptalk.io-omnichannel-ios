@@ -36,6 +36,9 @@
         self.backgroundContainerView.backgroundColor = [[TTLUtil getColor:@"191919"] colorWithAlphaComponent:0.8f];
         [self addSubview:self.backgroundContainerView];
         
+        _backgroundDismissButton = [[UIButton alloc] initWithFrame:self.backgroundContainerView.frame];
+        [self addSubview:self.backgroundDismissButton];
+        
         _containerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight([UIScreen mainScreen].bounds), CGRectGetWidth(self.frame), 0.0f)];
         self.containerView.backgroundColor = [UIColor whiteColor];
         [self addSubview:self.containerView];
