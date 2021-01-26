@@ -82,6 +82,10 @@
     [[TapUI sharedInstance] setMyAccountButtonInRoomListVisible:NO];
     [[TapUI sharedInstance] setNewChatButtonInRoomListVisible:YES];
     
+    // Remove disabled features from chat room
+    [[TapUI sharedInstance] setReplyMessageMenuEnabled:NO];
+    [[TapUI sharedInstance] setForwardMessageMenuEnabled:NO];
+    
     //Add custom bubble cell
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLReviewBubbleTableViewCell" type:3003 delegate:self bundle:[TTLUtil currentBundle]];
