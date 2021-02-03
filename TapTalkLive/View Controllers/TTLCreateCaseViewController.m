@@ -26,6 +26,7 @@
 @property (strong, nonatomic) NSString *obtainedEmailString;
 @property (strong, nonatomic) NSString *obtainedMessageString;
 @property (nonatomic) BOOL isTopicSelected;
+@property (nonatomic) BOOL isKeyboardShown;
 
 - (void)closeButtonDidTapped;
 - (void)doneKeyboardButtonDidTapped;
@@ -226,16 +227,26 @@
 
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
     [super keyboardWillShowWithHeight:keyboardHeight];
+    if (self.isKeyboardShown) {
+        return;
+    }
+    _isKeyboardShown = YES;
     [UIView animateWithDuration:0.2f animations:^{
         self.createCaseView.scrollView.frame = CGRectMake(CGRectGetMinX(self.createCaseView.scrollView.frame), CGRectGetMinY(self.createCaseView.scrollView.frame), CGRectGetWidth(self.createCaseView.scrollView.frame), CGRectGetHeight(self.createCaseView.frame) - keyboardHeight);
     }];
+    [self.createCaseView.scrollView setContentOffset:CGPointMake(self.createCaseView.scrollView.contentOffset.x, self.createCaseView.scrollView.contentOffset.y + keyboardHeight) animated:YES];
 }
 
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
     [super keyboardWillHideWithHeight:keyboardHeight];
+    if (!self.isKeyboardShown) {
+        return;
+    }
+    _isKeyboardShown = NO;
     [UIView animateWithDuration:0.2f animations:^{
         self.createCaseView.scrollView.frame = [TTLBaseView frameWithoutNavigationBar];
     }];
+    [self.createCaseView.scrollView setContentOffset:CGPointMake(self.createCaseView.scrollView.contentOffset.x, self.createCaseView.scrollView.contentOffset.y - keyboardHeight) animated:YES];
 }
 
 - (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {
@@ -280,6 +291,10 @@
                 [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                     //Call API create case
                     [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
+                        
+                        [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+                        [[NSUserDefaults standardUserDefaults] synchronize];
+                        
                         [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
                             if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
                                 self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
@@ -350,6 +365,10 @@
     if (isTapTalkAuthenticate) {
         //Call API create case
         [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
+            
+            [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
             [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
                 if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
                     self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
@@ -387,6 +406,10 @@
             [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                 //Call API create case
                 [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
+                    
+                    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    
                     if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
                         self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
                     }

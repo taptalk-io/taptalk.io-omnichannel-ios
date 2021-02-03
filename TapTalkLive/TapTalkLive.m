@@ -85,6 +85,7 @@
     // Remove disabled features from chat room
     [[TapUI sharedInstance] setReplyMessageMenuEnabled:NO];
     [[TapUI sharedInstance] setForwardMessageMenuEnabled:NO];
+    [[TapUI sharedInstance] setMentionUsernameEnabled:NO];
     
     //Add custom bubble cell
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
