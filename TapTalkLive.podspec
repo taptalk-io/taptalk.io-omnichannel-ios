@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.name         = "TapTalkLive"
-    s.version      = "1.0.2"
+    s.version      = "1.0.6"
     s.summary      = "TapTalk.io Omnichannel Live Chat is a complete omnichannel live char customer service chat SDK and API. Its in-app chat feature give you and your user the best in-app chat experience, it provides you with UI Based implementation and code based implementation and fully customizable."
     s.homepage     = "https://taptalk.io"
 
@@ -13,9 +13,7 @@ Pod::Spec.new do |s|
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.authors = { 'Ritchie Nathaniel' => 'ritchie@taptalk.io',
-                  'Dominic Vedericho' => 'dominic@taptalk.io',
-                  'Kevin Reynaldo' => 'kevin@taptalk.io' }
+    s.authors = { 'TapTalk.io' => 'hello@taptalk.io' }
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
@@ -42,7 +40,7 @@ Pod::Spec.new do |s|
     s.dependency "TapTalk"
     s.dependency "AFNetworking"
     s.dependency "JSONModel", "~> 1.1"
-    s.dependency "SDWebImage", "4.4.2"
+    s.dependency "SDWebImage"
     s.dependency "PodAsset"
 
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -65,5 +63,7 @@ Pod::Spec.new do |s|
     # ――― XCConfig ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     #uncomment to disable bitcode
 #    s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO', 'DEBUG_INFORMATION_FORMAT' => 'dwarf' }
+    s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+    s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
 end

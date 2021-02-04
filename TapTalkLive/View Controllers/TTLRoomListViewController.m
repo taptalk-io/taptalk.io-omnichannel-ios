@@ -16,6 +16,8 @@
 
 - (void)closeButtonDidTapped;
 
+@property (nonatomic) BOOL closeRoomListWhenCreateCaseIsClosed;
+
 @end
 
 @implementation TTLRoomListViewController
@@ -36,16 +38,16 @@
     UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
     
-    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
-    if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:)]) {
-        //Show Close Button
+//    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+//    if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:)]) {
+//        //Show Close Button
         button.alpha = 1.0f;
         button.userInteractionEnabled = YES;
-    }
-    else {
-        button.alpha = 0.0f;
-        button.userInteractionEnabled = NO;
-    }
+//    }
+//    else {
+//        button.alpha = 0.0f;
+//        button.userInteractionEnabled = NO;
+//    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -68,17 +70,14 @@
     }];
 }
 
-
 #pragma mark - Custom Method
 - (void)openCreateCaseFormViewIfNeeded {
     BOOL isContainCaseList = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST valid:nil];
     NSString *currentAccessToken = [TTLDataManager getAccessToken];
     currentAccessToken = [TTLUtil nullToEmptyString:currentAccessToken];
     
-    if ([currentAccessToken isEqualToString:@""]) {
-        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
-    }
-    else if (![currentAccessToken isEqualToString:@""] && !isContainCaseList) {
+    if ([currentAccessToken isEqualToString:@""] || (![currentAccessToken isEqualToString:@""] && !isContainCaseList)) {
+        _closeRoomListWhenCreateCaseIsClosed = YES;
         [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
     }
 }
@@ -90,6 +89,7 @@
     createCaseViewController.previousNavigationController = self.navigationController;
     [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeDefault];
     createCaseViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    createCaseViewController.closeRoomListWhenCreateCaseIsClosed = self.closeRoomListWhenCreateCaseIsClosed;
     UINavigationController *createCaseNavigationController = [[UINavigationController alloc] initWithRootViewController:createCaseViewController];
     createCaseNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [createCaseNavigationController setNavigationBarHidden:YES animated:YES];
@@ -101,6 +101,9 @@
     id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
     if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:)]) {
         [tapTalkLiveDelegate didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:self.navigationController];
+    }
+    else {
+        [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
 

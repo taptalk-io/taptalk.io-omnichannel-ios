@@ -41,10 +41,8 @@
 
 - (void)initialization {
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
-    imageCache.config.maxCacheSize = kMaxDiskCountLimit;
-    imageCache.config.maxCacheAge = kMaxCacheAge;
-//    imageCache.maxCacheSize = kMaxDiskCountLimit;
-//    imageCache.maxCacheAge = kMaxCacheAge;
+    imageCache.config.maxDiskSize = kMaxDiskCountLimit;
+    imageCache.config.maxDiskAge = kMaxCacheAge;
 }
 
 /*

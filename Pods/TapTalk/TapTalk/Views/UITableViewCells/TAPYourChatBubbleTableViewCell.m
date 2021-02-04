@@ -295,6 +295,10 @@
 }
 
 - (void)handlePanGestureAction:(UIPanGestureRecognizer *)recognizer {
+    if (![[TapUI sharedInstance] isReplyMessageMenuEnabled]) {
+        return;
+    }
+    
      if (recognizer.state == UIGestureRecognizerStateBegan) {
             _disableTriggerHapticFeedbackOnDrag = NO;
         }
@@ -540,6 +544,13 @@
             [attributedString addAttributes:attributes range:userRange];
         }
     }
+    
+    // Add line spacing
+    NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+    [style setLineSpacing:self.bubbleLabel.font.pointSize * 0.25f];
+    [attributedString addAttribute:NSParagraphStyleAttributeName
+                             value:style
+                             range:NSMakeRange(0, [attributedString length])];
     
     self.bubbleLabel.attributedText = attributedString;
     

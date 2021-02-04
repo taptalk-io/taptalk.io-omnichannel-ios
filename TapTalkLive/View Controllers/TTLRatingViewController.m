@@ -49,6 +49,7 @@
     self.ratingView.commentTextView.delegate = self;
     self.ratingView.submitButtonView.delegate = self;
     
+    [self.ratingView.backgroundDismissButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.ratingView.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.ratingView.starRating1Button addTarget:self action:@selector(firstStarRatingDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.ratingView.starRating2Button addTarget:self action:@selector(secondStarRatingDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -129,12 +130,18 @@
 
 #pragma mark - Custom Method
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
+    if (self.isKeyboardActive) {
+        return;
+    }
     _isKeyboardActive = YES;
     _keyboardHeight = keyboardHeight;
     self.ratingView.containerView.frame = CGRectMake(CGRectGetMinX(self.ratingView.containerView.frame), CGRectGetMinY(self.ratingView.containerView.frame) - keyboardHeight, CGRectGetWidth(self.ratingView.containerView.frame), CGRectGetHeight(self.ratingView.containerView.frame));
 }
 
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
+    if (!self.isKeyboardActive) {
+        return;
+    }
     _isKeyboardActive = NO;
     _keyboardHeight = keyboardHeight;
     self.ratingView.containerView.frame = CGRectMake(CGRectGetMinX(self.ratingView.containerView.frame), CGRectGetMinY(self.ratingView.containerView.frame) + keyboardHeight, CGRectGetWidth(self.ratingView.containerView.frame), CGRectGetHeight(self.ratingView.containerView.frame));

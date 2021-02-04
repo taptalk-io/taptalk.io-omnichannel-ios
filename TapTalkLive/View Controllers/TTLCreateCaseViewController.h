@@ -19,6 +19,8 @@ typedef NS_ENUM(NSInteger, TTLCreateCaseViewControllerType) {
 
 @property (strong, nonatomic) UINavigationController *previousNavigationController;
 @property (nonatomic) TTLCreateCaseViewControllerType createCaseViewControllerType;
+@property (nonatomic) BOOL closeRoomListWhenCreateCaseIsClosed;
+
 - (void)setCreateCaseViewControllerType:(TTLCreateCaseViewControllerType)createCaseViewControllerType;
 
 @end

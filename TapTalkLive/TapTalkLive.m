@@ -82,6 +82,11 @@
     [[TapUI sharedInstance] setMyAccountButtonInRoomListVisible:NO];
     [[TapUI sharedInstance] setNewChatButtonInRoomListVisible:YES];
     
+    // Remove disabled features from chat room
+    [[TapUI sharedInstance] setReplyMessageMenuEnabled:NO];
+    [[TapUI sharedInstance] setForwardMessageMenuEnabled:NO];
+    [[TapUI sharedInstance] setMentionUsernameEnabled:NO];
+    
     //Add custom bubble cell
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
     [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLReviewBubbleTableViewCell" type:3003 delegate:self bundle:[TTLUtil currentBundle]];
@@ -274,8 +279,8 @@ Obtain main view controller of TapTalk Live
 - (void)initWithSecretKey:(NSString *_Nonnull)secretKey {
 
     //DV NOTE
-    NSString *apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
-//    https://taplive-api-dev.taptalk.io/api/visitor
+//    NSString *apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
+    NSString *apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor";
 
     [[TTLNetworkManager sharedManager] setSecretKey:secretKey];
     [[TTLAPIManager sharedManager] setBaseAPIURLString:apiURLString];

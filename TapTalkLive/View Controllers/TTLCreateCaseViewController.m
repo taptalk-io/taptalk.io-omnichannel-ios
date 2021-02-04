@@ -26,6 +26,7 @@
 @property (strong, nonatomic) NSString *obtainedEmailString;
 @property (strong, nonatomic) NSString *obtainedMessageString;
 @property (nonatomic) BOOL isTopicSelected;
+@property (nonatomic) BOOL isKeyboardShown;
 
 - (void)closeButtonDidTapped;
 - (void)doneKeyboardButtonDidTapped;
@@ -77,13 +78,13 @@
         [self.createCaseView setCreateCaseViewType:TTLCreateCaseViewTypeDefault];
         
         id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
-        if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
-            //Show Close Button
+//        if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
+//            //Show Close Button
             [self.createCaseView showCloseButton:YES];
-        }
-        else {
-            [self.createCaseView showCloseButton:NO];
-        }
+//        }
+//        else {
+//            [self.createCaseView showCloseButton:NO];
+//        }
     }
 
     _topicListDataArray = [[NSArray alloc] init];
@@ -106,7 +107,7 @@
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-//    [self.view endEditing:YES];
+    [self.view endEditing:YES];
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
@@ -223,18 +224,29 @@
 }
 
 #pragma mark - Custom Method
+
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
     [super keyboardWillShowWithHeight:keyboardHeight];
+    if (self.isKeyboardShown) {
+        return;
+    }
+    _isKeyboardShown = YES;
     [UIView animateWithDuration:0.2f animations:^{
         self.createCaseView.scrollView.frame = CGRectMake(CGRectGetMinX(self.createCaseView.scrollView.frame), CGRectGetMinY(self.createCaseView.scrollView.frame), CGRectGetWidth(self.createCaseView.scrollView.frame), CGRectGetHeight(self.createCaseView.frame) - keyboardHeight);
     }];
+    [self.createCaseView.scrollView setContentOffset:CGPointMake(self.createCaseView.scrollView.contentOffset.x, self.createCaseView.scrollView.contentOffset.y + keyboardHeight) animated:YES];
 }
 
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
     [super keyboardWillHideWithHeight:keyboardHeight];
+    if (!self.isKeyboardShown) {
+        return;
+    }
+    _isKeyboardShown = NO;
     [UIView animateWithDuration:0.2f animations:^{
         self.createCaseView.scrollView.frame = [TTLBaseView frameWithoutNavigationBar];
     }];
+    [self.createCaseView.scrollView setContentOffset:CGPointMake(self.createCaseView.scrollView.contentOffset.x, self.createCaseView.scrollView.contentOffset.y - keyboardHeight) animated:YES];
 }
 
 - (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {
@@ -251,6 +263,13 @@
         [tapTalkLiveDelegate didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:self.navigationController];
     }
     else {
+        if (self.closeRoomListWhenCreateCaseIsClosed) {
+            UIViewController *vc = self.presentingViewController;
+            while (vc.presentingViewController) {
+                vc = vc.presentingViewController;
+            }
+            [vc dismissViewControllerAnimated:YES completion:nil];
+        }
         [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
@@ -272,6 +291,10 @@
                 [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                     //Call API create case
                     [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
+                        
+                        [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+                        [[NSUserDefaults standardUserDefaults] synchronize];
+                        
                         [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
                             if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
                                 self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
@@ -342,6 +365,10 @@
     if (isTapTalkAuthenticate) {
         //Call API create case
         [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
+            
+            [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
             [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
                 if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
                     self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
@@ -379,6 +406,10 @@
             [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                 //Call API create case
                 [TTLDataManager callAPICreateCaseWithTopicID:self.selectedTopic.topicID message:self.obtainedMessageString success:^(TTLCaseModel * _Nonnull caseData) {
+                    
+                    [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    
                     if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
                         self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
                     }
@@ -427,14 +458,14 @@
         [self.createCaseView showCloseButton:NO];
     }
     else {
-        id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
-        if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
+//        id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+//        if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
             //Show Close Button
             [self.createCaseView showCloseButton:YES];
-        }
-        else {
-            [self.createCaseView showCloseButton:NO];
-        }
+//        }
+//        else {
+//            [self.createCaseView showCloseButton:NO];
+//        }
     }
 }
 

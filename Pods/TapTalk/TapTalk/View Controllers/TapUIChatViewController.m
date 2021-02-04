@@ -163,6 +163,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) CGFloat keyboardHeight;
 @property (nonatomic) CGFloat lastKeyboardHeight;
 @property (nonatomic) CGFloat initialKeyboardHeight;
+@property (nonatomic) CGFloat hiddenKeyboardHeight; // Used to fix table view content inset when scroll view is dragged
 @property (nonatomic) CGFloat currentInputAccessoryExtensionHeight;
 
 @property (nonatomic) long apiBeforeLastCreated;
@@ -502,7 +503,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.textViewBorderView.layer.borderWidth = 1.0f;
     self.textViewBorderView.clipsToBounds = YES;
     self.messageTextView.minimumHeight = 32.0f;
-    self.messageTextView.maximumHeight = 64.0f;
+    self.messageTextView.maximumHeight = 120.0f;
         
     if (IS_IPHONE_X_FAMILY) {
         self.chatAnchorButtonBottomConstrait.constant = kChatAnchorDefaultBottomConstraint + self.safeAreaBottomPadding;
@@ -766,6 +767,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         
         [UIView performWithoutAnimation:^{
             [self.messageTextView resignFirstResponder];
+            [self keyboardWillHideWithHeight:0.0f];
         }];
         _isKeyboardShowed = NO;
     }
@@ -849,6 +851,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //Override present view controller method to resign keyboard before presenting view controller from Chat Room to avoid keyboard accessory missing after VC presented from Chat Room
     [self.secondaryTextField resignFirstResponder];
     [self.messageTextView resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     [super presentViewController:viewControllerToPresent animated:flag completion:completion];
 }
 
@@ -875,6 +878,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (tableView == self.mentionListTableView && self.currentRoom.type != RoomTypePersonal) {
+        if (![[TapUI sharedInstance] isMentionUsernameEnabled]) {
+            return 0;
+        }
         return [self.filteredMentionListArray count];
     }
     
@@ -954,7 +960,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (tableView == self.mentionListTableView) {
+    if (tableView == self.mentionListTableView && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
         return 10.0f;
     }
 
@@ -962,7 +968,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    if (tableView == self.mentionListTableView) {
+    if (tableView == self.mentionListTableView && [[TapUI sharedInstance] isMentionUsernameEnabled]) {
         UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 10.0f)];
         view.layer.cornerRadius = 15.0f;
         view.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
@@ -1046,9 +1052,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
 
                     cell.message = message;
@@ -1076,10 +1084,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.userInteractionEnabled = YES;
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
-
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     cell.message = message;
@@ -1134,9 +1144,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.delegate = self;
                     cell.message = message;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     if (!message.isHidden) {
@@ -1361,9 +1373,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     cell.message = message;
@@ -1392,9 +1406,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     cell.message = message;
@@ -1429,9 +1445,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.contentView.userInteractionEnabled = YES;
                     cell.delegate = self;
                     
-                    NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
-                    if ([mentionArray count] > 0) {
-                        cell.mentionIndexesArray = mentionArray;
+                    if ([[TapUI sharedInstance] isMentionUsernameEnabled]) {
+                        NSArray *mentionArray = [self.mentionIndexesDictionary objectForKey:message.localID];
+                        if ([mentionArray count] > 0) {
+                            cell.mentionIndexesArray = mentionArray;
+                        }
                     }
                     
                     cell.message = message;
@@ -1743,8 +1761,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 //            self.mentionAnchorButtonBottomConstrait.constant = 0.0f;
 //            self.mentionAnchorBackgroundViewBottomConstrait.constant = 0.0f;
 //        }
-        
-        CGFloat tableViewYContentInset = self.keyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
+        CGFloat currentKeyboardHeight;
+        if (self.isKeyboardShowed) {
+            currentKeyboardHeight = self.keyboardHeight;
+        }
+        else {
+            currentKeyboardHeight = self.hiddenKeyboardHeight;
+        }
+        CGFloat tableViewYContentInset = currentKeyboardHeight - [TAPUtil safeAreaBottomPadding] - kInputMessageAccessoryViewHeight;
         
         self.tableView.contentInset = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.contentInset.left, self.tableView.contentInset.bottom, self.tableView.contentInset.right);
         self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(tableViewYContentInset, self.tableView.scrollIndicatorInsets.left, self.tableView.scrollIndicatorInsets.bottom, self.tableView.scrollIndicatorInsets.right);
@@ -1762,8 +1786,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     if (scrollView == self.mentionListTableView) {
         return;
     }
-    
-    NSLog(@"===================== SCROLL VIEW CONTENT OFFSET: %f TABLE VIEW OFFSET: %f", scrollView.contentOffset.y, self.tableView.contentOffset.y);
     
     if (scrollView.contentOffset.y > kShowChatAnchorOffset) {
         
@@ -2434,11 +2456,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -2451,6 +2479,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -2653,6 +2682,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
     _isShowAccessoryView = NO;
     [self reloadInputViews];
@@ -2837,11 +2867,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -2854,6 +2890,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -3508,11 +3545,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -3525,6 +3568,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -3831,11 +3875,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -3848,6 +3898,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -3998,6 +4049,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell {
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
     _isShowAccessoryView = NO;
     [self reloadInputViews];
@@ -4193,11 +4245,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -4210,6 +4268,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -4725,11 +4784,17 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if (![usernameWithoutPrefix isEqualToString:[TAPDataManager getActiveUser].username]) {
         //Selected mention is not ours, show other option besides copy
-        [alertController addAction:viewProfileAction];
-        [alertController addAction:sendMessageAction];
+        if ([[TapUI sharedInstance] isViewProfileMenuEnabled]) {
+            [alertController addAction:viewProfileAction];
+        }
+        if ([[TapUI sharedInstance] isSendMessageMenuEnabled]) {
+            [alertController addAction:sendMessageAction];
+        }
     }
     
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -4742,6 +4807,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -5418,6 +5484,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
     if (isGroup) {
         if (isGroupDeleted) {
@@ -5482,6 +5549,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)checkAndSetupAddToContactsView {
+    if (![[TapUI sharedInstance] isAddContactEnabled] || ![[TapUI sharedInstance] getAddToContactsButtonInChatRoomVisibleState]) {
+        return;
+    }
     //Setup Add to Contacts View
     UIFont *clickableLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontClickableLabel];
     UIColor *clickableLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorClickableLabel];
@@ -6184,11 +6254,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [locationAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
     
-    [alertController addAction:documentsAction];
-    [alertController addAction:cameraAction];
-    [alertController addAction:galleryAction];
+    if ([[TapUI sharedInstance] isDocumentAttachmentEnabled]) {
+        [alertController addAction:documentsAction];
+    }
+    if ([[TapUI sharedInstance] isCameraAttachmentEnabled]) {
+        [alertController addAction:cameraAction];
+    }
+    if ([[TapUI sharedInstance] isGalleryAttachmentEnabled]) {
+        [alertController addAction:galleryAction];
+    }
     
-    if ([[TapTalk sharedInstance] obtainGooglePlacesAPIInitializeState]) {
+    if ([[TapTalk sharedInstance] obtainGooglePlacesAPIInitializeState] &&
+        [[TapUI sharedInstance] isLocationAttachmentEnabled]
+    ) {
         //Only show when Google Places API Key is insert
         [alertController addAction:locationAction];
     }
@@ -6205,6 +6283,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -6482,8 +6561,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
         [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
         
-        [alertController addAction:composeAction];
-        [alertController addAction:copyAction];
+        if ([[TapUI sharedInstance] isComposeEmailMenuEnabled]) {
+            [alertController addAction:composeAction];
+        }
+        if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+            [alertController addAction:copyAction];
+        }
         [alertController addAction:cancelAction];
         
         if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -6496,6 +6579,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [UIView animateWithDuration:0.2f animations:^{
             [self.messageTextView resignFirstResponder];
             [self.secondaryTextField resignFirstResponder];
+            [self keyboardWillHideWithHeight:0.0f];
         } completion:^(BOOL finished) {
             [self presentViewController:alertController animated:YES completion:^{
                 //after animation
@@ -6556,8 +6640,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
         [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
         
-        [alertController addAction:openAction];
-        [alertController addAction:copyAction];
+        if ([[TapUI sharedInstance] isOpenLinkMenuEnabled]) {
+            [alertController addAction:openAction];
+        }
+        if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+            [alertController addAction:copyAction];
+        }
         [alertController addAction:cancelAction];
         
         if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -6570,6 +6658,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [UIView animateWithDuration:0.2f animations:^{
             [self.messageTextView resignFirstResponder];
             [self.secondaryTextField resignFirstResponder];
+            [self keyboardWillHideWithHeight:0.0f];
         } completion:^(BOOL finished) {
             [self presentViewController:alertController animated:YES completion:^{
                 //after animation
@@ -6657,9 +6746,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [copyAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
     
-    [alertController addAction:callAction];
-    [alertController addAction:smsAction];
-    [alertController addAction:copyAction];
+    if ([[TapUI sharedInstance] isDialNumberMenuEnabled]) {
+        [alertController addAction:callAction];
+    }
+    if ([[TapUI sharedInstance] isSendSMSMenuEnabled]) {
+        [alertController addAction:smsAction];
+    }
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled]) {
+        [alertController addAction:copyAction];
+    }
     [alertController addAction:cancelAction];
     
     if (self.secondaryTextField.isFirstResponder || self.messageTextView.isFirstResponder) {
@@ -6672,6 +6767,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -6707,6 +6803,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                                  //CS NOTE - add resign first responder before every pushVC to handle keyboard height
                                                  [self.messageTextView resignFirstResponder];
                                                  [self.secondaryTextField resignFirstResponder];
+                                                 [self keyboardWillHideWithHeight:0.0f];
                                                  [self.navigationController pushViewController:webViewController animated:YES];
                                              }
                                          }];
@@ -6958,20 +7055,22 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [deleteMessageAction setValue:actionSheetDestructiveColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
     
-    [alertController addAction:replyAction];
+    if ([[TapUI sharedInstance] isReplyMessageMenuEnabled]) {
+        [alertController addAction:replyAction];
+    }
     
-    if ((message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) && message.room.type != RoomTypeTransaction) {
+    if ([[TapUI sharedInstance] isForwardMessageMenuEnabled] && ((message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLocation) && message.room.type != RoomTypeTransaction)) {
         //DV Temp
         //Show forward action for text and location only (temporary)
         [alertController addAction:forwardAction];
     }
     
-    if (message.type == TAPChatMessageTypeText) {
+    if ([[TapUI sharedInstance] isCopyMessageMenuEnabled] && message.type == TAPChatMessageTypeText) {
         //Show copy action for chat type text only
         [alertController addAction:copyAction];
     }
     
-    if (message.type == TAPChatMessageTypeImage) {
+    if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeImage) {
         //check already downloaded or not
         NSString *roomID = message.room.roomID;
         NSString *fileID = [message.data objectForKey:@"fileID"];
@@ -6986,7 +7085,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     
-    if (message.type == TAPChatMessageTypeVideo) {
+    if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeVideo) {
         //check already downloaded or not
         NSString *roomID = message.room.roomID;
         NSString *fileID = [message.data objectForKey:@"fileID"];
@@ -7000,7 +7099,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     
-    if ([message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isSending) {
+    if ([[TapUI sharedInstance] isDeleteMessageMenuEnabled] && [message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isSending) {
         //Show delete message for our bubble (my bubble) only
         [alertController addAction:deleteMessageAction];
     }
@@ -7017,6 +7116,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [UIView animateWithDuration:0.2f animations:^{
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
     } completion:^(BOOL finished) {
         [self presentViewController:alertController animated:YES completion:^{
             //after animation
@@ -7140,12 +7240,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         else {
             self.inputAccessoryExtensionHeightConstraint.constant = self.currentInputAccessoryExtensionHeight;
         }
+        
+        if (self.isKeyboardShowed) {
+            [self keyboardWillShowWithHeight:self.keyboardHeight];
+        }
+        else {
+            [self keyboardWillHideWithHeight:self.keyboardHeight];
+        }
     }
     else {
         _currentInputAccessoryExtensionHeight = 0.0f;
         
         if (self.isKeyboardShowed) {
-            _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight + self.initialKeyboardHeight;
+            _keyboardHeight = /*kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding +*/ self.currentInputAccessoryExtensionHeight + self.initialKeyboardHeight;
         }
         else {
             _keyboardHeight = kInputMessageAccessoryViewHeight + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
@@ -7165,6 +7272,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         if (self.isInputAccessoryExtensionShowedFirstTimeOpen) {
             _initialKeyboardHeight = 0.0f;
             _isInputAccessoryExtensionShowedFirstTimeOpen = NO;
+        }
+        
+        if (self.isKeyboardShowed) {
+            [self keyboardWillShowWithHeight:self.keyboardHeight];
+        }
+        else {
+            [self keyboardWillHideWithHeight:self.keyboardHeight];
         }
     }
 }
@@ -8269,6 +8383,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight {
     if(!self.isKeyboardShowedForFirstTime) {
         _isKeyboardShowedForFirstTime = YES;
+        
+        return;
+    }
+    
+    keyboardHeight = CGRectGetHeight([UIScreen mainScreen].bounds) - [self.inputMessageAccessoryView.superview convertPoint:self.inputMessageAccessoryView.frame.origin toView:nil].y;
+    
+    if (keyboardHeight < 0) {
+        return;
     }
     
     if (self.isKeyboardOptionTapped && self.isKeyboardShowed) {
@@ -8320,14 +8442,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }
     }
     CGFloat tempHeight = 0.0f;
-    if (keyboardHeight > self.keyboardHeight) {
+//    if (keyboardHeight > self.keyboardHeight) {
         //set keyboardHeight if height != accessoryViewAndSafeAreaHeight && keyboardHeight == initialKeyboardHeight
-        if (keyboardHeight != accessoryViewAndSafeAreaHeight && keyboardHeight == self.initialKeyboardHeight) {
+//        if (keyboardHeight != accessoryViewAndSafeAreaHeight && keyboardHeight == self.initialKeyboardHeight) {
             tempHeight = self.keyboardHeight;
             _lastKeyboardHeight = self.keyboardHeight;
             _keyboardHeight = keyboardHeight;
-        }
-    }
+//        }
+//    }
     
     //handle change keyboard height if keyboard is change to emoji
     if (keyboardHeight > self.initialKeyboardHeight && keyboardHeight != accessoryViewAndSafeAreaHeight) {
@@ -8450,6 +8572,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //set default keyboard height including accessory view height
     _keyboardHeight = self.messageViewHeightConstraint.constant + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
+    _hiddenKeyboardHeight = self.messageViewHeightConstraint.constant + self.safeAreaBottomPadding + self.currentInputAccessoryExtensionHeight;
     
     //reject if scrollView is being dragged
     if (self.isScrollViewDragged) {
@@ -8558,6 +8681,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if (self.isKeyboardShowed) {
                 [UIView performWithoutAnimation:^{
                     [self.messageTextView resignFirstResponder];
+                    [self keyboardWillHideWithHeight:0.0f];
                     [self.secondaryTextField becomeFirstResponder];
                 }];
             }
@@ -8576,6 +8700,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if (self.isKeyboardShowed) {
                 [UIView performWithoutAnimation:^{
                     [self.secondaryTextField resignFirstResponder];
+                    [self keyboardWillHideWithHeight:0.0f];
                     [self.messageTextView becameFirstResponder];
                 }];
             }
@@ -8648,6 +8773,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     [self hideInputAccessoryView];
     TAPUserModel *user = nil;
     user = [self.participantListDictionary objectForKey:username];
@@ -8763,6 +8889,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)showMentionListView:(BOOL)show animated:(BOOL)animated {
+    if (![[TapUI sharedInstance] isMentionUsernameEnabled]) {
+        return;
+    }
     if (show) {
         if (animated) {
             [UIView animateWithDuration:0.2f animations:^{
@@ -8822,6 +8951,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //CS NOTE - add resign first responder before every pushVC to handle keyboard height
         [self.messageTextView resignFirstResponder];
         [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
         [self hideInputAccessoryView];
         
         TAPProfileViewController *profileViewController = [[TAPProfileViewController alloc] init];
@@ -8849,6 +8979,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             //CS NOTE - add resign first responder before every pushVC to handle keyboard height
             [self.messageTextView resignFirstResponder];
             [self.secondaryTextField resignFirstResponder];
+            [self keyboardWillHideWithHeight:0.0f];
             [self hideInputAccessoryView];
             
             [self showMentionLoadingView:YES];
@@ -9244,6 +9375,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //CS NOTE - add resign first responder before every pushVC to handle keyboard height
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
     if (self.currentRoom.type == RoomTypePersonal) {
         id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
@@ -9298,6 +9430,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     //CS NOTE - add resign first responder before every pushVC to handle keyboard height
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
     
    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomProfileButtonTapped:otherUser:room:currentShownNavigationController:)]) {
        [tapUIChatRoomDelegate tapTalkChatRoomProfileButtonTapped:self otherUser:otherUser room:self.currentRoom currentShownNavigationController:self.navigationController];
@@ -9335,6 +9468,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     [self.messageTextView resignFirstResponder];
     [self.secondaryTextField resignFirstResponder];
+    [self keyboardWillHideWithHeight:0.0f];
+    [self.view endEditing:YES];
+    [self.view layoutIfNeeded];
 }
 
 - (IBAction)chatAnchorButtonDidTapped:(id)sender {
@@ -9520,7 +9656,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 - (void)isShowOnlineDotStatus:(BOOL)isShow {
     if (isShow) {
-        self.userStatusView.frame = CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f);
+//        self.userStatusView.frame = CGRectMake(0.0f, (16.0f - 7.0f) / 2.0f + 1.6f, 7.0f, 7.0f);
+        self.userStatusView.frame = CGRectMake(0.0f, (CGRectGetHeight(self.userStatusLabel.frame) - 7.0f) / 2.0f - 1.0f + 1.6f, 7.0f, 7.0f);
         self.userStatusView.alpha = 1.0f;
         self.userStatusLabel.frame = CGRectMake(CGRectGetMaxX(self.userStatusView.frame) + 4.0f, 0.0f, 0.0f, 16.0f);
     }

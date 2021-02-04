@@ -24,6 +24,29 @@
 @property (nonatomic) BOOL hideSetupLoadingViewFlow;
 @property (nonatomic) BOOL hideReadStatus;
 
+@property (nonatomic) BOOL isCloseRoomListButtonVisible;
+//@property (nonatomic) BOOL isConnectionStatusIndicatorHidden;
+@property (nonatomic) BOOL isDocumentAttachmentDisabled;
+@property (nonatomic) BOOL isCameraAttachmentDisabled;
+@property (nonatomic) BOOL isGalleryAttachmentDisabled;
+@property (nonatomic) BOOL isLocationAttachmentDisabled;
+@property (nonatomic) BOOL isReplyMessageMenuDisabled;
+@property (nonatomic) BOOL isForwardMessageMenuDisabled;
+@property (nonatomic) BOOL isCopyMessageMenuDisabled;
+@property (nonatomic) BOOL isDeleteMessageMenuDisabled;
+@property (nonatomic) BOOL isSaveMediaToGalleryMenuDisabled;
+@property (nonatomic) BOOL isSaveDocumentMenuDisabled;
+@property (nonatomic) BOOL isOpenLinkMenuDisabled;
+@property (nonatomic) BOOL isComposeEmailMenuDisabled;
+@property (nonatomic) BOOL isDialNumberMenuDisabled;
+@property (nonatomic) BOOL isSendSMSMenuDisabled;
+@property (nonatomic) BOOL isViewProfileMenuDisabled;
+@property (nonatomic) BOOL isSendMessageMenuDisabled;
+@property (nonatomic) BOOL isMentionUsernameDisabled;
+@property (nonatomic) BOOL isAddToContactsButtonInChatRoomHidden;
+@property (nonatomic) BOOL isAddToContactsButtonInChatProfileHidden;
+@property (nonatomic) BOOL isAddContactDisabled;
+
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
 @end
@@ -476,6 +499,299 @@ Get current state of hide read status
 */
 - (BOOL)getReadStatusHiddenState {
     return self.hideReadStatus;
+}
+
+/**
+Show or hide close button in room list
+*/
+- (void)setCloseRoomListButtonVisible:(BOOL)isVisible {
+    _isCloseRoomListButtonVisible = isVisible;
+}
+
+/**
+Get current visibility state of close button in room list
+*/
+- (BOOL)getCloseRoomListButtonVisibleState {
+    return self.isCloseRoomListButtonVisible;
+}
+/**
+Show or hide document attachment in chat room
+*/
+- (void)setDocumentAttachmentEnabled:(BOOL)isEnabled {
+    _isDocumentAttachmentDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of document attachment in chat room
+*/
+- (BOOL)isDocumentAttachmentEnabled {
+    return !self.isDocumentAttachmentDisabled;
+}
+
+/**
+Show or hide camera attachment in chat room
+*/
+- (void)setCameraAttachmentEnabled:(BOOL)isEnabled {
+    _isCameraAttachmentDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of camera attachment in chat room
+*/
+- (BOOL)isCameraAttachmentEnabled {
+    return !self.isCameraAttachmentDisabled;
+}
+
+/**
+Show or hide gallery attachment in chat room
+*/
+- (void)setGalleryAttachmentEnabled:(BOOL)isEnabled {
+    _isGalleryAttachmentDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of gallery attachment in chat room
+*/
+- (BOOL)isGalleryAttachmentEnabled {
+    return !self.isGalleryAttachmentDisabled;
+}
+
+/**
+Show or hide location attachment in chat room
+*/
+- (void)setLocationAttachmentEnabled:(BOOL)isEnabled {
+    _isLocationAttachmentDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of location attachment in chat room
+*/
+- (BOOL)isLocationAttachmentEnabled {
+    return !self.isLocationAttachmentDisabled;
+}
+
+/**
+Show or hide reply message long press menu in chat room
+*/
+- (void)setReplyMessageMenuEnabled:(BOOL)isEnabled {
+    _isReplyMessageMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of reply message long press menu in chat room
+*/
+- (BOOL)isReplyMessageMenuEnabled {
+    return !self.isReplyMessageMenuDisabled;
+}
+
+/**
+Show or hide forward message long press menu in chat room
+*/
+- (void)setForwardMessageMenuEnabled:(BOOL)isEnabled {
+    _isForwardMessageMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of forward message long press menu in chat room
+*/
+- (BOOL)isForwardMessageMenuEnabled {
+    return !self.isForwardMessageMenuDisabled;
+}
+
+/**
+Show or hide copy message long press menu in chat room
+*/
+- (void)setCopyMessageMenuEnabled:(BOOL)isEnabled {
+    _isCopyMessageMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of copy message long press menu in chat room
+*/
+- (BOOL)isCopyMessageMenuEnabled {
+    return !self.isCopyMessageMenuDisabled;
+}
+
+/**
+Show or hide delete message long press menu in chat room
+*/
+- (void)setDeleteMessageMenuEnabled:(BOOL)isEnabled {
+    _isDeleteMessageMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of delete message long press menu in chat room
+*/
+- (BOOL)isDeleteMessageMenuEnabled {
+    return !self.isDeleteMessageMenuDisabled;
+}
+
+/**
+Show or hide save media long press menu in chat room
+*/
+- (void)setSaveMediaToGalleryMenuEnabled:(BOOL)isEnabled {
+    _isSaveMediaToGalleryMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of save media long press menu in chat room
+*/
+- (BOOL)isSaveMediaToGalleryMenuEnabled {
+    return !self.isSaveMediaToGalleryMenuDisabled;
+}
+
+/**
+Show or hide save document long press menu in chat room
+*/
+- (void)setSaveDocumentMenuEnabled:(BOOL)isEnabled {
+    _isSaveDocumentMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of save document long press menu in chat room
+*/
+- (BOOL)isSaveDocumentMenuEnabled {
+    return !self.isSaveDocumentMenuDisabled;
+}
+
+/**
+Show or hide open link long press menu in chat room
+*/
+- (void)setOpenLinkMenuEnabled:(BOOL)isEnabled {
+    _isOpenLinkMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of open link long press menu in chat room
+*/
+- (BOOL)isOpenLinkMenuEnabled {
+    return !self.isOpenLinkMenuDisabled;
+}
+
+/**
+Show or hide compose email long press menu in chat room
+*/
+- (void)setComposeEmailMenuEnabled:(BOOL)isEnabled {
+    _isComposeEmailMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of compose email long press menu in chat room
+*/
+- (BOOL)isComposeEmailMenuEnabled {
+    return !self.isComposeEmailMenuDisabled;
+}
+
+/**
+Show or hide dial number long press menu in chat room
+*/
+- (void)setDialNumberMenuEnabled:(BOOL)isEnabled {
+    _isDialNumberMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of dial number long press menu in chat room
+*/
+- (BOOL)isDialNumberMenuEnabled {
+    return !self.isDialNumberMenuDisabled;
+}
+
+/**
+Show or hide send SMS long press menu in chat room
+*/
+- (void)setSendSMSMenuEnabled:(BOOL)isEnabled {
+    _isSendSMSMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of send SMS long press menu in chat room
+*/
+- (BOOL)isSendSMSMenuEnabled {
+    return !self.isSendSMSMenuDisabled;
+}
+
+/**
+Show or hide view profile long press menu in chat room
+*/
+- (void)setViewProfileMenuEnabled:(BOOL)isEnabled {
+    _isViewProfileMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of view profile long press menu in chat room
+*/
+- (BOOL)isViewProfileMenuEnabled {
+    return !self.isViewProfileMenuDisabled;
+}
+
+/**
+Show or hide send message long press menu in chat room
+*/
+- (void)setSendMessageMenuEnabled:(BOOL)isEnabled {
+    _isSendMessageMenuDisabled = !isEnabled;
+}
+
+/**
+Get current visibility state of send message long press menu in chat room
+*/
+- (BOOL)isSendMessageMenuEnabled {
+    return !self.isSendMessageMenuDisabled;
+}
+
+/**
+Enable or disable mention username in chat room
+*/
+- (void)setMentionUsernameEnabled:(BOOL)isEnabled {
+    _isMentionUsernameDisabled = !isEnabled;
+}
+
+/**
+Get current status of mention username
+*/
+- (BOOL)isMentionUsernameEnabled {
+    return !self.isMentionUsernameDisabled;
+}
+
+/**
+Show or hide add to contacts button in chat room
+*/
+- (void)setAddToContactsButtonInChatRoomVisible:(BOOL)isVisible {
+    _isAddToContactsButtonInChatRoomHidden = !isVisible;
+}
+
+/**
+Get current visibility state of add to contacts button in chat room
+*/
+- (BOOL)getAddToContactsButtonInChatRoomVisibleState {
+    return !self.isAddToContactsButtonInChatRoomHidden;
+}
+
+/**
+Show or hide add to contacts button in user / group profile
+*/
+- (void)setAddToContactsButtonInChatProfileVisible:(BOOL)isVisible {
+    _isAddToContactsButtonInChatProfileHidden = !isVisible;
+}
+
+/**
+Get current visibility state of add to contacts button in user / group profile
+*/
+- (BOOL)getAddToContactsButtonInChatProfileVisibleState {
+    return !self.isAddToContactsButtonInChatProfileHidden;
+}
+
+/**
+Enable or disable adding contacts & contact list
+*/
+- (void)setAddContactEnabled:(BOOL)isEnabled {
+    _isAddContactDisabled = !isEnabled;
+}
+
+/**
+Get current status of adding contacts & contact list
+*/
+- (BOOL)isAddContactEnabled {
+    return !self.isAddContactDisabled;
 }
 
 @end
