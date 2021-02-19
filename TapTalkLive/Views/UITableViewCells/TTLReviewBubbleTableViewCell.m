@@ -88,7 +88,7 @@
     self.doneReviewLabel.textColor = inactiveButtonColor;
     self.doneReviewView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonInactiveBackgroundGradientLight];
     
-    self.doneReviewIconImageView.image = [UIImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
+    self.doneReviewIconImageView.image = [UIImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     TTLImage *checkIconImage = self.doneReviewIconImageView.image;
     checkIconImage = [checkIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconReviewBubbleCellDoneReviewCheck]];
     self.doneReviewIconImageView.image = checkIconImage;

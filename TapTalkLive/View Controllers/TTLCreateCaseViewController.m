@@ -102,17 +102,11 @@
 
 #pragma mark - Delegate
 #pragma mark UIScrollView
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    
-}
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     [self.view endEditing:YES];
 }
 
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    
-}
 
 #pragma mark TTLCustomTextFieldView
 - (BOOL)customTextFieldViewTextFieldShouldReturn:(UITextField *)textField {
@@ -231,10 +225,21 @@
         return;
     }
     _isKeyboardShown = YES;
+    CGFloat containerViewDistanceToBottom = CGRectGetHeight([UIScreen mainScreen].bounds) - [self.createCaseView.formContainerView.superview convertPoint:self.createCaseView.formContainerView.frame.origin toView:nil].y - CGRectGetHeight(self.createCaseView.formContainerView.frame);
+    if (containerViewDistanceToBottom < 0.0f) {
+        containerViewDistanceToBottom = 0.0f;
+    }
+    CGFloat yDifference;
+    if (containerViewDistanceToBottom > keyboardHeight) {
+        yDifference = 0.0f;
+    }
+    else {
+        yDifference = keyboardHeight - containerViewDistanceToBottom;
+    }
     [UIView animateWithDuration:0.2f animations:^{
-        self.createCaseView.scrollView.frame = CGRectMake(CGRectGetMinX(self.createCaseView.scrollView.frame), CGRectGetMinY(self.createCaseView.scrollView.frame), CGRectGetWidth(self.createCaseView.scrollView.frame), CGRectGetHeight(self.createCaseView.frame) - keyboardHeight);
+        self.createCaseView.scrollView.frame = CGRectMake(CGRectGetMinX(self.createCaseView.scrollView.frame), CGRectGetMinY(self.createCaseView.scrollView.frame), CGRectGetWidth(self.createCaseView.scrollView.frame), CGRectGetHeight(self.createCaseView.frame) - yDifference);
     }];
-    [self.createCaseView.scrollView setContentOffset:CGPointMake(self.createCaseView.scrollView.contentOffset.x, self.createCaseView.scrollView.contentOffset.y + keyboardHeight) animated:YES];
+    [self.createCaseView.scrollView setContentOffset:CGPointMake(self.createCaseView.scrollView.contentOffset.x, self.createCaseView.scrollView.contentOffset.y + yDifference) animated:YES];
 }
 
 - (void)keyboardWillHideWithHeight:(CGFloat)keyboardHeight {
@@ -246,7 +251,7 @@
     [UIView animateWithDuration:0.2f animations:^{
         self.createCaseView.scrollView.frame = [TTLBaseView frameWithoutNavigationBar];
     }];
-    [self.createCaseView.scrollView setContentOffset:CGPointMake(self.createCaseView.scrollView.contentOffset.x, self.createCaseView.scrollView.contentOffset.y - keyboardHeight) animated:YES];
+    [self.createCaseView.scrollView setContentOffset:CGPointMake(self.createCaseView.scrollView.contentOffset.x, 0.0f) animated:YES];
 }
 
 - (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {

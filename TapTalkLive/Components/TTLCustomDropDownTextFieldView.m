@@ -59,13 +59,13 @@
         [self addSubview:self.containerView];
         
         _arrowImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.containerView.frame) - 24.0f - 16.0f, (CGRectGetHeight(self.containerView.frame) - 24.0f) / 2.0f, 24.0f, 24.0f)];
-        self.arrowImageView.image = [UIImage imageNamed:@"TTLIconArrowDown" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
+        self.arrowImageView.image = [UIImage imageNamed:@"TTLIconArrowDown" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         self.arrowImageView.clipsToBounds = YES;
         self.arrowImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.containerView addSubview:self.arrowImageView];
         
         _loadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.containerView.frame) - 24.0f - 16.0f, (CGRectGetHeight(self.containerView.frame) - 24.0f) / 2.0f, 24.0f, 24.0f)];
-        self.loadingImageView.image = [UIImage imageNamed:@"TTLIconLoaderProgress" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
+        self.loadingImageView.image = [UIImage imageNamed:@"TTLIconLoaderProgress" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         self.loadingImageView.clipsToBounds = YES;
         self.loadingImageView.contentMode = UIViewContentModeScaleAspectFit;
         self.loadingImageView.alpha = 0.0f;

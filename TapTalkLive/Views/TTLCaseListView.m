@@ -43,7 +43,7 @@
         [self addSubview:self.closeButtonContainerView];
         
         _closeImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.closeButtonContainerView.frame) - 24.0f) / 2.0f, (CGRectGetHeight(self.closeButtonContainerView.frame) - 24.0f) / 2.0f, 24.0f, 24.0f)];
-        self.closeImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
+        self.closeImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         TTLImage *closeIconImage = self.closeImageView.image;
         closeIconImage = [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
         self.closeImageView.image = closeIconImage;

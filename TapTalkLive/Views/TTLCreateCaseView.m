@@ -17,7 +17,6 @@
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *subtitleLabel;
 @property (strong, nonatomic) UIView *formHeaderContainerView;
-@property (strong, nonatomic) UIView *formContainerView;
 
 @property (nonatomic) CGFloat messageTextViewHeight;
 
@@ -62,9 +61,9 @@
         [self.headerView addSubview:self.logoImageView];
         
         _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 24.0f, CGRectGetMinY(self.logoImageView.frame) + 12.0f, 24.0f, 24.0f)];
-        self.closeImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
-        TTLImage *closeIconImage = self.closeImageView.image;
-        closeIconImage = [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
+        self.closeImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        TTLImage *closeIconImage = (TTLImage *) self.closeImageView.image;
+        closeIconImage = (TTLImage *) [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
         self.closeImageView.image = closeIconImage;
         self.closeImageView.alpha = 0.0f;
         [self.headerView addSubview:self.closeImageView];
@@ -75,9 +74,9 @@
         [self.headerView addSubview:self.closeButton];
         
         _leftCloseImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(12.0f, topGap + 16.0f, 24.0f, 24.0f)];
-        self.leftCloseImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] withConfiguration:nil];
-        TTLImage *leftCloseIconImage = self.leftCloseImageView.image;
-        leftCloseIconImage = [leftCloseIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
+        self.leftCloseImageView.image = (TTLImage *) [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        TTLImage *leftCloseIconImage = (TTLImage *) self.leftCloseImageView.image;
+        leftCloseIconImage = (TTLImage *) [leftCloseIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
         self.leftCloseImageView.image = leftCloseIconImage;
         self.leftCloseImageView.alpha = 0.0f;
         [self.headerView addSubview:self.leftCloseImageView];

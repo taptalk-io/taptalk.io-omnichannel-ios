@@ -42,8 +42,8 @@
         [self addSubview:self.buttonContainerView];
         
         _buttonIconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 32.0f, 32.0f)];
-        TTLImage *buttonIconImage = self.buttonIconImageView.image;
-        buttonIconImage = [buttonIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
+        TTLImage *buttonIconImage = (TTLImage *) self.buttonIconImageView.image;
+        buttonIconImage = (TTLImage *) [buttonIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
         self.buttonIconImageView.image = buttonIconImage;
         [self.buttonContainerView addSubview:self.buttonIconImageView];
         
@@ -62,8 +62,8 @@
         _buttonLoadingImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.buttonContainerView.frame) - 20.0f) / 2.0f, (CGRectGetHeight(self.buttonContainerView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f)];
         self.buttonLoadingImageView.alpha = 0.0f;
         [self.buttonLoadingImageView setImage:[UIImage imageNamed:@"TTLIconLoaderProgress" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil]];
-        TTLImage *buttonLoadingImage = self.buttonLoadingImageView.image;
-        buttonLoadingImage = [buttonLoadingImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconLoadingProgressWhite]];
+        TTLImage *buttonLoadingImage = (TTLImage *) self.buttonLoadingImageView.image;
+        buttonLoadingImage = (TTLImage *) [buttonLoadingImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconLoadingProgressWhite]];
         self.buttonLoadingImageView.image = buttonLoadingImage;
         [self.buttonContainerView addSubview:self.buttonLoadingImageView];
     }
@@ -153,8 +153,8 @@
         self.buttonLoadingImageView.frame = CGRectMake((CGRectGetWidth(self.buttonContainerView.frame) - 20.0f) / 2.0f, (CGRectGetHeight(self.buttonContainerView.frame) - 20.0f) / 2.0f, 20.0f, 20.0f);
         
         //Set icon tint color
-        TTLImage *buttonIconImage = self.buttonIconImageView.image;
-        buttonIconImage = [buttonIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
+        TTLImage *buttonIconImage = (TTLImage *) self.buttonIconImageView.image;
+        buttonIconImage = (TTLImage *) [buttonIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
         self.buttonIconImageView.image = buttonIconImage;
     }
     else if (customButtonViewStyleType == TTLCustomButtonViewStyleTypeDestructivePlain) {
@@ -180,8 +180,8 @@
         self.buttonTitleLabel.textColor = clickableDestructiveButtonLabelColor;
         
         //Set icon tint color
-        TTLImage *buttonIconImage = self.buttonIconImageView.image;
-        buttonIconImage = [buttonIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIconDestructive]];
+        TTLImage *buttonIconImage = (TTLImage *) self.buttonIconImageView.image;
+        buttonIconImage = (TTLImage *) [buttonIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIconDestructive]];
         self.buttonIconImageView.image = buttonIconImage;
     }
 }
@@ -254,7 +254,13 @@
 
 - (void)setButtonWithTitle:(NSString *)title andIcon:(NSString *)imageName iconPosition:(TTLCustomButtonViewIconPosititon)ttlCustomButtonViewIconPosititon {
     self.buttonTitleLabel.text = title;
-    self.buttonIconImageView.image = [UIImage imageNamed:imageName inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    
+    if (@available(iOS 13.0, *)) {
+        self.buttonIconImageView.image = [UIImage imageNamed:imageName inBundle:[TTLUtil currentBundle] withConfiguration:nil];
+    } else {
+        // Fallback on earlier versions
+        self.buttonIconImageView.image = [UIImage imageNamed:imageName inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
     
     CGSize size = [self.buttonTitleLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 20.0f)];
     CGFloat maximumLabelWidth = CGRectGetWidth(self.frame) - 10.0f - 10.0f - 4.0f - 32.0f; //10 - left&right gap, 4 - gap to image view, 32 image view width
@@ -365,8 +371,8 @@
 }
 
 - (void)setButtonIconTintColor:(UIColor *)color {
-    TTLImage *buttonIconImage = self.buttonIconImageView.image;
-    buttonIconImage = [buttonIconImage setImageTintColor:color];
+    TTLImage *buttonIconImage = (TTLImage *) self.buttonIconImageView.image;
+    buttonIconImage = (TTLImage *) [buttonIconImage setImageTintColor:color];
     self.buttonIconImageView.image = buttonIconImage;
 }
 
