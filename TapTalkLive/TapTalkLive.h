@@ -170,5 +170,17 @@ Obtain main view controller of TapTalk Live
 */
 - (TTLRoomListViewController *_Nonnull)getTapTalkLiveViewMainController;
 
+/**
+Authenticate and log in user with name and email
+*/
+- (void)authenticateUserWithFullName:(NSString *)fullName
+                               email:(NSString *)email
+                             success:(void (^)(NSString *message))success
+                             failure:(void (^)(NSError *error))failure;
+
+/**
+Clear all data from TapTalk Live when user logs out
+*/
+- (void)clearAllTapLiveData;
 
 @end

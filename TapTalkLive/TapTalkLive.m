@@ -351,4 +351,48 @@ Obtain main view controller of TapTalk Live
     }
 }
 
+- (void)authenticateUserWithFullName:(NSString *)fullName
+                               email:(NSString *)email
+                             success:(void (^)(NSString *message))success
+                             failure:(void (^)(NSError *error))failure {
+ 
+    [TTLDataManager callAPICreateUserWithFullName:fullName email:email success:^(TTLUserModel * _Nonnull user, NSString * _Nonnull ticket) {
+        // Get TapTalkLive access token
+        [TTLDataManager callAPIGetAccessTokenWithTicket:ticket success:^{
+            // Obtain TapTalk auth ticket
+            [TTLDataManager callAPIGetTapTalkAuthTicketSuccess:^(NSString * _Nonnull tapTalkAuthTicket) {
+                // Authenticate TapTalk.io Chat SDK
+                [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
+                    success(NSLocalizedString(@"Successfully authenticated.", @""));
+                } failure:^(NSError * _Nonnull error) {
+                    // Error authenticate TapTalk.io Chat SDK
+                    failure(error);
+                }];
+            } failure:^(NSError * _Nonnull error) {
+                // Error get TapTalk auth ticket
+                failure(error);
+            }];
+        } failure:^(NSError * _Nonnull error) {
+            // Error get access token
+            failure(error);
+        }];
+    } failure:^(NSError * _Nonnull error) {
+        // Error create user
+        failure(error);
+    }];
+}
+
+- (void)clearAllTapLiveData {
+    //Remove all preference
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACTIVE_USER];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACCESS_TOKEN];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_REFRESH_TOKEN];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_REFRESH_TOKEN_EXPIRED_TIME];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACCESS_TOKEN_EXPIRED_TIME];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [[TapTalk sharedInstance] clearAllTapTalkData];
+}
+
 @end

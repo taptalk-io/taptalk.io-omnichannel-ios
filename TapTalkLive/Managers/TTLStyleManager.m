@@ -7,6 +7,7 @@
 //
 
 #import "TTLStyleManager.h"
+#import <TapTalk/TAPStyleManager.h>
 
 @interface TTLStyleManager ()
 
@@ -61,6 +62,7 @@
 
 - (void)setDefaultFont:(UIFont *)font forType:(TTLDefaultFont)defaultFontType {
     [self.defaultFontDictionary setObject:font forKey:[NSNumber numberWithInteger:defaultFontType]];
+    [[TAPStyleManager sharedManager] setDefaultFont:font forType:defaultFontType];
 }
 
 - (void)setComponentFont:(UIFont *)font forType:(TTLComponentFont)componentFontType {
@@ -69,6 +71,7 @@
 
 - (void)setDefaultColor:(UIColor *)color forType:(TTLDefaultColor)defaultColorType {
     [self.defaultColorDictionary setObject:color forKey:[NSNumber numberWithInteger:defaultColorType]];
+    [[TAPStyleManager sharedManager] setDefaultColor:color forType:defaultColorType];
 }
 
 - (void)setTextColor:(UIColor *)color forType:(TTLTextColor)textColorType {
@@ -114,24 +117,27 @@
         case TTLDefaultFontItalic:
         {
             UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_ITALIC size:[UIFont systemFontSize]];
-            return font;
-            break;
-        }
-        case TTLDefaultFontRegular:
-        {
-            UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_REGULAR size:[UIFont systemFontSize]];
+            if (font == nil) {
+                font = [UIFont italicSystemFontOfSize:[UIFont systemFontSize]];
+            }
             return font;
             break;
         }
         case TTLDefaultFontMedium:
         {
             UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_MEDIUM size:[UIFont systemFontSize]];
+            if (font == nil) {
+                font = [UIFont systemFontOfSize:[UIFont systemFontSize] weight:UIFontWeightMedium];
+            }
             return font;
             break;
         }
         case TTLDefaultFontBold:
         {
             UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:[UIFont systemFontSize]];
+            if (font == nil) {
+                font = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
+            }
             return font;
             break;
         }
@@ -139,6 +145,9 @@
         {
             //Set default font to prevent crash
             UIFont *font = [UIFont fontWithName:TTL_FONT_FAMILY_REGULAR size:[UIFont systemFontSize]];
+            if (font == nil) {
+                font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
+            }
             return font;
             break;
         }

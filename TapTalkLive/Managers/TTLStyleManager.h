@@ -25,7 +25,7 @@ typedef NS_ENUM(NSInteger, TTLDefaultColor) {
     TTLDefaultColorIconGray,
     TTLDefaultColorIconSuccess,
     TTLDefaultColorIconDestructive,
-    
+    // TTLDefaultColor enum needs to be same as TAPDefaultColor (TAPStyleManager)
 };
 
 typedef NS_ENUM(NSInteger, TTLDefaultFont) {
@@ -33,6 +33,7 @@ typedef NS_ENUM(NSInteger, TTLDefaultFont) {
     TTLDefaultFontMedium,
     TTLDefaultFontBold,
     TTLDefaultFontItalic
+    // TTLDefaultFont enum needs to be same as TAPDefaultFont (TAPStyleManager)
 };
 
 typedef NS_ENUM(NSInteger, TTLComponentColor) {
