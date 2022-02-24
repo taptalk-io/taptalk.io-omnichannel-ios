@@ -42,6 +42,7 @@
     if (self) {
         //Add delegate to Connection Manager here
         _refreshTokenLock = [NSLock new];
+        _deletedRoomIDArray = [NSMutableArray array];
     }
     
     return self;
@@ -113,8 +114,14 @@
     BOOL roomIsLocked = [[dictionary objectForKey:@"roomIsLocked"] boolValue];
     room.isLocked = roomIsLocked;
     
+    NSInteger roomUnreadCount = [[dictionary objectForKey:@"roomUnreadCount"] integerValue];
+    room.unreadCount = [NSNumber numberWithInteger:roomUnreadCount];
+
     NSInteger roomDeleted = [[dictionary objectForKey:@"roomDeleted"] integerValue];
     room.deleted = [NSNumber numberWithInteger:roomDeleted];
+
+    NSInteger roomLockedTime = [[dictionary objectForKey:@"roomLockedTime"] integerValue];
+    room.lockedTime = [NSNumber numberWithInteger:roomLockedTime];
     
     message.room = room;
     
@@ -203,6 +210,30 @@
     NSNumber *requireChangePassword = [dictionary objectForKey:@"requireChangePassword"];
     requireChangePassword = [TAPUtil nullToEmptyNumber:requireChangePassword];
     user.requireChangePassword = [requireChangePassword boolValue];
+    
+    NSNumber *isRequestPending = [dictionary objectForKey:@"isRequestPending"];
+    isRequestPending = [TAPUtil nullToEmptyNumber:isRequestPending];
+    user.isRequestPending = [isRequestPending boolValue];
+
+    NSNumber *isRequestAccepted = [dictionary objectForKey:@"isRequestAccepted"];
+    isRequestAccepted = [TAPUtil nullToEmptyNumber:isRequestAccepted];
+    user.isRequestAccepted = [isRequestAccepted boolValue];
+
+    NSNumber *isContact = [dictionary objectForKey:@"isContact"];
+    isContact = [TAPUtil nullToEmptyNumber:isContact];
+    user.isContact = [isContact boolValue];
+
+    NSNumber *isOnline = [dictionary objectForKey:@"isOnline"];
+    isOnline = [TAPUtil nullToEmptyNumber:isOnline];
+    user.isOnline = [isOnline boolValue];
+
+    NSNumber *isEmailVerified = [dictionary objectForKey:@"isEmailVerified"];
+    isEmailVerified = [TAPUtil nullToEmptyNumber:isEmailVerified];
+    user.isEmailVerified = [isEmailVerified boolValue];
+
+    NSNumber *isPhoneVerified = [dictionary objectForKey:@"isPhoneVerified"];
+    isPhoneVerified = [TAPUtil nullToEmptyNumber:isPhoneVerified];
+    user.isPhoneVerified = [isPhoneVerified boolValue];
     
     NSNumber *userCreated = [dictionary objectForKey:@"userCreated"];
     userCreated = [TAPUtil nullToEmptyNumber:userCreated];
@@ -363,8 +394,14 @@
     BOOL roomIsLocked = [[roomDictionary objectForKey:@"isLocked"] boolValue];
     room.isLocked = roomIsLocked;
     
+    NSInteger roomUnreadCount = [[roomDictionary objectForKey:@"unreadCount"] integerValue];
+    room.unreadCount = [NSNumber numberWithInteger:roomUnreadCount];
+
     NSInteger roomDeleted = [[roomDictionary objectForKey:@"deleted"] integerValue];
     room.deleted = [NSNumber numberWithInteger:roomDeleted];
+
+    NSInteger roomLockedTime = [[roomDictionary objectForKey:@"lockedTime"] integerValue];
+    room.lockedTime = [NSNumber numberWithInteger:roomLockedTime];
     
     message.room = room;
         
@@ -639,8 +676,33 @@
     lastActivity = [TAPUtil nullToEmptyNumber:lastActivity];
     user.lastActivity = lastActivity;
     
-    BOOL requireChangePassword = [[dictionary objectForKey:@"requireChangePassword"] boolValue];
-    user.requireChangePassword = requireChangePassword;
+    NSNumber *requireChangePassword = [dictionary objectForKey:@"requireChangePassword"];
+    requireChangePassword = [TAPUtil nullToEmptyNumber:requireChangePassword];
+    user.requireChangePassword = [requireChangePassword boolValue];
+
+    NSNumber *isRequestPending = [dictionary objectForKey:@"isRequestPending"];
+    isRequestPending = [TAPUtil nullToEmptyNumber:isRequestPending];
+    user.isRequestPending = [isRequestPending boolValue];
+
+    NSNumber *isRequestAccepted = [dictionary objectForKey:@"isRequestAccepted"];
+    isRequestAccepted = [TAPUtil nullToEmptyNumber:isRequestAccepted];
+    user.isRequestAccepted = [isRequestAccepted boolValue];
+
+    NSNumber *isContact = [dictionary objectForKey:@"isContact"];
+    isContact = [TAPUtil nullToEmptyNumber:isContact];
+    user.isContact = [isContact boolValue];
+
+    NSNumber *isOnline = [dictionary objectForKey:@"isOnline"];
+    isOnline = [TAPUtil nullToEmptyNumber:isOnline];
+    user.isOnline = [isOnline boolValue];
+
+    NSNumber *isEmailVerified = [dictionary objectForKey:@"isEmailVerified"];
+    isEmailVerified = [TAPUtil nullToEmptyNumber:isEmailVerified];
+    user.isEmailVerified = [isEmailVerified boolValue];
+
+    NSNumber *isPhoneVerified = [dictionary objectForKey:@"isPhoneVerified"];
+    isPhoneVerified = [TAPUtil nullToEmptyNumber:isPhoneVerified];
+    user.isPhoneVerified = [isPhoneVerified boolValue];
     
     NSNumber *created = [dictionary objectForKey:@"created"];
     created = [TAPUtil nullToEmptyNumber:created];
@@ -705,8 +767,14 @@
     BOOL roomIsLocked = [[dictionary objectForKey:@"roomIsLocked"] boolValue];
     room.isLocked = roomIsLocked;
     
+    NSInteger roomUnreadCount = [[dictionary objectForKey:@"roomUnreadCount"] integerValue];
+    room.unreadCount = [NSNumber numberWithInteger:roomUnreadCount];
+    
     NSInteger roomDeleted = [[dictionary objectForKey:@"roomDeleted"] integerValue];
     room.deleted = [NSNumber numberWithInteger:roomDeleted];
+
+    NSInteger roomLockedTime = [[dictionary objectForKey:@"roomLockedTime"] integerValue];
+    room.lockedTime = [NSNumber numberWithInteger:roomLockedTime];
     
     recentSearch.room = room;
     
@@ -962,9 +1030,17 @@
     roomIsLocked = [TAPUtil nullToEmptyNumber:roomIsLocked];
     [messageMutableDictionary setValue:roomIsLocked forKey:@"roomIsLocked"];
     
+    NSNumber *roomUnreadCount = [roomDicitonary objectForKey:@"unreadCount"];
+    roomUnreadCount = [TAPUtil nullToEmptyNumber:roomUnreadCount];
+    [messageMutableDictionary setValue:roomUnreadCount forKey:@"roomUnreadCount"];
+    
     NSNumber *roomDeleted = [roomDicitonary objectForKey:@"deleted"];
     roomDeleted = [TAPUtil nullToEmptyNumber:roomDeleted];
     [messageMutableDictionary setValue:roomDeleted forKey:@"roomDeleted"];
+
+    NSNumber *roomLockedTime = [roomDicitonary objectForKey:@"lockedTime"];
+    roomLockedTime = [TAPUtil nullToEmptyNumber:roomLockedTime];
+    [messageMutableDictionary setValue:roomLockedTime forKey:@"roomLockedTime"];
     
     [messageMutableDictionary removeObjectForKey:@"room"];
     
@@ -1008,6 +1084,30 @@
     NSNumber *requireChangePassword = [userDictionary objectForKey:@"requireChangePassword"];
     requireChangePassword = [TAPUtil nullToEmptyNumber:requireChangePassword];
     [messageMutableDictionary setValue:requireChangePassword forKey:@"requireChangePassword"];
+    
+    NSNumber *isRequestPending = [userDictionary objectForKey:@"isRequestPending"];
+    isRequestPending = [TAPUtil nullToEmptyNumber:isRequestPending];
+    [messageMutableDictionary setValue:isRequestPending forKey:@"isRequestPending"];
+
+    NSNumber *isRequestAccepted = [userDictionary objectForKey:@"isRequestAccepted"];
+    isRequestAccepted = [TAPUtil nullToEmptyNumber:isRequestAccepted];
+    [messageMutableDictionary setValue:isRequestAccepted forKey:@"isRequestAccepted"];
+
+    NSNumber *isContact = [userDictionary objectForKey:@"isContact"];
+    isContact = [TAPUtil nullToEmptyNumber:isContact];
+    [messageMutableDictionary setValue:isContact forKey:@"isContact"];
+
+    NSNumber *isOnline = [userDictionary objectForKey:@"isOnline"];
+    isOnline = [TAPUtil nullToEmptyNumber:isOnline];
+    [messageMutableDictionary setValue:isOnline forKey:@"isOnline"];
+
+    NSNumber *isEmailVerified = [userDictionary objectForKey:@"isEmailVerified"];
+    isEmailVerified = [TAPUtil nullToEmptyNumber:isEmailVerified];
+    [messageMutableDictionary setValue:isEmailVerified forKey:@"isEmailVerified"];
+
+    NSNumber *isPhoneVerified = [userDictionary objectForKey:@"isPhoneVerified"];
+    isPhoneVerified = [TAPUtil nullToEmptyNumber:isPhoneVerified];
+    [messageMutableDictionary setValue:isPhoneVerified forKey:@"isPhoneVerified"];
     
     NSNumber *userCreated = [userDictionary objectForKey:@"created"];
     userCreated = [TAPUtil nullToEmptyNumber:userCreated];
@@ -1191,6 +1291,30 @@
     NSNumber *requireChangePassword = [userDictionary objectForKey:@"requireChangePassword"];
     requireChangePassword = [TAPUtil nullToEmptyNumber:requireChangePassword];
     [userMutableDictionary setValue:requireChangePassword forKey:@"requireChangePassword"];
+    
+    NSNumber *isRequestPending = [userDictionary objectForKey:@"isRequestPending"];
+    isRequestPending = [TAPUtil nullToEmptyNumber:isRequestPending];
+    [userMutableDictionary setValue:isRequestPending forKey:@"isRequestPending"];
+
+    NSNumber *isRequestAccepted = [userDictionary objectForKey:@"isRequestAccepted"];
+    isRequestAccepted = [TAPUtil nullToEmptyNumber:isRequestAccepted];
+    [userMutableDictionary setValue:isRequestAccepted forKey:@"isRequestAccepted"];
+
+    NSNumber *isContact = [userDictionary objectForKey:@"isContact"];
+    isContact = [TAPUtil nullToEmptyNumber:isContact];
+    [userMutableDictionary setValue:isContact forKey:@"isContact"];
+
+    NSNumber *isOnline = [userDictionary objectForKey:@"isOnline"];
+    isOnline = [TAPUtil nullToEmptyNumber:isOnline];
+    [userMutableDictionary setValue:isOnline forKey:@"isOnline"];
+
+    NSNumber *isEmailVerified = [userDictionary objectForKey:@"isEmailVerified"];
+    isEmailVerified = [TAPUtil nullToEmptyNumber:isEmailVerified];
+    [userMutableDictionary setValue:isEmailVerified forKey:@"isEmailVerified"];
+
+    NSNumber *isPhoneVerified = [userDictionary objectForKey:@"isPhoneVerified"];
+    isPhoneVerified = [TAPUtil nullToEmptyNumber:isPhoneVerified];
+    [userMutableDictionary setValue:isPhoneVerified forKey:@"isPhoneVerified"];
     
     NSNumber *created = [userDictionary objectForKey:@"created"];
     created = [TAPUtil nullToEmptyNumber:created];
@@ -1584,7 +1708,9 @@
         //Delete message & physical data of image/video/file
         [TAPDataManager deletePhysicalFileAndMessageSequenceWithMessageArray:messageArray success:^{
             //Delete all message
-            [TAPDataManager deleteDatabaseMessageWithData:allMessageArray success:^{
+            [TAPDataManager deleteDatabaseMessageWithRoomID:roomID success:^{
+                // Remove from group preference
+                [[TAPGroupManager sharedManager] removeRoomWithRoomID:roomID];
                 success();
             } failure:^(NSError *error) {
                 //failure delete message from database
@@ -2223,7 +2349,9 @@
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
-        [messageDictionaryArray addObject:messageDictionary];
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager insertDataToDatabaseWithData:messageDictionaryArray tableName:tableName success:^{
@@ -2246,7 +2374,9 @@
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
-        [messageDictionaryArray addObject:messageDictionary];
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
@@ -2269,7 +2399,9 @@
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
-        [messageDictionaryArray addObject:messageDictionary];
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager updateOrInsertDataToDatabaseInMainThreadWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
@@ -2342,8 +2474,10 @@
         
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
-        
-        [messageDictionaryArray addObject:messageDictionary];
+     
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
@@ -2370,7 +2504,9 @@
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
-        [messageDictionaryArray addObject:messageDictionary];
+        if (![[TAPDataManager sharedManager].deletedRoomIDArray containsObject:message.room.roomID]) {
+            [messageDictionaryArray addObject:messageDictionary];
+        }
     }
     
     [TAPDatabaseManager updateOrInsertDataToDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
@@ -2397,6 +2533,22 @@
     }
     
     [TAPDatabaseManager deleteDataInDatabaseWithData:messageDictionaryArray tableName:kDatabaseTableMessage success:^{
+        success();
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
++ (void)deleteDatabaseMessageWithRoomID:(NSString *)roomID
+                                success:(void (^)(void))success
+                                failure:(void (^)(NSError *error))failure {
+    if (roomID == nil || [roomID isEqualToString:@""]) {
+        success();
+        return;
+    }
+    
+    [TAPDatabaseManager deleteMessageInDatabaseWithRoomID:roomID tableName:kDatabaseTableMessage success:^{
+        [[TAPDataManager sharedManager].deletedRoomIDArray addObject:roomID];
         success();
     } failure:^(NSError *error) {
         failure(error);
@@ -2929,6 +3081,9 @@
             //Add user to Contact Manager
             [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO saveActiveUser:NO];
             
+            // Mark as delivered
+            [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:decryptedMessage];
+            
             [messageResultArray addObject:decryptedMessage];
             
         }
@@ -3022,9 +3177,18 @@
 
             //Add user to Contact Manager
             [[TAPContactManager sharedManager] addContactWithUserModel:decryptedMessage.user saveToDatabase:NO saveActiveUser:NO];
+            
+            // Mark as delivered
+            [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:decryptedMessage];
 
             [messageResultArray addObject:decryptedMessage];
             
+            if (decryptedMessage.type == TAPChatMessageTypeSystemMessage &&
+                [decryptedMessage.action isEqualToString:@"room/addParticipant"] &&
+                ([decryptedMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
+            ) {
+                [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:decryptedMessage.room.roomID];
+            }
         }
         
         if([tempRecipientIDArray count] > 0) {
@@ -3126,6 +3290,9 @@
             if ([preferenceLastUpdated longLongValue] < [decryptedMessage.updated longLongValue]) {
                 preferenceLastUpdated = [NSNumber numberWithLongLong:[decryptedMessage.updated longLongValue]];
             }
+            
+            // Mark as delivered
+            [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:decryptedMessage];
         }
         
         if (needToSaveLastUpdatedTimestamp) {
@@ -3135,12 +3302,10 @@
         
         //Insert To Database
         [TAPDataManager updateOrInsertDatabaseMessageWithData:messageResultArray success:^{
-            
+            success(messageResultArray);
         } failure:^(NSError *error) {
-            
+            success(messageResultArray);
         }];
-        
-        success(messageResultArray);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
@@ -3224,12 +3389,10 @@
         
         //Insert To Database
         [TAPDataManager updateOrInsertDatabaseMessageWithData:messageResultArray success:^{
-            
+            success(messageResultArray, hasMore);
         } failure:^(NSError *error) {
-            
+            success(messageResultArray, hasMore);
         }];
-        
-        success(messageResultArray, hasMore);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
@@ -4605,7 +4768,8 @@
 + (void)callAPIRequestVerificationCodeWithPhoneNumber:(NSString *)phoneNumber
                                             countryID:(NSString *)countryID
                                                method:(NSString *)method
-                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, NSString *successMessage))success
+                                              channel:(NSString *)channel
+                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, BOOL isSuccess, NSString *channelString, NSString *whatsAppFailureReason, NSInteger nextRequestSeconds, NSString *successMessage))success
                                               failure:(void (^)(NSError *error))failure {
     NSString *requestURL = [[TAPAPIManager sharedManager] urlForType:TAPAPIManagerTypeRequestOTP];
     
@@ -4613,6 +4777,7 @@
     [parameterDictionary setObject:phoneNumber forKey:@"phone"];
     [parameterDictionary setObject:[NSNumber numberWithInteger:[countryID integerValue]] forKey:@"countryID"];
     [parameterDictionary setObject:method forKey:@"method"]; //method should be phone or email
+    [parameterDictionary setObject:channel forKey:@"channel"]; //channel should be `sms` or `whatsapp`
     
     [[TAPNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
         
@@ -4629,7 +4794,7 @@
             if (errorStatusCode == 401) {
                 //Call refresh token
                 [[TAPDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
-                    [TAPDataManager callAPIRequestVerificationCodeWithPhoneNumber:phoneNumber countryID:countryID method:method success:success failure:failure];
+                    [TAPDataManager callAPIRequestVerificationCodeWithPhoneNumber:phoneNumber countryID:countryID method:method channel:channel success:success failure:failure];
                 } failure:^(NSError *error) {
                     failure(error);
                 }];
@@ -4648,7 +4813,7 @@
         }
         
         if ([self isDataEmpty:responseObject]) {
-            success([NSString string], [NSString string], [NSString string]);
+            success([NSString string], [NSString string], NO, [NSString string], [NSString string], 0, [NSString string]);
             return;
         }
         
@@ -4660,14 +4825,40 @@
         NSString *OTPID = [dataDictionary objectForKey:@"otpID"];
         OTPID = [TAPUtil nullToEmptyString:OTPID];
         
+        NSString *isSuccessString = [dataDictionary objectForKey:@"success"];
+        isSuccessString = [TAPUtil nullToEmptyString:isSuccessString];
+        BOOL isSuccessBoolean = [isSuccessString boolValue];
+        
+        NSString *channelString = [dataDictionary objectForKey:@"channel"];
+        channelString = [TAPUtil nullToEmptyString:channelString];
+        
+        NSString *whatsAppFailureReason = [dataDictionary objectForKey:@"whatsAppFailureReason"];
+        whatsAppFailureReason = [TAPUtil nullToEmptyString:whatsAppFailureReason];
+        
         NSString *successMessage = [dataDictionary objectForKey:@"message"];
         successMessage = [TAPUtil nullToEmptyString:successMessage];
         
-        success(OTPKey, OTPID, successMessage);
+        
+        NSString *nextRequestSecondsRaw = [dataDictionary objectForKey:@"nextRequestSeconds"];
+        nextRequestSecondsRaw = [TAPUtil nullToEmptyString:nextRequestSecondsRaw];
+        NSInteger nextRequestSeconds = [nextRequestSecondsRaw integerValue];
+        
+        success(OTPKey, OTPID, isSuccessBoolean,channelString, whatsAppFailureReason, nextRequestSeconds, successMessage);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
         
+        if (error.code == 199) {
+            //AS NOTE - NO INTERNET CONNECTION
+            NSString *errorDomain = error.domain;
+            NSString *newDomain = [NSString stringWithFormat:@"%@", errorDomain];
+            
+            NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+            
+            failure(newError);
+            return;
+        }
+        else {
 #ifdef DEBUG
         NSString *errorDomain = error.domain;
         NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
@@ -4679,6 +4870,7 @@
         NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
+        }
     }];
 }
 
@@ -4913,6 +5105,17 @@
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TAPDataManager logErrorStringFromError:error];
         
+        if (error.code == 199) {
+            //AS NOTE - NO INTERNET CONNECTION
+            NSString *errorDomain = error.domain;
+            NSString *newDomain = [NSString stringWithFormat:@"%@", errorDomain];
+            
+            NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+            
+            failure(newError);
+            return;
+        }
+        else {
 #ifdef DEBUG
         NSString *errorDomain = error.domain;
         NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
@@ -4924,6 +5127,7 @@
         NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TAPUtil currentBundle], @"")}];
         failure(localizedError);
 #endif
+        }
     }];
 }
 
@@ -5829,7 +6033,12 @@
         }
         
         if ([self isDataEmpty:responseObject]) {
-            success();
+            // Delete message and physical files from database
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:roomID success:^{
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
             return;
         }
         
@@ -5839,7 +6048,12 @@
         BOOL successBool = [successNumber boolValue];
         
         if (successBool) {
-            success();
+            // Delete message and physical files from database
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:roomID success:^{
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
         }
         else {
             NSString *errorMessage = [dataDictionary objectForKey:@"message"];
@@ -5911,7 +6125,12 @@
         }
         
         if ([self isDataEmpty:responseObject]) {
-            success();
+            // Delete message and physical files from database
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:room.roomID success:^{
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
             return;
         }
         
@@ -5921,7 +6140,12 @@
         BOOL successBool = [successNumber boolValue];
         
         if (successBool) {
-            success();
+            // Delete message and physical files from database
+            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:room.roomID success:^{
+                success();
+            } failure:^(NSError *error) {
+                failure(error);
+            }];
         }
         else {
             NSString *errorMessage = [dataDictionary objectForKey:@"message"];

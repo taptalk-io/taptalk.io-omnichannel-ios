@@ -269,6 +269,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 @property (strong, nonatomic) NSMutableArray *anchorUnreadMessageArray;
 @property (strong, nonatomic) NSMutableDictionary *anchorMentionMessageDictionary;
+@property (strong, nonatomic) NSMutableArray *anchorMentionMessageArray;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMessageArray;
 @property (strong, nonatomic) NSMutableArray *scrolledPendingMentionArray;
 @property (strong, nonatomic) NSMutableArray *filteredMentionListArray;
@@ -293,6 +294,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 @property (nonatomic) BOOL isShowingUnreadMessageIdentifier;
 
 @property (weak, nonatomic) id openedBubbleCell;
+
+// Textview mention loop index
+@property (nonatomic) NSInteger mentionLoopIndex;
+@property (nonatomic) NSInteger mentionCursorIndex;
 
 //DV Temp
 @property (nonatomic) BOOL disableTriggerHapticFeedbackOnDrag;
@@ -341,7 +346,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)setAsTypingNoAfterDelay;
 - (void)showInputAccessoryExtensionView:(BOOL)show;
 - (void)setInputAccessoryExtensionType:(InputAccessoryExtensionType)inputAccessoryExtensionType;
-- (void)showInputAccessoryView;
+- (void)checkAndShowInputAccessoryView;
 
 - (void)showLoadMoreMessageLoadingView:(BOOL)show
                               withType:(LoadMoreMessageViewType)type;
@@ -473,6 +478,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _cellHeightsDictionary = [[NSMutableDictionary alloc] init];
     _anchorUnreadMessageArray = [[NSMutableArray alloc] init];
     _anchorMentionMessageDictionary = [[NSMutableDictionary alloc] init];
+    _anchorMentionMessageArray = [[NSMutableArray alloc] init];
     _scrolledPendingMessageArray = [[NSMutableArray alloc] init];
     _scrolledPendingMentionArray = [[NSMutableArray alloc] init];
     _filteredMentionListArray = [[NSMutableArray alloc] init];
@@ -481,10 +487,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     _isKeyboardShowed = NO;
     _isShowAccessoryView = YES;
     _isShowingUnreadMessageIdentifier = NO;
-    _tappedMessageLocalID = @"";
     _safeAreaBottomPadding = [TAPUtil safeAreaBottomPadding];
     _selectedMessage = nil;
     _mentionIndexesDictionary = [[NSMutableDictionary alloc] init];
+    
+    if (self.tappedMessageLocalID == nil) {
+        _tappedMessageLocalID = @"";
+    }
     
     _keyboardState = keyboardStateDefault;
     _keyboardHeight = 0.0f;
@@ -563,6 +572,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     self.connectionStatusViewController.delegate = self;
     [self.view addSubview:self.connectionStatusViewController.view];
     _connectionStatusHeight = CGRectGetHeight(self.connectionStatusViewController.view.frame);
+    
+    self.inputMessageAccessoryDocumentsImageView.image = [self.inputMessageAccessoryDocumentsImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
     
     //Custom Keyboard
     _keyboardViewController = [[TAPKeyboardViewController alloc] initWithNibName:@"TAPKeyboardViewController" bundle:[TAPUtil currentBundle]];
@@ -683,12 +694,34 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     //check if there's scroll to message passed from open room method
     //if yes scroll to message after open chat room
-    if (![TAPUtil isEmptyString:self.scrollToMessageLocalIDString]) {
-        [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
-    }
+//    if (![TAPUtil isEmptyString:self.scrollToMessageLocalIDString]) {
+//        [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
+//    }
     
     self.tableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
     self.mentionListTableViewBottomConstraint.constant = kInputMessageAccessoryViewHeight;
+    
+    // Set quote layout label font and color
+    UIFont *quoteTitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontQuoteLayoutTitleLabel];
+    UIColor *quoteTitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorQuoteLayoutTitleLabel];
+    UIFont *quoteSubtitleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontQuoteLayoutContentLabel];
+    UIColor *quoteSubtitleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorQuoteLayoutContentLabel];
+    
+    [self.quoteTitleLabel setFont:quoteTitleLabelFont];
+    [self.quoteTitleLabel setTextColor:quoteTitleLabelColor];
+    [self.quoteSubtitleLabel setFont:quoteSubtitleLabelFont];
+    [self.quoteSubtitleLabel setTextColor:quoteSubtitleLabelColor];
+
+    [self.replyMessageNameLabel setFont:quoteTitleLabelFont];
+    [self.replyMessageNameLabel setTextColor:quoteTitleLabelColor];
+    [self.replyMessageMessageLabel setFont:quoteSubtitleLabelFont];
+    [self.replyMessageMessageLabel setTextColor:quoteSubtitleLabelColor];
+    
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidOpen:otherUser:currentViewController:currentShownNavigationController:)]) {
+        
+        [tapUIChatRoomDelegate tapTalkChatRoomDidOpen:self.currentRoom otherUser:self.otherUser currentViewController:self currentShownNavigationController:self.navigationController];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -775,42 +808,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self processVisibleMessageAsRead];
 
     //check if last message is deleted room
-    TAPMessageModel *lastMessage = [self.messageArray firstObject];
-    if (lastMessage.room.isLocked) {
-        [self showInputAccessoryExtensionView:NO];
-        [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
-        [self.messageTextView setText:@""];
-        [self hideInputAccessoryView];
-    }
-    else {
-        if (lastMessage.room.type == RoomTypePersonal && lastMessage.room.isDeleted) {
-            [self.view endEditing:YES];
-            [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
-        }
-        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/removeParticipant"] && [lastMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-            //Check if system message with action remove participant and target user is current user
-            //show deleted chat room view
-            [self.view endEditing:YES];
-            [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
-        }
-        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/delete"]) {
-            [self.view endEditing:YES];
-            
-            if (lastMessage.room.type == RoomTypePersonal) {
-                [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
-            }
-            else if (lastMessage.room.type == RoomTypeGroup || lastMessage.room.type == RoomTypeTransaction) {
-                [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:YES];
-            }
-        }
-        else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
-            [self.view endEditing:YES];
-            [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
-        }
-        else {
-            [self showInputAccessoryView];
-        }
-    }
+    [self checkAndShowRoomViewState];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -846,7 +844,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     // Dispose of any resources that can be recreated.
 }
 
-
 - (void)presentViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion {
     //Override present view controller method to resign keyboard before presenting view controller from Chat Room to avoid keyboard accessory missing after VC presented from Chat Room
     [self.secondaryTextField resignFirstResponder];
@@ -855,7 +852,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [super presentViewController:viewControllerToPresent animated:flag completion:completion];
 }
 
-- (void)dealloc {
+- (void)viewDidUnload {
+    [super viewDidUnload];
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_APPLICATION_WILL_ENTER_FOREGROUND object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_UPLOAD_FILE_PROGRESS object:nil];
@@ -868,6 +867,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_DOWNLOAD_FILE_FAILURE object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_USER_PROFILE_CHANGES object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TAP_NOTIFICATION_APPLICATION_DID_BECOME_ACTIVE object:nil];
+}
+
+- (void)dealloc {
+    
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkChatRoomDidClose:otherUser:currentViewController:currentShownNavigationController:)]) {
+        
+        [tapUIChatRoomDelegate tapTalkChatRoomDidClose:self.currentRoom otherUser:self.otherUser currentViewController:self currentShownNavigationController:self.navigationController];
+    }
 }
 
 #pragma mark - Data Source
@@ -1062,6 +1070,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1097,6 +1109,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     [cell showStatusLabel:YES];
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1115,11 +1131,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         if (status != 0) {
                             //Set current progress
                             NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
+                            [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeUploading];
                             if (uploadProgressDictionary == nil) {
                                 CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
                                 CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
-                                
-                                [cell setInitialAnimateUploadingImageWithType:TAPMyImageBubbleTableViewCellStateTypeUploading];
                                 
                                 [cell animateProgressUploadingImageWithProgress:progress total:total];
                             }
@@ -1152,12 +1167,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     }
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
                     if (message != nil) {
                         NSDictionary *dataDictionary = message.data;
-                        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
                         NSString *localID = message.localID;
                         NSString *roomID = message.room.roomID;
                         
@@ -1173,21 +1191,50 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             if (status != 0) {
                                 //Set current progress
                                 NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
+                                [cell showVideoBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
                                 if (uploadProgressDictionary == nil) {
                                     CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
                                     CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
                                     
-                                    [cell showVideoBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
                                     [cell animateProgressUploadingVideoWithProgress:progress total:total];
                                 }
                             }
                             else {
                                 //Check video is done downloaded or not
-                                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
+                                NSDictionary *dataDictionary = message.data;
+                                dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
                                 
-                                if ([filePath isEqualToString:@""] || filePath == nil) {
-                                    //File not exist, download file
-                                    if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                                NSString *key = [dataDictionary objectForKey:@"fileID"];
+                                key = [TAPUtil nullToEmptyString:key];
+                                
+                                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                                    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                        fileURL = [dataDictionary objectForKey:@"fileURL"];
+                                    }
+                                    fileURL = [TAPUtil nullToEmptyString:fileURL];
+                                    
+                                    if (![fileURL isEqualToString:@""]) {
+                                        key = fileURL;
+                                        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                                    }
+                                    
+                                    filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                }
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                                    if (downloadProgressDictionary != nil) {
+                                        // Show downloading in progress
+                                        CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                        CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                        
+                                        [cell showVideoBubbleStatusWithType:TAPMyVideoBubbleTableViewCellStateTypeDownloading];
+                                        [cell animateProgressDownloadingVideoWithProgress:progress total:total];
+                                    }
+                                    else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
                                         //previous download fail, show retry
                                         [cell showVideoBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeRetryDownload];
                                     }
@@ -1220,12 +1267,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
                     if (message != nil) {
                         NSDictionary *dataDictionary = message.data;
-                        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
                         NSString *localID = message.localID;
                         NSString *roomID = message.room.roomID;
                         
@@ -1241,21 +1291,50 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                             if (status != 0) {
                                 //Set current progress
                                 NSDictionary *uploadProgressDictionary = [[TAPFileUploadManager sharedManager] getUploadProgressWithLocalID:message.localID];
+                                [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
                                 if (uploadProgressDictionary == nil) {
                                     CGFloat progress = [[uploadProgressDictionary objectForKey:@"progress"] floatValue];
                                     CGFloat total = [[uploadProgressDictionary objectForKey:@"total"] floatValue];
                                     
-                                    [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeUploading];
                                     [cell animateProgressUploadingFileWithProgress:progress total:total];
                                 }
                             }
                             else {
                                 //Check file is done downloaded or not
-                                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
+                                NSDictionary *dataDictionary = message.data;
+                                dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
                                 
-                                if ([filePath isEqualToString:@""] || filePath == nil) {
-                                    //File not exist, download file
-                                    if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                                NSString *key = [dataDictionary objectForKey:@"fileID"];
+                                key = [TAPUtil nullToEmptyString:key];
+                                
+                                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                                    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                        fileURL = [dataDictionary objectForKey:@"fileURL"];
+                                    }
+                                    fileURL = [TAPUtil nullToEmptyString:fileURL];
+                                    
+                                    if (![fileURL isEqualToString:@""]) {
+                                        key = fileURL;
+                                        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                                    }
+                                    
+                                    filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                                }
+                                
+                                if (filePath == nil || [filePath isEqualToString:@""]) {
+                                    NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                                    if (downloadProgressDictionary != nil) {
+                                        // Show downloading in progress
+                                        CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                        CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                        
+                                        [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeDownloading];
+                                        [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                                    }
+                                    else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
                                         //previous download fail, show retry
                                         [cell showFileBubbleStatusWithType:TAPMyFileBubbleTableViewCellStateTypeRetryDownload];
                                     }
@@ -1282,6 +1361,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1383,6 +1466,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1416,6 +1503,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     [cell showStatusLabel:YES animated:NO];
@@ -1455,21 +1546,51 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
                     if (message != nil) {
                         NSDictionary *dataDictionary = message.data;
-                        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+                        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
                         NSString *localID = message.localID;
                         NSString *roomID = message.room.roomID;
                         
                         //Check video is done downloaded or not
-                        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
+                        NSString *key = [dataDictionary objectForKey:@"fileID"];
+                        key = [TAPUtil nullToEmptyString:key];
                         
-                        if ([filePath isEqualToString:@""] || filePath == nil) {
-                            //File not exist, download file
-                            if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                fileURL = [dataDictionary objectForKey:@"fileURL"];
+                            }
+                            fileURL = [TAPUtil nullToEmptyString:fileURL];
+                            
+                            if (![fileURL isEqualToString:@""]) {
+                                key = fileURL;
+                                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                            }
+                            
+                            filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        }
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                            if (downloadProgressDictionary != nil) {
+                                // Show downloading in progress
+                                CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                
+                                [cell showVideoBubbleStatusWithType:TAPYourVideoBubbleTableViewCellStateTypeDownloading];
+                                [cell animateProgressDownloadingVideoWithProgress:progress total:total];
+                            }
+                            else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
                                 //previous download fail, show retry
                                 [cell showVideoBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeRetry];
                             }
@@ -1500,22 +1621,51 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
                     if (message != nil) {
                         NSDictionary *dataDictionary = message.data;
-                        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+                        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
                         NSString *localID = message.localID;
                         NSString *roomID = message.room.roomID;
                         
                         //Check file is done downloaded or not
-                        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
+                        NSString *key = [dataDictionary objectForKey:@"fileID"];
+                        key = [TAPUtil nullToEmptyString:key];
                         
-                        if ([filePath isEqualToString:@""] || filePath == nil) {
-                            //File not exist, download file
-                            //File not exist, download file
-                            if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
+                        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                                fileURL = [dataDictionary objectForKey:@"fileURL"];
+                            }
+                            fileURL = [TAPUtil nullToEmptyString:fileURL];
+                            
+                            if (![fileURL isEqualToString:@""]) {
+                                key = fileURL;
+                                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                            }
+                            
+                            filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+                        }
+                        
+                        if (filePath == nil || [filePath isEqualToString:@""]) {
+                            NSDictionary *downloadProgressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+                            if (downloadProgressDictionary != nil) {
+                                // Show downloading in progress
+                                CGFloat progress = [[downloadProgressDictionary objectForKey:@"progress"] floatValue];
+                                CGFloat total = [[downloadProgressDictionary objectForKey:@"total"] floatValue];
+                                
+                                [cell showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeDownloading];
+                                [cell animateProgressDownloadingFileWithProgress:progress total:total];
+                            }
+                            else if ([[TAPFileDownloadManager sharedManager] checkFailedDownloadWithLocalID:message.localID]) {
                                 //previous download fail, show retry
                                 [cell showFileBubbleStatusWithType:TAPYourFileBubbleTableViewCellStateTypeRetry];
                             }
@@ -1540,6 +1690,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     cell.message = message;
                     
                     if (!message.isHidden) {
+                        if (![self.tappedMessageLocalID isEqualToString:@""] && [self.tappedMessageLocalID isEqualToString:message.localID]) {
+                            [cell showBubbleHighlight];
+                            _tappedMessageLocalID = @"";
+                        }
                         [cell setMessage:message];
                     }
                     
@@ -1677,49 +1831,54 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         NSString *username = user.username;
         username = [TAPUtil nullToEmptyString:username];
     
-        NSString *trimmedMessageString = [TAPUtil stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:self.messageTextView.text];
-        NSRange lastSpaceRange = [self.messageTextView.text rangeOfString:@" @" options:NSBackwardsSearch];
-        NSRange lastNewLineRange = [self.messageTextView.text rangeOfString:@"\n@" options:NSBackwardsSearch];
+//        NSString *trimmedMessageString = [TAPUtil stringByTrimmingTrailingWhitespaceAndNewlineCharactersWithString:self.messageTextView.text];
+//        NSRange lastSpaceRange = [self.messageTextView.text rangeOfString:@" @" options:NSBackwardsSearch];
+//        NSRange lastNewLineRange = [self.messageTextView.text rangeOfString:@"\n@" options:NSBackwardsSearch];
+//
+//        //Detect which one is the last word in sentence
+//        NSInteger lastStartIndex;
+//        if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location == NSNotFound) {
+//            //Not found space or new line
+//            lastStartIndex = -1;
+//        }
+//        else if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location != NSNotFound) {
+//            //Only found new line with following @ ("\n@")
+//            lastStartIndex = lastNewLineRange.location;
+//        }
+//        else if (lastSpaceRange.location != NSNotFound && lastNewLineRange.location == NSNotFound) {
+//            //Only found space with following @ (" @")
+//            lastStartIndex = lastSpaceRange.location;
+//        }
+//        else if (lastSpaceRange.location >= lastNewLineRange.location) {
+//            //Last word is separated by space
+//            lastStartIndex = lastSpaceRange.location;
+//        }
+//        else {
+//            //Last word is separated by newline
+//            lastStartIndex = lastNewLineRange.location;
+//        }
+//
+//        NSString *replacedString;
+//        NSArray *wordArray = [self.messageTextView.text componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+//        if ([wordArray count] > 1 && lastStartIndex != -1) {
+//            NSInteger totalReplacedWordLength = [trimmedMessageString length] - lastStartIndex;
+//            NSRange replacedRange = NSMakeRange(lastStartIndex, totalReplacedWordLength);
+//            replacedString = [trimmedMessageString stringByReplacingCharactersInRange:replacedRange withString:@""];
+//            //Adding space in the end of the username
+//            replacedString = [replacedString stringByAppendingString:[NSString stringWithFormat:@" @%@ ", username]];
+//        }
+//        else {
+//            //Adding space in the end of the username
+//            replacedString = [NSString stringWithFormat:@"@%@ ", username];
+//        }
+//        [self.messageTextView setText:replacedString];
         
-        //Detect which one is the last word in sentence
-        NSInteger lastStartIndex;
-        if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location == NSNotFound) {
-            //Not found space or new line
-            lastStartIndex = -1;
+        NSString *text = self.messageTextView.text;
+        if ([self.messageTextView.text length] >= self.mentionCursorIndex) {
+            // Append username to typed text
+            self.messageTextView.text = [self.messageTextView.text stringByReplacingCharactersInRange:NSMakeRange(self.mentionLoopIndex + 1, self.mentionCursorIndex - self.mentionLoopIndex - 1) withString:[NSString stringWithFormat:@"%@ ", username]];
+            [self showMentionListView:NO animated:YES];
         }
-        else if (lastSpaceRange.location == NSNotFound && lastNewLineRange.location != NSNotFound) {
-            //Only found new line with following @ ("\n@")
-            lastStartIndex = lastNewLineRange.location;
-        }
-        else if (lastSpaceRange.location != NSNotFound && lastNewLineRange.location == NSNotFound) {
-            //Only found space with following @ (" @")
-            lastStartIndex = lastSpaceRange.location;
-        }
-        else if (lastSpaceRange.location >= lastNewLineRange.location) {
-            //Last word is separated by space
-            lastStartIndex = lastSpaceRange.location;
-        }
-        else {
-            //Last word is separated by newline
-            lastStartIndex = lastNewLineRange.location;
-        }
-        
-        NSString *replacedString;
-        NSArray *wordArray = [self.messageTextView.text componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        if ([wordArray count] > 1 && lastStartIndex != -1) {
-            NSInteger totalReplacedWordLength = [trimmedMessageString length] - lastStartIndex;
-            NSRange replacedRange = NSMakeRange(lastStartIndex, totalReplacedWordLength);
-            replacedString = [trimmedMessageString stringByReplacingCharactersInRange:replacedRange withString:@""];
-            //Adding space in the end of the username
-            replacedString = [replacedString stringByAppendingString:[NSString stringWithFormat:@" @%@ ", username]];
-        }
-        else {
-            //Adding space in the end of the username
-            replacedString = [NSString stringWithFormat:@"@%@ ", username];
-        }
-        
-        [self.messageTextView setText:replacedString];
-        [self showMentionListView:NO animated:YES];
     }
 }
 
@@ -1977,7 +2136,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 #ifdef DEBUG
             NSLog(@"FileName: %@ \nMimeType:%@ \nFileSize: %ld",decodedFileName, mimeType, [fileSize doubleValue]);
 #endif
-            [[TAPChatManager sharedManager] sentFileMessage:dataFile filePath:filePath];
+            [[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath];
             
             [TAPUtil performBlock:^{
                 if ([self.messageArray count] != 0) {
@@ -1994,6 +2153,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidSendNewMessage:(TAPMessageModel *)message {
+    // Trigger send message callback to TapUI
+    id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+    if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkActiveUserDidSendMessage:room:currentViewController:currentShownNavigationController:)]) {
+        
+        [tapUIChatRoomDelegate tapTalkActiveUserDidSendMessage:message room:message.room currentViewController:self currentShownNavigationController:self.navigationController];
+    }
     
     //DV Note - 6 Nov 2020
     //Check if message.roomID is not equal to active room ID, dont send message
@@ -2069,7 +2234,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                 //Check if system message with action remove participant and target user is current user
                 //show deleted chat room view
                 [self.view endEditing:YES];
-                [self showDeletedRoomView:YES isGroup:YES];
+                [self showDeletedRoomView:YES isGroup:YES isGroupDeleted:NO];
             }
             //refresh room members by API
             [self checkAndRefreshOnlineStatus];
@@ -2251,7 +2416,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myChatReplyDidTapped {
-    
     if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
         return;
     }
@@ -2286,28 +2450,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-            
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)myChatBubbleDidTappedUrl:(NSURL *)url
@@ -2411,7 +2554,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
-                                     [self showInputAccessoryView];
+                                     [self checkAndShowInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      [pasteboard setString:username];
                                  }];
@@ -2420,7 +2563,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -2621,11 +2764,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     [self showInputAccessoryExtensionView:YES];
     
-    //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-    quote.title = quotedMessageModel.user.fullname;
-    quote.content = quotedMessageModel.body;
+    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
     [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
     
     quotedMessageModel.quote = quote;
@@ -2637,23 +2776,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myImageQuoteDidTappedWithMessage:(TAPMessageModel *)message {
-    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
-        //reply to exists
-        
-    }
-    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
-        //quote exists
-        if(message.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:message];
 }
 
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+        return;
+    }
+    
     NSInteger messageIndex = [self.messageArray indexOfObject:message];
     
     [TAPDataManager deleteDatabaseMessageWithData:@[message] success:^{
@@ -2666,13 +2796,59 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             } completion:^(BOOL finished) {
             }];
         
-            [TAPImageView imageFromCacheWithKey:message.localID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-                
-                NSDictionary *dataDictionary = resultMessage.data;
-                NSString *currentCaption = [dataDictionary objectForKey:@"caption"];
-                currentCaption = [TAPUtil nullToEmptyString:currentCaption];
-                
+            NSDictionary *dataDictionary = message.data;
+            dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+            NSString *currentCaption = [dataDictionary objectForKey:@"caption"];
+            currentCaption = [TAPUtil nullToEmptyString:currentCaption];
+        
+            [TAPImageView imageFromCacheWithKey:message.localID message:message
+            success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
                 [[TAPChatManager sharedManager] sendImageMessage:savedImage caption:currentCaption];
+            }
+            failure:^(TAPMessageModel *resultMessage) {
+                NSString *assetIdentifier = [dataDictionary objectForKey:@"assetIdentifier"];
+                assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
+                
+                if (![assetIdentifier isEqualToString:@""]) {
+                    NSArray<NSString *> *assetIdentifierArray = [NSArray arrayWithObject:assetIdentifier];
+                    PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
+                    PHAsset *imageAsset = [fetchResult firstObject];
+                    if (imageAsset != nil) {
+                        [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:imageAsset caption:currentCaption];
+                    }
+                    else {
+                        // Image data not found
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage
+                                         popupIdentifier:@"Image Asset Not Found"
+                                                   title:NSLocalizedStringFromTableInBundle(@"Unable to Resend Message", nil, [TAPUtil currentBundle], @"")
+                                       detailInformation:NSLocalizedStringFromTableInBundle(@"Image data is not found, please try resending the message from camera or gallery.", nil, [TAPUtil currentBundle], @"")
+                                   leftOptionButtonTitle:nil
+                          singleOrRightOptionButtonTitle:nil];
+                    }
+                }
+                else {
+                    NSString *key = [TAPUtil getFileKeyFromMessage:message];
+                    if (![key isEqualToString:@""] && message.isFailedSend) {
+                        // Image already uploaded, resend message
+                        TAPMessageModel *messageToResend = [TAPMessageModel createMessageWithUser:message.user
+                                                                                             room:message.room
+                                                                                             body:message.body
+                                                                                             type:message.type
+                                                                                            quote:message.quote
+                                                                                      messageData:message.data];
+                        NSInteger messageIndex = [self.messageArray indexOfObject:message];
+                        [[TAPChatManager sharedManager] sendCustomMessage:messageToResend];
+                    }
+                    else {
+                        // Image data not found
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage
+                                         popupIdentifier:@"Image Asset Not Found"
+                                                   title:NSLocalizedStringFromTableInBundle(@"Unable to Resend Message", nil, [TAPUtil currentBundle], @"")
+                                       detailInformation:NSLocalizedStringFromTableInBundle(@"Image data is not found, please try resending the message from camera or gallery.", nil, [TAPUtil currentBundle], @"")
+                                   leftOptionButtonTitle:nil
+                          singleOrRightOptionButtonTitle:nil];
+                    }
+                }
             }];
     } failure:^(NSError *error) {
         
@@ -2680,13 +2856,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myImageDidTapped:(TAPMyImageBubbleTableViewCell *)myImageBubbleCell {
-    [self.messageTextView resignFirstResponder];
-    [self.secondaryTextField resignFirstResponder];
-    [self keyboardWillHideWithHeight:0.0f];
-    
-    _isShowAccessoryView = NO;
-    [self reloadInputViews];
-    
     CGFloat bubbleImageViewMinY = CGRectGetMinY(myImageBubbleCell.bubbleImageView.frame);
     
     TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
@@ -2697,12 +2866,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIImage *cellImage = myImageBubbleCell.bubbleImageView.image;
     NSArray *imageSliderImage = [NSArray array];
     if(cellImage != nil) {
-        imageSliderImage = @[cellImage];
-        TAPMessageModel *currentMessage = myImageBubbleCell.message;
-        NSString *cellImageURLString = [TAPUtil nullToEmptyString:[myImageBubbleCell.message.data objectForKey:@"fileID"]];
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
         
-        NSString *fileID = [myImageBubbleCell.message.data objectForKey:@"fileID"];
-        fileID = [TAPUtil nullToEmptyString:fileID];
+        _isShowAccessoryView = NO;
+        [self reloadInputViews];
+        
+        imageSliderImage = @[cellImage];
         
         [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
         [mediaDetailViewController setImageArray:@[cellImage]];
@@ -2822,7 +2993,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
-                                     [self showInputAccessoryView];
+                                     [self checkAndShowInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      [pasteboard setString:username];
                                  }];
@@ -2831,7 +3002,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -2901,26 +3072,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPMyFileBubbleTableViewCell
 - (void)myFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)myFileReplyDidTapped:(TAPMessageModel *)tappedMessage {
@@ -2935,39 +3087,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self setInputAccessoryExtensionType:inputAccessoryExtensionTypeQuote];
     [self showInputAccessoryExtensionView:YES];
     
-    NSString *fileName = [quotedMessageModel.data objectForKey:@"fileName"];
-    fileName = [TAPUtil nullToEmptyString:fileName];
-    
-    NSString *fileExtension  = [[fileName pathExtension] uppercaseString];
-    
-    fileName = [fileName stringByDeletingPathExtension];
-    
-    if ([fileExtension isEqualToString:@""]) {
-        fileExtension = [quotedMessageModel.data objectForKey:@"mediaType"];
-        fileExtension = [TAPUtil nullToEmptyString:fileExtension];
-        fileExtension = [fileExtension lastPathComponent];
-        fileExtension = [fileExtension uppercaseString];
-    }
-    
-    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
-    
     //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-    quote.title = fileName;
-    quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
-    
-    NSString *fileTypeString = @"";
-    if (quotedMessageModel.type == TAPChatMessageTypeImage) {
-        fileTypeString = @"image";
-    }
-    else if (quotedMessageModel.type == TAPChatMessageTypeVideo) {
-        fileTypeString = @"video";
-    }
-    else if (quotedMessageModel.type == TAPChatMessageTypeFile) {
-        fileTypeString = @"file";
-    }
-    quote.fileType = fileTypeString;
+    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
     [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
     
     quotedMessageModel.quote = quote;
@@ -2987,12 +3108,14 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myFileRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+        return;
+    }
     
     NSDictionary *dataDictionary = tappedMessage.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
     
-    if ([fileID isEqualToString:@""] || fileID == nil) {
-        
+    if ([key isEqualToString:@""]) {
         //Remove from waiting upload dictionary in ChatManager
         [[TAPChatManager sharedManager] removeFromWaitingUploadFileMessage:tappedMessage];
         
@@ -3031,8 +3154,32 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             NSData *fileData = [NSData dataWithContentsOfURL:newURL];
             dataFile.fileData = fileData;
             
-            [[TAPChatManager sharedManager] sentFileMessage:dataFile filePath:filePath];
+            [[TAPChatManager sharedManager] sendFileMessage:dataFile filePath:filePath];
             
+        } failure:^(NSError *error) {
+            
+        }];
+    }
+    else if (tappedMessage.isFailedSend) {
+        // File already uploaded, resend message
+        TAPMessageModel *messageToResend = [TAPMessageModel createMessageWithUser:tappedMessage.user
+                                                                             room:tappedMessage.room
+                                                                             body:tappedMessage.body
+                                                                             type:tappedMessage.type
+                                                                            quote:tappedMessage.quote
+                                                                      messageData:tappedMessage.data];
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
+            [self.messageArray removeObjectAtIndex:messageIndex];
+            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
+            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
+            
+            [[TAPChatManager sharedManager] sendCustomMessage:messageToResend];
         } failure:^(NSError *error) {
             
         }];
@@ -3044,11 +3191,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myFileCancelButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    
     NSDictionary *dataDictionary = tappedMessage.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
     
-    if ([fileID isEqualToString:@""] || fileID == nil) {
+    if ([key isEqualToString:@""]) {
         //File exist, uploading file state
         //Cancel uploading task
         [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:tappedMessage];
@@ -3084,11 +3230,34 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    
-    NSDictionary *dataDictionary = tappedMessage.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     NSString *roomID = tappedMessage.room.roomID;
-    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        return;
+    }
+    
     self.currentSelectedFileURL = [NSURL fileURLWithPath:filePath];
     
     QLPreviewController *preview = [[QLPreviewController alloc] init];
@@ -3155,7 +3324,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
                                            //Do some thing here
-                                           [self showInputAccessoryView];
+                                           [self checkAndShowInputAccessoryView];
                                            [self checkKeyboard];
                                        }];
         
@@ -3181,23 +3350,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myLocationQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)myLocationReplyDidTapped:(TAPMessageModel *)tappedMessage {
@@ -3245,24 +3398,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPMyVideoBubbleTableViewCell
 - (void)myVideoQuoteDidTappedWithMessage:(TAPMessageModel *)message {
-    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
-        //reply to exists
-        
-    }
-    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
-        //quote exists
-        if(message.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:message];
 }
 
 - (void)myVideoReplyDidTappedWithMessage:(TAPMessageModel *)message {
-    
     if (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal) {
         return;
     }
@@ -3275,10 +3414,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self showInputAccessoryExtensionView:YES];
     
     //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-    quote.title = quotedMessageModel.user.fullname;
-    quote.content = quotedMessageModel.body;
+    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:message];
     [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
     
     quotedMessageModel.quote = quote;
@@ -3314,10 +3450,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myVideoCancelDidTappedWithMessage:(TAPMessageModel *)message {
-    NSDictionary *dataDictionary = message.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    NSString *key = [TAPUtil getFileKeyFromMessage:message];
     
-    if ([fileID isEqualToString:@""] || fileID == nil) {
+    if ([key isEqualToString:@""]) {
         //Video exist, uploading file state
         //Cancel uploading task
         [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:message];
@@ -3353,12 +3488,19 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myVideoRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    NSDictionary *dataDictionary = tappedMessage.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    NSLog(@"myVideoRetryUploadDownloadButtonDidTapped: %ld", [[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus]);
+    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+        return;
+    }
     
-    if ([fileID isEqualToString:@""] || fileID == nil) {
+    NSString *key = [TAPUtil getFileKeyFromMessage:tappedMessage];
+    
+    if ([key isEqualToString:@""]) {
         //Video exist, retry upload
         NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        
+        NSString *caption = [tappedMessage.data objectForKey:@"caption"];
+        caption = [TAPUtil nullToEmptyString:caption];
         
         [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
 
@@ -3376,14 +3518,54 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             
             //            PHAsset *asset = [tappedMessage.data objectForKey:@"asset"];
             NSString *assetIdentifier = [tappedMessage.data objectForKey:@"assetIdentifier"];
-            PHAsset *asset = [[TAPFileUploadManager sharedManager] getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:assetIdentifier];
-            NSString *caption = [tappedMessage.data objectForKey:@"caption"];
-            caption = [TAPUtil nullToEmptyString:caption];
+            assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
             
-            if (asset.mediaType == PHAssetMediaTypeVideo) {
+            PHAsset *asset = [[TAPFileUploadManager sharedManager] getAssetFromPendingUploadAssetDictionaryWithAssetIdentifier:assetIdentifier];
+            
+            if (asset != nil && asset.mediaType == PHAssetMediaTypeVideo) {
                 [[TAPChatManager sharedManager] sendVideoMessageWithPHAsset:asset caption:caption thumbnailImageData:thumbnailImageData];
             }
+            else {
+                NSArray<NSString *> *assetIdentifierArray = [NSArray arrayWithObject:assetIdentifier];
+                PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
+                PHAsset *videoAsset = [fetchResult firstObject];
+                if (videoAsset != nil && videoAsset.mediaType == PHAssetMediaTypeVideo) {
+                    [[TAPChatManager sharedManager] sendVideoMessageWithPHAsset:videoAsset caption:caption thumbnailImageData:thumbnailImageData];
+                }
+                else {
+                    // Video data not found
+                    [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage
+                                     popupIdentifier:@"Video Asset Not Found"
+                                               title:NSLocalizedStringFromTableInBundle(@"Unable to Resend Message", nil, [TAPUtil currentBundle], @"")
+                                   detailInformation:NSLocalizedStringFromTableInBundle(@"Video data is not found, please try resending the message from camera or gallery.", nil, [TAPUtil currentBundle], @"")
+                               leftOptionButtonTitle:nil
+                      singleOrRightOptionButtonTitle:nil];
+                }
+            }
+        } failure:^(NSError *error) {
             
+        }];
+    }
+    else if (tappedMessage.isFailedSend) {
+        // Video already uploaded, resend message
+        TAPMessageModel *messageToResend = [TAPMessageModel createMessageWithUser:tappedMessage.user
+                                                                             room:tappedMessage.room
+                                                                             body:tappedMessage.body
+                                                                             type:tappedMessage.type
+                                                                            quote:tappedMessage.quote
+                                                                      messageData:tappedMessage.data];
+        NSInteger messageIndex = [self.messageArray indexOfObject:tappedMessage];
+        [TAPDataManager deleteDatabaseMessageWithData:@[tappedMessage] success:^{
+            [self.messageArray removeObjectAtIndex:messageIndex];
+            [self.messageDictionary removeObjectForKey:tappedMessage.localID];
+            NSIndexPath *deleteAtIndexPath = [NSIndexPath indexPathForRow:messageIndex inSection:0];
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [self.tableView deleteRowsAtIndexPaths:@[deleteAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+            } completion:^(BOOL finished) {
+            }];
+            
+            [[TAPChatManager sharedManager] sendCustomMessage:messageToResend];
         } failure:^(NSError *error) {
             
         }];
@@ -3399,28 +3581,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)myVideoPlayDidTappedWithMessage:(TAPMessageModel *)message {
-    NSDictionary *dataDictionary = message.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    fileID = [TAPUtil nullToEmptyString:fileID];
-    
-    if (![fileID isEqualToString:@""]) {
-        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:fileID];
-        NSURL *url = [NSURL fileURLWithPath:filePath];
-        AVAsset *asset = [AVAsset assetWithURL:url];
-        
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-        
-        //        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
-        AVPlayerItem *item = [[AVPlayerItem alloc] initWithAsset:asset];
-        AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
-        
-        AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
-        controller.delegate = self;
-        controller.showsPlaybackControls = YES;
-        [self presentViewController:controller animated:YES completion:nil];
-        controller.player = player;
-        [player play];
-    }
+    [self playVideoWithMessage:message];
 }
 
 - (void)myVideoBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message {
@@ -3500,7 +3661,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
-                                     [self showInputAccessoryView];
+                                     [self checkAndShowInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      [pasteboard setString:username];
                                  }];
@@ -3509,7 +3670,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -3672,7 +3833,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         return;
     }
     
-    [self showInputAccessoryView];
+    [self checkAndShowInputAccessoryView];
     
     //set selected message to chat field
     NSInteger messageIndex = [self.messageArray indexOfObject:self.selectedMessage];
@@ -3704,26 +3865,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourChatQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)yourChatBubbleDidTappedUrl:(NSURL *)url
@@ -3830,7 +3972,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
-                                     [self showInputAccessoryView];
+                                     [self checkAndShowInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      [pasteboard setString:username];
                                  }];
@@ -3839,7 +3981,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -4015,10 +4157,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self showInputAccessoryExtensionView:YES];
     
     //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-    quote.title = quotedMessageModel.user.fullname;
-    quote.content = quotedMessageModel.body;
+    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:message];
     [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
     
     quotedMessageModel.quote = quote;
@@ -4030,30 +4169,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourImageQuoteDidTappedWithMessage:(TAPMessageModel *)message {
-    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
-        //reply to exists
-        
-    }
-    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
-        //quote exists
-        if(message.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:message];
 }
 
 - (void)yourImageDidTapped:(TAPYourImageBubbleTableViewCell *)yourImageBubbleCell {
-    [self.messageTextView resignFirstResponder];
-    [self.secondaryTextField resignFirstResponder];
-    [self keyboardWillHideWithHeight:0.0f];
-    
-    _isShowAccessoryView = NO;
-    [self reloadInputViews];
-    
     CGFloat bubbleImageViewMinY = CGRectGetMinY(yourImageBubbleCell.bubbleImageView.frame);
     
     TAPMediaDetailViewController *mediaDetailViewController = [[TAPMediaDetailViewController alloc] init];
@@ -4064,12 +4183,15 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     UIImage *cellImage = yourImageBubbleCell.bubbleImageView.image;
     NSArray *imageSliderImage = [NSArray array];
     if(cellImage != nil) {
+        [self.messageTextView resignFirstResponder];
+        [self.secondaryTextField resignFirstResponder];
+        [self keyboardWillHideWithHeight:0.0f];
+        
+        _isShowAccessoryView = NO;
+        [self reloadInputViews];
+        
         imageSliderImage = @[cellImage];
         TAPMessageModel *currentMessage = yourImageBubbleCell.message;
-        NSString *cellImageURLString = [TAPUtil nullToEmptyString:[yourImageBubbleCell.message.data objectForKey:@"fileID"]];
-        
-        NSString *fileID = [yourImageBubbleCell.message.data objectForKey:@"fileID"];
-        fileID = [TAPUtil nullToEmptyString:fileID];
         
         [mediaDetailViewController setThumbnailImageArray:imageSliderImage];
         [mediaDetailViewController setImageArray:@[cellImage]];
@@ -4200,7 +4322,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
-                                     [self showInputAccessoryView];
+                                     [self checkAndShowInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      [pasteboard setString:username];
                                  }];
@@ -4209,7 +4331,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -4283,26 +4405,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourFileQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)yourFileReplyDidTapped:(TAPMessageModel *)tappedMessage {
@@ -4335,21 +4438,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
     
     //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-    quote.title = fileName;
-    quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
-    NSString *fileTypeString = @"";
-    if (quotedMessageModel.type == TAPChatMessageTypeImage) {
-        fileTypeString = @"image";
-    }
-    else if (quotedMessageModel.type == TAPChatMessageTypeVideo) {
-        fileTypeString = @"video";
-    }
-    else if (quotedMessageModel.type == TAPChatMessageTypeFile) {
-        fileTypeString = @"file";
-    }
-    quote.fileType = fileTypeString;
+    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
     [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
     
     quotedMessageModel.quote = quote;
@@ -4378,10 +4467,34 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    NSDictionary *dataDictionary = tappedMessage.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     NSString *roomID = tappedMessage.room.roomID;
-    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
+    NSDictionary *dataDictionary = tappedMessage.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        return;
+    }
+    
     self.currentSelectedFileURL = [NSURL fileURLWithPath:filePath];
     
     QLPreviewController *preview = [[QLPreviewController alloc] init];
@@ -4425,7 +4538,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
         
@@ -4450,26 +4563,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourLocationQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
-    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
-        //reply to exists
-        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
-            //check if no reply message in loading / fetch to handle double tapped on waiting action
-            //check if message is forwarded, do nothing on forwarded message
-            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
-                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
-            }
-        }
-    }
-    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
-        //quote exists
-        if(tappedMessage.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:tappedMessage];
 }
 
 - (void)yourLocationReplyDidTapped:(TAPMessageModel *)tappedMessage {
@@ -4521,20 +4615,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 
 #pragma mark TAPYourVideoBubbleTableViewCell
 - (void)yourVideoQuoteDidTappedWithMessage:(TAPMessageModel *)message {
-    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
-        //reply to exists
-        
-    }
-    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
-        //quote exists
-        if(message.data) {
-            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[message.data objectForKey:@"userInfo"]];
-            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
-            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
-                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
-            }
-        }
-    }
+    [self messageBubbleQuoteViewDidTapped:message];
 }
 
 - (void)yourVideoReplyDidTappedWithMessage:(TAPMessageModel *)message {
@@ -4550,10 +4631,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [self showInputAccessoryExtensionView:YES];
     
     //convert to quote model
-    TAPQuoteModel *quote = [TAPQuoteModel new];
-    quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-    quote.title = quotedMessageModel.user.fullname;
-    quote.content = quotedMessageModel.body;
+    TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
     [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
     
     quotedMessageModel.quote = quote;
@@ -4589,34 +4667,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)yourVideoPlayDidTappedWithMessage:(TAPMessageModel *)message {
-    NSDictionary *dataDictionary = message.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    fileID = [TAPUtil nullToEmptyString:fileID];
-    
-    if (![fileID isEqualToString:@""]) {
-        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:fileID];
-        NSURL *url = [NSURL fileURLWithPath:filePath];
-        AVAsset *asset = [AVAsset assetWithURL:url];
-        
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-        
-        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
-        AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
-        
-        AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
-        controller.delegate = self;
-        controller.showsPlaybackControls = YES;
-        [self presentViewController:controller animated:YES completion:nil];
-        controller.player = player;
-        [player play];
-    }
+    [self playVideoWithMessage:message];
 }
 
 - (void)yourVideoCancelDidTappedWithMessage:(TAPMessageModel *)message {
-    NSDictionary *dataDictionary = message.data;
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+    NSString *key = [TAPUtil getFileKeyFromMessage:message];
     
-    if ([fileID isEqualToString:@""] || fileID == nil) {
+    if ([key isEqualToString:@""]) {
         //Video exist, uploading file state
         //Cancel uploading task
         [[TAPFileUploadManager sharedManager] cancelUploadingOperationWithMessage:message];
@@ -4739,7 +4796,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
-                                     [self showInputAccessoryView];
+                                     [self checkAndShowInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      [pasteboard setString:username];
                                  }];
@@ -4748,7 +4805,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -4906,19 +4963,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         return;
     }
     
-    [self filterMentionListWithKeyword:selectedWord];
-    if ([self.filteredMentionListArray count] == 0) {
-        [self showMentionListView:NO animated:YES];
-        [self.mentionListTableView reloadData];
-    }
-    else {
-        if (self.mentionListTableView.alpha != 1.0f) {
-            [self showMentionListView:YES animated:YES];
-        }
-        
-        [self.mentionListTableView reloadData];
-        [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
-    }
+//    [self filterMentionListWithKeyword:selectedWord];
+//    if ([self.filteredMentionListArray count] == 0) {
+//        [self showMentionListView:NO animated:YES];
+//        [self.mentionListTableView reloadData];
+//    }
+//    else {
+//        if (self.mentionListTableView.alpha != 1.0f) {
+//            [self showMentionListView:YES animated:YES];
+//        }
+//
+//        [self.mentionListTableView reloadData];
+//        [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
+//    }
+    [self checkAndSearchUserMentionList:newText isErasing:isErasing];
 }
 
 - (void)growingTextView:(TAPGrowingTextView *)textView shouldChangeHeight:(CGFloat)height {
@@ -4930,6 +4988,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self.inputMessageAccessoryView layoutIfNeeded];
         [self.view layoutIfNeeded];
     }];
+#ifdef DEBUG
+    NSLog(@">>>> growingTextViewShouldChangeHeight messageTextViewHeight: %f", height);
+    NSLog(@">>>> growingTextViewShouldChangeHeight messageViewHeightConstraint: %f", self.messageViewHeightConstraint.constant);
+#endif
 }
 
 - (void)growingTextViewDidBeginEditing:(TAPGrowingTextView *)textView {
@@ -5035,7 +5097,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         else {
             //Send using PHAsset
             UIImage *thumbnailImage = mediaPreview.thumbnailImage;
-            NSData *thumbnailImageData = UIImageJPEGRepresentation(thumbnailImage, 1.0f);
+            NSData *thumbnailImageData = UIImageJPEGRepresentation(thumbnailImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
             
             if (asset.mediaType == PHAssetMediaTypeImage) {
                 [[TAPChatManager sharedManager] sendImageMessageWithPHAsset:asset caption:caption];
@@ -5058,12 +5120,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)imagePreviewCancelButtonDidTapped {
-    [self showInputAccessoryView];
+    [self checkAndShowInputAccessoryView];
     [self checkKeyboard];
 }
 
 - (void)imagePreviewDidSendDataAndCompleteDismissView {
-    [self showInputAccessoryView];
+    [self checkAndShowInputAccessoryView];
     [self checkKeyboard];
 }
 
@@ -5125,7 +5187,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         PHAsset *asset = mediaPreview.asset;
         
         UIImage *thumbnailImage = mediaPreview.thumbnailImage;
-        NSData *thumbnailImageData = UIImageJPEGRepresentation(thumbnailImage, 1.0f);
+        NSData *thumbnailImageData = UIImageJPEGRepresentation(thumbnailImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
         
         NSString *caption = mediaPreview.caption;
         caption = [TAPUtil nullToEmptyString:caption];
@@ -5152,7 +5214,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 #pragma mark TAPMediaDetailViewController
 - (void)mediaDetailViewControllerWillStartClosingAnimation {
     //need to reload inputView after presenting another vc on top
-    [self showInputAccessoryView];
+    [self checkAndShowInputAccessoryView];
 }
 
 - (void)mediaDetailViewControllerDidFinishClosingAnimation {
@@ -5755,64 +5817,66 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)fileUploadManagerFailureNotification:(NSNotification *)notification {
-    NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
-    
-    TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
-    
-    NSString *roomID = obtainedMessage.room.roomID;
-    roomID = [TAPUtil nullToEmptyString:roomID];
-    
-//    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
-    NSString *currentActiveRoomID = self.currentRoom.roomID;
-    currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
-    
-    if (![roomID isEqualToString:currentActiveRoomID]) {
-        return;
-    }
-    
-    NSString *localID = obtainedMessage.localID;
-    localID = [TAPUtil nullToEmptyString:localID];
-    
-    TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
-    NSArray *messageArray = [self.messageArray copy];
-    NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-    
-    //Update message status to array and dictionary
-    currentMessage.isFailedSend = YES;
-    currentMessage.isSending = NO;
-    
-    TAPChatMessageType type = currentMessage.type;
-    if (type == TAPChatMessageTypeImage) {
-        TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [cell setMessage:currentMessage];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
         
-        [self.tableView performBatchUpdates:^{
-            //changing beginUpdates and endUpdates with this because of deprecation
-            [cell animateFailedUploadingImage];
-        } completion:^(BOOL finished) {
-        }];
-    }
-    else if (type == TAPChatMessageTypeFile) {
-        TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        [cell setMessage:currentMessage];
+        TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
         
-        [self.tableView performBatchUpdates:^{
-            //changing beginUpdates and endUpdates with this because of deprecation
-            [cell animateFailedUploadFile];
-        } completion:^(BOOL finished) {
-        }];
-    }
-    else if (type == TAPChatMessageTypeVideo) {
-        TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-        cell.message = obtainedMessage;
-        [cell setMessage:currentMessage];
+        NSString *roomID = obtainedMessage.room.roomID;
+        roomID = [TAPUtil nullToEmptyString:roomID];
         
-        [self.tableView performBatchUpdates:^{
-            //changing beginUpdates and endUpdates with this because of deprecation
-            [cell animateFailedUploadVideo];
-        } completion:^(BOOL finished) {
-        }];
-    }
+    //    TAPRoomModel *currentRoom = [TAPChatManager sharedManager].activeRoom;
+        NSString *currentActiveRoomID = self.currentRoom.roomID;
+        currentActiveRoomID = [TAPUtil nullToEmptyString:currentActiveRoomID];
+        
+        if (![roomID isEqualToString:currentActiveRoomID]) {
+            return;
+        }
+        
+        NSString *localID = obtainedMessage.localID;
+        localID = [TAPUtil nullToEmptyString:localID];
+        
+        TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
+        NSArray *messageArray = [self.messageArray copy];
+        NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
+        
+        //Update message status to array and dictionary
+        currentMessage.isFailedSend = YES;
+        currentMessage.isSending = NO;
+        
+        TAPChatMessageType type = currentMessage.type;
+        if (type == TAPChatMessageTypeImage) {
+            TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell setMessage:currentMessage];
+            
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [cell animateFailedUploadingImage];
+            } completion:^(BOOL finished) {
+            }];
+        }
+        else if (type == TAPChatMessageTypeFile) {
+            TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            [cell setMessage:currentMessage];
+            
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [cell animateFailedUploadFile];
+            } completion:^(BOOL finished) {
+            }];
+        }
+        else if (type == TAPChatMessageTypeVideo) {
+            TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
+            cell.message = obtainedMessage;
+            [cell setMessage:currentMessage];
+            
+            [self.tableView performBatchUpdates:^{
+                //changing beginUpdates and endUpdates with this because of deprecation
+                [cell animateFailedUploadVideo];
+            } completion:^(BOOL finished) {
+            }];
+        }
+    });
 }
 
 #pragma mark Download Notification
@@ -5964,7 +6028,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
         
         TAPMessageModel *obtainedMessage = [notificationParameterDictionary objectForKey:@"message"];
-        
         NSString *roomID = obtainedMessage.room.roomID;
         roomID = [TAPUtil nullToEmptyString:roomID];
         
@@ -5991,15 +6054,20 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (fullImage != nil) {
+                if (fullImage != nil && [fullImage class] == [UIImage class]) {
                     [cell setFullImage:fullImage];
                 }
-                [cell animateFinishedUploadingImage];
+                if (!currentMessage.isFailedSend) {
+                    [cell animateFinishedUploadingImage];
+                }
+                else {
+                    [cell animateFailedUploadingImage];
+                }
             }
             else {
                 //Their Chat
                 TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                if (fullImage != nil) {
+                if (fullImage != nil && [fullImage class] == [UIImage class]) {
                     [cell setFullImage:fullImage];
                 }
                 [cell animateFinishedDownloadingImage];
@@ -6009,7 +6077,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyFileBubbleTableViewCell *cell = (TAPMyFileBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateFinishedDownloadFile];
+                if (!currentMessage.isFailedSend) {
+                    [cell animateFinishedDownloadFile];
+                }
+                else {
+                    [cell animateFailedUploadFile];
+                }
             }
             else {
                 //Their Chat
@@ -6021,7 +6094,12 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             if ([currentMessage.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
                 //My Chat
                 TAPMyVideoBubbleTableViewCell *cell = (TAPMyVideoBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-                [cell animateFinishedDownloadVideo];
+                if (!currentMessage.isFailedSend) {
+                    [cell animateFinishedDownloadVideo];
+                }
+                else {
+                    [cell animateFailedUploadVideo];
+                }
                 [cell setVideoDurationAndSizeProgressViewWithMessage:currentMessage progress:nil stateType:TAPMyVideoBubbleTableViewCellStateTypeDoneDownloadedUploaded];
                 [cell setThumbnailImageForVideoWithMessage:currentMessage];
             }
@@ -6220,7 +6298,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -6417,7 +6495,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Already Handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
-    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
+    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nullable filePath) {
         //Already Handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
@@ -6429,7 +6507,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Already Handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
-    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
+    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nonnull filePath) {
         //Already Handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
@@ -6441,7 +6519,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         //Already Handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
-    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
+    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nonnull filePath) {
         //Already Handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
         //Already Handled via Notification
@@ -6515,7 +6593,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                         actionWithTitle:NSLocalizedStringFromTableInBundle(@"Compose", nil, [TAPUtil currentBundle], @"")
                                         style:UIAlertActionStyleDefault
                                         handler:^(UIAlertAction * action) {
-                                            [self showInputAccessoryView];
+                                            [self checkAndShowInputAccessoryView];
                                             if([[UIApplication sharedApplication] canOpenURL:url]) {
                                                 if(IS_IOS_11_OR_ABOVE) {
                                                     [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
@@ -6530,7 +6608,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
-                                         [self showInputAccessoryView];
+                                         [self checkAndShowInputAccessoryView];
                                          UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                          [pasteboard setString:originalString];
                                      }];
@@ -6539,7 +6617,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                        actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
-                                           [self showInputAccessoryView];
+                                           [self checkAndShowInputAccessoryView];
                                            [self checkKeyboard];
                                        }];
         
@@ -6595,7 +6673,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
                                          //CS TEMP - temporary open safari
-                                         [self showInputAccessoryView];
+                                         [self checkAndShowInputAccessoryView];
                                          if([[UIApplication sharedApplication] canOpenURL:url]) {
                                              if(IS_IOS_11_OR_ABOVE) {
                                                  [[UIApplication sharedApplication] openURL:url options:[NSDictionary dictionary] completionHandler:nil];
@@ -6610,7 +6688,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                      actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                      style:UIAlertActionStyleDefault
                                      handler:^(UIAlertAction * action) {
-                                         [self showInputAccessoryView];
+                                         [self checkAndShowInputAccessoryView];
                                          UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                          [pasteboard setString:originalString];
                                      }];
@@ -6619,7 +6697,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                        actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
                                        style:UIAlertActionStyleCancel
                                        handler:^(UIAlertAction * action) {
-                                           [self showInputAccessoryView];
+                                           [self checkAndShowInputAccessoryView];
                                            [self checkKeyboard];
                                        }];
         
@@ -6677,7 +6755,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Call Number", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
-                                     [self showInputAccessoryView];
+                                     [self checkAndShowInputAccessoryView];
                                      NSString *stringURL = [NSString stringWithFormat:@"tel:%@", phoneNumber];
                                      if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
                                          if(IS_IOS_11_OR_ABOVE) {
@@ -6693,7 +6771,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                 actionWithTitle:NSLocalizedStringFromTableInBundle(@"SMS Number", nil, [TAPUtil currentBundle], @"")
                                 style:UIAlertActionStyleDefault
                                 handler:^(UIAlertAction * action) {
-                                    [self showInputAccessoryView];
+                                    [self checkAndShowInputAccessoryView];
                                     NSString *stringURL = [NSString stringWithFormat:@"sms:%@", phoneNumber];
                                     if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:stringURL]]) {
                                         if(IS_IOS_11_OR_ABOVE) {
@@ -6709,7 +6787,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
-                                     [self showInputAccessoryView];
+                                     [self checkAndShowInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      [pasteboard setString:phoneNumber];
                                  }];
@@ -6719,7 +6797,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -6829,6 +6907,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)handleLongPressedWithMessage:(TAPMessageModel *)message {
+#ifdef DEBUG
+    NSLog(@"Message model: %@", [message toJSONString]);
+#endif
+    
     if (message.isDeleted || message.isSending || message.isFailedSend || (self.otherUser == nil && self.currentRoom.type == RoomTypePersonal)) {
         return;
     }
@@ -6843,7 +6925,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                   handler:^(UIAlertAction * action) {
                                       //Reply Action Here
                                       
-                                      [self showInputAccessoryView];
+                                      [self checkAndShowInputAccessoryView];
                                       
                                       if (message.type == TAPChatMessageTypeText) {
                                           [self showInputAccessoryExtensionView:NO];
@@ -6862,10 +6944,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           [self showInputAccessoryExtensionView:YES];
                                           
                                           //convert to quote model
-                                          TAPQuoteModel *quote = [TAPQuoteModel new];
-                                          quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-                                          quote.title = quotedMessageModel.user.fullname;
-                                          quote.content = quotedMessageModel.body;
+                                          TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
                                           [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
                                           
                                           quotedMessageModel.quote = quote;
@@ -6880,10 +6959,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           [self showInputAccessoryExtensionView:YES];
                                           
                                           //convert to quote model
-                                          TAPQuoteModel *quote = [TAPQuoteModel new];
-                                          quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-                                          quote.title = quotedMessageModel.user.fullname;
-                                          quote.content = quotedMessageModel.body;
+                                          TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
                                           [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
                                           
                                           quotedMessageModel.quote = quote;
@@ -6923,21 +6999,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
                                           
                                           //convert to quote model
-                                          TAPQuoteModel *quote = [TAPQuoteModel new];
-                                          quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-                                          quote.title = fileName;
-                                          quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
-                                              NSString *fileTypeString = @"";
-                                          if (quotedMessageModel.type == TAPChatMessageTypeImage) {
-                                              fileTypeString = @"image";
-                                          }
-                                          else if (quotedMessageModel.type == TAPChatMessageTypeVideo) {
-                                              fileTypeString = @"video";
-                                          }
-                                          else if (quotedMessageModel.type == TAPChatMessageTypeFile) {
-                                              fileTypeString = @"file";
-                                          }
-                                          quote.fileType = fileTypeString;
+                                          TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
                                           [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
                                           
                                           quotedMessageModel.quote = quote;
@@ -6950,7 +7012,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                     actionWithTitle:NSLocalizedStringFromTableInBundle(@"Forward", nil, [TAPUtil currentBundle], @"")
                                     style:UIAlertActionStyleDefault
                                     handler:^(UIAlertAction * action) {
-                                        [self showInputAccessoryView];
+                                        [self checkAndShowInputAccessoryView];
                                         //Forward Action Here
                                         TAPForwardListViewController *forwardListViewController = [[TAPForwardListViewController alloc] init];
                                         forwardListViewController.currentNavigationController = self.navigationController;
@@ -6963,7 +7025,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                  actionWithTitle:NSLocalizedStringFromTableInBundle(@"Copy", nil, [TAPUtil currentBundle], @"")
                                  style:UIAlertActionStyleDefault
                                  handler:^(UIAlertAction * action) {
-                                     [self showInputAccessoryView];
+                                     [self checkAndShowInputAccessoryView];
                                      UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
                                      if (message.type == TAPChatMessageTypeText) {
                                          [pasteboard setString:message.body];
@@ -6974,39 +7036,59 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Save", nil, [TAPUtil currentBundle], @"")
                                           style:UIAlertActionStyleDefault
                                           handler:^(UIAlertAction * action) {
-                                              [self showInputAccessoryView];
-                                              //Save to gallery Action Here
-                                              if (message.type == TAPChatMessageTypeImage) {
-                                                  //Save image to gallery
-                                                  NSString *fileID = [message.data objectForKey:@"fileID"];
-                                                  fileID = [TAPUtil nullToEmptyString:fileID];
-                                                  if (![fileID isEqualToString:@""]) {
-                                                      [TAPImageView imageFromCacheWithKey:fileID success:^(UIImage *savedImage) {
-                                                          UIImageWriteToSavedPhotosAlbum(savedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
-                                                      }];
-                                                  }
-                                              }
-                                              else if (message.type == TAPChatMessageTypeVideo) {
-                                                  //Save video to gallery
-                                                  NSString *roomID = message.room.roomID;
-                                                  NSString *fileID = [message.data objectForKey:@"fileID"];
-                                                  fileID = [TAPUtil nullToEmptyString:fileID];
-                                                  if (![fileID isEqualToString:@""]) {
-                                                      NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
-                                                      if (![filePath isEqualToString:@""] && filePath != nil) {
-                                                          //Video done download, save to gallery
-                                                          UISaveVideoAtPathToSavedPhotosAlbum(filePath, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
-                                                      }
-                                                  }
-                                              }
-                                          }];
+
+        [self checkAndShowInputAccessoryView];
+        // Save to gallery action here
+        NSDictionary *dataDictionary = message.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+        fileID = [TAPUtil nullToEmptyString:fileID];
+        
+        NSString *urlKey = [dataDictionary objectForKey:@"url"];
+        if (urlKey == nil || [urlKey isEqualToString:@""]) {
+            urlKey = [dataDictionary objectForKey:@"fileURL"];
+        }
+        urlKey = [TAPUtil nullToEmptyString:urlKey];
+        
+        if (![urlKey isEqualToString:@""]) {
+            urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        urlKey = [TAPUtil nullToEmptyString:urlKey];
+        
+        if (![fileID isEqualToString:@""] || ![urlKey isEqualToString:@""]) {
+            if (message.type == TAPChatMessageTypeImage) {
+                // Save image to gallery
+                [TAPImageView imageFromCacheWithKey:urlKey message:message
+                success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+                    UIImageWriteToSavedPhotosAlbum(savedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+                } failure:^(TAPMessageModel *resultMessage) {
+                    [TAPImageView imageFromCacheWithKey:fileID message:message
+                    success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+                        UIImageWriteToSavedPhotosAlbum(savedImage, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+                    }];
+                }];
+            }
+            else if (message.type == TAPChatMessageTypeVideo) {
+                //Save video to gallery
+                NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:urlKey];
+                if ([filePath isEqualToString:@""] || filePath == nil) {
+                    filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:fileID];
+                }
+                if (![filePath isEqualToString:@""] && filePath != nil) {
+                    // Video done download, save to gallery
+                    UISaveVideoAtPathToSavedPhotosAlbum(filePath, self, @selector(video:didFinishSavingWithError:contextInfo:), nil);
+                }
+            }
+        }
+    }];
     
     UIAlertAction *deleteMessageAction = [UIAlertAction
                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Delete", nil, [TAPUtil currentBundle], @"")
                                           style:UIAlertActionStyleDefault
                                           handler:^(UIAlertAction * action) {
-                                              [self showInputAccessoryView];
-                                              [self showDeleteMessageActionWithMessageArray:@[message.messageID]];
+                                              [self checkAndShowInputAccessoryView];
+                                              [self showDeleteMessageActionWithMessageArray:@[message]];
                                           }];
     
     UIAlertAction *cancelAction = [UIAlertAction
@@ -7014,7 +7096,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                                    style:UIAlertActionStyleCancel
                                    handler:^(UIAlertAction * action) {
                                        //Do some thing here
-                                       [self showInputAccessoryView];
+                                       [self checkAndShowInputAccessoryView];
                                        [self checkKeyboard];
                                    }];
     
@@ -7055,7 +7137,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [deleteMessageAction setValue:actionSheetDestructiveColor forKey:@"titleTextColor"];
     [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
     
-    if ([[TapUI sharedInstance] isReplyMessageMenuEnabled]) {
+    if ([[TapUI sharedInstance] isReplyMessageMenuEnabled] && self.isShowAccessoryView) {
         [alertController addAction:replyAction];
     }
     
@@ -7072,34 +7154,70 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     
     if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeImage) {
         //check already downloaded or not
+        UIImage *savedImage = nil;
         NSString *roomID = message.room.roomID;
-        NSString *fileID = [message.data objectForKey:@"fileID"];
-        fileID = [TAPUtil nullToEmptyString:fileID];
-        if (![fileID isEqualToString:@""]) {
-            UIImage *savedImage = nil;
-            savedImage = [TAPImageView imageFromCacheWithKey:fileID];
-            if (savedImage != nil) {
-                //Image exist
-                [alertController addAction:saveToGalleryAction];
+        NSDictionary *dataDictionary = message.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSString *key = [dataDictionary objectForKey:@"fileID"];
+        key = [TAPUtil nullToEmptyString:key];
+        
+        savedImage = [TAPImageView imageFromCacheWithKey:key];
+        
+        if (savedImage == nil) {
+            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                fileURL = [dataDictionary objectForKey:@"fileURL"];
             }
+            fileURL = [TAPUtil nullToEmptyString:fileURL];
+            
+            if (![fileURL isEqualToString:@""]) {
+                key = fileURL;
+                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+            }
+            
+            savedImage = [TAPImageView imageFromCacheWithKey:key];
+        }
+        
+        if (savedImage != nil) {
+            //Image exist
+            [alertController addAction:saveToGalleryAction];
         }
     }
     
     if ([[TapUI sharedInstance] isSaveMediaToGalleryMenuEnabled] && message.type == TAPChatMessageTypeVideo) {
         //check already downloaded or not
         NSString *roomID = message.room.roomID;
-        NSString *fileID = [message.data objectForKey:@"fileID"];
-        fileID = [TAPUtil nullToEmptyString:fileID];
-        if (![fileID isEqualToString:@""]) {
-            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
-            if (![filePath isEqualToString:@""] && filePath != nil) {
-                //File exist
-                [alertController addAction:saveToGalleryAction];
+        NSDictionary *dataDictionary = message.data;
+        dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+        
+        NSString *key = [dataDictionary objectForKey:@"fileID"];
+        key = [TAPUtil nullToEmptyString:key];
+        
+        NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+        
+        if (filePath == nil || [filePath isEqualToString:@""]) {
+            NSString *fileURL = [dataDictionary objectForKey:@"url"];
+            if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                fileURL = [dataDictionary objectForKey:@"fileURL"];
             }
+            fileURL = [TAPUtil nullToEmptyString:fileURL];
+            
+            if (![fileURL isEqualToString:@""]) {
+                key = fileURL;
+                key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+            }
+            
+            filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+        }
+        
+        if (filePath != nil && ![filePath isEqualToString:@""]) {
+            //File exist
+            [alertController addAction:saveToGalleryAction];
         }
     }
     
-    if ([[TapUI sharedInstance] isDeleteMessageMenuEnabled] && [message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isSending) {
+    if ([[TapUI sharedInstance] isDeleteMessageMenuEnabled] && [message.user.userID isEqualToString:[TAPDataManager getActiveUser].userID] && !message.isSending && self.isShowAccessoryView) {
         //Show delete message for our bubble (my bubble) only
         [alertController addAction:deleteMessageAction];
     }
@@ -7164,7 +7282,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)setQuoteWithQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
-    
     //check id message sender is equal to active user id, if yes change the title to "You"
     if ([userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
         self.quoteTitleLabel.text = NSLocalizedStringFromTableInBundle(@"You", nil, [TAPUtil currentBundle], @"");
@@ -7184,17 +7301,91 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
     else {
         
+//        if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
+//            [self.quoteImageView setImageWithURLString:quote.imageURL];
+//        }
+//        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+//            [self.quoteImageView setImageWithURLString:quote.fileID];
+//        }
+        
         if (quote.imageURL != nil && ![quote.imageURL isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.imageURL];
         }
-        else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
+        if (self.quoteImageView.image == nil && quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.fileID];
         }
+        
         self.quoteFileView.alpha = 0.0f;
         self.quoteImageView.alpha = 1.0f;
     }
 }
 
+- (void)messageBubbleQuoteViewDidTapped:(TAPMessageModel *)tappedMessage {
+    if ((![tappedMessage.replyTo.messageID isEqualToString:@"0"] && ![tappedMessage.replyTo.messageID isEqualToString:@""]) && ![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil && tappedMessage.replyTo != nil) {
+        //reply to exists
+        if ([TAPUtil isEmptyString:self.tappedMessageLocalID]) {
+            //check if no reply message in loading / fetch to handle double tapped on waiting action
+            //check if message is forwarded, do nothing on forwarded message
+            if ([TAPUtil isEmptyString:tappedMessage.forwardFrom.fullname]) {
+                [self scrollToMessageAndLoadDataWithLocalID:tappedMessage.replyTo.localID];
+            }
+        }
+    }
+    else if (![tappedMessage.quote.title isEqualToString:@""] && tappedMessage.quote != nil) {
+        //quote exists
+        if(tappedMessage.data) {
+            NSDictionary *userInfoDictionary = [TAPUtil nullToEmptyDictionary:[tappedMessage.data objectForKey:@"userInfo"]];
+            id<TapUIChatRoomDelegate> tapUIChatRoomDelegate = [TapUI sharedInstance].chatRoomDelegate;
+            if ([tapUIChatRoomDelegate respondsToSelector:@selector(tapTalkMessageQuoteTappedWithUserInfo:)]) {
+                [tapUIChatRoomDelegate tapTalkMessageQuoteTappedWithUserInfo:userInfoDictionary];
+            }
+        }
+    }
+}
+
+- (void)playVideoWithMessage:(TAPMessageModel *)message {
+    NSDictionary *dataDictionary = message.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key = [dataDictionary objectForKey:@"fileID"];
+    key = [TAPUtil nullToEmptyString:key];
+    
+    NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        NSString *fileURL = [dataDictionary objectForKey:@"url"];
+        if (fileURL == nil || [fileURL isEqualToString:@""]) {
+            fileURL = [dataDictionary objectForKey:@"fileURL"];
+        }
+        fileURL = [TAPUtil nullToEmptyString:fileURL];
+        
+        if (![fileURL isEqualToString:@""]) {
+            key = fileURL;
+            key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        
+        filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:key];
+    }
+    
+    if (filePath == nil || [filePath isEqualToString:@""]) {
+        return;
+    }
+    
+    NSURL *url = [NSURL fileURLWithPath:filePath];
+    AVAsset *asset = [AVAsset assetWithURL:url];
+    
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    
+    AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
+    AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+    
+    AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
+    controller.delegate = self;
+    controller.showsPlaybackControls = YES;
+    [self presentViewController:controller animated:YES completion:nil];
+    controller.player = player;
+    [player play];
+}
 
 #pragma mark Input Accessory View
 //Implement Input Accessory View
@@ -7298,6 +7489,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (IBAction)inputAccessoryExtensionCloseButtonDidTapped:(id)sender {
     [self showInputAccessoryExtensionView:NO];
     [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:self.currentRoom.roomID];
+}
+
+- (void)checkAndShowInputAccessoryView {
+    [self checkAndShowRoomViewState];
 }
 
 - (void)showInputAccessoryView {
@@ -7415,6 +7610,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                     if ([lastUpdated longLongValue] == 0 || lastUpdated == nil) {
                         //First time call, set minCreated to lastUpdated preference
                         [TAPDataManager setMessageLastUpdatedWithRoomID:roomID lastUpdated:minCreated];
+                    }
+                    
+                    if (![TAPUtil isEmptyString:self.scrollToMessageLocalIDString]) {
+                        [self scrollToMessageAndLoadDataWithLocalID:self.scrollToMessageLocalIDString];
                     }
                     
                     //Call API Get After Message
@@ -7680,6 +7879,10 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
                         
                         if (isSendingAnimation) {
                             [cell receiveSentEvent];
+                            
+                            [TAPUtil performBlock:^{
+                                [self fetchImageDataWithMessage:message];
+                            } afterDelay:1.0f];
                         }
                         else if (setAsDelivered) {
                             [cell receiveDeliveredEvent];
@@ -7868,6 +8071,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)addMessageToAnchorMentionArray:(TAPMessageModel *)message {
     if (![self.anchorMentionMessageDictionary objectForKey:message.localID]) {
         [self.anchorMentionMessageDictionary setObject:message forKey:message.localID];
+        [self.anchorMentionMessageArray addObject:message];
         [self checkAnchorMentionLabel];
     }
 }
@@ -7876,6 +8080,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     for (TAPMessageModel *message in messageArray) {
         if (![self.anchorMentionMessageDictionary objectForKey:message.localID]) {
             [self.anchorMentionMessageDictionary setObject:message forKey:message.localID];
+            [self.anchorMentionMessageArray addObject:message];
             [self checkAnchorMentionLabel];
         }
     }
@@ -7884,6 +8089,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 - (void)removeMessageFromAnchorMention:(TAPMessageModel *)message {
     if ([self.anchorMentionMessageDictionary objectForKey:message.localID]) {
         [self.anchorMentionMessageDictionary removeObjectForKey:message.localID];
+        [self.anchorMentionMessageArray removeObject:message];
         [self checkAnchorMentionLabel];
     }
     
@@ -7895,6 +8101,11 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         }];
     }
  }
+
+- (void)clearAnchorMentionDictionary {
+    [self.anchorMentionMessageDictionary removeAllObjects];
+    [self.anchorMentionMessageArray removeAllObjects];
+}
 
 - (void)retrieveExistingMessages {
     //Prevent retreive before message if already last page
@@ -8837,56 +9048,56 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
-- (void)filterMentionListWithKeyword:(NSString *)keyword {
-    _filteredMentionListArray = [[NSMutableArray alloc] init];
-
-    if ([keyword length] == 0 || ![keyword hasPrefix:@"@"]) {
-        return;
-    }
-    
-    if ([keyword hasPrefix:@"@"] && [keyword length] != 1) {
-        keyword = [keyword substringFromIndex:1];
-    }
-    
-    
-    if ([keyword isEqualToString:@"@"]) {
-        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.userID != %@", currentUserID];
-        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
-        self.filteredMentionListArray = [resultArray mutableCopy];
-    }
-    else {
-        
-        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(SELF.fullname contains[cd] %@ OR SELF.username contains[cd] %@) AND SELF.userID != %@",keyword, keyword, currentUserID];
-        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
-        self.filteredMentionListArray = [resultArray mutableCopy];
-    }
-    
-    if ([self.filteredMentionListArray count] > 0) {
-        CGFloat tableViewHeight = 0.0f;
-        if ([self.filteredMentionListArray count] >= 4) {
-            tableViewHeight = 4 * 54.0f;
-        }
-        else {
-            tableViewHeight = [self.filteredMentionListArray count] * 54.0f;
-        }
-        
-        self.mentionListTableViewHeightConstraint.constant = tableViewHeight + 10.0f; //10.0f for table view header height
-        
-        self.mentionListTableView.clipsToBounds = YES;
-        self.mentionListTableView.layer.cornerRadius = 15.0f;
-        self.mentionListTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
-        
-        self.mentionTableBackgroundView.clipsToBounds = YES;
-        self.mentionTableBackgroundView.layer.cornerRadius = 15.0f;
-        self.mentionTableBackgroundView.layer.shadowRadius = 20.0f;
-        self.mentionTableBackgroundView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
-        self.mentionTableBackgroundView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
-        self.mentionTableBackgroundView.layer.shadowOpacity = 1.0f;
-        self.mentionTableBackgroundView.layer.masksToBounds = NO;
-    }
-}
+//- (void)filterMentionListWithKeyword:(NSString *)keyword {
+//    _filteredMentionListArray = [[NSMutableArray alloc] init];
+//
+//    if ([keyword length] == 0 || ![keyword hasPrefix:@"@"]) {
+//        return;
+//    }
+//
+//    if ([keyword hasPrefix:@"@"] && [keyword length] != 1) {
+//        keyword = [keyword substringFromIndex:1];
+//    }
+//
+//
+//    if ([keyword isEqualToString:@"@"]) {
+//        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+//        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.userID != %@", currentUserID];
+//        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+//        self.filteredMentionListArray = [resultArray mutableCopy];
+//    }
+//    else {
+//
+//        NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+//        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(SELF.fullname contains[cd] %@ OR SELF.username contains[cd] %@) AND SELF.userID != %@",keyword, keyword, currentUserID];
+//        NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+//        self.filteredMentionListArray = [resultArray mutableCopy];
+//    }
+//
+//    if ([self.filteredMentionListArray count] > 0) {
+//        CGFloat tableViewHeight = 0.0f;
+//        if ([self.filteredMentionListArray count] >= 4) {
+//            tableViewHeight = 4 * 54.0f;
+//        }
+//        else {
+//            tableViewHeight = [self.filteredMentionListArray count] * 54.0f;
+//        }
+//
+//        self.mentionListTableViewHeightConstraint.constant = tableViewHeight + 10.0f; //10.0f for table view header height
+//
+//        self.mentionListTableView.clipsToBounds = YES;
+//        self.mentionListTableView.layer.cornerRadius = 15.0f;
+//        self.mentionListTableView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+//
+//        self.mentionTableBackgroundView.clipsToBounds = YES;
+//        self.mentionTableBackgroundView.layer.cornerRadius = 15.0f;
+//        self.mentionTableBackgroundView.layer.shadowRadius = 20.0f;
+//        self.mentionTableBackgroundView.layer.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f].CGColor;
+//        self.mentionTableBackgroundView.layer.shadowOffset = CGSizeMake(0.0f, 0.0f);
+//        self.mentionTableBackgroundView.layer.shadowOpacity = 1.0f;
+//        self.mentionTableBackgroundView.layer.masksToBounds = NO;
+//    }
+//}
 
 - (void)showMentionListView:(BOOL)show animated:(BOOL)animated {
     if (![[TapUI sharedInstance] isMentionUsernameEnabled]) {
@@ -8897,11 +9108,13 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.mentionTableBackgroundView.alpha = 1.0f;
                 self.mentionListTableView.alpha = 1.0f;
+                [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
             }];
         }
         else {
             self.mentionTableBackgroundView.alpha = 1.0f;
             self.mentionListTableView.alpha = 1.0f;
+            [self.mentionListTableView setContentOffset:CGPointZero animated:YES];
         }
     }
     else {
@@ -8915,7 +9128,67 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             self.mentionTableBackgroundView.alpha = 0.0f;
             self.mentionListTableView.alpha = 0.0f;
         }
+        _mentionLoopIndex = 0;
+        _mentionCursorIndex = 0;
     }
+    [self.mentionListTableView reloadData];
+}
+
+- (void)checkAndSearchUserMentionList:(NSString *)text isErasing:(BOOL)isErasing {
+    if (![[TapUI sharedInstance] isMentionUsernameEnabled] || [self.participantListDictionary count] == 0) {
+        [self showMentionListView:NO animated:YES];
+        [self.mentionListTableView reloadData];
+        return;
+    }
+    
+    if (![text containsString:@"@"]) {
+        // Return if text does not contain @
+        [self showMentionListView:NO animated:YES];
+        return;
+    }
+    
+    NSInteger cursorIndex = [self.messageTextView.textView selectedRange].location + 1 - (isErasing * 2);
+    NSInteger loopIndex = [self.messageTextView.textView selectedRange].location + 1 - (isErasing * 2);
+    
+    while (loopIndex > 0) {
+        // Loop text from cursor index to the left
+        loopIndex--;
+        char c = [text characterAtIndex:loopIndex];
+        if (c == ' ' || c == '\n') {
+            // Found space before @, return
+            [self showMentionListView:NO animated:YES];
+            return;
+        }
+        if (c == '@') {
+            // Found @, start searching user
+            if (cursorIndex - loopIndex <= 1) {
+//            if ([keyword length] == 0) {
+                // Show all participants
+                NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+                NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.userID != %@", currentUserID];
+                NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+                self.filteredMentionListArray = [resultArray mutableCopy];
+            }
+            else {
+                // Search participants from keyword
+                NSString *keyword = [[text substringWithRange:NSMakeRange(loopIndex + 1, cursorIndex - loopIndex - 1)] lowercaseString];
+                NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+                NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(SELF.fullname contains[cd] %@ OR SELF.username contains[cd] %@) AND SELF.userID != %@",keyword, keyword, currentUserID];
+                NSArray *resultArray = [self.currentRoom.participants filteredArrayUsingPredicate:predicate];
+                self.filteredMentionListArray = [resultArray mutableCopy];
+            }
+            if ([self.filteredMentionListArray count] > 0) {
+            [self showMentionListView:YES animated:YES];
+                _mentionLoopIndex = loopIndex;
+                _mentionCursorIndex = cursorIndex;
+            }
+            else {
+                [self showMentionListView:NO animated:YES];
+            }
+            return;
+        }
+    }
+    [self showMentionListView:NO animated:YES];
 }
 
 - (void)tapTalkUserMentionTappedWithRoom:(TAPRoomModel *)room
@@ -9015,30 +9288,32 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (IBAction)mentionAnchorButtonDidTapped:(id)sender {
+    TAPMessageModel *messageWithMention = [self.anchorMentionMessageArray firstObject];
+    [self scrollToMessageAndLoadDataWithLocalID:messageWithMention.localID];
     
-    NSInteger numberOfPendingArray = [self.scrolledPendingMessageArray count];
-    if (numberOfPendingArray > 0) {
-        //Add pending message to messageArray (pending message has previously inserted in messageDictionary in didReceiveNewMessage)
-        [self.messageArray insertObjects:self.scrolledPendingMessageArray atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfPendingArray)]];
-        
-        [self.scrolledPendingMessageArray removeAllObjects];
-        [self.tableView reloadData];
-    }
-
-    TAPMessageModel *obtainedMentionMessage = [self.scrolledPendingMentionArray firstObject];
-    NSInteger rowIndex = [self.messageArray indexOfObject:obtainedMentionMessage];
-    
-    if (rowIndex != NSNotFound) {
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:rowIndex inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
-        [self.scrolledPendingMentionArray removeObjectAtIndex:0];
-    }
-    
-//    NSString *currentMesageLocalID = [self.anchorMentionMessageLocalIDArray firstObject];
-//    currentMesageLocalID = [TAPUtil nullToEmptyString:currentMesageLocalID];
+//    NSInteger numberOfPendingArray = [self.scrolledPendingMessageArray count];
+//    if (numberOfPendingArray > 0) {
+//        //Add pending message to messageArray (pending message has previously inserted in messageDictionary in didReceiveNewMessage)
+//        [self.messageArray insertObjects:self.scrolledPendingMessageArray atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, numberOfPendingArray)]];
 //
-//    if (![currentMesageLocalID isEqualToString:@""]) {
-//        [self scrollToMessageAndLoadDataWithLocalID:currentMesageLocalID];
+//        [self.scrolledPendingMessageArray removeAllObjects];
+//        [self.tableView reloadData];
 //    }
+//
+//    TAPMessageModel *obtainedMentionMessage = [self.scrolledPendingMentionArray firstObject];
+//    NSInteger rowIndex = [self.messageArray indexOfObject:obtainedMentionMessage];
+//
+//    if (rowIndex != NSNotFound) {
+//        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:rowIndex inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+//        [self.scrolledPendingMentionArray removeObjectAtIndex:0];
+//    }
+//
+////    NSString *currentMesageLocalID = [self.anchorMentionMessageLocalIDArray firstObject];
+////    currentMesageLocalID = [TAPUtil nullToEmptyString:currentMesageLocalID];
+////
+////    if (![currentMesageLocalID isEqualToString:@""]) {
+////        [self scrollToMessageAndLoadDataWithLocalID:currentMesageLocalID];
+////    }
 }
 
 #pragma mark Others
@@ -9230,21 +9505,21 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     [super popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:popupIdentifier];
     
     if ([popupIdentifier isEqualToString:@"Error File Size Excedeed"]) {
-        [self showInputAccessoryView];
+        [self checkAndShowInputAccessoryView];
     }
     else if ([popupIdentifier isEqualToString:@"Error Delete Message"]) {
-        [self showInputAccessoryView];
+        [self checkAndShowInputAccessoryView];
     }
     else if ([popupIdentifier isEqualToString:@"Long Press Save Image"]) {
         //Do nothing because hide popup handled when we press the button
-        [self showInputAccessoryView];
+        [self checkAndShowInputAccessoryView];
     }
     else if ([popupIdentifier isEqualToString:@"Long Press Save Video"]) {
         //Do nothing because hide popup handled when we press the button
-        [self showInputAccessoryView];
+        [self checkAndShowInputAccessoryView];
     }
     else if ([popupIdentifier isEqualToString:@"User Not Found"]) {
-        [self showInputAccessoryView];
+        [self checkAndShowInputAccessoryView];
     }
 }
 
@@ -9491,6 +9766,8 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     else {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
+    
+    [self clearAnchorMentionDictionary];
 }
 
 - (void)checkAnchorUnreadLabel {
@@ -9950,17 +10227,29 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)scrollToMessageAndLoadDataWithLocalID:(NSString *)localID {
+    self.tappedMessageLocalID = localID;
     TAPMessageModel *currentMessage = [self.messageDictionary objectForKey:localID];
     if (currentMessage) {
         NSArray *messageArray = [self.messageArray copy];
         NSInteger currentRowIndex = [messageArray indexOfObject:currentMessage];
-        
-        self.tappedMessageLocalID = @"";
+//        self.tappedMessageLocalID = @"";
         
         if (!currentMessage.isDeleted && !currentMessage.isHidden) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:currentRowIndex inSection:0];
             [TAPUtil performBlock:^{
-                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+                [self.tableView reloadData];
+                [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:NO];
             } afterDelay:0.2f];
+        }
+        else {
+            self.tappedMessageLocalID = @"";
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"" message:NSLocalizedStringFromTableInBundle(@"Could not find message.", nil, [TAPUtil currentBundle], @"") preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *okAction = [UIAlertAction actionWithTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            }];
+
+            [alertController addAction:okAction];
+            [self presentViewController:alertController animated:YES completion:nil];
         }
         [TAPUtil performBlock:^{
              [self showTopFloatingIdentifierView:NO withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
@@ -9972,7 +10261,6 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
             [self showTopFloatingIdentifierView:YES withType:TopFloatingIndicatorViewTypeLoading numberOfUnreadMessages:0 animated:YES];
         }
         
-        self.tappedMessageLocalID = localID;
         [self retrieveExistingMessages];
     }
 }
@@ -10114,14 +10402,16 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
     }
 }
 
-- (void)showDeleteMessageActionWithMessageArray:(NSString *)deletedMessageIDArray {
+- (void)showDeleteMessageActionWithMessageArray:(NSArray<TAPMessageModel *> *)deletedMessageArray {
 
-    [self showInputAccessoryView];
+    [self checkAndShowInputAccessoryView];
     //Temporary delete for everyone
     //Delete For Everyone
-    [TAPDataManager callAPIDeleteMessageWithMessageIDs:deletedMessageIDArray roomID:[TAPChatManager sharedManager].activeRoom.roomID isDeletedForEveryone:YES success:^(NSArray *deletedMessageIDArray) {
+    
+    TAPMessageModel *message = [deletedMessageArray objectAtIndex:0];
+    [[TAPCoreMessageManager sharedManager] deleteMessage:message success:^{
         
-    } failure:^(NSError *error) {
+    } failure:^(TAPMessageModel * _Nullable message, NSError * _Nonnull error) {
         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Message"  title:NSLocalizedStringFromTableInBundle(@"Sorry", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Failed to delete message, please try again.", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
     
@@ -10267,7 +10557,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 //                if ([message.user.userID isEqualToString:[TAPChatManager sharedManager].activeUser.userID]) {
 //                    //My Chat
 //                    TAPMyImageBubbleTableViewCell *cell = (TAPMyImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-//                    if (fullImage != nil) {
+//                    if (fullImage != nil && [fullImage class] == [UIImage class]) {
 //                        [cell setFullImage:fullImage];
 //                    }
 //                    [cell animateFinishedUploadingImage];
@@ -10275,7 +10565,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 //                else {
 //                    //Their Chat
 //                    TAPYourImageBubbleTableViewCell *cell = (TAPYourImageBubbleTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:currentRowIndex inSection:0]];
-//                    if (fullImage != nil) {
+//                    if (fullImage != nil && [fullImage class] == [UIImage class]) {
 //                        [cell setFullImage:fullImage];
 //                    }
 //                    [cell animateFinishedDownloadingImage];
@@ -10531,7 +10821,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
 }
 
 - (void)showTapTalkMessageComposerView {
-    [self showInputAccessoryView];
+    [self checkAndShowInputAccessoryView];
 }
 
 - (void)hideTapTalkMessageComposerView {
@@ -10572,6 +10862,9 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         else if (lastMessage.type == TAPChatMessageTypeSystemMessage && [lastMessage.action isEqualToString:@"room/leave"] && [lastMessage.user.userID isEqualToString:[TAPDataManager getActiveUser].userID]) {
             [self.view endEditing:YES];
             [self showDeletedRoomView:YES isGroup:NO isGroupDeleted:NO];
+        }
+        else {
+            [self showInputAccessoryView];
         }
     }
 }
@@ -10682,21 +10975,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[quotedMessageModel.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
            
         //convert to quote model
-        TAPQuoteModel *quote = [TAPQuoteModel new];
-        quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-        quote.title = fileName;
-        quote.content = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
-        NSString *fileTypeString = @"";
-        if (quotedMessageModel.type == TAPChatMessageTypeImage) {
-           fileTypeString = @"image";
-        }
-        else if (quotedMessageModel.type == TAPChatMessageTypeVideo) {
-           fileTypeString = @"video";
-        }
-        else if (quotedMessageModel.type == TAPChatMessageTypeFile) {
-           fileTypeString = @"file";
-        }
-        quote.fileType = fileTypeString;
+        TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
         [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
            
        quotedMessageModel.quote = quote;
@@ -10712,10 +10991,7 @@ typedef NS_ENUM(NSInteger, TopFloatingIndicatorViewType) {
         [self showInputAccessoryExtensionView:YES];
         
         //convert to quote model
-        TAPQuoteModel *quote = [TAPQuoteModel new];
-        quote.fileID = [TAPUtil nullToEmptyString:[quotedMessageModel.data objectForKey:@"fileID"]];
-        quote.title = quotedMessageModel.user.fullname;
-        quote.content = quotedMessageModel.body;
+        TAPQuoteModel *quote = [TAPQuoteModel constructFromMessageModel:quotedMessageModel];
         [self setQuoteWithQuote:quote userID:quotedMessageModel.user.userID];
         
         quotedMessageModel.quote = quote;

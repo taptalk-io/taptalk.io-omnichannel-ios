@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (TAPCoreChatRoomManager *)sharedManager;
 
+- (TAPRoomModel *)getActiveChatRoom;
+
 - (void)getPersonalChatRoomWithRecipientUserID:(NSString *)userID
                                        success:(void (^)(TAPRoomModel *room))success
                                        failure:(void (^)(NSError *error))failure;
@@ -53,6 +55,9 @@ NS_ASSUME_NONNULL_BEGIN
               successBlock:(void (^)(TAPRoomModel *room))success
              progressBlock:(void (^)(CGFloat progress, CGFloat total))progress
               failureBlock:(void (^)(NSError *error))failure;
+- (void)deleteLocalGroupChatRoomWithRoomID:(NSString *)roomID
+                                   success:(void (^)(void))success
+                                   failure:(void (^)(NSError *error))failure;
 - (void)deleteGroupChatRoom:(TAPRoomModel *)room
                     success:(void (^)(void))success
                     failure:(void (^)(NSError *error))failure;

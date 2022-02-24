@@ -13,6 +13,7 @@
 
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *infoDescriptionLabel;
+@property (strong, nonatomic) UIImageView *iconErrorInFoImageView;
 @property (strong, nonatomic) UILabel *errorInfoLabel;
 
 @property (strong, nonatomic) UIView *containerView;
@@ -101,9 +102,14 @@
         self.infoDescriptionLabel.numberOfLines = 0;
         [self addSubview:self.infoDescriptionLabel];
         
+        _iconErrorInFoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + 8.0f, 16.0f, 0.0f)]; //AS NOTE - height will be resized
+        self.iconErrorInFoImageView.image = [UIImage imageNamed:@"TAPIconRedAlertCircle" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.iconErrorInFoImageView.contentMode = UIViewContentModeScaleAspectFit;
+        [self addSubview:self.iconErrorInFoImageView];
+        
         UIFont *formErrorInfoLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormErrorInfoLabel];
         UIColor *formErrorInfoLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormErrorInfoLabel];
-        _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
+        _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.iconErrorInFoImageView.frame) + 4.0f, CGRectGetMinY(self.iconErrorInFoImageView.frame), CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
         self.errorInfoLabel.font = formErrorInfoLabelFont;
         self.errorInfoLabel.textColor = formErrorInfoLabelColor;
         self.errorInfoLabel.numberOfLines = 0;
@@ -220,12 +226,16 @@
 #pragma mark - Custom Method
 - (void)setTapCustomTextFieldViewType:(TAPCustomTextFieldViewType)tapCustomTextFieldViewType {
     _tapCustomTextFieldViewType = tapCustomTextFieldViewType;
+    NSString *placeholderString = @"";
     if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeFullName) {
         self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Full Name", nil, [TAPUtil currentBundle], @"");
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Full Name", nil, [TAPUtil currentBundle], @"");
+        placeholderString = NSLocalizedStringFromTableInBundle(@"e.g Bernama", nil, [TAPUtil currentBundle], @"");
+        self.textField.placeholder = placeholderString;
+        
+        self.textField.alpha = 0.4f;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
@@ -235,7 +245,8 @@
         [self setInfoDescriptionText:NSLocalizedStringFromTableInBundle(@"Username is always required.\nMust be between 4-32 characters.\nCan only contain a-z, 0-9, underscores, and dot.\nCan't start with number or underscore or dot.\nCan't end with underscore or dot.\nCan't contain consecutive underscores, consecutive dot, underscore followed with dot, and otherwise.", nil, [TAPUtil currentBundle], @"")];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter username", nil, [TAPUtil currentBundle], @"");
+        placeholderString = NSLocalizedStringFromTableInBundle(@"e.g user1234", nil, [TAPUtil currentBundle], @"");
+        self.textField.placeholder = placeholderString;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
         self.containerView.alpha = 1.0f;
@@ -247,9 +258,11 @@
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter username", nil, [TAPUtil currentBundle], @"");
+        placeholderString = NSLocalizedStringFromTableInBundle(@"Enter username", nil, [TAPUtil currentBundle], @"");
+        self.textField.placeholder = placeholderString;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
         self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
+        self.textField.alpha = 0.4f;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
@@ -259,7 +272,8 @@
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = @"";
+        placeholderString = @"";
+        self.textField.placeholder = placeholderString;
         self.containerView.alpha = 0.0f;
         self.phoneNumberPickerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
@@ -280,7 +294,9 @@
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeEmailAddress;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter email address", nil, [TAPUtil currentBundle], @"");
+        placeholderString = NSLocalizedStringFromTableInBundle(@"e.g example@work.com", nil, [TAPUtil currentBundle], @"");
+        self.textField.placeholder = placeholderString;
+        self.textField.alpha = 0.4f;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
@@ -291,7 +307,8 @@
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeEmailAddress;
         self.textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter email address", nil, [TAPUtil currentBundle], @"");
+        placeholderString = NSLocalizedStringFromTableInBundle(@"e.g example@work.com", nil, [TAPUtil currentBundle], @"");
+        self.textField.placeholder = placeholderString;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
@@ -310,7 +327,8 @@
         [self setInfoDescriptionText:NSLocalizedStringFromTableInBundle(@"Password must contain at least one lowercase, uppercase, special character, and a number.", nil, [TAPUtil currentBundle], @"")];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Insert Password", nil, [TAPUtil currentBundle], @"");
+        placeholderString = NSLocalizedStringFromTableInBundle(@"Insert Password", nil, [TAPUtil currentBundle], @"");
+        self.textField.placeholder = placeholderString;
         self.textField.secureTextEntry = YES;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
@@ -321,7 +339,9 @@
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Retype Password", nil, [TAPUtil currentBundle], @"");
+        
+        placeholderString = NSLocalizedStringFromTableInBundle(@"Retype Password", nil, [TAPUtil currentBundle], @"");
+        self.textField.placeholder = placeholderString;
         self.textField.secureTextEntry = YES;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
@@ -332,15 +352,67 @@
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Insert Name", nil, [TAPUtil currentBundle], @"");
+        placeholderString = NSLocalizedStringFromTableInBundle(@"Insert Name", nil, [TAPUtil currentBundle], @"");
+        self.textField.placeholder = placeholderString;
         self.containerView.alpha = 1.0f;
         self.phoneNumberPickerView.alpha = 0.0f;
         [self showShowPasswordButton:NO];
     }
+    if (tapCustomTextFieldViewType == TAPCustomTextFieldViewTypeShareExtensionAddMessage) {
+        self.titleLabel.text = @"";
+        self.titleLabel.frame = CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f); //AS NOTE - BECAUSE USED in SHARE EXTENSION, so hide
+        
+        self.containerView.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame), CGRectGetWidth(self.frame) - 16.0f - 16.0f, 50.0f);
+        [self setInfoDescriptionText:@""];
+        [self setErrorInfoText:@""];
+        self.textField.keyboardType = UIKeyboardTypeDefault;
+        placeholderString = NSLocalizedStringFromTableInBundle(@"Add message...", nil, [TAPUtil currentBundle], @"");
+        self.textField.placeholder = placeholderString;
+        
+        self.containerView.alpha = 1.0f;
+        self.phoneNumberPickerView.alpha = 0.0f;
+        [self showShowPasswordButton:NO];
+    }
+    
+    //AS NOTE - `titleLabel` ADDED LETTER SPACING
+//    NSMutableAttributedString *titleLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:self.titleLabel.text];
+//    NSMutableDictionary *titleLabelAttributesDictionary = [NSMutableDictionary dictionary];
+//    CGFloat titleLabelLetterSpacing = -0.2f;
+//    [titleLabelAttributesDictionary setObject:@(titleLabelLetterSpacing) forKey:NSKernAttributeName];
+//    [titleLabelAttributedString addAttributes:titleLabelAttributesDictionary
+//                                           range:NSMakeRange(0, [self.titleLabel.text length])];
+//    self.titleLabel.attributedText = titleLabelAttributedString;
+    
+    //TEXTFIELD PLACEHOLDER
+    UIColor *textFieldPlaceholderColor = [[TAPUtil getColor:TAP_COLOR_TEXT_DARK] colorWithAlphaComponent:0.4f];
+    UIFont *textFieldPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
+    
+    //AS NOTE -  1TEXTFIELD PLACEHOLDER1 ADDED LETTER SPACING
+    NSMutableAttributedString *textFieldPlaceholderAttributedString = [[NSMutableAttributedString alloc] initWithString:placeholderString];
+    NSMutableDictionary *textFieldPlaceholderAttributesDictionary = [NSMutableDictionary dictionary];
+    CGFloat textFieldPlaceholderLetterSpacing = -0.3f;
+    [textFieldPlaceholderAttributesDictionary setObject:@(textFieldPlaceholderLetterSpacing) forKey:NSKernAttributeName];
+    [textFieldPlaceholderAttributedString addAttributes:textFieldPlaceholderAttributesDictionary
+                                           range:NSMakeRange(0, [placeholderString length])];
+    
+    [textFieldPlaceholderAttributedString addAttribute:NSForegroundColorAttributeName
+                                        value:textFieldPlaceholderColor
+                                        range:NSMakeRange(0, [placeholderString length])];
+    
+    self.textField.attributedPlaceholder = textFieldPlaceholderAttributedString;
 }
 
 - (void)setInfoDescriptionText:(NSString *)string {
+    string = [TAPUtil nullToEmptyString:string];
     self.infoDescriptionLabel.text = string;
+    
+    NSMutableAttributedString *infoDescriptionLabelAttributedString = [[NSMutableAttributedString alloc] initWithString:string];
+    NSMutableDictionary *infoDescriptionLabelAttributesDictionary = [NSMutableDictionary dictionary];
+    CGFloat infoDescriptionLabelLetterSpacing = -0.2f;
+    [infoDescriptionLabelAttributesDictionary setObject:@(infoDescriptionLabelLetterSpacing) forKey:NSKernAttributeName];
+    [infoDescriptionLabelAttributedString addAttributes:infoDescriptionLabelAttributesDictionary
+                                           range:NSMakeRange(0, [string length])];
+    self.infoDescriptionLabel.attributedText = infoDescriptionLabelAttributedString;
     
     CGFloat ySpacing = 8.0f;
     if ([string isEqualToString:@""] || string ==  nil) {
@@ -354,7 +426,10 @@
     if ([self.errorInfoLabel.text isEqualToString:@""] || self.errorInfoLabel.text ==  nil) {
         errorInfoYSpacing = 0.0f;
     }
-    self.errorInfoLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + errorInfoYSpacing, CGRectGetWidth(self.errorInfoLabel.frame), CGRectGetHeight(self.errorInfoLabel.frame));
+    
+    self.iconErrorInFoImageView.frame = CGRectMake(CGRectGetMinX(self.iconErrorInFoImageView.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + errorInfoYSpacing, CGRectGetWidth(self.iconErrorInFoImageView.frame), CGRectGetHeight(self.iconErrorInFoImageView.frame));
+    
+    self.errorInfoLabel.frame = CGRectMake(CGRectGetMinX(self.errorInfoLabel.frame), CGRectGetMinY(self.iconErrorInFoImageView.frame), CGRectGetWidth(self.errorInfoLabel.frame), CGRectGetHeight(self.errorInfoLabel.frame));
 }
 
 - (void)setErrorInfoText:(NSString *)string {
@@ -365,8 +440,15 @@
         ySpacing = 0.0f;
     }
     
+    CGFloat heightIconErrorInfoImage = 16.0f;
+    if ([string isEqualToString:@""]) {
+        heightIconErrorInfoImage = 0.0f;
+    }
+    
+    self.iconErrorInFoImageView.frame = CGRectMake(CGRectGetMinX(self.iconErrorInFoImageView.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + ySpacing, CGRectGetWidth(self.iconErrorInFoImageView.frame), heightIconErrorInfoImage);
+    
     CGSize size = [self.errorInfoLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.errorInfoLabel.frame), CGFLOAT_MAX)];
-    self.errorInfoLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + ySpacing, CGRectGetWidth(self.errorInfoLabel.frame), size.height);
+    self.errorInfoLabel.frame = CGRectMake(CGRectGetMinX(self.errorInfoLabel.frame), CGRectGetMinY(self.iconErrorInFoImageView.frame), CGRectGetWidth(self.errorInfoLabel.frame), size.height);
 }
 
 - (CGFloat)getTextFieldHeight {
@@ -385,7 +467,7 @@
         if (active) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 1.0f;
-                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive] colorWithAlphaComponent:0.24f].CGColor;
                 self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
                 self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive];
             }];
@@ -401,7 +483,7 @@
     else {
         if (active) {
             self.shadowView.alpha = 1.0f;
-            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive] colorWithAlphaComponent:0.24f].CGColor;
             self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
             self.containerSeparatorView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive];
         }

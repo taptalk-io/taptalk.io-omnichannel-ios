@@ -124,6 +124,12 @@
     )];
     [self setUpNavigationBar];
     
+    self.roomListView.roomListTableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    
+    if (@available(iOS 15.0, *)) {
+        [self.roomListView.roomListTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.roomListView.roomListTableView.delegate = self;
     self.roomListView.roomListTableView.dataSource = self;
     self.roomListView.roomListTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
@@ -445,13 +451,17 @@
 
 #pragma mark TAPConnectionStatusViewController
 - (void)connectionStatusViewControllerDelegateHeightChange:(CGFloat)height {
-//DV Note - v1.0.18
-//28 Nov 2019 - Temporary comment to hide connecting, waiting for network, connected state for further changing UI flow
-//    [UIView animateWithDuration:0.2f animations:^{
-//        //change frame
-//        self.roomListView.roomListTableView.frame = CGRectMake(CGRectGetMinX(self.roomListView.roomListTableView.frame), height, CGRectGetWidth(self.roomListView.roomListTableView.frame), CGRectGetHeight(self.roomListView.roomListTableView.frame));
-//    }];
-//END DV Note
+#ifdef DEBUG
+//    DV Note - v1.0.18
+//    28 Nov 2019 - Temporary comment to hide connecting, waiting for network, connected state for further changing UI flow
+    NSLog(@"===============connectionStatusViewControllerDelegateHeightChange");
+        [UIView animateWithDuration:0.2f animations:^{
+            //change frame
+            self.roomListView.roomListTableView.frame = CGRectMake(CGRectGetMinX(self.roomListView.roomListTableView.frame), height, CGRectGetWidth(self.roomListView.roomListTableView.frame), CGRectGetHeight(self.roomListView.roomListTableView.frame));
+        }];
+//    END DV Note
+#endif
+
 }
 
 #pragma mark TAPAddNewChatViewController
@@ -835,6 +845,7 @@
     BOOL isDoneFirstSetup = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_IS_DONE_FIRST_SETUP valid:nil];
     if (!isDoneFirstSetup) {
         //First setup, run get room list and unread message
+        [self showLoadingSetupView];
         [TAPDataManager callAPIGetMessageRoomListAndUnreadWithUserID:userID success:^(NSArray *messageArray) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
@@ -1006,9 +1017,9 @@
             //Handle room move
             if ([moveFromIndexArray count] > 0) {
                 for (int count = 0; count < [moveFromIndexArray count]; count++) {
-                    NSInteger oldIndex = [moveFromIndexArray objectAtIndex:count];
-                    NSInteger newIndex = [moveToIndexArray objectAtIndex:count];
-
+                    NSInteger oldIndex = [[moveFromIndexArray objectAtIndex:count] intValue];
+                    NSInteger newIndex = [[moveToIndexArray objectAtIndex:count] intValue];
+                    
                     [self updateCellDataAtIndexPath:[NSIndexPath indexPathForRow:oldIndex inSection:0] updateUnreadBubble:NO];
                     [self.roomListView.roomListTableView performBatchUpdates:^{
                         //changing beginUpdates and endUpdates with this because of deprecation

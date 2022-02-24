@@ -60,10 +60,13 @@
     self.myAccountView.emailTextField.delegate = self;
     self.myAccountView.continueButtonView.delegate = self;
     
-    [self.myAccountView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.myAccountView.removeProfilePictureButton addTarget:self action:@selector(removeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.myAccountView.cancelButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
+    if ([[TapUI sharedInstance] getChangeProfilePictureButtonVisibleState]) {
+        [self.myAccountView.changeProfilePictureButton addTarget:self action:@selector(changeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.myAccountView.removeProfilePictureButton addTarget:self action:@selector(removeProfilePictureButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+    }
+
     if ([[TapUI sharedInstance] getLogoutButtonVisibleState]) {
         //Handle only when logout is visible
         [self.myAccountView.logoutButton addTarget:self action:@selector(logoutButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
@@ -255,7 +258,7 @@
             //upload Image
             [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
                 
-                NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+                NSData *imageData = UIImageJPEGRepresentation(resizedImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
                 
                 [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
                     [self.myAccountView setAsLoading:NO];
@@ -612,10 +615,11 @@
         [self dismissViewControllerAnimated:NO completion:nil];
         [self.myAccountView showLogoutLoadingView:NO];
         
-        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
-        if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
-            [tapTalkDelegate userLogout];
-        }
+        // KR NOTE: USER LOGOUT DELEGATE MOVED TO logoutAndClearAllTapTalkData
+//        id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+//        if ([tapTalkDelegate respondsToSelector:@selector(userLogout)]) {
+//            [tapTalkDelegate userLogout];
+//        }
     }
 }
 
@@ -627,7 +631,7 @@
         
         [[TAPFileUploadManager sharedManager] resizeImage:self.selectedProfileImage maxImageSize:TAP_MAX_IMAGE_LARGE_SIZE success:^(UIImage * _Nonnull resizedImage) {
             
-            NSData *imageData = UIImageJPEGRepresentation(resizedImage, 1.0f);
+            NSData *imageData = UIImageJPEGRepresentation(resizedImage, [[TapTalk sharedInstance] getImageCompressionQuality]);
             
             [TAPDataManager callAPIUploadUserImageWithImageData:imageData completionBlock:^(TAPUserModel *user) {
                 [self.myAccountView setAsLoading:NO];

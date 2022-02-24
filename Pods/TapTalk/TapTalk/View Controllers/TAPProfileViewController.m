@@ -234,6 +234,29 @@
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
         CGFloat height = 56.0f;
+        if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
+            if (self.room.type == RoomTypePersonal) {
+                if (indexPath.row == 0) {
+                    //add to contacts
+                    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                    TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+                    if (![[TapUI sharedInstance] isAddContactEnabled] ||
+                        ![[TapUI sharedInstance] getAddToContactsButtonInChatRoomVisibleState] ||
+                        user != nil && user.isContact ||
+                        [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]
+                    ) {
+                        // Hide if add to contacts menu is disabled in TapUI or user is already a contact
+                        height = 0.0f;
+                    }
+                }
+                else if (indexPath.row == 1) {
+                    // Report user
+                    if (![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
+                        height = 0.0f;
+                    }
+                }
+            }
+        }
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile) {
             TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:self.user.userID];
             if (indexPath.row == 0) {
@@ -262,6 +285,12 @@
                     height = 0.0f;
                 }
             }
+            else if (indexPath.row == 4) {
+                // Report member
+                if (![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
+                    height = 0.0f;
+                }
+            }
         }
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
             TAPUserModel *user = [[TAPContactManager sharedManager] getUserWithUserID:self.user.userID];
@@ -273,6 +302,12 @@
                     [user.userID isEqualToString:[TAPDataManager getActiveUser].userID]
                 ) {
                     // Hide if add to contacts menu is disabled in TapUI or user is already a contact
+                    height = 0.0f;
+                }
+            }
+            else if (indexPath.row == 1) {
+                // Report member
+                if (![[TapUI sharedInstance] getReportButtonInChatProfileVisibleState]) {
                     height = 0.0f;
                 }
             }
@@ -339,17 +374,20 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
             //DV Note
             //Temporary Hidden For V1 because features is not complete (25 Mar 2019)
-            //        return 4;
+            //        return 5;
             //END DV Note
-            if (self.room.type == RoomTypeGroup) {
+            if (self.room.type == RoomTypePersonal) {
                 return 2;
+            }
+            else if (self.room.type == RoomTypeGroup) {
+                return 3;
             }
         }
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeGroupMemberProfile) {
-            return 4; //add to contact, send message, appoint as admin, remove member
+            return 5; //add to contact, send message, appoint as admin, remove member, report
         }
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
-            return 2; //add to contact, send message
+            return 3; //add to contact, send message, report
         }
         return 0;
     }
@@ -389,7 +427,22 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //END DV Note
         
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
-            if (self.room.type == RoomTypeGroup) {
+            if (self.room.type == RoomTypePersonal) {
+                NSString *cellID = @"TAPProfileCollectionViewCell";
+                [collectionView registerClass:[TAPProfileCollectionViewCell class] forCellWithReuseIdentifier:cellID];
+                TAPProfileCollectionViewCell *cell = (TAPProfileCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
+                if (indexPath.item == 0) {
+                    //add contact
+                    [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeAddContacts];
+                    [cell showSeparatorView:YES];
+                }
+                else if (indexPath.item == 1) {
+                    [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
+                    [cell showSeparatorView:YES];
+                }
+                return cell;
+            }
+            else if (self.room.type == RoomTypeGroup) {
                 NSString *cellID = @"TAPProfileCollectionViewCell";
                 [collectionView registerClass:[TAPProfileCollectionViewCell class] forCellWithReuseIdentifier:cellID];
                 TAPProfileCollectionViewCell *cell = (TAPProfileCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellID forIndexPath:indexPath];
@@ -407,6 +460,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                         [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeLeaveGroup];
                     }
                     
+                    [cell showSeparatorView:YES];
+                }
+                else if (indexPath.item == 2) {
+                    [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportGroup];
                     [cell showSeparatorView:YES];
                 }
                 
@@ -444,6 +501,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeRemoveMember];
                 [cell showSeparatorView:YES];
             }
+            else if (indexPath.item == 4) {
+                [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
+                [cell showSeparatorView:YES];
+            }
             
             return cell;
         }
@@ -462,6 +523,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeSendMessage];
                 [cell showSeparatorView:YES];
             }
+            else if (indexPath.item == 2) {
+                [cell setProfileCollectionViewCellType:profileCollectionViewCellTypeReportUser];
+                [cell showSeparatorView:YES];
+            }
             
             return cell;
         }
@@ -476,53 +541,39 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         TAPMessageModel *message = [self.mediaMessageDataArray objectAtIndex:indexPath.row];
         [cell setImageCollectionViewCellWithMessage:message];
         
+        NSString *roomID = message.room.roomID;
+        NSString *localID = message.localID;
+        NSDictionary *dataDictionary = message.data;
+        NSString *fileID = [dataDictionary objectForKey:@"fileID"];
+        fileID = [TAPUtil nullToEmptyString:fileID];
+        
+        NSString *urlKey = [dataDictionary objectForKey:@"url"];
+        if (urlKey == nil || [urlKey isEqualToString:@""]) {
+            urlKey = [dataDictionary objectForKey:@"fileURL"];
+        }
+        urlKey = [TAPUtil nullToEmptyString:urlKey];
+        
+        if (![urlKey isEqualToString:@""]) {
+            urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+        }
+        urlKey = [TAPUtil nullToEmptyString:urlKey];
+        
         if (message.type == TAPChatMessageTypeImage) {
-            NSString *roomID = message.room.roomID;
-            NSDictionary *dataDictionary = message.data;
-            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-            fileID = [TAPUtil nullToEmptyString:fileID];
-            
-            [TAPImageView imageFromCacheWithKey:fileID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-                NSString *currentRoomID = resultMessage.room.roomID;
-                NSString *currentLocalID = resultMessage.localID;
-                NSDictionary *currentDataDictionary = resultMessage.data;
-                NSString *currentFileID = [currentDataDictionary objectForKey:@"fileID"];
-                currentFileID = [TAPUtil nullToEmptyString:currentFileID];
-                
-                NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
-         
-                //Check image exist in cache
-                if (savedImage != nil) {
-                    //Image exist
-                    //set as downloaded
-                    //set image
-                    [cell setImageCollectionViewCellImageWithImage:savedImage];
-                    [cell setAsDownloaded];
-                    [cell setInfoLabelWithString:@""];
-                }
-                //Check image is downloading
-                else if (progressDictionary != nil) {
-                    
-                    CGFloat progress = [[progressDictionary objectForKey:@"progress"] floatValue];
-                    CGFloat total = [[progressDictionary objectForKey:@"total"] floatValue];
-                    [cell setInitialAnimateDownloadingMedia];
-                    
-                    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
-                    [cell setInfoLabelWithString:fileSize];
-                    
-                    [cell animateProgressDownloadingMediaWithProgress:progress total:total];
-                }
-                else {
-                    //Image not exist in cache
-                    //if not show download button
-                    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
-                    [cell setInfoLabelWithString:fileSize];
-                    [cell setAsNotDownloaded];
-                }
-            }];
+            if (![fileID isEqualToString:@""] || ![urlKey isEqualToString:@""]) {
+                [TAPImageView imageFromCacheWithKey:urlKey message:message
+                success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+                    [self setImageCollectionViewCell:cell image:savedImage message:resultMessage];
+                } failure:^(TAPMessageModel *resultMessage) {
+                    [TAPImageView imageFromCacheWithKey:fileID message:message
+                    success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+                        [self setImageCollectionViewCell:cell image:savedImage message:resultMessage];
+                    } failure:^(TAPMessageModel *resultMessage) {
+                        [self setImageCollectionViewCell:cell image:nil message:resultMessage];
+                    }];
+                }];
+            }
         }
         else if (message.type == TAPChatMessageTypeVideo) {
-            
             NSNumber *duration = [message.data objectForKey:@"duration"];
             NSTimeInterval durationTimeInterval = [duration integerValue] / 1000; //convert to second
             NSString *videoDurationString = [TAPUtil stringFromTimeInterval:ceil(durationTimeInterval)];
@@ -530,17 +581,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
             
             //Check video exist in cache
-            NSDictionary *dataDictionary = message.data;
-            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-            NSString *localID = message.localID;
-            NSString *roomID = message.room.roomID;
             
             //Check video is done downloaded or not
-            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:fileID];
+            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:roomID fileID:urlKey];
+            if ([filePath isEqualToString:@""] || filePath == nil) {
+                filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:message.room.roomID fileID:fileID];
+            }
             
             NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
        
-            
             if ([filePath isEqualToString:@""] || filePath == nil) {
                 //File not exist, download file
                 [cell setAsNotDownloaded];
@@ -661,7 +710,50 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
         if (self.tapProfileViewControllerType == TAPProfileViewControllerTypeDefault) {
-            if (self.room.type == RoomTypeGroup) {
+            if (self.room.type == RoomTypePersonal) {
+                if (indexPath.row == 0) {
+                    //add to contacts
+                    [self.profileView showLoadingView:YES];
+                    [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeAddToContact];
+                    NSString *currentUserID = [TAPDataManager getActiveUser].userID;
+                    currentUserID = [TAPUtil nullToEmptyString:currentUserID];
+                    
+                    if ([currentUserID isEqualToString:self.user.userID]) {
+                        //Add theirselves
+                        [self removeLoadingView];
+                        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Add User To Contact"  title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Can't add yourself as contact", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+                    }
+                    else {
+                        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+                        [TAPDataManager callAPIAddContactWithUserID:obtainedUser.userID success:^(NSString *message, TAPUserModel *user) {
+                            [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
+                            [self showFinishLoadingStateWithType:TAPProfileLoadingTypeAddToContact];
+                            
+                            [TAPUtil performBlock:^{
+                                [self.navigationController popViewControllerAnimated:YES];
+                            } afterDelay:1.2f];
+                            
+                        } failure:^(NSError *error) {
+    #ifdef DEBUG
+                            NSLog(@"%@", error);
+    #endif
+                            
+                            [self removeLoadingView];
+                        }];
+                    }
+                }
+                else if (indexPath.row == 1) {
+                    // Report user
+                    id <TapUIChatProfileDelegate> chatProfileDelegate = [TapUI sharedInstance].chatProfileDelegate;
+                    if ([chatProfileDelegate respondsToSelector:@selector(reportUserButtonDidTapped:room:user:)]) {
+                        NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+                        [chatProfileDelegate reportUserButtonDidTapped:self room:self.room user:obtainedUser];
+                    }
+                }
+            }
+            else if (self.room.type == RoomTypeGroup) {
                 if (indexPath.row == 0) {
                     //view group members
                     _isLeaveFromGroupProfilePage = YES;
@@ -681,6 +773,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     else {
                         //leave group
                         [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Leave Group" title:NSLocalizedStringFromTableInBundle(@"Leave Group", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"All messages and shared medias from this room will be inaccessible. Are you sure you want to leave?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Leave", nil, [TAPUtil currentBundle], @"")];
+                    }
+                }
+                else if (indexPath.row == 2) {
+                    // Report group
+                    id <TapUIChatProfileDelegate> chatProfileDelegate = [TapUI sharedInstance].chatProfileDelegate;
+                    if ([chatProfileDelegate respondsToSelector:@selector(reportGroupButtonDidTapped:room:)]) {
+                        [chatProfileDelegate reportGroupButtonDidTapped:self room:self.room];
                     }
                 }
             }
@@ -759,6 +858,13 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 //remove member
                  [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeInfoDestructive popupIdentifier:@"Remove Member" title:NSLocalizedStringFromTableInBundle(@"Remove Member", nil, [TAPUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Are you sure you want to remove this member?", nil, [TAPUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TAPUtil currentBundle], @"")];
             }
+            else if (indexPath.row == 4) {
+                // Report member
+                id <TapUIChatProfileDelegate> chatProfileDelegate = [TapUI sharedInstance].chatProfileDelegate;
+                if ([chatProfileDelegate respondsToSelector:@selector(reportUserButtonDidTapped:room:user:)]) {
+                    [chatProfileDelegate reportUserButtonDidTapped:self room:self.room user:self.user];
+                }
+            }
         }
         else if (self.tapProfileViewControllerType == TAPProfileViewControllerTypePersonalFromClickedMention) {
             if (indexPath.row == 0) {
@@ -799,6 +905,15 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                     chatViewController.hidesBottomBarWhenPushed = YES;
                     [[[TapUI sharedInstance] roomListViewController].navigationController pushViewController:chatViewController animated:YES];
                 }];
+            }
+            else if (indexPath.row == 2) {
+                // Report user
+                id <TapUIChatProfileDelegate> chatProfileDelegate = [TapUI sharedInstance].chatProfileDelegate;
+                if ([chatProfileDelegate respondsToSelector:@selector(reportUserButtonDidTapped:room:user:)]) {
+                    NSString *otherUserID = [[TAPChatManager sharedManager] getOtherUserIDWithRoomID:self.room.roomID];
+                    TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:otherUserID];
+                    [chatProfileDelegate reportUserButtonDidTapped:self room:self.room user:obtainedUser];
+                }
             }
         }
     }
@@ -852,33 +967,49 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         }
         if (selectedMessage.type == TAPChatMessageTypeVideo) {
             NSDictionary *dataDictionary = selectedMessage.data;
-            NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-            fileID = [TAPUtil nullToEmptyString:fileID];
+            dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
             
-            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:selectedMessage.room.roomID fileID:fileID];
+            NSString *key = [dataDictionary objectForKey:@"fileID"];
+            key = [TAPUtil nullToEmptyString:key];
             
-            if (![fileID isEqualToString:@""] && filePath != nil) {
-                NSURL *url = [NSURL fileURLWithPath:filePath];
-                AVAsset *asset = [AVAsset assetWithURL:url];
+            NSString *filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:selectedMessage.room.roomID fileID:key];
+            
+            if (filePath == nil || [filePath isEqualToString:@""]) {
+                NSString *fileURL = [dataDictionary objectForKey:@"url"];
+                if (fileURL == nil || [fileURL isEqualToString:@""]) {
+                    fileURL = [dataDictionary objectForKey:@"fileURL"];
+                }
+                fileURL = [TAPUtil nullToEmptyString:fileURL];
                 
-                [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+                if (![fileURL isEqualToString:@""]) {
+                    key = fileURL;
+                    key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+                }
                 
-                //        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
-                AVPlayerItem *item = [[AVPlayerItem alloc] initWithAsset:asset];
-                AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
-                
-                AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
-                controller.delegate = self;
-                controller.showsPlaybackControls = YES;
-                [self presentViewController:controller animated:YES completion:nil];
-                controller.player = player;
-                [player play];
+                filePath = [[TAPFileDownloadManager sharedManager] getDownloadedFilePathWithRoomID:selectedMessage.room.roomID fileID:key];
             }
+            
+            if (filePath == nil || [filePath isEqualToString:@""]) {
+                return;
+            }
+            
+            NSURL *url = [NSURL fileURLWithPath:filePath];
+            AVAsset *asset = [AVAsset assetWithURL:url];
+            
+            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+            
+            //        AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
+            AVPlayerItem *item = [[AVPlayerItem alloc] initWithAsset:asset];
+            AVPlayer *player = [[AVPlayer alloc] initWithPlayerItem:item];
+            
+            AVPlayerViewController *controller = [[AVPlayerViewController alloc] init];
+            controller.delegate = self;
+            controller.showsPlaybackControls = YES;
+            [self presentViewController:controller animated:YES completion:nil];
+            controller.player = player;
+            [player play];
         }
-        
     }
-   
-    
 }
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -1089,30 +1220,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [self.profileView showLoadingView:YES];
         [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeLeaveGroup];
         [TAPDataManager callAPILeaveRoomWithRoomID:self.room.roomID success:^{
-            
-            //Remove from group preference
-            [[TAPGroupManager sharedManager] removeRoomWithRoomID:self.room.roomID];
-            
-            //add sequence to delete message and physical files
-            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.room.roomID success:^{
+            [self showFinishLoadingStateWithType:TAPProfileLoadingTypeLeaveGroup];
 
-                [self showFinishLoadingStateWithType:TAPProfileLoadingTypeLeaveGroup];
-
-                if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
-                    [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
-                }
-                
-                //Throw view to room list
-                [TAPUtil performBlock:^{
-                    [self.navigationController popToRootViewControllerAnimated:YES];
-                } afterDelay:1.2f];
-                
-            } failure:^(NSError *error) {
-                [self removeLoadingView];
-                NSString *errorMessage = [error.userInfo objectForKey:@"message"];
-                errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-            }];
+            if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
+                [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
+            }
+            
+            //Throw view to room list
+            [TAPUtil performBlock:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            } afterDelay:1.2f];
         } failure:^(NSError *error) {
             [self removeLoadingView];
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -1125,31 +1242,16 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         [self.profileView setAsLoadingState:YES withType:TAPProfileLoadingTypeDeleteGroup];
         
         [TAPDataManager callAPIDeleteRoomWithRoom:self.room success:^{
+            [self showFinishLoadingStateWithType:TAPProfileLoadingTypeDeleteGroup];
             
-            //Remove from group preference
-            [[TAPGroupManager sharedManager] removeRoomWithRoomID:self.room.roomID];
+            if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
+                [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
+            }
             
-            //add sequence to delete message and physical files
-            [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:self.room.roomID success:^{
-                
-                [self showFinishLoadingStateWithType:TAPProfileLoadingTypeDeleteGroup];
-                
-                if ([self.delegate respondsToSelector:@selector(profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:)]) {
-                    [self.delegate profileViewControllerDidTriggerLeaveOrDeleteGroupWithRoom:self.room];
-                }
-                
-                //Throw view to room list
-                [TAPUtil performBlock:^{
-                    [self.navigationController popToRootViewControllerAnimated:YES];
-                } afterDelay:1.2f];
-                
-            } failure:^(NSError *error) {
-                [self removeLoadingView];
-                NSString *errorMessage = [error.userInfo objectForKey:@"message"];
-                errorMessage = [TAPUtil nullToEmptyString:errorMessage];
-                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Leave Group" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-            }];
-            
+            //Throw view to room list
+            [TAPUtil performBlock:^{
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            } afterDelay:1.2f];
         } failure:^(NSError *error) {
             [self removeLoadingView];
             NSString *errorMessage = [error.userInfo objectForKey:@"message"];
@@ -1406,7 +1508,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //Already handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
         //Already handled via Notification
-    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage) {
+    } success:^(UIImage * _Nonnull fullImage, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nullable filePath) {
         //Already handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
         //Already handled via Notification
@@ -1418,7 +1520,7 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
         //Already handled via Notification
     } progress:^(CGFloat progress, CGFloat total, TAPMessageModel * _Nonnull receivedMessage) {
         //Already handled via Notification
-    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage) {
+    } success:^(NSData * _Nonnull fileData, TAPMessageModel * _Nonnull receivedMessage, NSString * _Nonnull filePath) {
         //Already handled via Notification
     } failure:^(NSError * _Nonnull error, TAPMessageModel * _Nonnull receivedMessage) {
         //Already handled via Notification
@@ -1471,6 +1573,45 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     }
     else {
         self.profileView.editButton.alpha = 0.0f;
+    }
+}
+
+- (void)setImageCollectionViewCell:(TAPImageCollectionViewCell *)cell
+                             image:(UIImage *)image
+                           message:(TAPMessageModel *)message {
+    
+    NSString *currentRoomID = message.room.roomID;
+    NSString *currentLocalID = message.localID;
+    NSDictionary *currentDataDictionary = message.data;
+    
+    NSDictionary *progressDictionary = [[TAPFileDownloadManager sharedManager] getDownloadProgressWithLocalID:message.localID];
+
+    //Check image exist in cache
+    if (image != nil) {
+        //Image exist
+        //set as downloaded
+        //set image
+        [cell setImageCollectionViewCellImageWithImage:image];
+        [cell setAsDownloaded];
+        [cell setInfoLabelWithString:@""];
+    }
+    //Check image is downloading
+    else if (progressDictionary != nil) {
+        CGFloat progress = [[progressDictionary objectForKey:@"progress"] floatValue];
+        CGFloat total = [[progressDictionary objectForKey:@"total"] floatValue];
+        [cell setInitialAnimateDownloadingMedia];
+        
+        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        [cell setInfoLabelWithString:fileSize];
+        
+        [cell animateProgressDownloadingMediaWithProgress:progress total:total];
+    }
+    else {
+        //Image not exist in cache
+        //if not show download button
+        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        [cell setInfoLabelWithString:fileSize];
+        [cell setAsNotDownloaded];
     }
 }
 

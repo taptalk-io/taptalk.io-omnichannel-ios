@@ -49,6 +49,10 @@
         _socketURL = [[NSString alloc] init];
         
         _delegatesArray = [[NSMutableArray alloc] init];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(reachabilityDidChange:)
+                                                     name:AFNetworkingReachabilityDidChangeNotification
+                                                   object:nil];
     }
     
     return self;
@@ -56,6 +60,9 @@
 
 - (void)dealloc {
     // Should never be called, but just here for clarity really.
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:AFNetworkingReachabilityDidChangeNotification
+                                                  object:nil];
 }
 
 #pragma mark - Delegate
@@ -149,7 +156,16 @@
     NSLog(@"ConnectionManager Connect");
 #endif
     
-    if (self.tapConnectionStatus != TAPConnectionManagerStatusTypeDisconnected && self.tapConnectionStatus != TAPConnectionManagerStatusTypeNotConnected) {
+    if ((self.tapConnectionStatus != TAPConnectionManagerStatusTypeDisconnected &&
+         self.tapConnectionStatus != TAPConnectionManagerStatusTypeNotConnected) ||
+        [[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable
+    ) {
+        return;
+    }
+    
+    NSString *accessToken = [TAPDataManager getAccessToken];
+
+    if (accessToken == nil || [accessToken isEqualToString:@""]) {
         return;
     }
     
@@ -167,29 +183,36 @@
     _webSocket.delegate = nil;
     _webSocket = nil;
     
-    [self validateToken];
-    
-    NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", [TAPDataManager getAccessToken]];
-    NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.socketURL]];
-    NSString *encodedAppKey = [[TAPNetworkManager sharedManager] getAppKey];
-    NSString *clientUserAgent = [[TapTalk sharedInstance] getTapTalkUserAgent];
-    
-    if ([clientUserAgent isEqualToString:@""] || clientUserAgent == nil) {
-        clientUserAgent = @"ios";
-    }
-    
-    [urlRequest addValue:encodedAppKey forHTTPHeaderField:@"App-Key"];
-    [urlRequest addValue:[[UIDevice currentDevice] identifierForVendor].UUIDString forHTTPHeaderField:@"Device-Identifier"];
-    [urlRequest addValue:[[UIDevice currentDevice] model] forHTTPHeaderField:@"Device-Model"];
-    [urlRequest addValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
-    [urlRequest addValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
-    [urlRequest addValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"App-Version"];
-    [urlRequest addValue:clientUserAgent forHTTPHeaderField:@"User-Agent"];
-    [urlRequest addValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
-    
-    SRWebSocket *webSocket = [[SRWebSocket alloc] initWithURLRequest:urlRequest];
-    webSocket.delegate = self;
-    [webSocket open];
+    [TAPDataManager callAPIValidateAccessTokenAndAutoRefreshSuccess:^{
+#ifdef DEBUG
+        NSLog(@"Token Validated");
+#endif
+        NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", [TAPDataManager getAccessToken]];
+        NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:self.socketURL]];
+        NSString *encodedAppKey = [[TAPNetworkManager sharedManager] getAppKey];
+        NSString *clientUserAgent = [[TapTalk sharedInstance] getTapTalkUserAgent];
+        
+        if ([clientUserAgent isEqualToString:@""] || clientUserAgent == nil) {
+            clientUserAgent = @"ios";
+        }
+        
+        [urlRequest addValue:encodedAppKey forHTTPHeaderField:@"App-Key"];
+        [urlRequest addValue:[[UIDevice currentDevice] identifierForVendor].UUIDString forHTTPHeaderField:@"Device-Identifier"];
+        [urlRequest addValue:[[UIDevice currentDevice] model] forHTTPHeaderField:@"Device-Model"];
+        [urlRequest addValue:@"ios" forHTTPHeaderField:@"Device-Platform"];
+        [urlRequest addValue:[[UIDevice currentDevice] systemVersion] forHTTPHeaderField:@"Device-OS-Version"];
+        [urlRequest addValue:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"] forHTTPHeaderField:@"App-Version"];
+        [urlRequest addValue:clientUserAgent forHTTPHeaderField:@"User-Agent"];
+        [urlRequest addValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
+        
+        SRWebSocket *webSocket = [[SRWebSocket alloc] initWithURLRequest:urlRequest];
+        webSocket.delegate = self;
+        [webSocket open];
+    } failure:^(NSError *error) {
+        if (self.tapConnectionStatus != TAPConnectionManagerStatusTypeConnected) {
+            _tapConnectionStatus = TAPConnectionManagerStatusTypeDisconnected;
+        }
+    }];
 }
 
 - (void)reconnect {
@@ -275,29 +298,13 @@
     return self.tapConnectionStatus;
 }
 
-- (void)validateToken {
-    NSString *accessToken = [TAPDataManager getAccessToken];
-
-    if (accessToken == nil || [accessToken isEqualToString:@""]) {
-        return;
-    }
-    
-    [TAPDataManager callAPIValidateAccessTokenAndAutoRefreshSuccess:^{
-#ifdef DEBUG
-        NSLog(@"Token Validated");
-#endif
-    } failure:^(NSError *error) {
-        
-    }];
-}
-
 - (void)setSocketURLString:(NSString *)urlString {
     NSString *formattedSocketURLString;
     if ([urlString hasPrefix:@"https"]) {
         formattedSocketURLString = [urlString stringByReplacingOccurrencesOfString:@"https" withString:@"wss"];
     }
     else if ([urlString hasPrefix:@"http"]) {
-        formattedSocketURLString = [urlString stringByReplacingOccurrencesOfString:@"http" withString:@"wss"];
+        formattedSocketURLString = [urlString stringByReplacingOccurrencesOfString:@"http" withString:@"ws"];
     }
     
     _socketURL = [NSString stringWithFormat:@"%@/connect", formattedSocketURLString];
@@ -315,6 +322,40 @@
 
 - (void)removeDelegate:(id)delegate {
     [self.delegatesArray removeObject:delegate];
+}
+
+- (void)reachabilityDidChange:(NSNotification *)notification {
+    
+    BOOL reachable;
+    NSString *status = [notification.userInfo objectForKey:AFNetworkingReachabilityNotificationStatusItem];
+    NSInteger statusValue = [status integerValue];
+    switch(statusValue)
+    {
+        case 0:
+            //AFNetworkReachabilityStatusNotReachable
+            reachable = NO;
+            break;
+        case 1:
+            //AFNetworkReachabilityStatusReachableViaWWAN
+            reachable = YES;
+            break;
+        case 2:
+            //AFNetworkReachabilityStatusReachableViaWiFi
+            reachable = YES;
+            break;
+        default:
+            //AFNetworkReachabilityStatusUnknown
+            reachable = NO;
+            break;
+    }
+    
+    [self reachabilityChangeIsReachable:reachable];
+}
+
+- (void)reachabilityChangeIsReachable:(BOOL)reachable {
+    if (reachable) {
+        [self tryToReconnect];
+    }
 }
 
 @end

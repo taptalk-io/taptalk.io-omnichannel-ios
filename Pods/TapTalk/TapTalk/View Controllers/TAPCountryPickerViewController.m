@@ -66,6 +66,10 @@
     
     self.title = NSLocalizedStringFromTableInBundle(@"Select Country", nil, [TAPUtil currentBundle], @"");
     
+    if (@available(iOS 15.0, *)) {
+        [self.countryPickerView.searchResultTableView setSectionHeaderTopPadding:0.0f];
+    }
+    
     self.countryPickerView.searchBarView.delegate = self;
     self.countryPickerView.tableView.delegate = self;
     self.countryPickerView.tableView.dataSource = self;
@@ -142,12 +146,12 @@
         TAPCountryModel *currentCountry = [countryArray objectAtIndex:indexPath.row];
         [cell setCountryData:currentCountry];
         
-        if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
-            [cell showSeparatorView:NO];
-        }
-        else {
-            [cell showSeparatorView:YES];
-        }
+//        if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
+//            [cell showSeparatorView:NO];
+//        }
+//        else {
+//            [cell showSeparatorView:YES];
+//        }
         
         if (self.selectedCountry.countryID != nil) {
             NSString *selectedCountryID = self.selectedCountry.countryID;
@@ -175,12 +179,12 @@
         TAPCountryModel *currentCountry = [countryArray objectAtIndex:indexPath.row];
         [cell setCountryData:currentCountry];
         
-        if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
-            [cell showSeparatorView:NO];
-        }
-        else {
-            [cell showSeparatorView:YES];
-        }
+//        if (indexPath.row == [tableView numberOfRowsInSection:indexPath.section] - 1) {
+//            [cell showSeparatorView:NO];
+//        }
+//        else {
+//            [cell showSeparatorView:YES];
+//        }
         
         if (self.selectedCountry.countryID != nil) {
             NSString *selectedCountryID = self.selectedCountry.countryID;
@@ -210,14 +214,14 @@
         headerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
         if (section > 0) {
-            UIView *topSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(headerView.frame), 1.0f)];
-            topSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
-            [headerView addSubview:topSeparatorView];
+//            UIView *topSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(headerView.frame), 1.0f)];
+//            topSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+//            [headerView addSubview:topSeparatorView];
         }
         
-        UIView *bottomSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(headerView.frame) - 1.0f, CGRectGetWidth(headerView.frame), 1.0f)];
-        bottomSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
-        [headerView addSubview:bottomSeparatorView];
+//        UIView *bottomSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(headerView.frame) - 1.0f, CGRectGetWidth(headerView.frame), 1.0f)];
+//        bottomSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+//        [headerView addSubview:bottomSeparatorView];
         
         NSArray *keysArray = [self.indexSectionDictionary allKeys];
         NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
@@ -225,7 +229,7 @@
         
         UIFont *sectionHeaderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
         UIColor *sectionHeaderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
-        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(headerView.frame) - 16.0f - 16.0f, 34.0f)];
+        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(headerView.frame) - 16.0f - 16.0f, CGRectGetHeight(headerView.frame))];
         titleLabel.textColor = sectionHeaderColor;
         titleLabel.font = sectionHeaderFont;
         [headerView addSubview:titleLabel];
@@ -240,13 +244,13 @@
         UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 28.0f)];
         headerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
-        UIView *topSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(headerView.frame), 1.0f)];
-        topSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
-        [headerView addSubview:topSeparatorView];
+//        UIView *topSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(headerView.frame), 1.0f)];
+//        topSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+//        [headerView addSubview:topSeparatorView];
         
-        UIView *bottomSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(headerView.frame) - 1.0f, CGRectGetWidth(headerView.frame), 1.0f)];
-        bottomSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
-        [headerView addSubview:bottomSeparatorView];
+//        UIView *bottomSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(headerView.frame) - 1.0f, CGRectGetWidth(headerView.frame), 1.0f)];
+//        bottomSeparatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
+//        [headerView addSubview:bottomSeparatorView];
         
         NSArray *keysArray = [self.searchResultIndexSectionDictionary allKeys];
         NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:nil ascending:YES];
@@ -254,7 +258,7 @@
         
         UIFont *sectionHeaderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontTableViewSectionHeaderLabel];
         UIColor *sectionHeaderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTableViewSectionHeaderLabel];
-        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(headerView.frame) - 16.0f - 16.0f, 34.0f)];
+        UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(headerView.frame) - 16.0f - 16.0f, CGRectGetHeight(headerView.frame))];
         titleLabel.textColor = sectionHeaderColor;
         titleLabel.font = sectionHeaderFont;
         [headerView addSubview:titleLabel];
@@ -371,7 +375,7 @@
 #pragma mark TAPSearchBarView
 - (BOOL)searchBarTextFieldShouldBeginEditing:(UITextField *)textField {
     
-    [self.countryPickerView.searchBarView setAsActive:YES animated:YES];
+    [self.countryPickerView.searchBarView setAsActive:YES animated:NO]; //AS NOTE - CHANGE TO WITHOUT ANIMATION
     
     if ([textField.text isEqualToString:@""]) {
         if (textField == self.countryPickerView.searchBarView.searchTextField) {
@@ -397,7 +401,7 @@
 
 - (BOOL)searchBarTextFieldShouldEndEditing:(UITextField *)textField {
     
-    [self.countryPickerView.searchBarView setAsActive:YES animated:YES];
+    [self.countryPickerView.searchBarView setAsActive:NO animated:NO]; //AS NOTE - CHANGE TO WITHOUT ANIMATION
     
     return YES;
 }
@@ -408,10 +412,20 @@
     
     [UIView animateWithDuration:0.2f animations:^{
         self.countryPickerView.searchResultTableView.alpha = 0.0f;
+        
+        if ([self.indexSectionDictionary count] > 0) {
+            self.countryPickerView.tableView.alpha = 1.0f;
+            [self.countryPickerView isShowEmptyState:NO];
+        }
+        else {
+            self.countryPickerView.tableView.alpha = 0.0f;
+            [self.countryPickerView isShowEmptyState:YES];
+        }
     } completion:^(BOOL finished) {
         //completion
         [self.countryPickerView.searchResultTableView reloadData];
     }];
+    
     return YES;
 }
 
@@ -437,11 +451,20 @@
         }
         
         [self fetchSearchResultCountryListWithData:self.searchResultCountryMutableArray];
-        [UIView animateWithDuration:0.2f animations:^{
-            self.countryPickerView.searchResultTableView.alpha = 1.0f;
-        } completion:^(BOOL finished) {
-            //completion
-        }];
+//        [UIView animateWithDuration:0.2f animations:^{
+            if ([self.searchResultCountryMutableArray count] > 0) {
+                self.countryPickerView.tableView.alpha = 1.0f;
+                self.countryPickerView.searchResultTableView.alpha = 1.0f;
+                [self.countryPickerView isShowEmptyState:NO];
+            }
+            else {
+                self.countryPickerView.tableView.alpha = 0.0f;
+                self.countryPickerView.searchResultTableView.alpha = 0.0f;
+                [self.countryPickerView isShowEmptyState:YES];
+            }
+//        } completion:^(BOOL finished) {
+//            //completion
+//        }];
     }
     else {
         textField.text = @"";
@@ -462,6 +485,15 @@
             self.countryPickerView.searchBarCancelButton.frame = searchBarCancelButtonFrame;
             
             self.countryPickerView.searchResultTableView.alpha = 0.0f;
+            
+            if ([self.indexSectionDictionary count] > 0) {
+                self.countryPickerView.tableView.alpha = 1.0f;
+                [self.countryPickerView isShowEmptyState:NO];
+            }
+            else {
+                self.countryPickerView.tableView.alpha = 0.0f;
+                [self.countryPickerView isShowEmptyState:YES];
+            }
         } completion:^(BOOL finished) {
             //completion
             [self.countryPickerView.searchResultTableView reloadData];
@@ -496,6 +528,15 @@
         self.countryPickerView.searchBarCancelButton.frame = searchBarCancelButtonFrame;
         
         self.countryPickerView.searchResultTableView.alpha = 0.0f;
+        
+        if ([self.indexSectionDictionary count] > 0) {
+            self.countryPickerView.tableView.alpha = 1.0f;
+            [self.countryPickerView isShowEmptyState:NO];
+        }
+        else {
+            self.countryPickerView.tableView.alpha = 0.0f;
+            [self.countryPickerView isShowEmptyState:YES];
+        }
     } completion:^(BOOL finished) {
         //completion
         [self.countryPickerView.searchResultTableView reloadData];
@@ -532,6 +573,15 @@
                 [self.indexSectionDictionary setObject:countryArray forKey:firstAlphabet];
             }
         }
+    }
+    
+    if ([self.indexSectionDictionary count] > 0) {
+        self.countryPickerView.tableView.alpha = 1.0f;
+        [self.countryPickerView isShowEmptyState:NO];
+    }
+    else {
+        self.countryPickerView.tableView.alpha = 0.0f;
+        [self.countryPickerView isShowEmptyState:YES];
     }
     
     [self.countryPickerView.tableView reloadData];

@@ -9,16 +9,20 @@
 #import "TAPYourFileBubbleTableViewCell.h"
 #import "TAPGradientView.h"
 
-@interface TAPYourFileBubbleTableViewCell () <UIGestureRecognizerDelegate>
+@interface TAPYourFileBubbleTableViewCell () <UIGestureRecognizerDelegate, TAPImageViewDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *replyInnerView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
-@property (strong, nonatomic) IBOutlet UIView *fileView;
+@property (strong, nonatomic) IBOutlet UIView *replyDecorationView;
+@property (strong, nonatomic) IBOutlet UIView *quoteDecorationView;
+@property (strong, nonatomic) IBOutlet UIView *fileBackgroundView;
+@property (strong, nonatomic) IBOutlet UIView *bubbleHighlightView;
 @property (strong, nonatomic) IBOutlet UILabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
+@property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
@@ -26,6 +30,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *forwardTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *forwardFromLabel;
 @property (strong, nonatomic) IBOutlet UILabel *fileDescriptionSizePlaceholderLabel;
+@property (strong, nonatomic) IBOutlet UIImageView *fileImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet UIButton *chatBubbleButton;
 @property (strong, nonatomic) IBOutlet UIButton *replyButton;
@@ -164,16 +169,24 @@
     
     _isDownloaded = NO;
     
+    self.bubbleView.layer.cornerRadius = 16.0f;
+    self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleView.layer.cornerRadius = 8.0f;
-    self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
+    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
+    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
+    self.bubbleHighlightView.clipsToBounds = YES;
     
-    self.replyView.layer. cornerRadius = 4.0f;
+    self.replyView.layer.cornerRadius = 4.0f;
+    self.replyView.clipsToBounds = YES;
     
-    self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
-    self.fileView.layer.cornerRadius = 8.0f;
+    self.quoteView.clipsToBounds = YES;
+    
+    self.quoteImageView.layer.cornerRadius = 4.0f;
+    self.quoteImageView.delegate = self;
+    
+    self.fileBackgroundView.layer.cornerRadius = 24.0f;
     
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
@@ -220,6 +233,15 @@
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+    
+    self.lastProgress = 0.0f;
+    self.progressLayer.strokeEnd = 0.0f;
+    self.progressLayer.strokeStart = 0.0f;
+    [self.progressLayer removeAllAnimations];
+    [self.syncProgressSubView removeFromSuperview];
+    _progressLayer = nil;
+    _syncProgressSubView = nil;
+    
     [self showSenderInfo:NO];
 }
 
@@ -345,14 +367,26 @@
         }
 }
 
+#pragma mark - TAPImageViewDelegate
+
+- (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
+    if (imageView == self.quoteImageView) {
+        if (imageView.image == nil) {
+            [self showQuoteView:NO];
+            [self showReplyView:YES withMessage:self.message];
+        }
+    }
+}
+
 #pragma mark - Custom Method
 - (void)setBubbleCellStyle {
     self.contentView.backgroundColor = [UIColor clearColor];
     self.bubbleView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleBackground];
     self.quoteView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteBackground];
     self.replyInnerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteBackground];
-    self.replyView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorQuoteLayoutDecorationBackground];
-    self.fileView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftFileButtonBackground];
+    self.replyDecorationView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteDecorationBackground];
+    self.quoteDecorationView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteDecorationBackground];
+    self.fileBackgroundView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconQuotedFileBackgroundLeft];
     self.progressContainerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftFileButtonBackground];
 
     UIFont *quoteTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleQuoteTitle];
@@ -366,6 +400,9 @@
     
     UIFont *statusLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontBubbleMessageStatus];
     UIColor *statusLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorBubbleMessageStatus];
+
+    UIFont *timestampLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleMessageTimestamp];
+    UIColor *timestampLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleMessageTimestamp];
     
     UIFont *fileNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftFileBubbleName];
     UIColor *fileNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftFileBubbleName];
@@ -407,6 +444,9 @@
     
     self.statusLabel.textColor = statusLabelColor;
     self.statusLabel.font = statusLabelFont;
+
+    self.timestampLabel.textColor = timestampLabelColor;
+    self.timestampLabel.font = timestampLabelFont;
     
     self.fileDescriptionLabel.textColor = fileInfoLabelColor;
     self.fileDescriptionLabel.font = fileInfoLabelFont;
@@ -418,19 +458,20 @@
     self.senderNameLabel.textColor = senderNameLabelColor;
     
     UIImage *abortImage = [UIImage imageNamed:@"TAPIconAbort" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownload]];
+    abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownloadWhite]];
     self.cancelImageView.image = abortImage;
     
     UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFile]];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
+    self.fileImageView.image = documentsImage;
     self.doneDownloadImageView.image = documentsImage;
     
     UIImage *retryImage = [UIImage imageNamed:@"TAPIconRetry" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    retryImage = [retryImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileRetryUploadDownload]];
+    retryImage = [retryImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileRetryUploadDownloadWhite]];
     self.retryDownloadImageView.image = retryImage;
     
     UIImage *downloadImage = [UIImage imageNamed:@"TAPIconDownload" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-    downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownload]];
+    downloadImage = [downloadImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileUploadDownloadWhite]];
     self.downloadImageView.image = downloadImage;
 }
 
@@ -519,9 +560,16 @@
     
     self.bubbleLabel.text = fileName;
     
-    NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[[message.data objectForKey:@"size"] integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
-    self.fileDescriptionSizePlaceholderLabel.text = [NSString stringWithFormat:@"999.99 MB / %@", fileSize];
-    self.fileDescriptionLabel.text = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
+    NSNumber *sizeData = [message.data objectForKey:@"size"];
+    
+    if (sizeData != nil && sizeData.longValue > 0L) {
+        NSString *fileSize = [NSByteCountFormatter stringFromByteCount:[sizeData integerValue] countStyle:NSByteCountFormatterCountStyleBinary];
+        self.fileDescriptionSizePlaceholderLabel.text = [NSString stringWithFormat:@"999.99 MB / %@", fileSize];
+        self.fileDescriptionLabel.text = [NSString stringWithFormat:@"%@ %@", fileSize, fileExtension];
+    }
+    else {
+        self.fileDescriptionLabel.text = fileExtension;
+    }
     
     NSTimeInterval lastMessageTimeInterval = [message.created doubleValue] / 1000.0f; //change to second from milisecond
     
@@ -622,6 +670,8 @@
         self.senderImageView.image = nil;
         self.senderNameLabel.text = @"";
     }
+
+    self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
     
     //CS NOTE - Update Spacing should be placed at the bottom
     [self updateSpacingConstraint];
@@ -630,70 +680,70 @@
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
     //    self.chatBubbleButton.userInteractionEnabled = NO;
     
-    if (isShowed) {
-        NSTimeInterval lastMessageTimeInterval = [self.message.created doubleValue] / 1000.0f; //change to second from milisecond
-        
-        NSDate *currentDate = [NSDate date];
-        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
-        
-        NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
-        NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
-        [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
-        midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
-        NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
-        
-        NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
-        NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
-        
-        NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
-        
-                NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
-        NSString *lastMessageDateString = @"";
-        if (timeGap <= midnightTimeGap) {
-            //Today
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"HH:mm";
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
-        }
-        else if (timeGap <= 86400.0f + midnightTimeGap) {
-            //Yesterday
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"HH:mm";
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
-        }
-        else {
-            //Set date
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
-            
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
-        }
-        
-        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
-        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
-        self.statusLabel.text = statusString;
-        
-        self.statusLabel.alpha = 1.0f;
-        self.statusLabelTopConstraint.constant = 2.0f;
-        self.statusLabelHeightConstraint.constant = 13.0f;
-        self.replyButton.alpha = 1.0f;
-        self.replyButtonLeftConstraint.constant = 2.0f;
-    }
-    else {
-        
-        self.statusLabelTopConstraint.constant = 0.0f;
-        self.statusLabelHeightConstraint.constant = 0.0f;
-        self.replyButton.alpha = 0.0f;
-        self.replyButtonLeftConstraint.constant = -28.0f;
-        self.statusLabel.alpha = 0.0f;
-    }
-    [self.contentView layoutIfNeeded];
+//    if (isShowed) {
+//        NSTimeInterval lastMessageTimeInterval = [self.message.created doubleValue] / 1000.0f; //change to second from milisecond
+//        
+//        NSDate *currentDate = [NSDate date];
+//        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+//        
+//        NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
+//        NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
+//        [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
+//        midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
+//        NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
+//        
+//        NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
+//        NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
+//        
+//        NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
+//        
+//                NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
+//        NSString *lastMessageDateString = @"";
+//        if (timeGap <= midnightTimeGap) {
+//            //Today
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            dateFormatter.dateFormat = @"HH:mm";
+//            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+//            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+//            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
+//        }
+//        else if (timeGap <= 86400.0f + midnightTimeGap) {
+//            //Yesterday
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            dateFormatter.dateFormat = @"HH:mm";
+//            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+//            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
+//            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
+//        }
+//        else {
+//            //Set date
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
+//            
+//            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+//            NSString *appendedLastDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+//            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedLastDateString, dateString];
+//        }
+//        
+//        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
+//        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
+//        self.statusLabel.text = statusString;
+//        
+//        self.statusLabel.alpha = 1.0f;
+//        self.statusLabelTopConstraint.constant = 2.0f;
+//        self.statusLabelHeightConstraint.constant = 13.0f;
+//        self.replyButton.alpha = 1.0f;
+//        self.replyButtonLeftConstraint.constant = 2.0f;
+//    }
+//    else {
+//        
+//        self.statusLabelTopConstraint.constant = 0.0f;
+//        self.statusLabelHeightConstraint.constant = 0.0f;
+//        self.replyButton.alpha = 0.0f;
+//        self.replyButtonLeftConstraint.constant = -28.0f;
+//        self.statusLabel.alpha = 0.0f;
+//    }
+//    [self.contentView layoutIfNeeded];
 }
 
 - (IBAction)senderProfileImageButtonDidTapped:(id)sender {
@@ -782,9 +832,9 @@
         self.replyViewTopConstraint.active = YES;
         self.replyViewTopConstraint.constant = 0.0f;
         self.replyViewInnerViewLeadingContraint.constant = 4.0f;
-        self.replyNameLabelLeadingConstraint.constant = 4.0f;
+        self.replyNameLabelLeadingConstraint.constant = 8.0f;
         self.replyNameLabelTrailingConstraint.constant = 8.0f;
-        self.replyMessageLabelLeadingConstraint.constant = 4.0f;
+        self.replyMessageLabelLeadingConstraint.constant = 8.0f;
         self.replyMessageLabelTrailingConstraint.constant = 8.0f;
         self.replyButtonLeadingConstraint.active = YES;
         self.replyButtonTrailingConstraint.active = YES;
@@ -880,7 +930,7 @@
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
     if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
-        self.fileView.alpha = 1.0f;
+        self.fileImageView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
     }
     else {
@@ -890,7 +940,7 @@
         else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.fileID];
         }
-        self.fileView.alpha = 0.0f;
+        self.fileImageView.alpha = 0.0f;
         self.quoteImageView.alpha = 1.0f;
     }
     
@@ -969,7 +1019,7 @@
     UIBezierPath *progressPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMidX(self.progressBarView.bounds), CGRectGetMidY(self.progressBarView.bounds)) radius:(self.progressBarView.bounds.size.height - self.borderWidth - self.pathWidth) / 2 startAngle:self.startAngle endAngle:self.endAngle clockwise:YES];
     
     self.progressLayer.lineCap = kCALineCapRound;
-    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackground].CGColor;
+    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackgroundWhite].CGColor;
     
     self.progressLayer.lineWidth = 3.0f;
     self.progressLayer.path = progressPath.CGPath;
@@ -1082,6 +1132,21 @@
         self.forwardFromLabelTopConstraint.constant = 0.0f;
     }
     [self.contentView layoutIfNeeded];
+}
+
+- (void)showBubbleHighlight {
+    self.bubbleHighlightView.alpha = 0.0f;
+    [TAPUtil performBlock:^{
+        [UIView animateWithDuration:0.2f animations:^{
+            self.bubbleHighlightView.alpha = 1.0f;
+        } completion:^(BOOL finished) {
+            [TAPUtil performBlock:^{
+                [UIView animateWithDuration:0.75f animations:^{
+                    self.bubbleHighlightView.alpha = 0.0f;
+                }];
+            } afterDelay:1.0f];
+        }];
+    } afterDelay:0.2f];
 }
 
 @end

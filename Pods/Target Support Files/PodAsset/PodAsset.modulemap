@@ -1,4 +1,4 @@
-framework module PodAsset {
+module PodAsset {
   umbrella header "PodAsset-umbrella.h"
 
   export *

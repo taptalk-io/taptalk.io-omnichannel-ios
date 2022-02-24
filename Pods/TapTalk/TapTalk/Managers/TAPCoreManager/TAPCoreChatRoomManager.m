@@ -69,6 +69,10 @@
 }
 
 #pragma mark - Custom Method
+- (TAPRoomModel *)getActiveChatRoom {
+    return [TAPChatManager sharedManager].activeRoom;
+}
+
 - (void)getPersonalChatRoomWithRecipientUserID:(NSString *)userID
                                        success:(void (^)(TAPRoomModel *room))success
                                        failure:(void (^)(NSError *error))failure {
@@ -105,19 +109,19 @@
 - (void)getGroupChatRoomWithGroupRoomID:(NSString *)groupRoomID
                                 success:(void (^)(TAPRoomModel *room))success
                                 failure:(void (^)(NSError *error))failure {
-    TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:groupRoomID];
-    if (obtainedRoom == nil) {
-        [TAPDataManager callAPIGetRoomWithRoomID:groupRoomID success:^(TAPRoomModel *room) {
-            [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
-            success(room);
-        } failure:^(NSError *error) {
+    [TAPDataManager callAPIGetRoomWithRoomID:groupRoomID success:^(TAPRoomModel *room) {
+        [[TAPGroupManager sharedManager] setRoomWithRoomID:room.roomID room:room];
+        success(room);
+    } failure:^(NSError *error) {
+        TAPRoomModel *obtainedRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:groupRoomID];
+        if (obtainedRoom == nil) {
+            success(obtainedRoom);
+        }
+        else {
             NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
             failure(localizedError);
-        }];
-    }
-    else {
-        success(obtainedRoom);
-    }
+        }
+    }];
 }
 
 - (void)getChatRoomByXCRoomID:(NSString *)xcRoomID
@@ -160,7 +164,7 @@
         if (profilePictureImage != nil) {
             //has image, upload image
             UIImage *imageToSend = [self rotateImage:profilePictureImage];
-            NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
+            NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
             [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:room.roomID completionBlock:^(TAPRoomModel *room) {
                 //Update to group cache
                 TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
@@ -221,7 +225,7 @@
              progressBlock:(void (^)(CGFloat progress, CGFloat total))progressBlock
               failureBlock:(void (^)(NSError *error))failureBlock {
     UIImage *imageToSend = [self rotateImage:groupPictureImage];
-    NSData *imageData = UIImageJPEGRepresentation(imageToSend, 0.6);
+    NSData *imageData = UIImageJPEGRepresentation(imageToSend, [[TapTalk sharedInstance] getImageCompressionQuality]);
     [TAPDataManager callAPIUploadRoomImageWithImageData:imageData roomID:roomID completionBlock:^(TAPRoomModel *room) {
         //Update to group cache
         TAPRoomModel *existingRoom = [[TAPGroupManager sharedManager] getRoomWithRoomID:room.roomID];
@@ -243,12 +247,20 @@
     }];
 }
 
+- (void)deleteLocalGroupChatRoomWithRoomID:(NSString *)roomID
+                                   success:(void (^)(void))success
+                                   failure:(void (^)(NSError *error))failure {
+    [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:roomID success:^{
+        success();
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
 - (void)deleteGroupChatRoom:(TAPRoomModel *)room
                     success:(void (^)(void))success
                     failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIDeleteRoomWithRoom:room success:^{
-        //Remove from group preference
-        [[TAPGroupManager sharedManager] removeRoomWithRoomID:room.roomID];
         success();
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
@@ -260,8 +272,6 @@
                              success:(void (^)(void))success
                              failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPILeaveRoomWithRoomID:roomID success:^{
-        //Remove from group preference
-        [[TAPGroupManager sharedManager] removeRoomWithRoomID:roomID];        
         success();
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];

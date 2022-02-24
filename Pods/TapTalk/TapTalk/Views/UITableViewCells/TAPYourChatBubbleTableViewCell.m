@@ -11,21 +11,26 @@
 #import "ZSWTappableLabel.h"
 #import "TAPProfileViewController.h"
 
-@interface TAPYourChatBubbleTableViewCell() <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate, UIGestureRecognizerDelegate>
+@interface TAPYourChatBubbleTableViewCell() <ZSWTappableLabelTapDelegate, ZSWTappableLabelLongPressDelegate, UIGestureRecognizerDelegate, TAPImageViewDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
 @property (strong, nonatomic) IBOutlet UIView *replyView;
 @property (strong, nonatomic) IBOutlet UIView *replyInnerView;
 @property (strong, nonatomic) IBOutlet UIView *quoteView;
-@property (strong, nonatomic) IBOutlet UIView *fileView;
+@property (strong, nonatomic) IBOutlet UIView *replyDecorationView;
+@property (strong, nonatomic) IBOutlet UIView *quoteDecorationView;
+@property (strong, nonatomic) IBOutlet UIView *fileBackgroundView;
+@property (strong, nonatomic) IBOutlet UIView *bubbleHighlightView;
 @property (strong, nonatomic) IBOutlet ZSWTappableLabel *bubbleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
+@property (strong, nonatomic) IBOutlet UILabel *timestampLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyNameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *replyMessageLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *quoteSubtitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *forwardTitleLabel;
 @property (strong, nonatomic) IBOutlet UILabel *forwardFromLabel;
+@property (strong, nonatomic) IBOutlet UIImageView *fileImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *quoteImageView;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 @property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
@@ -98,16 +103,25 @@
     [self.contentView layoutIfNeeded];
     self.statusLabel.alpha = 0.0f;
     
+    
+    self.bubbleView.layer.cornerRadius = 16.0f;
+    self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleView.layer.cornerRadius = 8.0f;
-    self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
+    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+    self.bubbleHighlightView.clipsToBounds = YES;
     
-    self.replyView.layer. cornerRadius = 4.0f;
+    self.replyView.layer.cornerRadius = 4.0f;
+    self.replyView.clipsToBounds = YES;
     
-    self.quoteImageView.layer.cornerRadius = 8.0f;
     self.quoteView.layer.cornerRadius = 8.0f;
-    self.fileView.layer.cornerRadius = 8.0f;
+    self.quoteView.clipsToBounds = YES;
+    
+    self.quoteImageView.layer.cornerRadius = 4.0f;
+    self.quoteImageView.delegate = self;
+    
+    self.fileBackgroundView.layer.cornerRadius = 24.0f;
     
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
@@ -173,6 +187,7 @@
 
     self.mentionIndexesArray = nil;
     self.statusLabel.alpha = 0.0f;
+    self.bubbleHighlightView.alpha = 0.0f;
     [self showSenderInfo:NO];
 }
 
@@ -396,14 +411,26 @@
         }
 }
 
+#pragma mark - TAPImageViewDelegate
+
+- (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
+    if (imageView == self.quoteImageView) {
+        if (imageView.image == nil) {
+            [self showQuoteView:NO];
+            [self showReplyView:YES withMessage:self.message];
+        }
+    }
+}
+
 #pragma mark - Custom Method
 - (void)setBubbleCellStyle {
     self.contentView.backgroundColor = [UIColor clearColor];
     self.bubbleView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleBackground];
     self.quoteView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteBackground];
     self.replyInnerView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteBackground];
-    self.replyView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorQuoteLayoutDecorationBackground];
-    self.fileView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftFileButtonBackground];
+    self.replyDecorationView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteDecorationBackground];
+    self.quoteDecorationView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorLeftBubbleQuoteDecorationBackground];
+    self.fileBackgroundView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconQuotedFileBackgroundLeft];
     
     UIFont *quoteTitleFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleQuoteTitle];
     UIColor *quoteTitleColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleQuoteTitle];
@@ -416,6 +443,9 @@
     
     UIFont *statusLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontBubbleMessageStatus];
     UIColor *statusLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorBubbleMessageStatus];
+
+    UIFont *timestampLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleMessageTimestamp];
+    UIColor *timestampLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleMessageTimestamp];
     
     UIFont *senderNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleSenderName];
     UIColor *senderNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleSenderName];
@@ -451,9 +481,16 @@
     
     self.statusLabel.textColor = statusLabelColor;
     self.statusLabel.font = statusLabelFont;
+
+    self.timestampLabel.textColor = timestampLabelColor;
+    self.timestampLabel.font = timestampLabelFont;
     
     self.senderNameLabel.font = senderNameLabelFont;
     self.senderNameLabel.textColor = senderNameLabelColor;
+    
+    UIImage *documentsImage = [UIImage imageNamed:@"TAPIconDocuments" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+    documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
+    self.fileImageView.image = documentsImage;
 }
 
 - (void)setMessage:(TAPMessageModel *)message {
@@ -605,102 +642,104 @@
         self.senderImageView.image = nil;
         self.senderNameLabel.text = @"";
     }
+    
+    self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
-    self.chatBubbleButton.userInteractionEnabled = NO;
-    
-    if (isShowed) {
-        NSTimeInterval lastMessageTimeInterval = [self.message.created doubleValue] / 1000.0f; //change to second from milisecond
-        
-        NSDate *currentDate = [NSDate date];
-        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
-        
-        NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
-        NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
-        [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
-        midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
-        NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
-        
-        NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
-        NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
-        
-        NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
-        
-        NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
-        NSString *lastMessageDateString = @"";
-        if (timeGap <= midnightTimeGap) {
-            //Today
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"HH:mm";
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedMessageDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedMessageDateString, dateString];
-        }
-        else if (timeGap <= 86400.0f + midnightTimeGap) {
-            //Yesterday
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"HH:mm";
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedMessageDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedMessageDateString, dateString];
-        }
-        else {
-            //Set date
-            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-            dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
-            
-            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
-            NSString *appendedMessageDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
-            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedMessageDateString, dateString];
-        }
-        
-        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
-        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
-        self.statusLabel.text = statusString;
-        
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
-        self.chatBubbleButton.alpha = 1.0f;
-        
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.statusLabel.alpha = 1.0f;
-            self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
-            self.statusLabelTopConstraint.constant = 2.0f;
-            self.statusLabelHeightConstraint.constant = 13.0f;
-            self.replyButton.alpha = 1.0f;
-            self.replyButtonLeftConstraint.constant = 2.0f;
-            [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.userInteractionEnabled = YES;
-        }];
-    }
-    else {
-        CGFloat animationDuration = 0.2f;
-        
-        if (!animated) {
-            animationDuration = 0.0f;
-        }
-        
-        [UIView animateWithDuration:animationDuration animations:^{
-            self.chatBubbleButton.backgroundColor = [UIColor clearColor];
-            self.statusLabelTopConstraint.constant = 0.0f;
-            self.statusLabelHeightConstraint.constant = 0.0f;
-            self.replyButton.alpha = 0.0f;
-            self.replyButtonLeftConstraint.constant = -28.0f;
-            [self.contentView layoutIfNeeded];
-            [self layoutIfNeeded];
-        } completion:^(BOOL finished) {
-            self.chatBubbleButton.alpha = 0.0f;
-            self.chatBubbleButton.userInteractionEnabled = YES;
-            self.statusLabel.alpha = 0.0f;
-        }];
-    }
+//    self.chatBubbleButton.userInteractionEnabled = NO;
+//
+//    if (isShowed) {
+//        NSTimeInterval lastMessageTimeInterval = [self.message.created doubleValue] / 1000.0f; //change to second from milisecond
+//
+//        NSDate *currentDate = [NSDate date];
+//        NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+//
+//        NSTimeInterval timeGap = currentTimeInterval - lastMessageTimeInterval;
+//        NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
+//        [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
+//        midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
+//        NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
+//
+//        NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
+//        NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
+//
+//        NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
+//
+//        NSDate *lastMessageDate = [NSDate dateWithTimeIntervalSince1970:lastMessageTimeInterval];
+//        NSString *lastMessageDateString = @"";
+//        if (timeGap <= midnightTimeGap) {
+//            //Today
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            dateFormatter.dateFormat = @"HH:mm";
+//            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+//            NSString *appendedMessageDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+//            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedMessageDateString, dateString];
+//        }
+//        else if (timeGap <= 86400.0f + midnightTimeGap) {
+//            //Yesterday
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            dateFormatter.dateFormat = @"HH:mm";
+//            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+//            NSString *appendedMessageDateString = NSLocalizedStringFromTableInBundle(@"yesterday at ", nil, [TAPUtil currentBundle], @"");
+//            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedMessageDateString, dateString];
+//        }
+//        else {
+//            //Set date
+//            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+//            dateFormatter.dateFormat = @"dd/MM/yyyy HH:mm";
+//
+//            NSString *dateString = [dateFormatter stringFromDate:lastMessageDate];
+//            NSString *appendedMessageDateString = NSLocalizedStringFromTableInBundle(@"at ", nil, [TAPUtil currentBundle], @"");
+//            lastMessageDateString = [NSString stringWithFormat:@"%@%@", appendedMessageDateString, dateString];
+//        }
+//
+//        NSString *appendedStatusString = NSLocalizedStringFromTableInBundle(@"Sent ", nil, [TAPUtil currentBundle], @"");
+//        NSString *statusString = [NSString stringWithFormat:@"%@%@", appendedStatusString, lastMessageDateString];
+//        self.statusLabel.text = statusString;
+//
+//        CGFloat animationDuration = 0.2f;
+//
+//        if (!animated) {
+//            animationDuration = 0.0f;
+//        }
+//
+//        self.chatBubbleButton.alpha = 1.0f;
+//
+//        [UIView animateWithDuration:animationDuration animations:^{
+//            self.statusLabel.alpha = 1.0f;
+//            self.chatBubbleButton.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.18f];
+//            self.statusLabelTopConstraint.constant = 2.0f;
+//            self.statusLabelHeightConstraint.constant = 13.0f;
+//            self.replyButton.alpha = 1.0f;
+//            self.replyButtonLeftConstraint.constant = 2.0f;
+//            [self.contentView layoutIfNeeded];
+//            [self layoutIfNeeded];
+//        } completion:^(BOOL finished) {
+//            self.chatBubbleButton.userInteractionEnabled = YES;
+//        }];
+//    }
+//    else {
+//        CGFloat animationDuration = 0.2f;
+//
+//        if (!animated) {
+//            animationDuration = 0.0f;
+//        }
+//
+//        [UIView animateWithDuration:animationDuration animations:^{
+//            self.chatBubbleButton.backgroundColor = [UIColor clearColor];
+//            self.statusLabelTopConstraint.constant = 0.0f;
+//            self.statusLabelHeightConstraint.constant = 0.0f;
+//            self.replyButton.alpha = 0.0f;
+//            self.replyButtonLeftConstraint.constant = -28.0f;
+//            [self.contentView layoutIfNeeded];
+//            [self layoutIfNeeded];
+//        } completion:^(BOOL finished) {
+//            self.chatBubbleButton.alpha = 0.0f;
+//            self.chatBubbleButton.userInteractionEnabled = YES;
+//            self.statusLabel.alpha = 0.0f;
+//        }];
+//    }
 }
 
 - (void)handleBubbleViewTap:(UITapGestureRecognizer *)recognizer {
@@ -710,9 +749,9 @@
 }
 
 - (IBAction)chatBubbleButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(yourChatBubbleViewDidTapped:)]) {
-        [self.delegate yourChatBubbleViewDidTapped:self.message];
-    }
+//    if ([self.delegate respondsToSelector:@selector(yourChatBubbleViewDidTapped:)]) {
+//        [self.delegate yourChatBubbleViewDidTapped:self.message];
+//    }
 }
 
 - (IBAction)replyButtonDidTapped:(id)sender {
@@ -748,9 +787,9 @@
         self.replyViewBottomConstraint.active = YES;
         self.replyViewBottomConstraint.constant = 3.0f;
         self.replyViewInnerViewLeadingContraint.constant = 4.0f;
-        self.replyNameLabelLeadingConstraint.constant = 4.0f;
+        self.replyNameLabelLeadingConstraint.constant = 8.0f;
         self.replyNameLabelTrailingConstraint.constant = 8.0f;
-        self.replyMessageLabelLeadingConstraint.constant = 4.0f;
+        self.replyMessageLabelLeadingConstraint.constant = 8.0f;
         self.replyMessageLabelTrailingConstraint.constant = 8.0f;
         self.replyButtonLeadingConstraint.active = YES;
         self.replyButtonTrailingConstraint.active = YES;
@@ -836,7 +875,7 @@
 - (void)setQuote:(TAPQuoteModel *)quote userID:(NSString *)userID {
     if ([quote.fileType isEqualToString:[NSString stringWithFormat:@"%ld", TAPChatMessageTypeFile]] || [quote.fileType isEqualToString:@"file"]) {
         //TYPE FILE
-        self.fileView.alpha = 1.0f;
+        self.fileImageView.alpha = 1.0f;
         self.quoteImageView.alpha = 0.0f;
     }
     else {
@@ -846,7 +885,7 @@
         else if (quote.fileID != nil && ![quote.fileID isEqualToString:@""]) {
             [self.quoteImageView setImageWithURLString:quote.fileID];
         }
-        self.fileView.alpha = 0.0f;
+        self.fileImageView.alpha = 0.0f;
         self.quoteImageView.alpha = 1.0f;
     }
     
@@ -886,6 +925,21 @@
         self.forwardTitleTopConstraint.constant = 0.0f;
     }
     [self.contentView layoutIfNeeded];
+}
+
+- (void)showBubbleHighlight {
+    self.bubbleHighlightView.alpha = 0.0f;
+    [TAPUtil performBlock:^{
+        [UIView animateWithDuration:0.2f animations:^{
+            self.bubbleHighlightView.alpha = 1.0f;
+        } completion:^(BOOL finished) {
+            [TAPUtil performBlock:^{
+                [UIView animateWithDuration:0.75f animations:^{
+                    self.bubbleHighlightView.alpha = 0.0f;
+                }];
+            } afterDelay:1.0f];
+        }];
+    } afterDelay:0.2f];
 }
 
 @end

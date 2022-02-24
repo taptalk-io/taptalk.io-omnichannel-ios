@@ -89,7 +89,7 @@
         
         UIImageView *cancelImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.downloadButtonView.frame) - 32.0f)/2, (CGRectGetWidth(self.downloadButtonView.frame) - 32.0f) / 2, 32.0f, 32.0f)];
         UIImage *abortImage = [UIImage imageNamed:@"TAPIconAbort" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownload]];
+        abortImage = [abortImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconCancelUploadDownloadWhite]];
         cancelImageView.image = abortImage;
         [self.progressView addSubview:cancelImageView];
         
@@ -202,7 +202,7 @@
     UIBezierPath *progressPath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(CGRectGetMidX(self.progressBarView.bounds), CGRectGetMidY(self.progressBarView.bounds)) radius:(self.progressBarView.bounds.size.height - self.borderWidth - self.pathWidth) / 2 startAngle:self.startAngle endAngle:self.endAngle clockwise:YES];
 
     self.progressLayer.lineCap = kCALineCapRound;
-    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackground].CGColor;
+    self.progressLayer.strokeColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorFileProgressBackgroundWhite].CGColor;
     self.progressLayer.lineWidth = 3.0f;
     self.progressLayer.path = progressPath.CGPath;
     self.progressLayer.anchorPoint = CGPointMake(0.5f, 0.5f);
@@ -302,18 +302,36 @@
 
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message {
     NSDictionary *dataDictionary = message.data;
-    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    
     NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     fileID = [TAPUtil nullToEmptyString:fileID];
     
-    [TAPImageView imageFromCacheWithKey:fileID message:message success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+    NSString *urlKey = [dataDictionary objectForKey:@"url"];
+    if (urlKey == nil || [urlKey isEqualToString:@""]) {
+        urlKey = [dataDictionary objectForKey:@"fileURL"];
+    }
+    urlKey = [TAPUtil nullToEmptyString:urlKey];
+    
+    if (![urlKey isEqualToString:@""]) {
+        urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    }
+    urlKey = [TAPUtil nullToEmptyString:urlKey];
+    
+    [TAPImageView imageFromCacheWithKey:urlKey message:message
+    success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
         if (savedImage != nil) {
             [self.imageView setImage:savedImage];
             CGFloat width = savedImage.size.width;
             CGFloat height = savedImage.size.height;
         }
-        else {
+    } failure:^(TAPMessageModel *resultMessage) {
+        [TAPImageView imageFromCacheWithKey:fileID message:message
+        success:^(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage) {
+            if (savedImage != nil) {
+                [self.imageView setImage:savedImage];
+                CGFloat width = savedImage.size.width;
+                CGFloat height = savedImage.size.height;
+            }
+        } failure:^(TAPMessageModel *resultMessage) {
             //Get from message.data
             NSString *thumbnailImageBase64String = [dataDictionary objectForKey:@"thumbnail"];
             NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
@@ -321,7 +339,7 @@
             if (image != nil) {
                 self.thumbnailImageView.image = image;
             }
-        }
+        }];
     }];
 }
 

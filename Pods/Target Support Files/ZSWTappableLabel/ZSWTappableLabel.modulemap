@@ -1,4 +1,4 @@
-framework module ZSWTappableLabel {
+module ZSWTappableLabel {
   umbrella header "ZSWTappableLabel-umbrella.h"
 
   export *

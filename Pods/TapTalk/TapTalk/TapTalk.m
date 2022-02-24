@@ -18,8 +18,11 @@
 @interface TapTalk () <TAPNotificationManagerDelegate>
 
 @property (nonatomic) TapTalkImplentationType implementationType;
+@property (nonatomic) BOOL isInitialized;
 @property (nonatomic) BOOL isAutoConnectDisabled;
 @property (nonatomic) BOOL isGooglePlacesAPIInitialize;
+@property (nonatomic) CGFloat imageCompressionQuality;
+@property (nonatomic) NSInteger maxCaptionLength;
 @property (strong, nonatomic) NSString *clientCustomUserAgent;
 
 @property (strong, nonatomic) NSDictionary * _Nullable projectConfigsDictionary;
@@ -54,6 +57,8 @@
         _coreConfigsDictionary = [[NSDictionary alloc] init];
         _customConfigsDictionary = [[NSDictionary alloc] init];
         _clientCustomUserAgent = @"";
+        _imageCompressionQuality = TAP_DEFAULT_IMAGE_COMPRESSION_QUALITY;
+        _maxCaptionLength = TAP_LIMIT_OF_CAPTION_CHARACTER;
         
         //Set secret for NSSecureUserDefaults
         [NSUserDefaults setSecret:TAP_SECURE_KEY_NSUSERDEFAULTS];
@@ -427,6 +432,17 @@
             appKeySecret:(NSString *_Nonnull)appKeySecret
             apiURLString:(NSString *_Nonnull)apiURLString
       implementationType:(TapTalkImplentationType)tapTalkImplementationType {
+    
+    [self initWithAppKeyID:appKeyID appKeySecret:appKeySecret apiURLString:apiURLString implementationType:tapTalkImplementationType success:^{
+            
+    }];
+}
+
+- (void)initWithAppKeyID:(NSString *_Nonnull)appKeyID
+            appKeySecret:(NSString *_Nonnull)appKeySecret
+            apiURLString:(NSString *_Nonnull)apiURLString
+      implementationType:(TapTalkImplentationType)tapTalkImplementationType
+                 success:(void (^)(void))success {
         
     [[TAPNetworkManager sharedManager] setAppKeyWithID:appKeyID secret:appKeySecret];
     [[TAPAPIManager sharedManager] setBaseAPIURLString:apiURLString];
@@ -443,6 +459,14 @@
     
 //    //Validate and refresh access token
 //    [[TAPConnectionManager sharedManager] validateToken];
+    
+    _isInitialized = YES;
+    
+    success();
+}
+
+- (BOOL)checkTapTalkInitialized {
+    return self.isInitialized;
 }
 
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {
@@ -457,9 +481,22 @@
 }
 
 - (void)refreshActiveUser {
+    [self refreshActiveUserWithSuccess:^{
+        
+    } failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)refreshActiveUserWithSuccess:(void (^)(void))success
+                             failure:(void (^)(NSError *error))failure {
+    
     TAPUserModel *currentUser = [TAPDataManager getActiveUser];
     
     if (currentUser == nil) {
+        NSString *errorMessage =  NSLocalizedStringFromTableInBundle(@"Active user not found", nil, [TAPUtil currentBundle], @"");
+        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90001 errorMessage:errorMessage];
+        failure(error);
         return;
     }
     
@@ -468,9 +505,10 @@
         if (user != nil) {
             //Save to prefs
             [TAPDataManager setActiveUser:user];
+            success();
         }
     } failure:^(NSError *error) {
-        
+        failure(error);
     }];
 }
 
@@ -546,10 +584,16 @@
         [[TapTalk sharedInstance] clearAllTapTalkData];
         [[TapTalk sharedInstance] disconnectWithCompletionHandler:^{
         }];
+        if ([self.delegate respondsToSelector:@selector(userLogout)]) {
+            [self.delegate userLogout];
+        }
     } failure:^(NSError *error) {
         [[TapTalk sharedInstance] clearAllTapTalkData];
         [[TapTalk sharedInstance] disconnectWithCompletionHandler:^{
         }];
+        if ([self.delegate respondsToSelector:@selector(userLogout)]) {
+            [self.delegate userLogout];
+        }
     }];
 }
 
@@ -584,6 +628,20 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_GOOGLE_PLACES_TOKEN];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    //AS NOTE - CLEAR `receiveMessageDictionary` from AppGroup Share Extension
+    NSUserDefaults *appGroupUserDefaultSTG = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_NAME_STAGING]; //AS NOTE - CONNECT TO APP GROUP `STG`
+    [appGroupUserDefaultSTG removeObjectForKey:@"receiveMessageDictionary"];
+    [appGroupUserDefaultSTG synchronize];
+    
+    NSUserDefaults *appGroupUserDefaultDEV = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_NAME_DEV]; //AS NOTE - CONNECT TO APP GROUP `DEV`
+    [appGroupUserDefaultDEV removeObjectForKey:@"receiveMessageDictionary"];
+    [appGroupUserDefaultDEV synchronize];
+    
+    NSUserDefaults *appGroupUserDefaultRelease = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_NAME_RELEASE]; //AS NOTE - CONNECT TO APP GROUP `RELEASE`
+    [appGroupUserDefaultRelease removeObjectForKey:@"receiveMessageDictionary"];
+    [appGroupUserDefaultRelease synchronize];
+    //END AS NOTE
+    
     //Clear Manager Data
     [[TAPChatManager sharedManager] clearChatManagerData];
     [[TAPContactManager sharedManager] clearContactManagerData];
@@ -591,6 +649,12 @@
     [[TAPFileDownloadManager sharedManager] clearFileDownloadManagerData];
     [[TAPFileUploadManager sharedManager] clearFileUploadManagerData];
     [[TAPMessageStatusManager sharedManager] clearMessageStatusManagerData];
+    [[TAPDataManager sharedManager].deletedRoomIDArray removeAllObjects];
+    
+    // Disconnect socket connection
+    [self disconnectWithCompletionHandler:^{
+        
+    }];
 }
 
 /**
@@ -637,6 +701,35 @@
 - (BOOL)isAutoContactSyncEnabled {
     BOOL isDisabled = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TAP_PREFS_AUTO_SYNC_CONTACT_DISABLED valid:nil];
     return !isDisabled;
+}
+
+- (void)setImageCompressionQuality:(CGFloat)imageCompressionQuality {
+    if (imageCompressionQuality < 0.1f) {
+        _imageCompressionQuality = 0.1f;
+    }
+    else if (imageCompressionQuality > 1.0f) {
+        _imageCompressionQuality = 1.0f;
+    }
+    else {
+        _imageCompressionQuality = imageCompressionQuality;
+    }
+}
+
+- (CGFloat)getImageCompressionQuality {
+    return self.imageCompressionQuality;
+}
+
+- (void)setMaxCaptionLength:(NSInteger)maxCaptionLength {
+    if (maxCaptionLength < 0) {
+        _maxCaptionLength = 0;
+    }
+    else {
+        _maxCaptionLength = maxCaptionLength;
+    }
+}
+
+- (NSInteger)getMaxCaptionLength {
+    return self.maxCaptionLength;
 }
 
 @end

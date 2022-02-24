@@ -20,6 +20,46 @@ NS_ASSUME_NONNULL_BEGIN
 //==========================================================
 @protocol TapUIChatRoomDelegate <NSObject>
 @optional
+
+/**
+ Called when a chat room is opened
+ 
+ @param room (TAPRoomModel *) room data that is opened
+ @param otherUser (TapUserModel *) user data that will be shown
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkChatRoomDidOpen:(TAPRoomModel *)room
+                     otherUser:(TAPUserModel * _Nullable)otherUser
+         currentViewController:(UIViewController *)currentViewController
+currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
+/**
+ Called when a chat room is closed
+ 
+ @param room (TAPRoomModel *) room data that is closed
+ @param otherUser (TapUserModel *) user data that will be shown
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkChatRoomDidClose:(TAPRoomModel *)room
+                      otherUser:(TAPUserModel * _Nullable)otherUser
+          currentViewController:(UIViewController *)currentViewController
+currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
+/**
+ Called when user sends any message to a chat room
+ 
+ @param message (TAPMessageModel *) temporary message data that is being sent to the chat room
+ @param room (TAPRoomModel *) room data that will be shown
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkActiveUserDidSendMessage:(TAPMessageModel *)message
+                                   room:(TAPRoomModel *)room
+                  currentViewController:(UIViewController *)currentViewController
+       currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
 /**
  Called when user click the profile button on the top right side of personal chat room page.
  
@@ -110,7 +150,7 @@ Called when user click mention in the bubble chat.
  Called when user click the profile button on the top left side of room list view.
  
  @param currentViewController (UIViewController *) current shown view controller
- @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ @param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
  */
 - (void)tapTalkAccountButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController;
@@ -119,10 +159,38 @@ Called when user click mention in the bubble chat.
  Called when user click the new chat button on the top right side of room list view.
  
  @param currentViewController (UIViewController *) current shown view controller
- @param currentNavigationController (TapUserModel *) current shown navigation controller, you can handle push or push using this navigation controller
+ @param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
  */
 - (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController;
+@end
+
+//==========================================================
+//                 TapUIChatProfileDelegate
+//==========================================================
+@protocol TapUIChatProfileDelegate <NSObject>
+@optional
+
+/**
+ Called when user taps the Report User button in chat profile
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param room (TAPRoomModel *) chat room details of the reported user
+ @param reportedUser (TapUserModel *) details of the reported user
+ */
+- (void)reportUserButtonDidTapped:(UIViewController *)currentViewController
+                             room:(TAPRoomModel *)room
+                             user:(TAPUserModel *)reportedUser;
+
+/**
+ Called when user taps the Report Group button in chat profile
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param room (TAPRoomModel *) chat room details of the reported group
+ */
+- (void)reportGroupButtonDidTapped:(UIViewController *)currentViewController
+                              room:(TAPRoomModel *)room;
+
 @end
 
 //==========================================================
@@ -163,6 +231,7 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 @property (weak, nonatomic) UIWindow *activeWindow;
 @property (weak, nonatomic) id<TapUIChatRoomDelegate> chatRoomDelegate;
 @property (weak, nonatomic) id<TapUIRoomListDelegate> roomListDelegate;
+@property (weak, nonatomic) id<TapUIChatProfileDelegate> chatProfileDelegate;
 @property (weak, nonatomic) id<TapUICustomKeyboardDelegate> customKeyboardDelegate;
 
 //Initalization
@@ -215,6 +284,18 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 //==========================================================
 //                      My Account View
 //==========================================================
+/**
+Show or hide change profile picture button in MyAccount view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setChangeProfilePictureButtonVisible:(BOOL)isVisible;
+
+/**
+Get current visibility state of change profile picture button
+*/
+- (BOOL)getChangeProfilePictureButtonVisibleState;
+
 /**
 Show or hide logout button in MyAccount view
  
@@ -638,6 +719,15 @@ Enable or disable adding contacts & contact list
 Get current status of adding contacts & contact list
 */
 - (BOOL)isAddContactEnabled;
+
+/**
+Show or hide report button in user/group profile page
+*/
+- (void)setReportButtonInChatProfileVisible:(BOOL)isVisible;
+/**
+ Get current visibility state of report button in user/group profile page
+*/
+- (BOOL)getReportButtonInChatProfileVisibleState;
 
 @end
 

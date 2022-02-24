@@ -190,6 +190,64 @@
     [[TAPConnectionManager sharedManager] sendEmit:kTAPEventStopTyping parameters:parameterDictionary];
 }
 
+- (TAPMessageModel *)createMessageModelWithRoom:(TAPRoomModel *)room
+                                           body:(NSString *)body
+                                           type:(TAPChatMessageType)type
+                                    messageData:messageData {
+    
+    TAPMessageModel *message;
+    
+    // Check if quote message available
+    id quotedMessageObject = [[TAPChatManager sharedManager].quotedMessageDictionary objectForKey:room.roomID];
+    if (quotedMessageObject != nil) {
+        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
+            // Construct message with quoted message model
+            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
+            message = [TAPMessageModel createMessageWithUser:self.activeUser
+                                                        room:room
+                                                        body:body
+                                                        type:type
+                                               quotedMessage:quotedMessage
+                                                 messageData:messageData];
+        }
+        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
+            // Construct message with existing quote model
+            TAPQuoteModel *quote = (TAPQuoteModel *)quotedMessageObject;
+            message = [TAPMessageModel createMessageWithUser:self.activeUser
+                                                        room:room
+                                                        body:body
+                                                        type:type
+                                                       quote:quote
+                                                 messageData:messageData];
+        }
+    }
+    else {
+        // Construct message model without quote
+        message = [TAPMessageModel createMessageWithUser:self.activeUser
+                                                    room:room
+                                                    body:body
+                                                    type:type
+                                             messageData:messageData];
+    }
+    
+    // Check and add userInfo to message data if available
+    // userInfo contains custom information from client, used for custom quote click action
+    id userInfo = [self.userInfoDictionary objectForKey:room.roomID];
+    if (userInfo != nil) {
+        NSMutableDictionary *dataDictionary = message.data;
+        if (dataDictionary == nil) {
+            dataDictionary = [[NSMutableDictionary alloc] init];
+        }
+        
+        [dataDictionary setObject:userInfo forKey:@"userInfo"];
+        message.data = dataDictionary;
+    }
+    
+    [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
+    
+    return message;
+}
+
 - (void)sendMessage:(TAPMessageModel *)message notifyDelegate:(BOOL)notifyDelegate {
 //    Check if socket is connected
 //    ConnectionManagerStatusTypeDisconnected = 0
@@ -304,125 +362,28 @@
             }
             
             NSString *substringMessage = [textMessage substringWithRange:NSMakeRange(startIndex, substringLength)];
-            TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:substringMessage type:TAPChatMessageTypeText messageData:nil];
             
-            //Check if quote message available
-            id quotedMessageObject = [[TAPChatManager sharedManager].quotedMessageDictionary objectForKey:room.roomID];
-            if (quotedMessageObject != nil) {
-                if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
-                    
-                    //if message quoted from message model then should construct quote and reply to model
-                    TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
-                    quotedMessage = [quotedMessage copy];
-
-                    if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
-                        message.quote = [quotedMessage.quote copy];
-                        message.quote.title = quotedMessage.user.fullname;
-                        message.quote.content = quotedMessage.body;
-                    }
-                    else {
-                        TAPQuoteModel *quote = [TAPQuoteModel new];
-                        quote.title = quotedMessage.user.fullname;
-                        quote.content = quotedMessage.body;
-                        message.quote = [quote copy];
-                    }
-                    
-                    TAPReplyToModel *replyTo = [TAPReplyToModel new];
-                    replyTo.messageID = quotedMessage.messageID;
-                    replyTo.localID = quotedMessage.localID;
-                    replyTo.messageType = quotedMessage.type;
-                    replyTo.fullname = quotedMessage.user.fullname;
-                    replyTo.xcUserID = quotedMessage.user.xcUserID;
-                    replyTo.userID = quotedMessage.user.userID;
-                    message.replyTo = [replyTo copy];
-                }
-                else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
-                     //if message quoted from quote model then should just construct quote model
-                    TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
-                    message.quote = [quotedMessage copy];
-                }
-            }
-            
-            //check if userInfo is available, if available add to data in message model
-            //userInfo custom user information from client, used for custom quote click action
-            id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
-            if (userInfo != nil) {
-                NSMutableDictionary *dataDictionary = message.data;
-                if (dataDictionary == nil) {
-                    dataDictionary = [[NSMutableDictionary alloc] init];
-                }
-                
-                [dataDictionary setObject:userInfo forKey:@"userInfo"];
-                message.data = dataDictionary;
-            }
+            TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                                   body:substringMessage
+                                                                   type:TAPChatMessageTypeText
+                                                            messageData:nil];
             
             //Call block in TAPCoreMessageManager to handle things in TAPCore
             successGenerateMessage(message);
             
             [self sendMessage:message notifyDelegate:YES];
-            
-            [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
         }
     }
     else {
-        TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:textMessage type:TAPChatMessageTypeText messageData:nil];
-        
-        //Check if quote message available
-        id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
-        if (quotedMessageObject != nil) {
-            if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
-                //if message quoted from message model then should construct quote and reply to model
-                TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
-                quotedMessage = [quotedMessage copy];
-                
-                NSString *quoteImageUrl = [TAPUtil nullToEmptyString:quotedMessage.quote.imageURL];
-                NSString *quoteFileID = [TAPUtil nullToEmptyString:quotedMessage.quote.fileID];
-                
-                if (![quoteImageUrl isEqualToString:@""] || ![quoteFileID isEqualToString:@""]) {
-                    message.quote = [quotedMessage.quote copy];
-                }
-                else {
-                    TAPQuoteModel *quote = [TAPQuoteModel new];
-                    quote.title = quotedMessage.user.fullname;
-                    quote.content = quotedMessage.body;
-                    message.quote = [quote copy];
-                }
-                
-                TAPReplyToModel *replyTo = [TAPReplyToModel new];
-                replyTo.messageID = quotedMessage.messageID;
-                replyTo.localID = quotedMessage.localID;
-                replyTo.messageType = quotedMessage.type;
-                replyTo.fullname = quotedMessage.user.fullname;
-                replyTo.xcUserID = quotedMessage.user.xcUserID;
-                replyTo.userID = quotedMessage.user.userID;
-                message.replyTo = replyTo;
-            }
-            else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
-                //if message quoted from quote model then should just construct quote model
-                TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
-                message.quote = [quotedMessage copy];
-            }
-        }
-        
-        //check if userInfo is available, if available add to data in message model
-        //userInfo custom user information from client, used for custom quote click action
-        id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
-        if (userInfo != nil) {
-            NSMutableDictionary *dataDictionary = message.data;
-            if (dataDictionary == nil) {
-                dataDictionary = [[NSMutableDictionary alloc] init];
-            }
-            
-            [dataDictionary setObject:userInfo forKey:@"userInfo"];
-            message.data = dataDictionary;
-        }
+        TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                               body:textMessage
+                                                               type:TAPChatMessageTypeText
+                                                        messageData:nil];
         
         //Call block in TAPCoreMessageManager to handle things in TAPCore
         successGenerateMessage(message);
         
         [self sendMessage:message notifyDelegate:YES];
-        
-        [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
     }
 }
 
@@ -451,12 +412,7 @@
         messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
     }
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeImage messageData:nil];
-    
-    NSMutableDictionary *dataDictionary = message.data;
-    if (dataDictionary == nil) {
-        dataDictionary = [[NSMutableDictionary alloc] init];
-    }
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
     
     NSNumber *imageHeight = [NSNumber numberWithFloat:image.size.height];
     NSNumber *imageWidth = [NSNumber numberWithFloat:image.size.width];
@@ -465,54 +421,10 @@
     [dataDictionary setObject:imageWidth forKey:@"width"];
     [dataDictionary setObject:caption forKey:@"caption"];
     
-    //check if userInfo is available, if available add to data in message model
-    //userInfo custom user information from client, used for custom quote click action
-    id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
-    if (userInfo != nil) {
-        [dataDictionary setObject:userInfo forKey:@"userInfo"];
-    }
-    
-    message.data = [dataDictionary copy];
-    
-    //Check if quote message available
-    id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
-    if (quotedMessageObject != nil) {
-        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
-            //if message quoted from message model then should construct quote and reply to model
-            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
-            quotedMessage = [quotedMessage copy];
-            
-            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]] || [quotedMessage.quote.fileType isEqualToString:@"file"]) {
-                //TYPE FILE
-                message.quote = quotedMessage.quote;
-            }
-            else if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
-                message.quote = [quotedMessage.quote copy];
-                message.quote.title = quotedMessage.user.fullname;
-                message.quote.content = quotedMessage.body;
-            }
-            else {
-                TAPQuoteModel *quote = [TAPQuoteModel new];
-                quote.title = quotedMessage.user.fullname;
-                quote.content = quotedMessage.body;
-                message.quote = [quote copy];
-            }
-            
-            TAPReplyToModel *replyTo = [TAPReplyToModel new];
-            replyTo.messageID = quotedMessage.messageID;
-            replyTo.localID = quotedMessage.localID;
-            replyTo.messageType = quotedMessage.type;
-            replyTo.fullname = quotedMessage.user.fullname;
-            replyTo.xcUserID = quotedMessage.user.xcUserID;
-            replyTo.userID = quotedMessage.user.userID;
-            message.replyTo = replyTo;
-        }
-        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
-            //if message quoted from quote model then should just construct quote model
-            TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
-            message.quote = [quotedMessage copy];
-        }
-    }
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyCaption
+                                                           type:TAPChatMessageTypeImage
+                                                    messageData:dataDictionary];
     
     //Call block in TAPCoreMessageManager to handle things in TAPCore
     successGenerateMessage(message);
@@ -549,12 +461,7 @@
         messageBodyCaption = [NSString stringWithFormat:@"🖼 %@", caption];
     }
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeImage messageData:nil];
-    
-    NSMutableDictionary *dataDictionary = message.data;
-    if (dataDictionary == nil) {
-        dataDictionary = [[NSMutableDictionary alloc] init];
-    }
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
     
     CGFloat imageWidthFloat = (CGFloat)asset.pixelWidth;
     CGFloat imageHeightFloat = (CGFloat)asset.pixelHeight;
@@ -572,49 +479,10 @@
     [dataDictionary setObject:assetIdentifier forKey:@"assetIdentifier"];
     [dataDictionary setObject:caption forKey:@"caption"];
     
-    //check if userInfo is available, if available add to data in message model
-    //userInfo custom user information from client, used for custom quote click action
-    id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
-    if (userInfo != nil) {
-        [dataDictionary setObject:userInfo forKey:@"userInfo"];
-    }
-    
-    message.data = [dataDictionary copy];
-    
-    //Check if quote message available
-    id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
-    if (quotedMessageObject != nil) {
-        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
-            //if message quoted from message model then should construct quote and reply to model
-            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
-            quotedMessage = [quotedMessage copy];
-            if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
-                message.quote = [quotedMessage.quote copy];
-                message.quote.title = quotedMessage.user.fullname;
-                message.quote.content = quotedMessage.body;
-            }
-            else {
-                TAPQuoteModel *quote = [TAPQuoteModel new];
-                quote.title = quotedMessage.user.fullname;
-                quote.content = quotedMessage.body;
-                message.quote = [quote copy];
-            }
-            
-            TAPReplyToModel *replyTo = [TAPReplyToModel new];
-            replyTo.messageID = quotedMessage.messageID;
-            replyTo.localID = quotedMessage.localID;
-            replyTo.messageType = quotedMessage.type;
-            replyTo.fullname = quotedMessage.user.fullname;
-            replyTo.xcUserID = quotedMessage.user.xcUserID;
-            replyTo.userID = quotedMessage.user.userID;
-            message.replyTo = replyTo;
-        }
-        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
-            //if message quoted from quote model then should just construct quote model
-            TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
-            message.quote = [quotedMessage copy];
-        }
-    }
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyCaption
+                                                           type:TAPChatMessageTypeImage
+                                                    messageData:dataDictionary];
     
     //Call block in TAPCoreMessageManager to handle things in TAPCore
     successGenerateMessage(message);
@@ -647,12 +515,7 @@
         messageBodyCaption = [NSString stringWithFormat:@"🎥 %@", caption];
     }
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyCaption type:TAPChatMessageTypeVideo messageData:nil];
-    
-    NSMutableDictionary *dataDictionary = message.data;
-    if (dataDictionary == nil) {
-        dataDictionary = [[NSMutableDictionary alloc] init];
-    }
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
     
     CGFloat imageWidthFloat = (CGFloat)asset.pixelWidth;
     CGFloat imageHeightFloat = (CGFloat)asset.pixelHeight;
@@ -691,49 +554,106 @@
     [dataDictionary setObject:caption forKey:@"caption"];
     [dataDictionary setObject:[NSNumber numberWithInteger:videoDurationInteger] forKey:@"duration"];
     
-    //check if userInfo is available, if available add to data in message model
-    //userInfo custom user information from client, used for custom quote click action
-    id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
-    if (userInfo != nil) {
-        [dataDictionary setObject:userInfo forKey:@"userInfo"];
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyCaption
+                                                           type:TAPChatMessageTypeVideo
+                                                    messageData:dataDictionary];
+    
+    successGenerateMessage(message);
+    
+    //Add message to waiting upload file dictionary in ChatManager to prepare save to database
+    [[TAPChatManager sharedManager] addToWaitingUploadFileMessage:message];
+    
+    [[TAPFileUploadManager sharedManager] sendFileAsAssetWithData:message];
+    [[TAPChatManager sharedManager] notifySendMessageToDelegate:message];
+}
+
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL caption:(NSString *)caption thumbnailImageData:(NSData *)thumbnailImageData {
+    TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
+    [self sendVideoMessageWithVideoAssetURL:videoAssetURL caption:caption thumbnailImageData:thumbnailImageData room:room successGenerateMessage:^(TAPMessageModel *message) {
+    }];
+}
+
+- (void)sendVideoMessageWithVideoAssetURL:(NSURL *)videoAssetURL
+                                  caption:(NSString *)caption
+                       thumbnailImageData:(NSData *)thumbnailImageData
+                                     room:(TAPRoomModel *)room
+                   successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
+    
+    //Check if forward message exist, send forward message
+    [self checkAndSendForwardedMessageWithRoom:room];
+    
+    caption = [TAPUtil nullToEmptyString:caption];
+    
+    NSString *messageBodyCaption = [NSString string];
+    //Check contain caption or not
+    if ([caption isEqualToString:@""]) {
+        messageBodyCaption = NSLocalizedStringFromTableInBundle(@"🎥 Video", nil, [TAPUtil currentBundle], @"");
+    }
+    else {
+        messageBodyCaption = [NSString stringWithFormat:@"🎥 %@", caption];
     }
     
-    message.data = [dataDictionary copy];
+    AVAsset *videoAsset = [AVAsset assetWithURL:videoAssetURL]; //AS NOTE - get AVAsset via videoURLAsset
     
-    //Check if quote message available
-    id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
-    if (quotedMessageObject != nil) {
-        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
-            //if message quoted from message model then should construct quote and reply to model
-            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
-            quotedMessage = [quotedMessage copy];
-            if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
-                message.quote = [quotedMessage.quote copy];
-                message.quote.title = quotedMessage.user.fullname;
-                message.quote.content = quotedMessage.body;
-            }
-            else {
-                TAPQuoteModel *quote = [TAPQuoteModel new];
-                quote.title = quotedMessage.user.fullname;
-                quote.content = quotedMessage.body;
-                message.quote = [quote copy];
-            }
-            
-            TAPReplyToModel *replyTo = [TAPReplyToModel new];
-            replyTo.messageID = quotedMessage.messageID;
-            replyTo.localID = quotedMessage.localID;
-            replyTo.messageType = quotedMessage.type;
-            replyTo.fullname = quotedMessage.user.fullname;
-            replyTo.xcUserID = quotedMessage.user.xcUserID;
-            replyTo.userID = quotedMessage.user.userID;
-            message.replyTo = replyTo;
-        }
-        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
-            //if message quoted from quote model then should just construct quote model
-            TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
-            message.quote = [quotedMessage copy];
-        }
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
+    
+    //AS NOTE - GET FILE SIZE
+    NSNumber *fileSizeValue = nil;
+    NSError *fileSizeError = nil;
+    NSNumber *videoAssetURLFileSize = nil;
+    [videoAssetURL getResourceValue:&fileSizeValue forKey:NSURLFileSizeKey
+                         error:(&fileSizeError)];
+    
+    if (fileSizeValue) {
+        NSLog(@"value for %@ is %@", videoAssetURL, fileSizeValue);
+        videoAssetURLFileSize = fileSizeValue;
     }
+    else {
+        NSLog(@"error getting size for url %@ error was %@", videoAssetURL, fileSizeError);
+        videoAssetURLFileSize = [NSNumber numberWithFloat:0.0f];
+    }
+    
+    CGSize naturalSizeVideo = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] firstObject] naturalSize];
+    CGFloat videoWidthFloat = (CGFloat)naturalSizeVideo.width;
+    CGFloat videoHeightFloat = (CGFloat)naturalSizeVideo.height;
+    
+    NSNumber *videoHeight = [NSNumber numberWithFloat:videoWidthFloat];
+    NSNumber *videoWidth = [NSNumber numberWithFloat:videoHeightFloat];
+    
+    Float64 videoDurationFloat = floorf(CMTimeGetSeconds(videoAsset.duration));
+    Float64 videoDurationInMilisecondsFloat = videoDurationFloat * 1000; // in miliseconds
+    NSInteger videoDurationInteger = (NSInteger)videoDurationInMilisecondsFloat;
+    
+    NSString *thumbnailImageBase64String = [TAPUtil nullToEmptyString:[thumbnailImageData base64EncodedString]];
+    
+//    NSURL *videoAssetURL = [(AVURLAsset *)videoAsset URL];
+    NSString *videoAssetURLString = [videoAssetURL absoluteString];
+    videoAssetURLString = [TAPUtil nullToEmptyString:videoAssetURLString];
+    
+    NSString *fileNameString = [videoAssetURLString lastPathComponent];
+    fileNameString = [TAPUtil nullToEmptyString:fileNameString];
+    
+    NSString *assetIdentifier = fileNameString;
+    assetIdentifier = [TAPUtil nullToEmptyString:assetIdentifier];
+    
+    //Save asset to dictionary
+    [[TAPFileUploadManager sharedManager] saveToPendingUploadAssetDictionaryWithAVAsset:videoAsset];
+    
+    [dataDictionary setObject:videoHeight forKey:@"height"];
+    [dataDictionary setObject:videoWidth forKey:@"width"];
+    [dataDictionary setObject:videoAssetURLFileSize forKey:@"size"];
+//    [dataDictionary setObject:asset forKey:@"asset"];
+    [dataDictionary setObject:assetIdentifier forKey:@"assetIdentifier"];
+    [dataDictionary setObject:videoAssetURLString forKey:@"videoAssetURLString"];
+    [dataDictionary setObject:thumbnailImageBase64String forKey:@"thumbnail"];
+    [dataDictionary setObject:caption forKey:@"caption"];
+    [dataDictionary setObject:[NSNumber numberWithInteger:videoDurationInteger] forKey:@"duration"];
+    
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyCaption
+                                                           type:TAPChatMessageTypeVideo
+                                                    messageData:dataDictionary];
     
     successGenerateMessage(message);
     
@@ -757,80 +677,30 @@
 
     NSString *messageBodyString = NSLocalizedStringFromTableInBundle(@"📍Location", nil, [TAPUtil currentBundle], @"");
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeLocation messageData:nil];
-    
-    NSMutableDictionary *dataDictionary = message.data;
-    if (dataDictionary == nil) {
-        dataDictionary = [[NSMutableDictionary alloc] init];
-    }
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
     
     [dataDictionary setObject:[NSNumber numberWithFloat:latitude] forKey:@"latitude"];
     [dataDictionary setObject:[NSNumber numberWithFloat:longitude] forKey:@"longitude"];
     [dataDictionary setObject:address forKey:@"address"];
     
-    //check if userInfo is available, if available add to data in message model
-    //userInfo custom user information from client, used for custom quote click action
-    id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
-    if (userInfo != nil) {
-        [dataDictionary setObject:userInfo forKey:@"userInfo"];
-    }
-    
-    message.data = [dataDictionary copy];
-    
-    //Check if quote message available
-    id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
-    if (quotedMessageObject != nil) {
-        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
-            //if message quoted from message model then should construct quote and reply to model
-            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
-            quotedMessage = [quotedMessage copy];
-            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]] || [quotedMessage.quote.fileType isEqualToString:@"file"]) {
-                //TYPE FILE
-                message.quote = quotedMessage.quote;
-            }
-            else if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
-                message.quote = [quotedMessage.quote copy];
-                message.quote.title = quotedMessage.user.fullname;
-                message.quote.content = quotedMessage.body;
-            }
-            else {
-                TAPQuoteModel *quote = [TAPQuoteModel new];
-                quote.title = quotedMessage.user.fullname;
-                quote.content = quotedMessage.body;
-                message.quote = [quote copy];
-            }
-            
-            TAPReplyToModel *replyTo = [TAPReplyToModel new];
-            replyTo.messageID = quotedMessage.messageID;
-            replyTo.localID = quotedMessage.localID;
-            replyTo.messageType = quotedMessage.type;
-            replyTo.fullname = quotedMessage.user.fullname;
-            replyTo.xcUserID = quotedMessage.user.xcUserID;
-            replyTo.userID = quotedMessage.user.userID;
-            message.replyTo = replyTo;
-        }
-        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
-            //if message quoted from quote model then should just construct quote model
-            TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
-            message.quote = [quotedMessage copy];
-        }
-    }
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyString
+                                                           type:TAPChatMessageTypeLocation
+                                                    messageData:dataDictionary];
     
     //Call block in TAPCoreMessageManager to handle things in TAPCore
     successGenerateMessage(message);
     
     [self sendMessage:message notifyDelegate:YES];
-    
-    [[TAPChatManager sharedManager] removeQuotedMessageObjectWithRoomID:room.roomID];
 }
 
-- (void)sentFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath {
+- (void)sendFileMessage:(TAPDataFileModel *)dataFile filePath:(NSString *)filePath {
     TAPRoomModel *room = [TAPChatManager sharedManager].activeRoom;
-    [self sentFileMessage:dataFile filePath:filePath room:room successGenerateMessage:^(TAPMessageModel *message) {
+    [self sendFileMessage:dataFile filePath:filePath room:room successGenerateMessage:^(TAPMessageModel *message) {
     }];
 }
 
-- (void)sentFileMessage:(TAPDataFileModel *)dataFile
+- (void)sendFileMessage:(TAPDataFileModel *)dataFile
                filePath:(NSString *)filePath
                    room:(TAPRoomModel *)room
  successGenerateMessage:(void (^)(TAPMessageModel *message))successGenerateMessage {
@@ -848,65 +718,17 @@
     
     NSString *messageBodyString = [NSString stringWithFormat:@"📎 %@", fileName];
     
-    TAPMessageModel *message = [TAPMessageModel createMessageWithUser:[TAPChatManager sharedManager].activeUser room:room body:messageBodyString type:TAPChatMessageTypeFile messageData:nil];
-    
-    NSMutableDictionary *dataDictionary = message.data;
-    if (dataDictionary == nil) {
-        dataDictionary = [[NSMutableDictionary alloc] init];
-    }
+    NSMutableDictionary *dataDictionary = [[NSMutableDictionary alloc] init];
 
     [dataDictionary setObject:filePath forKey:@"filePath"];
     [dataDictionary setObject:fileName forKey:@"fileName"];
     [dataDictionary setObject:mediaType forKey:@"mediaType"];
     [dataDictionary setObject:size forKey:@"size"];
     
-    //check if userInfo is available, if available add to data in message model
-    //userInfo custom user information from client, used for custom quote click action
-    id userInfo = [[TAPChatManager sharedManager].userInfoDictionary objectForKey:room.roomID];
-    if (userInfo != nil) {
-        [dataDictionary setObject:userInfo forKey:@"userInfo"];
-    }
-    
-    message.data = [dataDictionary copy];
-    
-    //Check if quote message available
-    id quotedMessageObject = [self.quotedMessageDictionary objectForKey:room.roomID];
-    if (quotedMessageObject != nil) {
-        if ([quotedMessageObject isKindOfClass:[TAPMessageModel class]]) {
-            //if message quoted from message model then should construct quote and reply to model
-            TAPMessageModel *quotedMessage = (TAPMessageModel *)quotedMessageObject;
-            quotedMessage = [quotedMessage copy];
-            if ([quotedMessage.quote.fileType isEqualToString:[NSString stringWithFormat: @"%ld", TAPChatMessageTypeFile]] || [quotedMessage.quote.fileType isEqualToString:@"file"]) {
-                //TYPE FILE
-                message.quote = quotedMessage.quote;
-            }
-            else if (![quotedMessage.quote.imageURL isEqualToString:@""] || ![quotedMessage.quote.fileID isEqualToString:@""]) {
-                message.quote = [quotedMessage.quote copy];
-                message.quote.title = quotedMessage.user.fullname;
-                message.quote.content = quotedMessage.body;
-            }
-            else {
-                TAPQuoteModel *quote = [TAPQuoteModel new];
-                quote.title = quotedMessage.user.fullname;
-                quote.content = quotedMessage.body;
-                message.quote = [quote copy];
-            }
-            
-            TAPReplyToModel *replyTo = [TAPReplyToModel new];
-            replyTo.messageID = quotedMessage.messageID;
-            replyTo.localID = quotedMessage.localID;
-            replyTo.messageType = quotedMessage.type;
-            replyTo.fullname = quotedMessage.user.fullname;
-            replyTo.xcUserID = quotedMessage.user.xcUserID;
-            replyTo.userID = quotedMessage.user.userID;
-            message.replyTo = replyTo;
-        }
-        else if ([quotedMessageObject isKindOfClass:[TAPQuoteModel class]]) {
-            //if message quoted from quote model then should just construct quote model
-            TAPQuoteModel *quotedMessage = (TAPQuoteModel *)quotedMessageObject;
-            message.quote = [quotedMessage copy];
-        }
-    }
+    TAPMessageModel *message = [self createMessageModelWithRoom:room
+                                                           body:messageBodyString
+                                                           type:TAPChatMessageTypeFile
+                                                    messageData:dataDictionary];
     
     //Call block in TAPCoreMessageManager to handle things in TAPCore
     successGenerateMessage(message);
@@ -1102,11 +924,19 @@
         //DV Temp
         //TODO Notification Manager Handle New Message
     }
+    
+    if (decryptedMessage.type == TAPChatMessageTypeSystemMessage &&
+        [decryptedMessage.action isEqualToString:@"room/addParticipant"] &&
+        ([decryptedMessage.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
+    ) {
+        [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:decryptedMessage.room.roomID];
+    }
 }
 
 - (void)receiveContactUpdatedFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
     TAPUserModel *user = [[TAPUserModel alloc] initWithDictionary:dataDictionary error:nil];
-    [[TAPContactCacheManager sharedManager] shouldUpdateUserWithData:user isTriggerDelegate:YES];
+//    [[TAPContactCacheManager sharedManager] shouldUpdateUserWithData:user isTriggerDelegate:YES];
+    [[TAPContactManager sharedManager] addContactWithUserModel:user saveToDatabase:YES saveActiveUser:NO];
 }
 
 - (void)receiveOnlineStatusFromSocketWithDataDictionary:(NSDictionary *)dataDictionary {
@@ -1176,6 +1006,19 @@
 - (void)stopTimerSaveNewMessage {
     [self.saveNewMessageTimer invalidate];
     _saveNewMessageTimer = nil;
+}
+
+- (void)removeMessagesFromPendingMessagesArrayWithRoomID:(NSString *)roomID {
+    for (TAPMessageModel *message in self.incomingMessageArray) {
+        if ([message.room.roomID isEqualToString:roomID]) {
+            [self.incomingMessageArray removeObject:message];
+        }
+    }
+    for (TAPMessageModel *message in self.pendingMessageArray) {
+        if ([message.room.roomID isEqualToString:roomID]) {
+            [self.pendingMessageArray removeObject:message];
+        }
+    }
 }
 
 - (void)saveNewMessageToDatabase {

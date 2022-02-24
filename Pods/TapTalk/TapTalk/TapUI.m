@@ -13,6 +13,7 @@
 @property (strong, nonatomic) TAPCustomNotificationAlertViewController *customNotificationAlertViewController;
 
 @property (nonatomic) BOOL isDisableActivateInAppNotification;
+@property (nonatomic) BOOL isChangeProfilePictureButtonHidden;
 @property (nonatomic) BOOL isLogoutButtonVisible;
 @property (nonatomic) BOOL isSearchBarRoomListViewHidden;
 @property (nonatomic) BOOL isLeftBarItemRoomListViewHidden;
@@ -46,6 +47,7 @@
 @property (nonatomic) BOOL isAddToContactsButtonInChatRoomHidden;
 @property (nonatomic) BOOL isAddToContactsButtonInChatProfileHidden;
 @property (nonatomic) BOOL isAddContactDisabled;
+@property (nonatomic) BOOL isReportButtonInChatProfileVisible;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -68,7 +70,7 @@
     self = [super init];
     
     if (self) {
-        _roomListViewController = [[TapUIRoomListViewController alloc] init];
+//        _roomListViewController = [[TapUIRoomListViewController alloc] init];
         _customNotificationAlertViewController = [[TAPCustomNotificationAlertViewController alloc] init];
         _activeWindow = [[UIWindow alloc] init];
     }
@@ -78,6 +80,9 @@
 
 #pragma mark - Property
 - (TapUIRoomListViewController *)roomListViewController {
+    if (_roomListViewController == nil) {
+        _roomListViewController = [[TapUIRoomListViewController alloc] init];
+    }
     return _roomListViewController;
 }
 
@@ -339,6 +344,22 @@ scrollToMessageWithLocalID:(NSString *)messageLocalID
     chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
     chatViewController.scrollToMessageLocalIDString = messageLocalID;
     success(chatViewController);
+}
+
+/**
+Show or hide change profile picture button in MyAccount view
+ 
+@param isVisible (BOOL) boolean to indicating is visible or not
+*/
+- (void)setChangeProfilePictureButtonVisible:(BOOL)isVisible {
+    _isChangeProfilePictureButtonHidden = !isVisible;
+}
+
+/**
+Get current visibility state of change profile picture button
+*/
+- (BOOL)getChangeProfilePictureButtonVisibleState {
+    return !self.isChangeProfilePictureButtonHidden;
 }
 
 /**
@@ -792,6 +813,20 @@ Get current status of adding contacts & contact list
 */
 - (BOOL)isAddContactEnabled {
     return !self.isAddContactDisabled;
+}
+
+/**
+Show or hide report button in user/group profile page
+*/
+- (void)setReportButtonInChatProfileVisible:(BOOL)isVisible {
+    _isReportButtonInChatProfileVisible = isVisible;
+}
+
+/**
+ Get current visibility state of report button in user/group profile page
+*/
+- (BOOL)getReportButtonInChatProfileVisibleState {
+    return self.isReportButtonInChatProfileVisible;
 }
 
 @end

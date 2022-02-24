@@ -59,6 +59,55 @@ static const char kBundleKey = 0;
     return totalTimeString;
 }
 
++ (NSString *)getMessageTimestampText:(NSNumber *)createdTime {
+    NSDate *currentDate = [NSDate date];
+    NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+    NSTimeInterval messageTimeInterval = [createdTime doubleValue] / 1000.0f; //change to second from milisecond
+
+    NSTimeInterval timeGap = currentTimeInterval - messageTimeInterval;
+    NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
+    [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
+    midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
+    NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
+
+    NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
+    NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
+
+    NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
+
+    NSDate *messageDate = [NSDate dateWithTimeIntervalSince1970:messageTimeInterval];
+    NSString *messageDateString = @"";
+    if (timeGap <= midnightTimeGap) {
+        // Today
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"HH:mm";
+        NSString *dateString = [dateFormatter stringFromDate:messageDate];
+        
+        NSString *today = NSLocalizedStringFromTableInBundle(@"Today", nil, [TAPUtil currentBundle], @"");
+        messageDateString = [NSString stringWithFormat:@"%@ • %@", today, dateString];
+    }
+    else if (timeGap <= 86400.0f + midnightTimeGap) {
+        // Yesterday
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"HH:mm";
+        NSString *dateString = [dateFormatter stringFromDate:messageDate];
+        NSString *yesterday = NSLocalizedStringFromTableInBundle(@"Yesterday", nil, [TAPUtil currentBundle], @"");
+        messageDateString = [NSString stringWithFormat:@"%@ • %@", yesterday, dateString];
+    }
+    else {
+        // Set date and time
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"dd/MM/yy";
+        NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
+        timeFormatter.dateFormat = @"HH:mm";
+
+        NSString *dateString = [dateFormatter stringFromDate:messageDate];
+        NSString *timeString = [timeFormatter stringFromDate:messageDate];
+        messageDateString = [NSString stringWithFormat:@"%@ • %@", dateString, timeString];
+    }
+    return messageDateString;
+}
+
 #pragma mark - Null Handler
 + (NSString *)nullToEmptyString:(id)value {
     NSString *emptyString = @"";
@@ -110,12 +159,7 @@ static const char kBundleKey = 0;
 
 #pragma mark - Color
 + (UIColor *)getColor:(NSString *)hexColor {
-    
-    if ([hexColor isEqualToString:@""]){
-        return [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
-        
-    }
-    else {
+    if ([hexColor length] == 6) {
         unsigned int red, green, blue;
         
         NSRange range;
@@ -132,6 +176,30 @@ static const char kBundleKey = 0;
         [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&blue];
         
         return [UIColor colorWithRed:(float)(red/255.0f) green:(float)(green/255.0f) blue:(float)(blue/255.0f) alpha:1.0f];
+    }
+    else if ([hexColor length] == 8) {
+        unsigned int alpha, red, green, blue;
+        
+        NSRange range;
+        
+        range.length = 2;
+        
+        range.location = 0;
+        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&alpha];
+        
+        range.location = 2;
+        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&red];
+        
+        range.location = 4;
+        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&green];
+        
+        range.location = 6;
+        [[NSScanner scannerWithString:[hexColor substringWithRange:range]] scanHexInt:&blue];
+        
+        return [UIColor colorWithRed:(float)(red/255.0f) green:(float)(green/255.0f) blue:(float)(blue/255.0f) alpha:(float)(alpha/255.0f)];
+    }
+    else {
+        return [UIColor colorWithRed:0.0f green:0.0f  blue:0.0f alpha:1.0f];
     }
 }
 
@@ -1098,6 +1166,30 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     }
         
     return NO;
+}
+
+// Only used to check if key is empty
++ (NSString *)getFileKeyFromMessage:(TAPMessageModel *)message {
+    NSDictionary *dataDictionary = message.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+    
+    NSString *key;
+    NSString *fileURL = [dataDictionary objectForKey:@"url"];
+    if (fileURL == nil || [fileURL isEqualToString:@""]) {
+        fileURL = [dataDictionary objectForKey:@"fileURL"];
+    }
+    fileURL = [TAPUtil nullToEmptyString:fileURL];
+    
+    if (![fileURL isEqualToString:@""]) {
+        key = fileURL;
+        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    }
+    else {
+        key = [dataDictionary objectForKey:@"fileID"];
+        key = [TAPUtil nullToEmptyString:key];
+    }
+    
+    return key;
 }
 
 @end

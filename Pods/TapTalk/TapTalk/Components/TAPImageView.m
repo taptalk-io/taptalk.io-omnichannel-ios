@@ -39,8 +39,8 @@
 
 - (void)initialization {
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
-    imageCache.config.maxDiskAge = kMaxDiskCountLimit;
-    imageCache.config.maxDiskSize = kMaxCacheAge;
+    imageCache.config.maxDiskAge = kMaxCacheAge;
+    imageCache.config.maxDiskSize = kMaxDiskCountLimit;
 //    imageCache.maxCacheSize = kMaxDiskCountLimit;
 //    imageCache.maxCacheAge = kMaxCacheAge;
     
@@ -90,11 +90,15 @@
     }
     
     _imageURLString = urlString;
+    NSString *key = urlString;
+    if ([urlString hasPrefix:@"http"]) {
+        key = [[key componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
+    }
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
-    [imageCache diskImageExistsWithKey:urlString completion:^(BOOL isInCache) {
+    [imageCache diskImageExistsWithKey:key completion:^(BOOL isInCache) {
         if (isInCache) {
             //Image exist in disk, load from disk
-            UIImage *savedImage = [imageCache imageFromDiskCacheForKey:urlString];
+            UIImage *savedImage = [imageCache imageFromDiskCacheForKey:key];
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.image = savedImage;
                 
@@ -106,18 +110,21 @@
         else {
             if (![urlString hasPrefix:@"http"]) {
                 //Do not load url when url is fileID type
+                if ([self.delegate respondsToSelector:@selector(imageViewDidFinishLoadImage:)]) {
+                    [self.delegate imageViewDidFinishLoadImage:self];
+                }
                 return;
             }
             NSURL *imageURL = [NSURL URLWithString:urlString];
             
             SDWebImageDownloader *imageDownloader = [SDWebImageDownloader sharedDownloader];
             [imageDownloader downloadImageWithURL:imageURL options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
-#ifdef RNIMAGE_LOG
+#ifdef DEBUG
                 NSLog(@"Image Download: %ld of %ld", (long)receivedSize, (long)expectedSize);
 #endif
             } completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, BOOL finished) {
                 if (finished && image != nil) {
-#ifdef RNIMAGE_LOG
+#ifdef DEBUG
                     NSLog(@"Image Download Completed");
 #endif
                     //            [imageCache storeImage:image forKey:urlString];
@@ -134,7 +141,7 @@
                     }
                 }
                 else {
-#ifdef RNIMAGE_LOG
+#ifdef DEBUG
                     NSLog(@"Image Download Failed: %@", [error description]);
 #endif
                     dispatch_async(dispatch_get_main_queue(), ^{
@@ -155,13 +162,57 @@
 }
 
 #pragma mark - TapTalk
-+ (void)imageFromCacheWithKey:(NSString *)key message:(TAPMessageModel *)receivedMessage success:(void (^)(UIImage *savedImage, TAPMessageModel *resultMessage))success {
-    //Run in background thread, async
++ (void)imageFromCacheWithKey:(NSString *)key
+                      message:(TAPMessageModel *)receivedMessage
+                      success:(void (^)(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage))success {
+    
+    if (key == nil || [key isEqual:@""]) {
+        return;
+    }
+    
+    // Run in background thread, async
     [[SDImageCache sharedImageCache] queryCacheOperationForKey:key done:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+        if (image == nil) {
+            return;
+        }
         dispatch_async(dispatch_get_main_queue(), ^{
             success(image, receivedMessage);
         });
     }];
+}
+
++ (void)imageFromCacheWithKey:(NSString *)key
+                      message:(TAPMessageModel *)receivedMessage
+                      success:(void (^)(UIImage * _Nullable savedImage, TAPMessageModel *resultMessage))success
+                      failure:(void (^)(TAPMessageModel *resultMessage))failure {
+    
+    if (key == nil || [key isEqual:@""]) {
+        failure(receivedMessage);
+    }
+    
+    @try {
+        // Run in background thread, async
+        [[SDImageCache sharedImageCache] queryCacheOperationForKey:key done:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (image == nil) {
+                    [[SDImageCache sharedImageCache] queryImageForKey:key options:nil context:nil cacheType:cacheType completion:^(UIImage * _Nullable image, NSData * _Nullable data, SDImageCacheType cacheType) {
+                            if (image == nil) {
+                                failure(receivedMessage);
+                            }
+                            else {
+                                success(image, receivedMessage);
+                            }
+                    }];
+                }
+                else {
+                    success(image, receivedMessage);
+                }
+            });
+        }];
+    }
+    @catch (NSException *exception) {
+        return;
+    }
 }
 
 @end

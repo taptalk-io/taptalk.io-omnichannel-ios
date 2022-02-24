@@ -66,6 +66,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorChatRoomBackground,
     TAPComponentColorRoomListBackground,
     TAPComponentColorQuoteLayoutDecorationBackground,
+    TAPComponentColorRightBubbleQuoteDecorationBackground,
+    TAPComponentColorLeftBubbleQuoteDecorationBackground,
     TAPComponentColorLeftBubbleBackground,
     TAPComponentColorRightBubbleBackground,
     TAPComponentColorLeftBubbleQuoteBackground,
@@ -74,7 +76,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorRightFileButtonBackground,
     TAPComponentColorSystemMessageBackground,
     TAPComponentColorSystemMessageBackgroundShadow,
-    TAPComponentColorFileProgressBackground,
+    TAPComponentColorFileProgressBackgroundPrimary,
+    TAPComponentColorFileProgressBackgroundWhite,
     TAPComponentColorDeletedChatRoomInfoBackground,
     TAPComponentColorChatComposerBackground,
     TAPComponentColorUnreadIdentifierBackground,
@@ -84,12 +87,21 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorButtonIcon,
     TAPComponentColorButtonIconPrimary,
     TAPComponentColorButtonIconDestructive,
-    TAPComponentColorIconMessageSending,
-    TAPComponentColorIconMessageFailed,
-    TAPComponentColorIconMessageSent,
-    TAPComponentColorIconMessageDelivered,
-    TAPComponentColorIconMessageRead,
-    TAPComponentColorIconMessageDeleted,
+    TAPComponentColorIconRoomListMessageSending,
+    TAPComponentColorIconRoomListMessageFailed,
+    TAPComponentColorIconRoomListMessageSent,
+    TAPComponentColorIconRoomListMessageDelivered,
+    TAPComponentColorIconRoomListMessageRead,
+    TAPComponentColorIconRoomListMessageDeleted,
+    TAPComponentColorIconChatRoomMessageSending,
+    TAPComponentColorIconChatRoomMessageFailed,
+    TAPComponentColorIconChatRoomMessageSent,
+    TAPComponentColorIconChatRoomMessageSentImage,
+    TAPComponentColorIconChatRoomMessageDelivered,
+    TAPComponentColorIconChatRoomMessageDeliveredImage,
+    TAPComponentColorIconChatRoomMessageRead,
+    TAPComponentColorIconChatRoomMessageDeletedLeft,
+    TAPComponentColorIconChatRoomMessageDeletedRight,
     TAPComponentColorIconRemoveItem,
     TAPComponentColorIconRemoveItemBackground,
     TAPComponentColorIconLoadingProgressPrimary,
@@ -106,6 +118,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconNavigationBarCloseButton, //Navigation Bar
     TAPComponentColorIconClearTextButton, //Navigation Bar
     TAPComponentColorIconSearchBarMagnifier, //Navigation Bar
+    TAPComponentColorIconSearchBarMagnifierActive, //Navigation Bar
     TAPComponentColorIconActionSheetDocument, //Action Sheet
     TAPComponentColorIconActionSheetCamera, //Action Sheet
     TAPComponentColorIconActionSheetGallery, //Action Sheet
@@ -126,7 +139,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconSelectPictureCamera, // Register
     TAPComponentColorIconSelectPictureGallery, // Register
     TAPComponentColorIconChatRoomCancelQuote, //Chat Room
-    TAPComponentColorIconCancelUploadDownload, //Chat Room
+    TAPComponentColorIconCancelUploadDownloadPrimary, //Chat Room
+    TAPComponentColorIconCancelUploadDownloadWhite, //Chat Room
     TAPComponentColorIconChatComposerSend, //Chat Room
     TAPComponentColorIconChatComposerSendInactive, //Chat Room
     TAPComponentColorIconChatComposerBurgerMenu, //Chat Room
@@ -156,6 +170,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconGroupMemberProfileMenuPromoteAdmin, //Chat / Group Profile Page
     TAPComponentColorIconGroupMemberProfileMenuDemoteAdmin, //Chat / Group Profile Page
     TAPComponentColorIconGroupMemberProfileMenuRemoveMember, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup, //Chat / Group Profile Page
     TAPComponentColorIconMediaPreviewAdd, //Media / Image Detail Preview
     TAPComponentColorIconMediaPreviewWarning, //Media / Image Detail Preview
     TAPComponentColorIconMediaPreviewThumbnailWarning,//Media / Image Detail Preview
@@ -182,11 +197,22 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconChatComposerBurgerMenuBackground, //Chat Room Page
     TAPComponentColorIconChatComposerShowKeyboardBackground, //Chat Room Page
     TAPComponentColorIconChatComposerAttach, //Chat Room Page
-    TAPComponentColorIconFile, //Chat Room Page
-    TAPComponentColorIconFileUploadDownload, //Chat Room Page
-    TAPComponentColorIconFileCancelUploadDownload, //Chat Room Page
-    TAPComponentColorIconFileRetryUploadDownload, //Chat Room Page
+    TAPComponentColorIconFilePrimary, //Chat Room Page
+    TAPComponentColorIconFileWhite, //Chat Room Page
+    TAPComponentColorIconQuotedFileBackgroundRight, //Chat Room Page
+    TAPComponentColorIconQuotedFileBackgroundLeft, //Chat Room Page
+    TAPComponentColorIconFileUploadDownloadPrimary, //Chat Room Page
+    TAPComponentColorIconFileUploadDownloadWhite, //Chat Room Page
+    TAPComponentColorIconFileCancelUploadDownloadPrimary, //Chat Room Page
+    TAPComponentColorIconFileCancelUploadDownloadWhite, //Chat Room Page
+    TAPComponentColorIconFileRetryUploadDownloadPrimary, //Chat Room Page
+    TAPComponentColorIconFileRetryUploadDownloadWhite, //Chat Room Page
     TAPComponentColorIconFilePlayMedia, //Chat Room Page
+    TAPComponentColorShareExtensionIconSearch, //Share Extension
+    TAPComponentColorBorderSendToContactProfileImage, //Share Extension Profile Image Border Color
+    TAPComponentColorIconCheckmarkSendToContactProfile, //Share Extension Profile Image with checkMark
+    TAPComponentColorBackgroundCheckmarkSendToContact, //Share Extension backgroundColor checkmark on Profile Image with checkMark
+    TAPComponentColorDefaultBackgroundTableView,
 };
 
 typedef NS_ENUM(NSInteger, TAPTextColor) {
@@ -201,6 +227,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorClickableLabel,
     TAPTextColorClickableDestructiveLabel,
     TAPTextColorButtonLabel,
+    TAPTextColorButtonInactiveLabel,
     TAPTextColorInfoLabelTitle,
     TAPTextColorInfoLabelSubtitle,
     TAPTextColorInfoLabelSubtitleBold,
@@ -268,6 +295,8 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorLeftFileBubbleInfo,
     TAPTextColorLeftBubbleSenderName,
     TAPTextColorBubbleMessageStatus,
+    TAPTextColorRightBubbleMessageTimestamp,
+    TAPTextColorLeftBubbleMessageTimestamp,
     TAPTextColorBubbleMediaInfo,
     TAPTextColorSystemMessageBody,
     TAPTextColorChatRoomUnreadBadge,
@@ -311,6 +340,15 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorRoomAvatarMediumLabel,
     TAPTextColorRoomAvatarLargeLabel,
     TAPTextColorRoomAvatarExtraLargeLabel,
+    TAPTextColorVersionCode,
+    TAPTextColorShareExtensionCancelButton,
+    TAPTextColorShareExtensionNavigationBarTitleLabel,
+    TAPTextColorShareExtensionSelectedChatsLabel,
+    TAPTextColorShareExtensionSendButtonTitleLabel,
+    TAPTextColorProfileNameSendToContactLabel,
+    TAPTextColorInitialProfileNameSendToContactLabel,
+    TAPTextColorShareExtensionCollectionViewCellHeaderLabel,
+    TAPTextColorTableViewProfileNameSendToContactLabel,
 };
 
 typedef NS_ENUM(NSInteger, TAPComponentFont) {
@@ -392,6 +430,8 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontLeftFileBubbleInfo,
     TAPComponentFontLeftBubbleSenderName,
     TAPComponentFontBubbleMessageStatus,
+    TAPComponentFontRightBubbleMessageTimestamp,
+    TAPComponentFontLeftBubbleMessageTimestamp,
     TAPComponentFontBubbleMediaInfo,
     TAPComponentFontSystemMessageBody,
     TAPComponentFontChatRoomUnreadBadge,
@@ -433,6 +473,16 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontRoomAvatarExtraLargeLabel,
     TAPComponentFontMentionListNameLabel,
     TAPComponentFontMentionListUsernameLabel,
+    TAPComponentFontVersionCode,
+    TAPComponentFontShareExtensionCancelButton,
+    TAPComponentFontShareExtensionNavigationBarTitleLabel,
+    TAPComponentFontShareExtensionSelectedChatsLabel,
+    TAPComponentFontShareExtensionSendButtonTitleLabel,
+    TAPComponentFontProfileNameSendToContactLabel,
+    TAPComponentFontInitialProfileNameSendToContactLabel,
+    TAPComponentFontShareExtensionCollectionViewCellHeaderLabel,
+    TAPComponentFontTableViewInitialProfileNameSendToContactLabel,
+    TAPComponentFontTableViewProfileNameSendToContactLabel,
 };
 
 @interface TAPStyleManager : NSObject

@@ -62,6 +62,7 @@
 
 #pragma mark - Time
 + (NSString *)stringFromTimeInterval:(NSTimeInterval)interval;
++ (NSString *)getMessageTimestampText:(NSNumber *)createdTime;
 
 #pragma mark - Null Handler
 + (NSString *)nullToEmptyString:(id)value;
@@ -145,5 +146,6 @@
 + (NSArray *)getMentionIndexes:(NSString *)messageString;
 + (BOOL)isActiveUserMentionedWithMessage:(TAPMessageModel *)message
                               activeUser:(TAPUserModel *)activeUser;
++ (NSString *)getFileKeyFromMessage:(TAPMessageModel *)message;
 
 @end

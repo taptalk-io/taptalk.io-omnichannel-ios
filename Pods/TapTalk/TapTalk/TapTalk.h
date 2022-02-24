@@ -215,6 +215,14 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
             apiURLString:(NSString *_Nonnull)apiURLString
       implementationType:(TapTalkImplentationType)tapTalkImplementationType;
 
+- (void)initWithAppKeyID:(NSString *_Nonnull)appKeyID
+            appKeySecret:(NSString *_Nonnull)appKeySecret
+            apiURLString:(NSString *_Nonnull)apiURLString
+      implementationType:(TapTalkImplentationType)tapTalkImplementationType
+                 success:(void (^)(void))success;
+
+- (BOOL)checkTapTalkInitialized;
+
 /**
  Obtain the implementation type of TapTalk.io set by user
  
@@ -271,6 +279,26 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
 */
 - (BOOL)obtainGooglePlacesAPIInitializeState;
 
+/**
+ Set default image compression quality for upload and download, range is 0.1f to 1.0f
+*/
+- (void)setImageCompressionQuality:(CGFloat)imageCompressionQuality;
+
+/**
+ Get image compression quality
+*/
+- (CGFloat)getImageCompressionQuality;
+
+/**
+ Set max caption length for sending media messages
+*/
+- (void)setMaxCaptionLength:(NSInteger)maxCaptionLength;
+
+/**
+ Get caption length limit
+*/
+- (NSInteger)getMaxCaptionLength;
+
 //==========================================================
 //                 Language & Localization
 //==========================================================
@@ -291,6 +319,8 @@ FOUNDATION_EXPORT const unsigned char TapTalkVersionString[];
  Refresh latest active user data from the server
  */
 - (void)refreshActiveUser;
+- (void)refreshActiveUserWithSuccess:(void (^)(void))success
+                             failure:(void (^)(NSError *error))failure;
 
 /**
  Obtain active user data

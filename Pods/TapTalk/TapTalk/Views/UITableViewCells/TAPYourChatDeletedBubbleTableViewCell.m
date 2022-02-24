@@ -51,7 +51,7 @@
     self.statusLabel.alpha = 0.0f;
     
     self.bubbleView.clipsToBounds = YES;
-    self.bubbleView.layer.cornerRadius = 8.0f;
+    self.bubbleView.layer.cornerRadius = 16.0f;
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
     
     self.senderImageView.clipsToBounds = YES;
@@ -91,6 +91,9 @@
     UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
     UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
     
+    UIFont *senderNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontLeftBubbleSenderName];
+    UIColor *senderNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleSenderName];
+    
     self.senderInitialLabel.textColor = initialNameLabelColor;
     self.senderInitialLabel.font = initialNameLabelFont;
     self.senderInitialView.layer.cornerRadius = CGRectGetWidth(self.senderInitialView.frame) / 2.0f;
@@ -101,6 +104,9 @@
     
     self.statusLabel.textColor = statusLabelColor;
     self.statusLabel.font = statusLabelFont;
+    
+    self.senderNameLabel.font = senderNameLabelFont;
+    self.senderNameLabel.textColor = senderNameLabelColor;
     
     UIImage *deletedImage = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     deletedImage = [deletedImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconDeletedLeftMessageBubble]];

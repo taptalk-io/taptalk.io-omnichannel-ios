@@ -9,6 +9,7 @@
 #define TAP_MAX_IMAGE_LARGE_SIZE 2000.0f
 #define TAP_MAX_THUMBNAIL_IMAGE_SIZE 20.0f
 #define TAP_DEFAULT_MAX_FILE_SIZE 5 * 1024 * 1024 //5 MB
+#define TAP_DEFAULT_IMAGE_COMPRESSION_QUALITY 0.5f
 #define TAP_DEFAULT_MAX_GROUP_PARTICIPANTS 100
 #define TAP_DEFAULT_MAX_CHANNEL_PARTICIPANTS 5000
 #define TAP_UPDATED_TIME_LIMIT 24 * 60 * 60 //1 day (in seconds)
@@ -78,3 +79,13 @@
 
 //Domain
 #define TAPErrorDomain @"user/updated"
+
+//Login
+#define API_REQUEST_OTP_TYPE_SMS @"sms"
+#define API_REQUEST_OTP_TYPE_WHATSAPP @"whatsapp"
+#define API_REQUEST_OTP_TYPE_WHATSAPP_INVALID_RECIPIENT @"invalid_recipient"
+
+//AppGroupName
+#define APP_GROUP_NAME_DEV @"group.io.taptalk.TapTalk-Dev"
+#define APP_GROUP_NAME_STAGING @"group.io.taptalk.TapTalk-Staging"
+#define APP_GROUP_NAME_RELEASE @"group.io.taptalk.TapTalk"

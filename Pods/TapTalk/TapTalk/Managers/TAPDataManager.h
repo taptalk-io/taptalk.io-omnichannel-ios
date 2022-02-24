@@ -47,6 +47,7 @@
                                                  failure:(void (^)(NSError *error))failure;
 
 //Convert from dictionary to model or model to dictionary
++ (TAPMessageModel *)messageModelFromDictionary:(NSDictionary *)dictionary;
 + (TAPMessageModel *)messageModelFromPayloadWithUserInfo:(NSDictionary *)dictionary;
 + (TAPCountryModel *)countryModelFromDictionary:(NSDictionary *)dictionary;
 + (TAPUserModel *)userModelFromDictionary:(NSDictionary *)dictionary;
@@ -156,6 +157,9 @@
 + (void)deleteDatabaseMessageWithData:(NSArray *)dataArray
                               success:(void (^)(void))success
                               failure:(void (^)(NSError *error))failure;
++ (void)deleteDatabaseMessageWithRoomID:(NSString *)roomID
+                                success:(void (^)(void))success
+                                failure:(void (^)(NSError *error))failure;
 + (void)deleteDatabaseMessageWithPredicateString:(NSString *)predicateString
                                          success:(void (^)(void))success
                                          failure:(void (^)(NSError *error))failure;
@@ -262,7 +266,8 @@
 + (void)callAPIRequestVerificationCodeWithPhoneNumber:(NSString *)phoneNumber
                                             countryID:(NSString *)countryID
                                                method:(NSString *)method
-                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, NSString *successMessage))success
+                                              channel:(NSString *)channel
+                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, BOOL isSuccess, NSString *channelString, NSString *whatsAppFailureReason, NSInteger nextRequestSeconds, NSString *successMessage))success
                                               failure:(void (^)(NSError *error))failure;
 + (void)callAPIVerifyOTPWithCode:(NSString *)OTPcode
                            OTPID:(NSString *)OTPID
@@ -327,5 +332,8 @@
                           failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetProjectConfigsWithSuccess:(void (^)(NSDictionary *projectConfigsDictionary))success
                                     failure:(void (^)(NSError *error))failure;
+
+// Used to prevent inserting message to deleted chat room
+@property (strong, nonatomic) NSMutableArray<NSString *> *deletedRoomIDArray;
 
 @end

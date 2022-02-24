@@ -113,11 +113,34 @@
                                     success:(void (^)(NSString *successMessage))success
                                     failure:(void (^)(NSError *error))failure {
     [TAPDataManager callAPIRemoveContactWithUserID:userID success:^(NSString *message) {
-        [[TAPContactCacheManager sharedManager] removeFromContactsWithUserID:userID];
+        [[TAPContactManager sharedManager] removeFromContactsWithUserID:userID];
         success(message);
     } failure:^(NSError *error) {
         NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
         failure(localizedError);
+    }];
+}
+
+- (void)searchLocalContactsByName:(NSString *)keyword
+                          success:(void (^)(NSArray <TAPUserModel *>*userArray))success
+                          failure:(void (^)(NSError *error))failure {
+    
+    NSString *queryClause = [NSString stringWithFormat:@"fullname CONTAINS[c] \'%@\'", keyword];
+    [TAPDatabaseManager loadDataFromTableName:@"TAPContactRealmModel"
+                             whereClauseQuery:queryClause
+                             sortByColumnName:@"fullname"
+                                  isAscending:YES
+                                      success:^(NSArray *resultArray) {
+        
+        NSMutableArray <TAPUserModel *> *searchResultArray = [NSMutableArray array];
+        for (NSInteger count = 0; count < [resultArray count]; count++) {
+            NSDictionary *databaseDictionary = [NSDictionary dictionaryWithDictionary:[resultArray objectAtIndex:count]];
+            TAPUserModel *user = [TAPDataManager userModelFromDictionary:databaseDictionary];
+            [searchResultArray addObject:user];
+        }
+        success(searchResultArray);
+    } failure:^(NSError *error) {
+        failure(error);
     }];
 }
 

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5314F77E53B8919667FE449B /* Pods_TapTalkLive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46DBEB46C573D319A2B455D9 /* Pods_TapTalkLive.framework */; };
+		9479E2AB33982A90FE74FC36 /* libPods-TapTalkLive.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 434603578946F28D58AE828C /* libPods-TapTalkLive.a */; };
 		D7054C7723A0B0BA00B20950 /* TapTalkLive.h in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7523A0B0BA00B20950 /* TapTalkLive.h */; };
 		D7054C7823A0B0BA00B20950 /* TapTalkLive.m in Sources */ = {isa = PBXBuildFile; fileRef = D7054C7623A0B0BA00B20950 /* TapTalkLive.m */; };
 		D7054C7B23A0B13B00B20950 /* TapTalkLive-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7A23A0B13B00B20950 /* TapTalkLive-Prefix.pch */; };
@@ -107,7 +107,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		46DBEB46C573D319A2B455D9 /* Pods_TapTalkLive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TapTalkLive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		434603578946F28D58AE828C /* libPods-TapTalkLive.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TapTalkLive.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		47C6BAE8C45228CC9E71B516 /* Pods-TapTalkLive.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.debug.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.debug.xcconfig"; sourceTree = "<group>"; };
 		D4DB80AC0E047821EE6C64EB /* Pods-TapTalkLive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.release.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.release.xcconfig"; sourceTree = "<group>"; };
 		D7054C7523A0B0BA00B20950 /* TapTalkLive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TapTalkLive.h; sourceTree = "<group>"; };
@@ -213,7 +213,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5314F77E53B8919667FE449B /* Pods_TapTalkLive.framework in Frameworks */,
+				9479E2AB33982A90FE74FC36 /* libPods-TapTalkLive.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,7 +231,7 @@
 		B0768FB51CAAF8584F418B3D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				46DBEB46C573D319A2B455D9 /* Pods_TapTalkLive.framework */,
+				434603578946F28D58AE828C /* libPods-TapTalkLive.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -854,7 +854,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.taptalk.TapTalkLive;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -882,7 +882,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.taptalk.TapTalkLive;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

@@ -20,19 +20,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)receiveImageDataWithMessage:(TAPMessageModel *)message
                               start:(void(^)(TAPMessageModel *receivedMessage))startProgress
                            progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
-                            success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage))success
+                            success:(void (^)(UIImage *fullImage,TAPMessageModel *receivedMessage, NSString * _Nullable filePath))success
                             failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure;
 
 - (void)receiveFileDataWithMessage:(TAPMessageModel *)message
                              start:(void(^)(TAPMessageModel *receivedMessage))startProgress
                           progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
-                           success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage))success
+                           success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage, NSString *filePath))success
                            failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure;
 
 - (void)receiveVideoDataWithMessage:(TAPMessageModel *)message
                               start:(void(^)(TAPMessageModel *receivedMessage))startProgress
                            progress:(void (^)(CGFloat progress, CGFloat total, TAPMessageModel *receivedMessage))progressBlock
-                            success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage))success
+                            success:(void (^)(NSData *fileData, TAPMessageModel *receivedMessage, NSString *filePath))success
                             failure:(void(^)(NSError *error, TAPMessageModel *receivedMessage))failure;
 
 - (NSDictionary *)getDownloadProgressWithLocalID:(NSString *)localID;

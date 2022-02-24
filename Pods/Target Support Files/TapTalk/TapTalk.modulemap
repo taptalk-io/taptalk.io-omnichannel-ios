@@ -1,4 +1,4 @@
-framework module TapTalk {
+module TapTalk {
   umbrella header "TapTalk-umbrella.h"
 
   export *
