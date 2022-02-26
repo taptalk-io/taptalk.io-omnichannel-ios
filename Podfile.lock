@@ -25,11 +25,11 @@ PODS:
   - Realm (10.1.0):
     - Realm/Headers (= 10.1.0)
   - Realm/Headers (10.1.0)
-  - SDWebImage (5.10.4):
-    - SDWebImage/Core (= 5.10.4)
-  - SDWebImage/Core (5.10.4)
+  - SDWebImage (5.12.3):
+    - SDWebImage/Core (= 5.12.3)
+  - SDWebImage/Core (5.12.3)
   - SocketRocket (0.6.0)
-  - TapTalk (1.4.1):
+  - TapTalk (1.4.2):
     - AFNetworking (~> 4.0.0)
     - GoogleMaps
     - GooglePlaces
@@ -68,9 +68,9 @@ SPEC CHECKSUMS:
   JSONModel: 02ab723958366a3fd27da57ea2af2113658762e9
   PodAsset: 161b57cdf4d7307b0fb652cccab32fa8d5dc580b
   Realm: 100df88a0faf5328f48477427e4b3e1a1598bae3
-  SDWebImage: c666b97e1fa9c64b4909816a903322018f0a9c84
+  SDWebImage: 53179a2dba77246efa8a9b85f5c5b21f8f43e38f
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
-  TapTalk: f55a95a6bae5959d18c5ef1f11c9674a4d91ef07
+  TapTalk: 5f4f454f1b60133899c68122180518837b7f6dbc
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
 PODFILE CHECKSUM: e61ec74d7fa039c5c77b8925e45972320e51b263
