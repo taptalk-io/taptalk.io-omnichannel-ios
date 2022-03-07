@@ -42,7 +42,7 @@ PODS:
   - ZSWTappableLabel (2.0)
 
 DEPENDENCIES:
-  - AFNetworking
+  - AFNetworking (~> 4.0.0)
   - JSONModel (~> 1.1)
   - PodAsset
   - SDWebImage
@@ -73,6 +73,6 @@ SPEC CHECKSUMS:
   TapTalk: 5f4f454f1b60133899c68122180518837b7f6dbc
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
-PODFILE CHECKSUM: e61ec74d7fa039c5c77b8925e45972320e51b263
+PODFILE CHECKSUM: 42b28f71ac313bd6859b7f5085afea9081b4eb4b
 
 COCOAPODS: 1.11.2
