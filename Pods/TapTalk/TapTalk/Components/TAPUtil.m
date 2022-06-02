@@ -108,6 +108,10 @@ static const char kBundleKey = 0;
     return messageDateString;
 }
 
++ (NSNumber *)currentTimeInMillis {
+    return [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970] * 1000.0f];
+}
+
 #pragma mark - Null Handler
 + (NSString *)nullToEmptyString:(id)value {
     NSString *emptyString = @"";
@@ -554,7 +558,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         jsonString = [[NSString alloc] initWithData:jsonData
                                            encoding:NSUTF8StringEncoding];
     }
-    
+    jsonString = [TAPUtil nullToEmptyString:jsonString];
     return jsonString;
 }
 
@@ -1045,6 +1049,19 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     void (^block_)() = [block copy]; // autorelease this if you're not using ARC
     [self performSelector:@selector(performBlock:) withObject:block_ afterDelay:delay];
 }
+
++ (UIViewController *_Nullable) topViewController {
+    UIViewController *topViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    if (topViewController == nil) {
+        return nil;
+    }
+    while (topViewController.presentedViewController) {
+        topViewController = topViewController.presentedViewController;
+    }
+    return topViewController;
+}
+
+
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle {

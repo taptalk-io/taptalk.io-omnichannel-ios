@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, TAPMyVideoBubbleTableViewCellStateType) {
 
 - (void)myVideoQuoteDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myVideoReplyDidTappedWithMessage:(TAPMessageModel *)message;
+- (void)myVideoCheckmarkDidTappedWithMessage:(TAPMessageModel *)message;
 - (void)myVideoBubbleLongPressedWithMessage:(TAPMessageModel *)longPressedMessage;
 - (void)myVideoLongPressedUrl:(NSURL *)url
                originalString:(NSString*)originalString;
@@ -81,6 +82,10 @@ typedef NS_ENUM(NSInteger, TAPMyVideoBubbleTableViewCellStateType) {
 - (void)showVideoBubbleStatusWithType:(TAPMyVideoBubbleTableViewCellStateType)type;
 - (void)setVideoDurationAndSizeProgressViewWithMessage:(TAPMessageModel *)message progress:(NSNumber *)progress stateType:(TAPMyVideoBubbleTableViewCellStateType)type;
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message;
+- (void)showStarMessageView;
+- (void)showSeperator;
+- (void)showCheckMarkIcon:(BOOL)isShow;
+- (void)setCheckMarkState:(BOOL)isSelected;
 
 @end
 

@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
     s.name         = "TapTalkLive"
-    s.version      = "1.1.2"
+    s.version      = "1.1.3"
     s.summary      = "TapTalk.io Live Chat SDK is a complete live chat customer service chat SDK and API. Its in-app chat features give you and your user the best in-app chat experience. TapTalk.io Live Chat SDK UI based implementation and code based implementation and is fully customizable."
     s.homepage     = "https://taptalk.io"
 

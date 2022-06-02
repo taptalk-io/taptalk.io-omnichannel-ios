@@ -78,6 +78,10 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/message/new_and_updated";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeSendCustomMessage) {
+        NSString *apiPath = @"chat/message/send/custom";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     else if (type == TAPAPIManagerTypeLogout) {
         NSString *apiPath = @"client/logout";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
@@ -210,7 +214,53 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/project_configs";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeUpdateBio) {
+        NSString *apiPath = @"client/user/update_bio";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetPhotoList) {
+        NSString *apiPath = @"client/user/photo/get_list";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeSetProfilePhotoAsMain) {
+        NSString *apiPath = @"client/user/photo/set_main";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeRemoveProfilePhoto) {
+        NSString *apiPath = @"client/user/photo/delete";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+
+    else if (type == TAPAPIManagerTypeMarkAsUnread) {
+        NSString *apiPath = @"client/room/mark_as_unread";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetUnreadRommIDs) {
+        NSString *apiPath = @"client/room/get_unread_room_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     
+    else if (type == TAPAPIManagerTypeStarMessage) {
+        NSString *apiPath = @"chat/message/star";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUnStarMessage) {
+        NSString *apiPath = @"chat/message/unstar";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUnStarMessage) {
+        NSString *apiPath = @"chat/message/unstar";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetStarredMessages) {
+        NSString *apiPath = @"chat/message/get_starred_list";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetStarredMessagesIDs) {
+        NSString *apiPath = @"chat/message/get_starred_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }
 

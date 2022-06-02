@@ -24,6 +24,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)searchLocalRoomListWithKeyword:(NSString *)keyword
                                success:(void (^)(NSArray <TAPRoomListModel *> *roomListArray))success
                                failure:(void (^)(NSError *error))failure;
+- (void)markChatRoomAsUnreadWithRoomID:(NSString *)roomID
+                               success:(void (^)(void))success
+                               failure:(void (^)(NSError *error))failure;
+- (void)markChatRoomsAsUnreadWithRoomID:(NSArray<NSString *> *)roomIDs
+                                success:(void (^)(void))success
+                                failure:(void (^)(NSError *error))failure;
+- (void)removeUnreadMarkFromChatRoom:(NSString *)roomID
+                             success:(void (^)(void))success
+                             failure:(void (^)(NSError *error))failure;
+- (void)removeUnreadMarkFromChatRooms:(NSArray<NSString *> *)roomIDs
+                              success:(void (^)(void))success
+                              failure:(void (^)(NSError *error))failure;
+- (void)getMarkedAsUnreadChatRoomListWithSuccess:(void (^)(NSArray *unreadRoomIDs))success
+                                         failure:(void (^)(NSError *error))failure;
 
 @end
 

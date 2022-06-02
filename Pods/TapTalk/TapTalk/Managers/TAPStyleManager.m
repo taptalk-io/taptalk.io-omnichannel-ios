@@ -527,6 +527,14 @@
             return font;
             break;
         }
+        case TAPComponentFontChatProfileTitleLabelStyle:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_CHAT_PROFILE_DETAIL_TITLE_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
         case TAPComponentFontChatProfileMenuDestructiveLabel:
         {
             
@@ -780,6 +788,15 @@
 //            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
 //            font = [font fontWithSize:TAP_LEFT_FILE_BUBBLE_INFO_FONTSIZE_STYLE];
             UIFont *font = [UIFont systemFontOfSize:TAP_LEFT_FILE_BUBBLE_INFO_FONTSIZE_STYLE weight:UIFontWeightRegular];
+            return font;
+            break;
+        }
+        case TAPComponentFontRightVoiceBubbleDuration:
+        {
+            
+//            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+//            font = [font fontWithSize:TAP_RIGHT_FILE_BUBBLE_NAME_FONTSIZE_STYLE];
+            UIFont *font = [UIFont systemFontOfSize:TAP_RIGHT_VOICE_BUBBLE_DURATION_FONTSIZE_STYLE weight:UIFontWeightRegular];
             return font;
             break;
         }
@@ -1552,6 +1569,11 @@
             return color;
             break;
         }
+        case TAPTextColorChatProfileDetailTitleLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
         case TAPTextColorChatProfileMenuDestructiveLabel: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorError];
             return color;
@@ -1986,6 +2008,11 @@
             return color;
             break;
         }
+        case TAPTextColorRecordingTimeLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
         default: {
             //Set default color to black to prevent crash
             UIColor *color = [TAPUtil getColor:@"9B9B9B"];
@@ -2233,6 +2260,12 @@
         case TAPComponentColorRightFileButtonBackground:
         {
             UIColor *color = [TAPUtil getColor:@"FFFFFF"];
+            return color;
+            break;
+        }
+        case TAPComponentColorRightVoiceNoteButtonBackground:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_RIGHT_BUBBLE_VOICE_NOTE_BUTTON_COLOR];
             return color;
             break;
         }
@@ -2838,6 +2871,12 @@
             return color;
             break;
         }
+        case TAPComponentColorRoomListSwipeButtonBackground:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
     //Room List Setup
         case TAPComponentColorIconRoomListSettingUp:
         {
@@ -2891,25 +2930,25 @@
         }
         case TAPComponentColorIconChatProfileMenuNotificationInactive:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
         }
         case TAPComponentColorIconChatProfileMenuConversationColor:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }
         case TAPComponentColorIconChatProfileMenuBlockUser:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconDestructive];
             return color;
             break;
         }
         case TAPComponentColorIconChatProfileMenuSearchChat:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }
@@ -2921,31 +2960,31 @@
         }
         case TAPComponentColorIconGroupProfileMenuViewMembers:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }
         case TAPComponentColorIconGroupMemberProfileMenuAddToContacts:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }
         case TAPComponentColorIconGroupMemberProfileMenuSendMessage:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }
         case TAPComponentColorIconGroupMemberProfileMenuPromoteAdmin:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }
         case TAPComponentColorIconGroupMemberProfileMenuDemoteAdmin:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }
@@ -2958,6 +2997,18 @@
         case TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup:
         {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconDestructive];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconGroupMemberProfileSearchChat:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
+            return color;
+            break;
+        }
+        case TAPComponentColorIconGroupMemberProfileEditGroup:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconPrimary];
             return color;
             break;
         }

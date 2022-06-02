@@ -12,6 +12,8 @@
 #import <CoreLocation/CoreLocation.h>
 #include <sys/types.h>
 #include <sys/sysctl.h>
+#import "TAPMessageModel.h"
+#import "TAPUserModel.h"
 
 #pragma mark - Math
 #define DEGREES_TO_RADIANS(x) (M_PI * x / 180.0f)
@@ -63,6 +65,7 @@
 #pragma mark - Time
 + (NSString *)stringFromTimeInterval:(NSTimeInterval)interval;
 + (NSString *)getMessageTimestampText:(NSNumber *)createdTime;
++ (NSNumber *)currentTimeInMillis;
 
 #pragma mark - Null Handler
 + (NSString *)nullToEmptyString:(id)value;
@@ -139,6 +142,7 @@
 + (CGFloat)safeAreaTopPadding;
 + (CGFloat)topGapPresentingViewController;
 + (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay;
++ (UIViewController *_Nullable) topViewController;
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;

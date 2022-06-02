@@ -11,6 +11,7 @@
 #import <TapTalk/TapTalk.h>
 #import <TapTalk/TapUI.h>
 #import <TapTalk/TapUIChatViewController.h>
+#import <TapTalk/TAPUtil.h>
 
 #import "TTLPopUpHandlerViewController.h"
 #import "TTLPopUpInfoViewController.h"
@@ -74,11 +75,11 @@
     //Disable auto connect TapTalk because needs to wait Base URL called from init TapLive using API
     [[TapTalk sharedInstance] setAutoConnectEnabled:NO];
     
-    //Hide profile button in TapTalk Chat in chat room view
+    // Hide disabled features in TapTalk Room List View
+    [[TapUI sharedInstance] setHideReadStatus:YES];
+    [[TapUI sharedInstance] setCloseRoomListButtonVisible:YES];
     [[TapUI sharedInstance] setProfileButtonInChatRoomVisible:NO];
-    
-    //Hide my account, search bar, and new chat button in TapTalk Chat in chat room view
-    [[TapUI sharedInstance] setSearchBarInRoomListVisible:NO];
+//    [[TapUI sharedInstance] setSearchBarInRoomListVisible:NO];
     [[TapUI sharedInstance] setMyAccountButtonInRoomListVisible:NO];
     [[TapUI sharedInstance] setNewChatButtonInRoomListVisible:YES];
     
@@ -224,19 +225,17 @@ Obtain main view controller of TapTalk Live
                                   sender:(TAPUserModel * _Nonnull)sender
                                recipient:(TAPUserModel * _Nullable)recipient
                             keyboardItem:(TAPCustomKeyboardItemModel * _Nonnull)keyboardItem {
-  //Do an action when user taps a custom keyboard item
     
+    // Do an action when user taps a custom keyboard item
     if ([keyboardItem.itemID isEqualToString:@"1"]) {
         TTLPopUpHandlerViewController *popupHandlerViewController = [[TTLPopUpHandlerViewController alloc] init];
         popupHandlerViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
         popupHandlerViewController.room = room;
         popupHandlerViewController.sender = sender;
         popupHandlerViewController.recipient = recipient;
-        UIViewController *currentActiveController = [self getCurrentTapTalkLiveActiveViewController];
+//        UIViewController *currentActiveController = [self getCurrentTapTalkLiveActiveViewController];
+        UIViewController *currentActiveController = [TAPUtil topViewController];
         [currentActiveController presentViewController:popupHandlerViewController animated:NO completion:^{
-            
-            
-            
             [popupHandlerViewController showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Custom Keyboard - Close Case Tapped" title:NSLocalizedStringFromTableInBundle(@"Warning", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"This case will be closed and you wont be able to further send messages or receive assistance regarding this case. Would you like to proceed?", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TTLUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TTLUtil currentBundle], @"")];
         }];
     }
@@ -278,8 +277,13 @@ Obtain main view controller of TapTalk Live
  */
 - (void)initWithSecretKey:(NSString *_Nonnull)secretKey {
 
-    NSString *apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
-//    NSString *apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor";
+    NSString *apiURLString;
+    // FIXME: DEBUG URL CALLED IN PRODUCTION BUILD
+//#ifdef DEBUG
+    apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor";
+//#else
+//    apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
+//#endif
 
     [[TTLNetworkManager sharedManager] setSecretKey:secretKey];
     [[TTLAPIManager sharedManager] setBaseAPIURLString:apiURLString];

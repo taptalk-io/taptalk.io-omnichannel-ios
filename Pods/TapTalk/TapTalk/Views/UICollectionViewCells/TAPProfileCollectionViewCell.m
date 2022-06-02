@@ -13,6 +13,7 @@
 @property (strong, nonatomic) UIImageView *iconImageView;
 @property (strong, nonatomic) UIImageView *rightIconImageView;
 @property (strong, nonatomic) UILabel *titleLabel;
+@property (strong, nonatomic) UILabel *userDetailLabel;
 @property (strong, nonatomic) UISwitch *switchButton;
 @property (strong, nonatomic) UIView *separatorView;
 
@@ -56,6 +57,13 @@
         self.titleLabel.textColor = titleLabelColor;
         [self.contentView addSubview:self.titleLabel];
         
+        _userDetailLabel = [[UILabel alloc] initWithFrame:CGRectMake(titleXPosition, 0.0f, titleWidth, CGRectGetHeight(frame))];
+        self.userDetailLabel.font = titleLabelFont;
+        self.userDetailLabel.textColor = titleLabelColor;
+        self.userDetailLabel.alpha = 0.0f;
+        self.userDetailLabel.numberOfLines = 0;
+        [self.contentView addSubview:self.userDetailLabel];
+        
         _separatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight(frame) - 1.0f, CGRectGetWidth(frame), 1.0f)];
         self.separatorView.backgroundColor = [TAPUtil getColor:TAP_COLOR_GREY_DC];
         [self.contentView addSubview:self.separatorView];
@@ -70,22 +78,46 @@
 - (void)showSeparatorView:(BOOL)isShowed {
     if (isShowed) {
         self.separatorView.alpha = 1.0f;
+        self.separatorView.frame = CGRectMake(0.0f, CGRectGetHeight(self.frame) - 1.0f, CGRectGetWidth(self.frame), 1.0f);
     }
     else {
         self.separatorView.alpha = 0.0f;
     }
 }
 
+- (void)prepareForReuse{
+    [super prepareForReuse];
+    self.userDetailLabel.alpha = 0.0f;
+    self.iconImageView.alpha = 1.0f;
+    self.separatorView.alpha = 1.0f;
+    
+    CGFloat titleXPosition = CGRectGetMaxX(self.iconImageView.frame) + 4.0f; //4.0f is left padding of title
+    CGFloat titleWidth = CGRectGetMinX(self.switchButton.frame) - 4.0f - titleXPosition; //4.0f is right padding of title
+    UIFont *titleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatProfileMenuLabel];
+    UIColor *titleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatProfileMenuLabel];
+    
+    self.titleLabel.frame = CGRectMake(titleXPosition, 0.0f, titleWidth, CGRectGetHeight(self.frame));
+    self.titleLabel.font = titleLabelFont;
+    self.titleLabel.textColor = titleLabelColor;
+    
+}
+
+- (void)setUserDetail:(NSString *)userDetail{
+    self.userDetailLabel.text = userDetail;
+    [self.userDetailLabel sizeToFit];
+}
+
 - (void)setProfileCollectionViewCellType:(TAPProfileCollectionViewCellType)type {
     //DV Temp
     BOOL isMute = NO;
-    BOOL isBlocked = YES;
+    BOOL isBlocked = NO;
     //End Temp
     
     UIColor *titleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatProfileMenuLabel];
     UIColor *titleLabelDestructiveColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatProfileMenuDestructiveLabel];
     
     if (type == profileCollectionViewCellTypeNotification) {
+        [self refreshPosition];
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Notification", nil, [TAPUtil currentBundle], @"");
         
@@ -110,10 +142,11 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeBlock) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuBlockUser]];
         
-        self.titleLabel.textColor = titleLabelColor;
+        self.titleLabel.textColor = titleLabelDestructiveColor;
         
         self.switchButton.alpha = 0.0f;
         
@@ -127,6 +160,7 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeConversationColor) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconConversationColor" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuConversationColor]];
 
@@ -138,6 +172,7 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeClearChat) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuClearChat]];
 
@@ -148,7 +183,8 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeLeaveGroup) {
-        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        [self refreshPosition];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconLeaveGroup" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuClearChat]];
         
         self.titleLabel.textColor = titleLabelDestructiveColor;
@@ -158,6 +194,7 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeDeleteGroup) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         
         self.titleLabel.textColor = titleLabelDestructiveColor;
@@ -167,18 +204,18 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeViewGroupMembers) {
-        
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconGroupMembers" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupProfileMenuViewMembers]];
 
         self.titleLabel.textColor = titleLabelColor;
-        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"View Group Members", nil, [TAPUtil currentBundle], @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"View Members", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 1.0f;
     }
     else if (type == profileCollectionViewCellTypeRemoveMember) {
-        
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconTrash" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuRemoveMember]];
         
@@ -189,6 +226,7 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeAppointAsAdmin) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconAppointAdmin" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuPromoteAdmin]];
 
@@ -199,6 +237,7 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeRemoveFromAdmin) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconDemote" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuDemoteAdmin]];
 
@@ -209,6 +248,7 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeSendMessage) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconMessage" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuSendMessage]];
 
@@ -216,9 +256,10 @@
         self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TAPUtil currentBundle], @"");
         
         self.switchButton.alpha = 0.0f;
-        self.rightIconImageView.alpha = 0.0f;
+        self.rightIconImageView.alpha = 1.0f;
     }
     else if (type == profileCollectionViewCellTypeAddContacts) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconAddGrey" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuAddToContacts]];
 
@@ -229,6 +270,7 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeReportUser) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconFlag" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup]];
         
@@ -239,6 +281,7 @@
         self.rightIconImageView.alpha = 0.0f;
     }
     else if (type == profileCollectionViewCellTypeReportGroup) {
+        [self refreshPosition];
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconFlag" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup]];
         
@@ -248,7 +291,69 @@
         self.switchButton.alpha = 0.0f;
         self.rightIconImageView.alpha = 0.0f;
     }
+    else if (type == profileCollectionViewCellTypeSearchChat) {
+        [self refreshPosition];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconSearchContactYellow" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileSearchChat]];
+
+        self.titleLabel.textColor = titleLabelColor;
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Search chat", nil, [TAPUtil currentBundle], @"");
+        
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 0.0f;
+    }
+    else if (type == profileCollectionViewCellTypeEditGroup) {
+        [self refreshPosition];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileEditGroup]];
+
+        self.titleLabel.textColor = titleLabelColor;
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Edit group", nil, [TAPUtil currentBundle], @"");
+        
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 1.0f;
+    }
+    else if (type == profileCollectionViewCellTypeStarMessage) {
+        [self refreshPosition];
+        [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconStarInactive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+        self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconGroupMemberProfileMenuAddToContacts]];
+
+        self.titleLabel.textColor = titleLabelColor;
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Starred Messages", nil, [TAPUtil currentBundle], @"");
+        
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 1.0f;
+    }
+    else if (type == profileCollectionViewCellTypeUserDetail) {
+        self.titleLabel.textColor = titleLabelColor;
+        self.titleLabel.frame =CGRectMake(24.0f, 9.0f, CGRectGetWidth(self.frame) - 24.0f - 24.0f, 16.0f);
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Edit group", nil, [TAPUtil currentBundle], @"");
+        UIFont *titleLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontChatProfileTitleLabelStyle];
+        self.titleLabel.font = titleLabelFont;
+        UIColor *titleLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorChatProfileDetailTitleLabel];
+        self.titleLabel.textColor = titleLabelColor;
+        
+        self.userDetailLabel.frame = CGRectMake(24.0f, CGRectGetMaxY(self.titleLabel.frame) + 0.0f, CGRectGetWidth(self.frame) - 24.0f - 24.0f, 24.0f);
+        self.userDetailLabel.text = @"etst";
+        
+        self.userDetailLabel.alpha = 1.0f;
+        self.switchButton.alpha = 0.0f;
+        self.rightIconImageView.alpha = 0.0f;
+        self.iconImageView.alpha = 0.0;
+    }
     
+}
+
+- (void)refreshPosition{
+    self.iconImageView.frame = CGRectMake(8.0f, (CGRectGetHeight(self.frame) - 32.0f) / 2.0f, 32.0f, 32.0f);
+    
+    CGFloat titleXPosition = CGRectGetMaxX(self.iconImageView.frame) + 4.0f; //4.0f is left padding of title
+    CGFloat titleWidth = CGRectGetMinX(self.switchButton.frame) - 4.0f - titleXPosition; //4.0f is right
+    self.titleLabel.frame = CGRectMake(titleXPosition, 0.0f, titleWidth, CGRectGetHeight(self.frame));
+    
+    self.separatorView.frame = CGRectMake(0.0f, CGRectGetHeight(self.frame) - 1.0f, CGRectGetWidth(self.frame), 1.0f);
+    
+    self.rightIconImageView.frame = CGRectMake(CGRectGetWidth(self.frame) - 24.0f - 16.0f, (CGRectGetHeight(self.frame) - 24.0f) / 2.0f, 24.0f, 24.0f);
 }
 
 - (void)switchValueChanged:(id)sender {
@@ -264,6 +369,11 @@
         [self.iconImageView setImage:[UIImage imageNamed:@"TAPIconNotificationActive" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
         self.iconImageView.image = [self.iconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconChatProfileMenuNotificationInactive]];
     }
+}
+
+- (void)setUserDetailString:(NSString *)title detail:(NSString *)detail {
+    self.userDetailLabel.text = detail;
+    self.titleLabel.text = title;
 }
 
 @end

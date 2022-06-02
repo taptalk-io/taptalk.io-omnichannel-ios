@@ -55,6 +55,14 @@
     }];
 }
 
+- (TAPUserModel *)getLocalUserDataWithUserID:(NSString *)userID {
+    TAPUserModel *activeUser = [[TapTalk sharedInstance] getTapTalkActiveUser];
+    if ([userID isEqualToString:activeUser.userID]) {
+        return  activeUser;
+    }
+    return [[TAPContactManager sharedManager] getUserWithUserID:userID];
+}
+
 - (void)getUserDataWithUserID:(NSString *)userID
                       success:(void (^)(TAPUserModel *user))success
                       failure:(void (^)(NSError *error))failure {
@@ -141,6 +149,18 @@
         success(searchResultArray);
     } failure:^(NSError *error) {
         failure(error);
+    }];
+}
+
+- (void)updateActiveUserBio:(NSString *)bio
+                    success:(void (^)())success
+                    failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIUpdateBio:bio success:^(TAPUserModel *user) {
+        
+        success(user);
+    } failure:^(NSError *error) {
+        NSError *localizedError = [[TAPCoreErrorManager sharedManager] generateLocalizedError:error];
+        failure(localizedError);
     }];
 }
 

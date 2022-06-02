@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)getAllUserContactsWithSuccess:(void (^)(NSArray <TAPUserModel *>*userArray))success
                               failure:(void (^)(NSError *error))failure;
+- (TAPUserModel *)getLocalUserDataWithUserID:(NSString *)userID;
 - (void)getUserDataWithUserID:(NSString *)userID
                       success:(void (^)(TAPUserModel *user))success
                       failure:(void (^)(NSError *error))failure;
@@ -35,6 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)searchLocalContactsByName:(NSString *)keyword
                           success:(void (^)(NSArray <TAPUserModel *>*userArray))success
                           failure:(void (^)(NSError *error))failure;
+- (void)updateActiveUserBio:(NSString *)bio
+                    success:(void (^)())success
+                    failure:(void (^)(NSError *error))failure;
 @end
 
 NS_ASSUME_NONNULL_END

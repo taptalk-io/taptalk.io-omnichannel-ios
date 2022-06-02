@@ -12,6 +12,7 @@
 #import "TAPCountryModel.h"
 #import "TAPProjectConfigsModel.h"
 #import "TAPCoreConfigsModel.h"
+#import "TAPPhotoListModel.h"
 
 @import AFNetworking;
 
@@ -28,6 +29,9 @@
 + (NSString *)getRefreshToken;
 + (TAPProjectConfigsModel *)getProjectConfigs;
 + (TAPCoreConfigsModel *)getCoreConfigs;
++ (void)setUnreadRoomIDs:(NSArray *)roomIDs;
++ (NSArray *)getUnreadRoomIDs;
+
 
 + (void)updateMessageToFailedWhenClosedInDatabase;
 + (void)updateMessageToFailedWithLocalID:(NSString *)localID;
@@ -68,14 +72,32 @@
                          sortBy:(NSString *)columnName
                         success:(void (^)(NSArray *resultArray))success
                         failure:(void (^)(NSError *error))failure;
++ (void)getMessageFromDatabaseWithLocalID:(NSString *)localID
+                                  success:(void (^)(NSArray<TAPMessageModel *> *resultArray))success
+                                  failure:(void (^)(NSError *error))failure;
++ (void)getMessageFromDatabaseWithLocalIDs:(NSArray<NSString *> *)localIDs
+                                   success:(void (^)(NSArray<TAPMessageModel *> *resultArray))success
+                                   failure:(void (^)(NSError *error))failure;
 + (void)getMessageWithRoomID:(NSString *)roomID
         lastMessageTimeStamp:(NSNumber *)timeStamp
                    limitData:(NSInteger)limit
                      success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
                      failure:(void (^)(NSError *error))failure;
++ (void)getMessageWithRoomID:(NSString *)roomID
+        lastMessageTimeStamp:(NSNumber *)timeStamp
+                   limitData:(NSInteger)limit
+               excludeHidden:(BOOL)excludeHidden
+                     success:(void (^)(NSArray<TAPMessageModel *> *obtainedMessageArray))success
+                     failure:(void (^)(NSError *error))failure;
 + (void)getAllMessageWithRoomID:(NSString *)roomID
                       sortByKey:(NSString *)columnName
                       ascending:(BOOL)isAscending
+                        success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
+                        failure:(void (^)(NSError *error))failure;
++ (void)getAllMessageWithRoomID:(NSString *)roomID
+                      sortByKey:(NSString *)columnName
+                      ascending:(BOOL)isAscending
+                  excludeHidden:(BOOL)excludeHidden
                         success:(void (^)(NSArray<TAPMessageModel *> *messageArray))success
                         failure:(void (^)(NSError *error))failure;
 + (void)getAllMessageWithQuery:(NSString *)query
@@ -117,8 +139,11 @@
                                          success:(void (^)(NSArray *mediaMessages))success
                                          failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseUnreadRoomCountWithActiveUserID:(NSString *)activeUserID
-                                           success:(void (^)(NSInteger unreadRoomCount))success
-                                           failure:(void (^)(NSError *error))failure;
+                                           success:(void (^)(NSArray *unreadRoomIDs))success
+                                           failure:(void (^)(NSError *))failure;
++ (void)getDatabaseOldestCreatedTimeFromRoom:(NSString *)roomID
+                                     success:(void (^)(NSNumber *createdTime))success
+                                     failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseContactSearchKeyword:(NSString *)keyword
                                  sortBy:(NSString *)columnName
                                 success:(void (^)(NSArray *resultArray))success
@@ -203,6 +228,24 @@
           needToSaveLastUpdatedTimestamp:(BOOL)needToSaveLastUpdatedTimestamp
                                  success:(void (^)(NSArray *messageArray))success
                                  failure:(void (^)(NSError *error))failure;
++ (void)callAPISendCustomMessageToPersonalRoomWithRecipientUserID:(NSString *)recipientUserID
+                                                          localID:(NSString *)localID
+                                                      messageType:(NSInteger)messageType
+                                                             body:(NSString *)body
+                                                             data:(NSString *)data
+                                                         filterID:(NSString *)filterID
+                                                         isHidden:(BOOL)isHidden
+                                                          success:(void (^)(void))success
+                                                          failure:(void (^)(NSError *error))failure;
++ (void)callAPISendCustomMessageWithRoomID:(NSString *)roomID
+                                   localID:(NSString *)localID
+                               messageType:(NSInteger)messageType
+                                      body:(NSString *)body
+                                      data:(NSString *)data
+                                  filterID:(NSString *)filterID
+                                  isHidden:(BOOL)isHidden
+                                   success:(void (^)(void))success
+                                   failure:(void (^)(NSError *error))failure;
 + (void)callAPIDeleteMessageWithMessageIDs:(NSArray *)messageIDArray
                                     roomID:(NSString *)roomID
                       isDeletedForEveryone:(BOOL)isDeletedForEveryone
@@ -337,7 +380,27 @@
                           failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetProjectConfigsWithSuccess:(void (^)(NSDictionary *projectConfigsDictionary))success
                                     failure:(void (^)(NSError *error))failure;
++ (void)callAPIUpdateBio:(NSString *)bioContent
+                            success:(void (^)(TAPUserModel *user))success
+                 failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetPhotoList:(NSString *)userID success:(void (^)(NSMutableArray<TAPPhotoListModel *> * photoListArray))success
+                      failure:(void (^)(NSError *error))failure;
 
++ (void)callAPISetProfilePhotoAsMain:(NSInteger)userID
+                            success:(void (^)())success
+                             failure:(void (^)(NSError *error))failure;
++ (void)callAPIRemovePhotoProfile:(NSInteger)userID createdTime:(long)createdTime
+                            success:(void (^)())success
+                          failure:(void (^)(NSError *error))failure;
++ (void)callAPIMarkChatRoomAsUnread:(NSArray<NSString *> *)roomIDs
+                            success:(void (^)(NSArray<NSString *> *unreadRoomIDs))success
+                            failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetMarkedAsUnreadChatRoomList:(void (^)(NSArray<NSString *> *unreadRoomIDs))success
+                                     failure:(void (^)(NSError *error))failure;
++ (void)callAPIStarMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageID success:(void (^)(NSArray *starredMessageIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIUnStarMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageID success:(void (^)(NSArray *messagesArray))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetStarredMessages:(NSString *)roomID pageNumber:(NSInteger)pageNumber numberOfItems:(NSInteger)numberOfItems success:(void (^)(NSArray *starredMessageIDs,BOOL hasMoreData))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetStarredMessageIDs:(NSString *)roomID success:(void (^)(NSMutableArray *starredMessageIDs))success failure:(void (^)(NSError *error))failure;
 // Used to prevent inserting message to deleted chat room
 @property (strong, nonatomic) NSMutableArray<NSString *> *deletedRoomIDArray;
 

@@ -74,6 +74,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorRightBubbleQuoteBackground,
     TAPComponentColorLeftFileButtonBackground,
     TAPComponentColorRightFileButtonBackground,
+    TAPComponentColorRightVoiceNoteButtonBackground,
     TAPComponentColorSystemMessageBackground,
     TAPComponentColorSystemMessageBackgroundShadow,
     TAPComponentColorFileProgressBackgroundPrimary,
@@ -151,6 +152,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconDeletedRightMessageBubble, //Chat Room
     TAPComponentColorIconRoomListMuted, //Room List
     TAPComponentColorIconStartNewChatButton, //RoomList
+    TAPComponentColorRoomListSwipeButtonBackground, //RoomList
     TAPComponentColorIconRoomListSettingUp, //Room List Setup
     TAPComponentColorIconRoomListSetUpSuccess, //Room List Setup
     TAPComponentColorIconRoomListSetUpFailure, //Room List Setup
@@ -171,6 +173,8 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconGroupMemberProfileMenuDemoteAdmin, //Chat / Group Profile Page
     TAPComponentColorIconGroupMemberProfileMenuRemoveMember, //Chat / Group Profile Page
     TAPComponentColorIconGroupMemberProfileMenuReportUserOrGroup, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileSearchChat, //Chat / Group Profile Page
+    TAPComponentColorIconGroupMemberProfileEditGroup, //Chat / Group Profile Page
     TAPComponentColorIconMediaPreviewAdd, //Media / Image Detail Preview
     TAPComponentColorIconMediaPreviewWarning, //Media / Image Detail Preview
     TAPComponentColorIconMediaPreviewThumbnailWarning,//Media / Image Detail Preview
@@ -263,6 +267,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorNewChatMenuLabel,
     TAPTextColorChatProfileRoomNameLabel,
     TAPTextColorChatProfileMenuLabel,
+    TAPTextColorChatProfileDetailTitleLabel,
     TAPTextColorChatProfileMenuDestructiveLabel,
     TAPTextColorSearchNewContactResultName,
     TAPTextColorSearchNewContactResultUsername,
@@ -349,6 +354,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorInitialProfileNameSendToContactLabel,
     TAPTextColorShareExtensionCollectionViewCellHeaderLabel,
     TAPTextColorTableViewProfileNameSendToContactLabel,
+    TAPTextColorRecordingTimeLabel,
 };
 
 typedef NS_ENUM(NSInteger, TAPComponentFont) {
@@ -398,6 +404,7 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontNewChatMenuLabel,
     TAPComponentFontChatProfileRoomNameLabel,
     TAPComponentFontChatProfileMenuLabel,
+    TAPComponentFontChatProfileTitleLabelStyle,
     TAPComponentFontChatProfileMenuDestructiveLabel,
     TAPComponentFontSearchNewContactResultName,
     TAPComponentFontSearchNewContactResultUsername,
@@ -439,6 +446,7 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontUnreadMessageButtonLabel,
     TAPComponentFontDeletedChatRoomInfoTitleLabel,
     TAPComponentFontDeletedChatRoomInfoContentLabel,
+    TAPComponentFontRightVoiceBubbleDuration,
     TAPComponentFontLocationPickerTextField,
     TAPComponentFontLocationPickerTextFieldPlaceholder,
     TAPComponentFontLocationPickerClearButton,

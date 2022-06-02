@@ -48,6 +48,15 @@
 @property (nonatomic) BOOL isAddToContactsButtonInChatProfileHidden;
 @property (nonatomic) BOOL isAddContactDisabled;
 @property (nonatomic) BOOL isReportButtonInChatProfileVisible;
+@property (nonatomic) BOOL isUsernameInChatProfileHidden;
+@property (nonatomic) BOOL isMobileNumberInChatProfileHidden;
+@property (nonatomic) BOOL isEmailAddressInChatProfileVisible;
+@property (nonatomic) BOOL isEditBioTextFieldHidden;
+@property (nonatomic) BOOL isMarkAsReadRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isMarkAsUnreadRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isStarMessageMenuDisabled;
+@property (nonatomic) BOOL isSendVoiceNoteMenuDisabled;
+
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -828,5 +837,121 @@ Show or hide report button in user/group profile page
 - (BOOL)getReportButtonInChatProfileVisibleState {
     return self.isReportButtonInChatProfileVisible;
 }
+
+/**
+Show or hide username label in user/group profile page
+*/
+- (void)setUsernameInChatProfileVisible:(BOOL)isVisible {
+    _isUsernameInChatProfileHidden = !isVisible;
+}
+
+/**
+ Get current visibility state of username label in user/group profile page
+*/
+- (BOOL)getUsernameInChatProfileVisible {
+    return !self.isUsernameInChatProfileHidden;
+}
+
+/**
+Show or hide mobile number label in user/group profile page
+*/
+- (void)setMobileNumberInChatProfileVisible:(BOOL)isVisible {
+    _isMobileNumberInChatProfileHidden = !isVisible;
+}
+
+/**
+ Get current visibility state of mobile number label in user/group profile page
+*/
+- (BOOL)getMobileNumberInChatProfileVisible {
+    return !self.isMobileNumberInChatProfileHidden;
+}
+
+/**
+Show or hide email label in user/group profile page
+*/
+- (void)setEmailAddressInChatProfileVisible:(BOOL)isVisible {
+    _isEmailAddressInChatProfileVisible = isVisible;
+}
+
+/**
+ Get current visibility state of email label in user/group profile page and my account page
+*/
+- (BOOL)getEmailAddressInChatProfileVisible {
+    return self.isEmailAddressInChatProfileVisible;
+}
+
+/**
+Show or hide bio in user/group profile page
+*/
+- (void)setEditBioTextFieldVisible:(BOOL)isVisible {
+    _isEditBioTextFieldHidden = !isVisible;
+}
+
+/**
+ Get current visibility state of bio in user/group profile page and my account page
+*/
+- (BOOL)getEditBioTextFieldVisible {
+    return !self.isEditBioTextFieldHidden;
+}
+
+/**
+<<<<<<< HEAD
+Enable or disable mark as read swipe in chat room list
+*/
+- (void)setMarkAsReadRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isMarkAsReadRoomListSwipeMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of mark as read swipe in chat room list
+*/
+- (BOOL)getMarkAsReadRoomListSwipeMenuEnabled {
+    return !self.isMarkAsReadRoomListSwipeMenuDisabled;
+}
+
+/**
+ Enable or disable mark as unread swipe in chat room list
+*/
+- (void)setMarkAsUnreadRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isMarkAsUnreadRoomListSwipeMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of mark as unread swipe in chat room list
+*/
+- (BOOL)getMarkAsUnreadRoomListSwipeMenuEnabled {
+    return !self.isMarkAsUnreadRoomListSwipeMenuDisabled;
+}
+
+/**
+Show or hide star message menu from message bubble long press & chat profile
+*/
+- (void)setStarMessageMenuEnabled:(BOOL)isEnabled {
+    _isStarMessageMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of star message menu from message bubble long press & chat profile
+*/
+- (BOOL)isStarMessageMenuEnabled {
+    return !self.isStarMessageMenuDisabled;
+}
+
+/**
+Show or hide voice note menu from message bubble long press & chat profile
+*/
+- (void)setSendVoiceNoteMenuEnabled:(BOOL)isEnabled {
+    _isSendVoiceNoteMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of voice noite menu from message bubble long press & chat profile
+*/
+- (BOOL)isSendVoiceNoteMenuEnabled{
+    return !self.isSendVoiceNoteMenuDisabled;
+}
+
 
 @end

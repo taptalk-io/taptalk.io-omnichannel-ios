@@ -29,6 +29,10 @@
     // Do any additional setup after loading the view.
     [self showCustomCloseButton];
     self.title = NSLocalizedStringFromTableInBundle(@"Select Topic", nil, [TTLUtil currentBundle], @"");
+    
+    if (@available(iOS 15.0, *)) {
+        [self.topicListView.tableView setSectionHeaderTopPadding:0.0f];
+    }
 
     self.topicListView.tableView.delegate = self;
     self.topicListView.tableView.dataSource = self;
