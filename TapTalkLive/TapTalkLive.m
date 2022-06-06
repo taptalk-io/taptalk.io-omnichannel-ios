@@ -280,9 +280,9 @@ Obtain main view controller of TapTalk Live
     NSString *apiURLString;
     // FIXME: DEBUG URL CALLED IN PRODUCTION BUILD
 //#ifdef DEBUG
-    apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor";
+//    apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor";
 //#else
-//    apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
+    apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
 //#endif
 
     [[TTLNetworkManager sharedManager] setSecretKey:secretKey];
