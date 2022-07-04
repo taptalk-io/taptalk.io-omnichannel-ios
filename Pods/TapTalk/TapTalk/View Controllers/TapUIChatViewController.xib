@@ -1260,14 +1260,14 @@
                             <rect key="frame" x="60" y="8" width="221" height="36"/>
                             <subviews>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconTrashChatComposer" translatesAutoresizingMaskIntoConstraints="NO" id="I8z-0p-drU">
-                                    <rect key="frame" x="3" y="2" width="32" height="32"/>
+                                    <rect key="frame" x="3" y="6" width="24" height="24"/>
                                     <constraints>
-                                        <constraint firstAttribute="width" constant="32" id="eiY-ta-N7G"/>
-                                        <constraint firstAttribute="height" constant="32" id="f5p-RL-YES"/>
+                                        <constraint firstAttribute="width" constant="24" id="eiY-ta-N7G"/>
+                                        <constraint firstAttribute="height" constant="24" id="f5p-RL-YES"/>
                                     </constraints>
                                 </imageView>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7FP-sJ-au9" userLabel="Slide To CancelView">
-                                    <rect key="frame" x="35" y="0.0" width="119" height="36"/>
+                                    <rect key="frame" x="27" y="0.0" width="127" height="36"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="TAPIconChevronLeft" translatesAutoresizingMaskIntoConstraints="NO" id="SA9-JR-pNs">
                                             <rect key="frame" x="15" y="6" width="24" height="24"/>
@@ -1277,7 +1277,7 @@
                                             </constraints>
                                         </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Slide left to cancel" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vdD-JI-z0m">
-                                            <rect key="frame" x="39" y="11.5" width="80" height="13.5"/>
+                                            <rect key="frame" x="39" y="11.5" width="88" height="13.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
@@ -1333,10 +1333,10 @@
                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 </button>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jX0-aV-h00" userLabel="Finsih Recording">
-                                    <rect key="frame" x="35" y="0.0" width="119" height="36"/>
+                                    <rect key="frame" x="27" y="0.0" width="127" height="36"/>
                                     <subviews>
                                         <slider opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="AuN-zg-eJa">
-                                            <rect key="frame" x="18" y="0.0" width="103" height="37"/>
+                                            <rect key="frame" x="18" y="0.0" width="111" height="37"/>
                                             <connections>
                                                 <action selector="playerSliderDidChanged:" destination="-1" eventType="valueChanged" id="5Wp-o0-jIK"/>
                                             </connections>
@@ -1481,7 +1481,7 @@
         <image name="TAPIconClose" width="24" height="24"/>
         <image name="TAPIconDemote" width="24" height="24"/>
         <image name="TAPIconDocuments" width="24" height="24"/>
-        <image name="TAPIconForward" width="32" height="32"/>
+        <image name="TAPIconForward" width="24" height="24"/>
         <image name="TAPIconHamburger" width="28" height="28"/>
         <image name="TAPIconHistory" width="14" height="14"/>
         <image name="TAPIconLoadingSmall" width="14" height="14"/>
@@ -1489,7 +1489,7 @@
         <image name="TAPIconPlayComposer" width="34" height="35"/>
         <image name="TAPIconSend" width="20" height="20"/>
         <image name="TAPIconTrash" width="32" height="32"/>
-        <image name="TAPIconTrashChatComposer" width="34" height="34"/>
+        <image name="TAPIconTrashChatComposer" width="24" height="24"/>
         <systemColor name="groupTableViewBackgroundColor">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

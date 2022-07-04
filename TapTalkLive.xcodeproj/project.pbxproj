@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A5B807F2872EDD4002BA4BC /* TTLTapTalkRoomModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A5B807D2872EDD4002BA4BC /* TTLTapTalkRoomModel.h */; };
+		0A5B80802872EDD5002BA4BC /* TTLTapTalkRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A5B807E2872EDD4002BA4BC /* TTLTapTalkRoomModel.m */; };
 		9479E2AB33982A90FE74FC36 /* libPods-TapTalkLive.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 434603578946F28D58AE828C /* libPods-TapTalkLive.a */; };
 		D7054C7723A0B0BA00B20950 /* TapTalkLive.h in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7523A0B0BA00B20950 /* TapTalkLive.h */; };
 		D7054C7823A0B0BA00B20950 /* TapTalkLive.m in Sources */ = {isa = PBXBuildFile; fileRef = D7054C7623A0B0BA00B20950 /* TapTalkLive.m */; };
@@ -107,6 +109,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0A5B807D2872EDD4002BA4BC /* TTLTapTalkRoomModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLTapTalkRoomModel.h; sourceTree = "<group>"; };
+		0A5B807E2872EDD4002BA4BC /* TTLTapTalkRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLTapTalkRoomModel.m; sourceTree = "<group>"; };
 		434603578946F28D58AE828C /* libPods-TapTalkLive.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TapTalkLive.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		47C6BAE8C45228CC9E71B516 /* Pods-TapTalkLive.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.debug.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.debug.xcconfig"; sourceTree = "<group>"; };
 		D4DB80AC0E047821EE6C64EB /* Pods-TapTalkLive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.release.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.release.xcconfig"; sourceTree = "<group>"; };
@@ -287,6 +291,8 @@
 				D72740C723D4A9260073784E /* TTLUserModel.m */,
 				D72740D423D4C14D0073784E /* TTLCaseModel.h */,
 				D72740D523D4C14D0073784E /* TTLCaseModel.m */,
+				0A5B807D2872EDD4002BA4BC /* TTLTapTalkRoomModel.h */,
+				0A5B807E2872EDD4002BA4BC /* TTLTapTalkRoomModel.m */,
 				D79A7DA323D4C8CC00862E57 /* TTLTopicModel.h */,
 				D79A7DA423D4C8CC00862E57 /* TTLTopicModel.m */,
 			);
@@ -479,6 +485,7 @@
 				D79D999C23E014D500A08D49 /* TTLPopUpHandlerViewController.h in Headers */,
 				D747615C23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h in Headers */,
 				D74C322D23D2CF7200626C9D /* TTLCustomButtonView.h in Headers */,
+				0A5B807F2872EDD4002BA4BC /* TTLTapTalkRoomModel.h in Headers */,
 				D7A96BBA23B9C8D600654C71 /* TTLBaseView.h in Headers */,
 				D74C323523D3057800626C9D /* TTLTopicOptionTableViewCell.h in Headers */,
 				D76D884B23C71B37009F87B8 /* TTLCreateCaseViewController.h in Headers */,
@@ -655,6 +662,7 @@
 				D7485FB723D2C35D001770FA /* TTLStyleManager.m in Sources */,
 				D79A7DA623D4C8CC00862E57 /* TTLTopicModel.m in Sources */,
 				D7485FA723D1B2C0001770FA /* TTLDataManager.m in Sources */,
+				0A5B80802872EDD5002BA4BC /* TTLTapTalkRoomModel.m in Sources */,
 				D7A96BCC23B9C96A00654C71 /* TTLBaseViewController.m in Sources */,
 				D79EDBA523DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m in Sources */,
 				D75080F323F15D1000F9EBA6 /* TTLCaseListViewController.m in Sources */,
@@ -854,7 +862,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.taptalk.TapTalkLive;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -882,7 +890,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.taptalk.TapTalkLive;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

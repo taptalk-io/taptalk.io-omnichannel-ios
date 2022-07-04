@@ -108,6 +108,10 @@ static const NSInteger kAPITimeOut = 60;
         urlString = @"";
     }
     
+#ifdef DEBUG
+    NSLog(@"TTLNetworkManager GET: %@", urlString);
+#endif
+    
     if (parameters == nil) {
         parameters = [NSDictionary dictionary];
     }
@@ -130,9 +134,15 @@ static const NSInteger kAPITimeOut = 60;
                       }
                        success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                            success(task, (NSDictionary *)responseObject);
+#ifdef DEBUG
+    NSLog(@"TTLNetworkManager GET 200: %@", urlString);
+#endif
                        }
                        failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                            failure(task, error);
+#ifdef DEBUG
+    NSLog(@"TTLNetworkManager GET %ld: %@", (long)error.code, urlString);
+#endif
                        }];
 }
 
@@ -144,6 +154,10 @@ static const NSInteger kAPITimeOut = 60;
     if (urlString == nil) {
         urlString = @"";
     }
+    
+#ifdef DEBUG
+    NSLog(@"TTLNetworkManager POST: %@", urlString);
+#endif
     
     if (parameters == nil) {
         parameters = [NSDictionary dictionary];
@@ -167,9 +181,15 @@ static const NSInteger kAPITimeOut = 60;
                        }
                         success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                             success(task, (NSDictionary *)responseObject);
+#ifdef DEBUG
+    NSLog(@"TTLNetworkManager POST 200: %@", urlString);
+#endif
                         }
                         failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                             failure(task, error);
+#ifdef DEBUG
+    NSLog(@"TTLNetworkManager POST %ld: %@", (long)error.code, urlString);
+#endif
                         }];
 }
 
@@ -208,6 +228,9 @@ static const NSInteger kAPITimeOut = 60;
     if (urlString == nil) {
         urlString = @"";
     }
+#ifdef DEBUG
+    NSLog(@"TTLNetworkManager DELETE: %@", urlString);
+#endif
     
     if (parameters == nil) {
         parameters = [NSDictionary dictionary];
@@ -223,9 +246,15 @@ static const NSInteger kAPITimeOut = 60;
                           headers:[NSDictionary dictionary]
                           success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                               success(task, (NSDictionary *)responseObject);
+#ifdef DEBUG
+    NSLog(@"TTLNetworkManager DELETE 200: %@", urlString);
+#endif
     }
                           failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                               failure(task, error);
+#ifdef DEBUG
+    NSLog(@"TTLNetworkManager DELETE %ld: %@", (long)error.code, urlString);
+#endif
     }];
 }
 

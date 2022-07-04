@@ -28,8 +28,8 @@ typedef NS_ENUM(NSInteger,TTLCreateCaseViewType) {
 @property (strong, nonatomic) TTLKeyboardAccessoryView *keyboardAccessoryView;
 @property (strong, nonatomic) UIButton *closeButton;
 @property (strong, nonatomic) TTLImageView *closeImageView;
-@property (strong, nonatomic) UIButton *leftCloseButton;
-@property (strong, nonatomic) TTLImageView *leftCloseImageView;
+//@property (strong, nonatomic) UIButton *leftCloseButton;
+//@property (strong, nonatomic) TTLImageView *leftCloseImageView;
 @property (strong, nonatomic) UIView *formContainerView;
 @property (nonatomic) TTLCreateCaseViewType createCaseViewType;
 

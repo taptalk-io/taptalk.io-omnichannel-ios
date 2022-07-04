@@ -663,7 +663,15 @@
            fullNameString = [TAPUtil nullToEmptyString:fullNameString];
         }
         
-        if ([thumbnailImageString isEqualToString:@""]) {
+        if(message.user.deleted.longValue > 0){
+            //set deleted account profil pict
+            self.senderInitialView.alpha = 1.0f;
+            self.senderImageView.alpha = 1.0f;
+            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderInitialLabel.text =@"";
+        }
+        else if ([thumbnailImageString isEqualToString:@""]) {
             //No photo found, get the initial
             self.senderInitialView.alpha = 1.0f;
             self.senderImageView.alpha = 0.0f;
@@ -690,7 +698,13 @@
         self.senderNameLabel.text = @"";
     }
 
-    self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+    if(message.isMessageEdited){
+        NSString *editedMessageString = [NSString stringWithFormat:@"Edited • %@", [TAPUtil getMessageTimestampText:self.message.created]];
+        self.timestampLabel.text = editedMessageString;
+    }
+    else{
+        self.timestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+    }
     
     //CS NOTE - Update Spacing should be placed at the bottom
     [self updateSpacingConstraint];

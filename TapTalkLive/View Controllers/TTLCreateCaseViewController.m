@@ -53,7 +53,7 @@
     self.createCaseView.createCaseButtonView.delegate = self;
     [self.createCaseView.keyboardAccessoryView.doneKeyboardButton addTarget:self action:@selector(doneKeyboardButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.createCaseView.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.createCaseView.leftCloseButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+//    [self.createCaseView.leftCloseButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     
     
     //DV Note
@@ -285,7 +285,7 @@
 
 - (void)handleSubmitCaseFormFlow {
     self.createCaseView.closeButton.userInteractionEnabled = NO;
-    self.createCaseView.leftCloseButton.userInteractionEnabled = NO;
+//    self.createCaseView.leftCloseButton.userInteractionEnabled = NO;
     [self.createCaseView showCreateCaseButtonAsLoading:YES];
     
     [[TapTalkLive sharedInstance] authenticateUserWithFullName:self.obtainedFullNameString
@@ -295,7 +295,8 @@
     }
     failure:^(NSError *error) {
         if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
-            self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
+            self.createCaseView.closeButton.userInteractionEnabled = YES;
+//            self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
         }
         
         [self.createCaseView showCreateCaseButtonAsLoading:NO];
@@ -390,7 +391,8 @@
             
             [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
                 if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
-                    self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
+                    self.createCaseView.closeButton.userInteractionEnabled = YES;
+//                    self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
                 }
                 
                 [self.createCaseView showCreateCaseButtonAsLoading:NO];
@@ -398,21 +400,24 @@
                 [[[TapTalkLive sharedInstance] roomListViewController] viewLoadedSequence];
                 [self.navigationController dismissViewControllerAnimated:NO completion:^{
                     [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                        chatViewController.delegate = [[TapTalkLive sharedInstance] roomListViewController];
                         [self.previousNavigationController pushViewController:chatViewController animated:YES];
                     }];
                 }];
             } failure:^(NSError * _Nonnull error) {
                 //Error get chat room from TapTalk
                 if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
-                    self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
+                    self.createCaseView.closeButton.userInteractionEnabled = YES;
+//                    self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
                 }
                 
                 [self.createCaseView showCreateCaseButtonAsLoading:NO];
             }];
         } failure:^(NSError * _Nonnull error) {
             //Error create case
-          if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
-                self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
+            if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
+                self.createCaseView.closeButton.userInteractionEnabled = YES;
+//                self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
             }
             
             [self.createCaseView showCreateCaseButtonAsLoading:NO];
@@ -430,39 +435,44 @@
                     [[NSUserDefaults standardUserDefaults] synchronize];
                     
                     if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
-                        self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
+                        self.createCaseView.closeButton.userInteractionEnabled = YES;
+//                        self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
                     }
                     
                     [self.createCaseView showCreateCaseButtonAsLoading:NO];
-                    TapUIRoomListViewController *tapTalkRoomListViewController = [[TapUI sharedInstance] roomListViewController];
-                    if ( self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
+                    if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
                         [self.navigationController dismissViewControllerAnimated:YES completion:^{
-                            [self.previousNavigationController pushViewController:tapTalkRoomListViewController animated:YES];
+                            [[TapTalkLive sharedInstance] presentTapTalkLiveViewWithCurrentNavigationController:self.previousNavigationController animated:YES];
                         }];
                     }
                     else {
-                        [self.navigationController pushViewController:tapTalkRoomListViewController animated:YES];
+                        [self.navigationController dismissViewControllerAnimated:YES completion:^{
+                            [[TapTalkLive sharedInstance] presentTapTalkLiveViewWithCurrentNavigationController:self.navigationController animated:YES];
+                        }];
                     }
                 } failure:^(NSError * _Nonnull error) {
                     //Error create case
-                  if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
-                        self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
+                    if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
+                        self.createCaseView.closeButton.userInteractionEnabled = YES;
+//                        self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
                     }
                     
                     [self.createCaseView showCreateCaseButtonAsLoading:NO];
                 }];
             } failure:^(NSError * _Nonnull error) {
                 //Error authenticate TapTalk.io Chat SDK
-               if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
-                    self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
+                if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
+                    self.createCaseView.closeButton.userInteractionEnabled = YES;
+//                    self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
                 }
                 
                 [self.createCaseView showCreateCaseButtonAsLoading:NO];
             }];
         } failure:^(NSError * _Nonnull error) {
             //Error get TapTalk auth ticket
-           if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
-                self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
+            if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
+                self.createCaseView.closeButton.userInteractionEnabled = YES;
+//                self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
             }
             
             [self.createCaseView showCreateCaseButtonAsLoading:NO];

@@ -8,6 +8,8 @@
 
 #import "TTLDataManager.h"
 #import "TTLAPIManager.h"
+#import "TAPDataManager.h"
+#import "TAPEncryptorManager.h"
 
 @interface TTLDataManager()
 
@@ -1167,6 +1169,7 @@
         NSString *requestURL = [[TTLAPIManager sharedManager] urlForType:TTLAPIManagerTypeGetCaseList];
             
         NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+        [parameterDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"withTapTalkRoom"];
         [[TTLNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
             
         } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
@@ -1212,8 +1215,8 @@
             caseListArray = [TTLUtil nullToEmptyArray:caseListArray];
             
             NSMutableArray *caseListResultArray = [[NSMutableArray alloc] init];
+            NSMutableArray *messageArray = [[NSMutableArray alloc] init];
             for (NSDictionary *caseDictionary in caseListArray) {
-            
                 TTLCaseModel *caseData = [TTLCaseModel new];
                 
                 NSString *caseIDRaw = [caseDictionary objectForKey:@"id"];
@@ -1232,6 +1235,18 @@
                 NSString *userFullName = [caseDictionary objectForKey:@"userFullName"];
                 userFullName = [TTLUtil nullToEmptyString:userFullName];
                 caseData.userFullName = userFullName;
+
+                NSString *userAlias = [caseDictionary objectForKey:@"userAlias"];
+                userAlias = [TTLUtil nullToEmptyString:userAlias];
+                caseData.userAlias = userAlias;
+
+                NSString *userEmail = [caseDictionary objectForKey:@"userEmail"];
+                userEmail = [TTLUtil nullToEmptyString:userEmail];
+                caseData.userEmail = userEmail;
+
+                NSString *userPhone = [caseDictionary objectForKey:@"userPhone"];
+                userPhone = [TTLUtil nullToEmptyString:userPhone];
+                caseData.userPhone = userPhone;
                 
                 NSString *topicIDRaw = [caseDictionary objectForKey:@"topicID"];
                 topicIDRaw = [TTLUtil nullToEmptyString:topicIDRaw];
@@ -1259,6 +1274,10 @@
                 medium = [TTLUtil nullToEmptyString:medium];
                 caseData.medium = medium;
                 
+                NSNumber *mediumChannelID = [caseDictionary objectForKey:@"mediumChannelID"];
+                mediumChannelID = [TTLUtil nullToEmptyNumber:mediumChannelID];
+                caseData.mediumChannelID = mediumChannelID;
+                
                 NSString *firstMessage = [caseDictionary objectForKey:@"firstMessage"];
                 firstMessage = [TTLUtil nullToEmptyString:firstMessage];
                 caseData.firstMessage = firstMessage;
@@ -1275,9 +1294,14 @@
                 NSString *firstResponseAgentFullName = [caseDictionary objectForKey:@"firstResponseAgentFullName"];
                 firstResponseAgentFullName = [TTLUtil nullToEmptyString:firstResponseAgentFullName];
                 caseData.firstResponseAgentFullName = firstResponseAgentFullName;
-            
-                BOOL isClosed = [[caseDictionary objectForKey:@"isClosed"] boolValue];
-                caseData.isClosed = isClosed;
+                
+                NSString *agentRemark = [caseDictionary objectForKey:@"agentRemark"];
+                agentRemark = [TTLUtil nullToEmptyString:agentRemark];
+                caseData.agentRemark = agentRemark;
+
+//                NSArray<NSNumber *> *labelIDs = [caseDictionary objectForKey:@"labelIDs"];
+//                labelIDs = [TTLUtil nullToEmptyArray:labelIDs];
+//                caseData.labelIDs = labelIDs;
                 
                 NSNumber *closedTime = [caseDictionary objectForKey:@"closedTime"];
                 closedTime = [TTLUtil nullToEmptyNumber:closedTime];
@@ -1294,8 +1318,47 @@
                 NSNumber *deletedTime = [caseDictionary objectForKey:@"deletedTime"];
                 deletedTime = [TTLUtil nullToEmptyNumber:deletedTime];
                 caseData.deletedTime = deletedTime;
+
+                NSNumber *isCreatedByAgent = [caseDictionary objectForKey:@"isCreatedByAgent"];
+                isCreatedByAgent = [TTLUtil nullToEmptyNumber:isCreatedByAgent];
+                caseData.isCreatedByAgent = [isCreatedByAgent boolValue];
+                
+                NSNumber *isClosed = [caseDictionary objectForKey:@"isClosed"];
+                isClosed = [TTLUtil nullToEmptyNumber:isClosed];
+                caseData.isClosed = [isClosed boolValue];
+
+                NSNumber *isJunk = [caseDictionary objectForKey:@"isJunk"];
+                isJunk = [TTLUtil nullToEmptyNumber:isJunk];
+                caseData.isJunk = [isJunk boolValue];
+                
+                NSDictionary *tapTalkRoomDictionary = [caseDictionary objectForKey:@"tapTalkRoom"];
+                tapTalkRoomDictionary = [TTLUtil nullToEmptyDictionary:tapTalkRoomDictionary];
+
+                NSDictionary *lastMessageDictionary = [tapTalkRoomDictionary objectForKey:@"lastMessage"];
+                lastMessageDictionary = [TTLUtil nullToEmptyDictionary:lastMessageDictionary];
+                TAPMessageModel *lastMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:lastMessageDictionary];
+
+                NSNumber *unreadCount = [tapTalkRoomDictionary objectForKey:@"unreadCount"];
+                unreadCount = [TTLUtil nullToEmptyNumber:unreadCount];
+                
+                TTLTapTalkRoomModel *tapTalkRoom = [TTLTapTalkRoomModel new];
+                tapTalkRoom.lastMessage = lastMessage;
+                tapTalkRoom.unreadCount = [unreadCount intValue];
+                caseData.tapTalkRoom = tapTalkRoom;
                 
                 [caseListResultArray addObject:caseData];
+                [messageArray addObject:lastMessage];
+            }
+            
+            if (messageArray.count > 0) {
+                // Save messages to database
+                [TAPDataManager updateOrInsertDatabaseMessageWithData:messageArray
+                success:^{
+                    
+                }
+                failure:^(NSError *error) {
+                    
+                }];
             }
             
             success(caseListResultArray);

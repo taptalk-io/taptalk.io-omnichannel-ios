@@ -314,7 +314,9 @@ typedef NS_ENUM(NSInteger, TTLTextColor) {
     TTLTextColorTopicListLabel,
     TTLTextColorTopicListLabelSelected,
     TTLTextColorRatingBodyLabel,
-    TTLTextColorReviewBubbleDoneReviewButtonTitleLabel
+    TTLTextColorReviewBubbleDoneReviewButtonTitleLabel,
+    TTLTextColorCreateFormTitle,
+    TTLTextColorCreateFormDescription,
 };
 
 typedef NS_ENUM(NSInteger, TTLComponentFont) {

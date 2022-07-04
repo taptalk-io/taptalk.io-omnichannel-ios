@@ -658,7 +658,7 @@
     }
     else {
         CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
-        timestampWidthWithMargin = timestampTextSize.width + 4.0f + CGRectGetWidth(self.imageStatusIconImageView.frame);
+        timestampWidthWithMargin = timestampTextSize.width + 4.0f + CGRectGetWidth(self.imageStatusIconImageView.frame) + 50.0f;
     }
     if (self.minWidth < timestampWidthWithMargin) {
         _minWidth = timestampWidthWithMargin;
@@ -765,6 +765,10 @@
     [self.forwardFromLabel.layer removeAllAnimations];
     [self.forwardTitleLabel.layer removeAllAnimations];
     [self.quoteImageView.layer removeAllAnimations];
+    [self.imageTimestampStatusContainerView.layer removeAllAnimations];
+    [self.imageTimestampLabel.layer removeAllAnimations];
+    [self.checkMarkIconImageView.layer removeAllAnimations];
+    [self.imageStatusIconImageView.layer removeAllAnimations];
 }
 
 - (void)receiveSentEvent {
@@ -1141,7 +1145,14 @@
         self.imageStatusIconImageView.alpha = 0.0f;
         self.imageTimestampStatusContainerView.alpha = 1.0f;
         self.starIconBottomImageView.alpha = 0.0f;
-        self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+        
+        if(self.message.isMessageEdited){
+            NSString *editedMessageString = [NSString stringWithFormat:@"Edited • %@", [TAPUtil getMessageTimestampText:self.message.created]];
+            self.imageTimestampLabel.text = editedMessageString;
+        }
+        else{
+            self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+        }
         
         [self setInnerImageStatusIcon];
     }
@@ -1771,54 +1782,16 @@
 }
 
 - (void)setThumbnailImageForVideoWithMessage:(TAPMessageModel *)message {
-    NSDictionary *dataDictionary = message.data;
-    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
-    
-    NSString *urlKey = [dataDictionary objectForKey:@"url"];
-    if (urlKey == nil || [urlKey isEqualToString:@""]) {
-        urlKey = [dataDictionary objectForKey:@"fileURL"];
+    [TAPImageView imageFromCacheWithMessage:message
+    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+        [self.bubbleImageView setImage:savedImage];
+        [self getImageSizeFromImage:savedImage];
+        [self.contentView layoutIfNeeded];
     }
-    urlKey = [TAPUtil nullToEmptyString:urlKey];
-    if (![urlKey isEqualToString:@""]) {
-        urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
-    }
-    
-    NSString *fileID = [dataDictionary objectForKey:@"fileID"];
-    fileID = [TAPUtil nullToEmptyString:fileID];
-    
-    if (![urlKey isEqualToString:@""]) {
-        [TAPImageView imageFromCacheWithKey:urlKey message:message
-        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            [self.bubbleImageView setImage:savedImage];
-            [self getImageSizeFromImage:savedImage];
-            [self.contentView layoutIfNeeded];
-        }
-        failure:^(TAPMessageModel *resultMessage) {
-            [TAPImageView imageFromCacheWithKey:fileID message:message
-            success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-                [self.bubbleImageView setImage:savedImage];
-                [self getImageSizeFromImage:savedImage];
-                [self.contentView layoutIfNeeded];
-            }
-            failure:^(TAPMessageModel *resultMessage) {
-                [self setSmallThumbnailFromMessageData:dataDictionary];
-            }];
-        }];
-    }
-    else if (![fileID isEqualToString:@""]) {
-        [TAPImageView imageFromCacheWithKey:fileID message:message
-        success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            [self.bubbleImageView setImage:savedImage];
-            [self getImageSizeFromImage:savedImage];
-            [self.contentView layoutIfNeeded];
-        }
-        failure:^(TAPMessageModel *resultMessage) {
-            [self setSmallThumbnailFromMessageData:dataDictionary];
-        }];
-    }
-    else {
+    failure:^(NSError *error, TAPMessageModel *receivedMessage) {
+        NSDictionary *dataDictionary = message.data;
         [self setSmallThumbnailFromMessageData:dataDictionary];
-    }
+    }];
 }
 
 - (void)setSmallThumbnailFromMessageData:(NSDictionary *)messageDataDictionary {

@@ -277,6 +277,7 @@
         
         TAPRoomListTableViewCell *cell = [[TAPRoomListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
         TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
+        cell.tableView = tableView;
         [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:NO];
         
         if (indexPath.row == [self.roomListArray count] - 1) {
@@ -1319,6 +1320,8 @@
             roomLastMessage.isRead = message.isRead;
             roomLastMessage.isDelivered = message.isDelivered;
             roomLastMessage.isHidden = message.isHidden;
+            roomLastMessage.body = message.body;
+            
             
             NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];

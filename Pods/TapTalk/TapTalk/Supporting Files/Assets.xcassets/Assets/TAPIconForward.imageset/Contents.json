@@ -1,23 +1,23 @@
 {
   "images" : [
     {
+      "filename" : "forward.png",
       "idiom" : "universal",
-      "filename" : "TAPIconForward.png",
       "scale" : "1x"
     },
     {
+      "filename" : "forward@2x.png",
       "idiom" : "universal",
-      "filename" : "TAPIconForward@2x.png",
       "scale" : "2x"
     },
     {
+      "filename" : "forward@3x.png",
       "idiom" : "universal",
-      "filename" : "TAPIconForward@3x.png",
       "scale" : "3x"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }

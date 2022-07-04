@@ -56,6 +56,8 @@
 @property (nonatomic) BOOL isMarkAsUnreadRoomListSwipeMenuDisabled;
 @property (nonatomic) BOOL isStarMessageMenuDisabled;
 @property (nonatomic) BOOL isSendVoiceNoteMenuDisabled;
+@property (nonatomic) BOOL isEditMessageMenuDisabled;
+@property (nonatomic) BOOL isDeleteAccountButtonVisible;
 
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -947,10 +949,39 @@ Show or hide voice note menu from message bubble long press & chat profile
 
 
 /**
-Get current status of voice noite menu from message bubble long press & chat profile
+Get current status of edit message menu from message bubble long press & chat profile
 */
 - (BOOL)isSendVoiceNoteMenuEnabled{
     return !self.isSendVoiceNoteMenuDisabled;
+}
+
+/**
+Show or hide edit message menu from message bubble long press & chat profile
+*/
+- (void)setEditMessageMenuEnabled:(BOOL)isEnabled {
+    _isEditMessageMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of voice noite menu from message bubble long press & chat profile
+*/
+- (BOOL)isEditMessageMenuEnabled{
+    return !self.isEditMessageMenuDisabled;
+}
+
+/**
+Show or hide delete account button in my account
+*/
+- (void)setDeleteAccountButtonVisible:(BOOL)isVisible {
+    _isDeleteAccountButtonVisible = isVisible;
+}
+
+/**
+Get current visibility state of  delete account button in my account 
+*/
+- (BOOL)getDeleteAccountButtonVisible {
+    return self.isDeleteAccountButtonVisible;
 }
 
 

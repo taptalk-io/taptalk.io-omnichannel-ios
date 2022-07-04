@@ -1825,6 +1825,16 @@
             return color;
             break;
         }
+        case TTLTextColorCreateFormTitle: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TTLTextColorCreateFormDescription: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextLight];
+            return color;
+            break;
+        }
             
         default: {
             //Set default color to black to prevent crash

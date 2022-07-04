@@ -10,7 +10,7 @@
 #import <Foundation/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
 #import "TTLCreateCaseViewController.h"
-#import "TTLRoomListViewController.h"
+#import "TTLCaseListViewController.h"
 
 //! Project version number for TapTalkLive.
 FOUNDATION_EXPORT double TapTalkLiveVersionNumber;
@@ -41,7 +41,7 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 + (TapTalkLive *_Nonnull)sharedInstance;
 
 //Property
-- (TTLRoomListViewController *_Nonnull)roomListViewController;
+- (TTLCaseListViewController *_Nonnull)roomListViewController;
 
 //==========================================================
 //            UIApplicationDelegate Handling
@@ -129,6 +129,10 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
  */
 - (void)initWithSecretKey:(NSString *_Nonnull)secretKey;
 
+- (void)initWithSecretKey:(NSString *_Nonnull)secretKey
+                  success:(void (^)(void))success
+                  failure:(void (^)(NSString *errorMessage))failure;
+
 /**
  Set Google Places API Key to pick and obtain location when send location chat
  */
@@ -168,7 +172,8 @@ Called to show TapTalk Live view with push animation
 /**
 Obtain main view controller of TapTalk Live
 */
-- (TTLRoomListViewController *_Nonnull)getTapTalkLiveViewMainController;
+//- (TTLRoomListViewController *_Nonnull)getTapTalkLiveViewMainController;
+- (TTLCaseListViewController *_Nonnull)getTapTalkLiveViewMainController;
 
 /**
 Authenticate and log in user with name and email

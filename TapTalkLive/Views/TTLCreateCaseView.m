@@ -41,7 +41,7 @@
         //500.0f used for still show orange color background dragging up when scrolling
         //END DV Note
         _topBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, -500.0f, CGRectGetWidth([UIScreen mainScreen].bounds), 244.0f + 500.0f)];
-        self.topBackgroundView.backgroundColor = [TTLUtil getColor:@"FF7D00"];
+        self.topBackgroundView.backgroundColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
         [self.scrollView addSubview:self.topBackgroundView];
         
         CGFloat topGap = 20.0f;
@@ -60,7 +60,7 @@
         self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.headerView addSubview:self.logoImageView];
         
-        _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 24.0f, CGRectGetMinY(self.logoImageView.frame) + 12.0f, 24.0f, 24.0f)];
+        _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(14.0f, topGap + 16.0f + 14.0f, 28.0f, 28.0f)];
         self.closeImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         TTLImage *closeIconImage = (TTLImage *) self.closeImageView.image;
         closeIconImage = (TTLImage *) [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
@@ -68,30 +68,30 @@
         self.closeImageView.alpha = 0.0f;
         [self.headerView addSubview:self.closeImageView];
         
-        _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.closeImageView.frame) - 8.0f, CGRectGetMinY(self.closeImageView.frame) - 8.0f, 40.0f, 40.0f)];
+        _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, topGap + 16.0f, 56.0f, 56.0f)];
         self.closeButton.alpha = 0.0f;
         self.closeButton.userInteractionEnabled = NO;
         [self.headerView addSubview:self.closeButton];
         
-        _leftCloseImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(12.0f, topGap + 16.0f, 24.0f, 24.0f)];
-        self.leftCloseImageView.image = (TTLImage *) [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
-        TTLImage *leftCloseIconImage = (TTLImage *) self.leftCloseImageView.image;
-        leftCloseIconImage = (TTLImage *) [leftCloseIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
-        self.leftCloseImageView.image = leftCloseIconImage;
-        self.leftCloseImageView.alpha = 0.0f;
-        [self.headerView addSubview:self.leftCloseImageView];
+//        _leftCloseImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(12.0f, topGap + 16.0f, 24.0f, 24.0f)];
+//        self.leftCloseImageView.image = (TTLImage *) [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+//        TTLImage *leftCloseIconImage = (TTLImage *) self.leftCloseImageView.image;
+//        leftCloseIconImage = (TTLImage *) [leftCloseIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
+//        self.leftCloseImageView.image = leftCloseIconImage;
+//        self.leftCloseImageView.alpha = 0.0f;
+//        [self.headerView addSubview:self.leftCloseImageView];
         
-        _leftCloseButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.leftCloseImageView.frame) - 8.0f, CGRectGetMinY(self.leftCloseImageView.frame) - 8.0f, 40.0f, 40.0f)];
-        self.leftCloseButton.alpha = 0.0f;
-        self.leftCloseButton.userInteractionEnabled = NO;
-        [self.headerView addSubview:self.leftCloseButton];
+//        _leftCloseButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.leftCloseImageView.frame) - 8.0f, CGRectGetMinY(self.leftCloseImageView.frame) - 8.0f, 40.0f, 40.0f)];
+//        self.leftCloseButton.alpha = 0.0f;
+//        self.leftCloseButton.userInteractionEnabled = NO;
+//        [self.headerView addSubview:self.leftCloseButton];
         
-        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(12.0f, CGRectGetMaxY(self.logoImageView.frame) + 16.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 12.0f - 12.0f, 36.0f)];
+        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, CGRectGetMaxY(self.closeButton.frame) + 16.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 36.0f)];
         self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Need help with anything?", nil, [TTLUtil currentBundle], @"");
         UIFont *obtainedTitleLabelFont = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
         obtainedTitleLabelFont = [obtainedTitleLabelFont fontWithSize:24.0f];
         self.titleLabel.font = obtainedTitleLabelFont;
-        self.titleLabel.textColor = [UIColor whiteColor];
+        self.titleLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorCreateFormTitle];
         [self.headerView addSubview:self.titleLabel];
         
         _subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.titleLabel.frame), 48.0f)];
@@ -100,7 +100,7 @@
         UIFont *obtainedSubtitleLabelFont = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
         obtainedSubtitleLabelFont = [obtainedSubtitleLabelFont fontWithSize:16.0f];
         self.subtitleLabel.font = obtainedSubtitleLabelFont;
-        self.subtitleLabel.textColor = [UIColor whiteColor];
+        self.subtitleLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorCreateFormDescription];
         CGSize subtitleSize = [self.subtitleLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.subtitleLabel.frame), CGFLOAT_MAX)];
         self.subtitleLabel.frame = CGRectMake(CGRectGetMinX(self.subtitleLabel.frame), CGRectGetMinY(self.subtitleLabel.frame), CGRectGetWidth(self.subtitleLabel.frame), subtitleSize.height);
         [self.headerView addSubview:self.subtitleLabel];
@@ -111,12 +111,20 @@
         //500.0f used for still show orange color background dragging up when scrolling
         //END DV Note
         self.topBackgroundView.frame = CGRectMake(CGRectGetMinX(self.topBackgroundView.frame), CGRectGetMinY(self.topBackgroundView.frame), CGRectGetWidth(self.topBackgroundView.frame), CGRectGetMaxY(self.headerView.frame) + 56.0f + topGap + 500.0f);
-                
-        _formHeaderContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.headerView.frame) + 24.0f, CGRectGetWidth(self.titleLabel.frame), 12.0f)];
-        self.formHeaderContainerView.backgroundColor = [TTLUtil getColor:@"FFE7D0"];
+        
+        UIView *formHeaderBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.headerView.frame) + 24.0f, CGRectGetWidth(self.titleLabel.frame), 12.0f)];
+        formHeaderBackgroundView.backgroundColor = [UIColor whiteColor];
+        CAShapeLayer *headerBackgroundViewLayer = [CAShapeLayer layer];
+        headerBackgroundViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:formHeaderBackgroundView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerTopRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
+        formHeaderBackgroundView.layer.mask = headerBackgroundViewLayer;
+        [self.scrollView addSubview:formHeaderBackgroundView];
+
+        _formHeaderContainerView = [[UIView alloc] initWithFrame:formHeaderBackgroundView.frame];
+        self.formHeaderContainerView.backgroundColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
         CAShapeLayer *headerContainerViewLayer = [CAShapeLayer layer];
         headerContainerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.formHeaderContainerView.bounds byRoundingCorners: UIRectCornerTopLeft | UIRectCornerTopRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
         self.formHeaderContainerView.layer.mask = headerContainerViewLayer;
+        self.formHeaderContainerView.alpha = 0.1f;
         [self.scrollView addSubview:self.formHeaderContainerView];
         
         _formContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.formHeaderContainerView.frame), CGRectGetWidth(self.titleLabel.frame), 100.0f)];
@@ -263,30 +271,29 @@
             topGap = 44.0f;
         }
         
-        self.logoImageView.frame = CGRectMake(12.0f, topGap + 16.0f, 48.0f, 48.0f);
-        self.closeImageView.frame = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 24.0f, CGRectGetMinY(self.logoImageView.frame) + 12.0f, 24.0f, 24.0f);
-        self.closeButton.frame = CGRectMake(CGRectGetMinX(self.closeImageView.frame) - 8.0f, CGRectGetMinY(self.closeImageView.frame) - 8.0f, 40.0f, 40.0f);
+//        self.logoImageView.frame = CGRectMake(12.0f, topGap + 16.0f, 48.0f, 48.0f);
+//        self.closeImageView.frame = CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 24.0f, CGRectGetMinY(self.logoImageView.frame) + 12.0f, 24.0f, 24.0f);
+//        self.closeButton.frame = CGRectMake(CGRectGetMinX(self.closeImageView.frame) - 8.0f, CGRectGetMinY(self.closeImageView.frame) - 8.0f, 40.0f, 40.0f);
         self.closeButton.userInteractionEnabled = YES;
         self.closeButton.alpha = 1.0f;
         self.closeImageView.alpha = 1.0f;
 
+//        self.leftCloseImageView.frame = CGRectZero;
+//        self.leftCloseButton.frame = CGRectZero;
+//        self.leftCloseButton.userInteractionEnabled = NO;
+//        self.leftCloseButton.alpha = 0.0f;
+//        self.leftCloseImageView.alpha = 0.0f;
         
-        self.leftCloseImageView.frame = CGRectZero;
-        self.leftCloseButton.frame = CGRectZero;
-        self.leftCloseButton.userInteractionEnabled = NO;
-        self.leftCloseButton.alpha = 0.0f;
-        self.leftCloseImageView.alpha = 0.0f;
-        
-        self.titleLabel.frame = CGRectMake(12.0f, CGRectGetMaxY(self.logoImageView.frame) + 16.0f, CGRectGetWidth(self.titleLabel.frame), CGRectGetHeight(self.titleLabel.frame));
-        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Need help with anything?", nil, [TTLUtil currentBundle], @"");
-        self.subtitleLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.titleLabel.frame), 48.0f);
-        self.headerView.frame = CGRectMake(CGRectGetMinX(self.headerView.frame), CGRectGetMinY(self.headerView.frame), CGRectGetWidth(self.headerView.frame), CGRectGetMaxY(self.subtitleLabel.frame));
-             
-        self.topBackgroundView.frame = CGRectMake(CGRectGetMinX(self.topBackgroundView.frame), CGRectGetMinY(self.topBackgroundView.frame), CGRectGetWidth(self.topBackgroundView.frame), CGRectGetMaxY(self.headerView.frame) + 56.0f + topGap + 500.0f);
-                     
-        self.formHeaderContainerView.frame = CGRectMake(CGRectGetMinX(self.formHeaderContainerView.frame), CGRectGetMaxY(self.headerView.frame) + 24.0f, CGRectGetWidth(self.formHeaderContainerView.frame), CGRectGetHeight(self.formHeaderContainerView.frame));
-        
-         self.formContainerView.frame = CGRectMake(CGRectGetMinX(self.formContainerView.frame), CGRectGetMaxY(self.formHeaderContainerView.frame), CGRectGetWidth(self.formContainerView.frame), CGRectGetMaxY(self.createCaseButtonView.frame) + 16.0f);
+//        self.titleLabel.frame = CGRectMake(12.0f, CGRectGetMaxY(self.logoImageView.frame) + 16.0f, CGRectGetWidth(self.titleLabel.frame), CGRectGetHeight(self.titleLabel.frame));
+//        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Need help with anything?", nil, [TTLUtil currentBundle], @"");
+//        self.subtitleLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.titleLabel.frame), 48.0f);
+//        self.headerView.frame = CGRectMake(CGRectGetMinX(self.headerView.frame), CGRectGetMinY(self.headerView.frame), CGRectGetWidth(self.headerView.frame), CGRectGetMaxY(self.subtitleLabel.frame));
+//
+//        self.topBackgroundView.frame = CGRectMake(CGRectGetMinX(self.topBackgroundView.frame), CGRectGetMinY(self.topBackgroundView.frame), CGRectGetWidth(self.topBackgroundView.frame), CGRectGetMaxY(self.headerView.frame) + 56.0f + topGap + 500.0f);
+//
+//        self.formHeaderContainerView.frame = CGRectMake(CGRectGetMinX(self.formHeaderContainerView.frame), CGRectGetMaxY(self.headerView.frame) + 24.0f, CGRectGetWidth(self.formHeaderContainerView.frame), CGRectGetHeight(self.formHeaderContainerView.frame));
+//
+//         self.formContainerView.frame = CGRectMake(CGRectGetMinX(self.formContainerView.frame), CGRectGetMaxY(self.formHeaderContainerView.frame), CGRectGetWidth(self.formContainerView.frame), CGRectGetMaxY(self.createCaseButtonView.frame) + 16.0f);
          CAShapeLayer *containerViewLayer = [CAShapeLayer layer];
          containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.formContainerView.bounds byRoundingCorners: UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
          self.formContainerView.layer.mask = containerViewLayer;
@@ -299,31 +306,30 @@
                  topGap = 44.0f;
              }
         
-        self.logoImageView.frame = CGRectZero;
-        self.closeImageView.frame = CGRectZero;
-        self.closeButton.frame = CGRectZero;
-        self.closeButton.userInteractionEnabled = NO;
-        self.closeButton.alpha = 0.0f;
-        self.closeImageView.alpha = 0.0f;
-
+//        self.logoImageView.frame = CGRectZero;
+//        self.closeImageView.frame = CGRectZero;
+//        self.closeButton.frame = CGRectZero;
+//        self.closeButton.userInteractionEnabled = NO;
+//        self.closeButton.alpha = 0.0f;
+//        self.closeImageView.alpha = 0.0f;
+  
+//        self.leftCloseImageView.frame = CGRectMake(12.0f, topGap + 16.0f, 24.0f, 24.0f);
+//        self.leftCloseButton.frame = CGRectMake(CGRectGetMinX(self.leftCloseImageView.frame) - 8.0f, CGRectGetMinY(self.leftCloseImageView.frame) - 8.0f, 40.0f, 40.0f);
+//        self.leftCloseButton.userInteractionEnabled = YES;
+//        self.leftCloseButton.alpha = 1.0f;
+//        self.leftCloseImageView.alpha = 1.0f;
         
-        self.leftCloseImageView.frame = CGRectMake(12.0f, topGap + 16.0f, 24.0f, 24.0f);
-        self.leftCloseButton.frame = CGRectMake(CGRectGetMinX(self.leftCloseImageView.frame) - 8.0f, CGRectGetMinY(self.leftCloseImageView.frame) - 8.0f, 40.0f, 40.0f);
-        self.leftCloseButton.userInteractionEnabled = YES;
-        self.leftCloseButton.alpha = 1.0f;
-        self.leftCloseImageView.alpha = 1.0f;
-        
-        self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.leftCloseImageView.frame) + 12.0f, CGRectGetMinY(self.leftCloseImageView.frame) - 6.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetMaxX(self.leftCloseImageView.frame) - 12.0f - 12.0f, CGRectGetHeight(self.titleLabel.frame));
-        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"New message", nil, [TTLUtil currentBundle], @"");
-        
-        self.subtitleLabel.frame = CGRectMake(CGRectGetMinX(self.subtitleLabel.frame), CGRectGetMaxY(self.titleLabel.frame), CGRectGetWidth(self.subtitleLabel.frame), 0.0f);
-         self.headerView.frame = CGRectMake(CGRectGetMinX(self.headerView.frame), CGRectGetMinY(self.headerView.frame), CGRectGetWidth(self.headerView.frame), CGRectGetMaxY(self.subtitleLabel.frame));
-        
-        self.topBackgroundView.frame = CGRectMake(CGRectGetMinX(self.topBackgroundView.frame), CGRectGetMinY(self.topBackgroundView.frame), CGRectGetWidth(self.topBackgroundView.frame), CGRectGetMaxY(self.headerView.frame) + 56.0f + topGap + 500.0f);
-                     
-        self.formHeaderContainerView.frame = CGRectMake(CGRectGetMinX(self.formHeaderContainerView.frame), CGRectGetMaxY(self.headerView.frame) + 24.0f, CGRectGetWidth(self.formHeaderContainerView.frame), CGRectGetHeight(self.formHeaderContainerView.frame));
-        
-         self.formContainerView.frame = CGRectMake(CGRectGetMinX(self.formContainerView.frame), CGRectGetMaxY(self.formHeaderContainerView.frame), CGRectGetWidth(self.formContainerView.frame), CGRectGetMaxY(self.createCaseButtonView.frame) + 16.0f);
+//        self.titleLabel.frame = CGRectMake(CGRectGetMaxX(self.leftCloseImageView.frame) + 12.0f, CGRectGetMinY(self.leftCloseImageView.frame) - 6.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetMaxX(self.leftCloseImageView.frame) - 12.0f - 12.0f, CGRectGetHeight(self.titleLabel.frame));
+//        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"New message", nil, [TTLUtil currentBundle], @"");
+//
+//        self.subtitleLabel.frame = CGRectMake(CGRectGetMinX(self.subtitleLabel.frame), CGRectGetMaxY(self.titleLabel.frame), CGRectGetWidth(self.subtitleLabel.frame), 0.0f);
+//         self.headerView.frame = CGRectMake(CGRectGetMinX(self.headerView.frame), CGRectGetMinY(self.headerView.frame), CGRectGetWidth(self.headerView.frame), CGRectGetMaxY(self.subtitleLabel.frame));
+//
+//        self.topBackgroundView.frame = CGRectMake(CGRectGetMinX(self.topBackgroundView.frame), CGRectGetMinY(self.topBackgroundView.frame), CGRectGetWidth(self.topBackgroundView.frame), CGRectGetMaxY(self.headerView.frame) + 56.0f + topGap + 500.0f);
+//
+//        self.formHeaderContainerView.frame = CGRectMake(CGRectGetMinX(self.formHeaderContainerView.frame), CGRectGetMaxY(self.headerView.frame) + 24.0f, CGRectGetWidth(self.formHeaderContainerView.frame), CGRectGetHeight(self.formHeaderContainerView.frame));
+//
+//         self.formContainerView.frame = CGRectMake(CGRectGetMinX(self.formContainerView.frame), CGRectGetMaxY(self.formHeaderContainerView.frame), CGRectGetWidth(self.formContainerView.frame), CGRectGetMaxY(self.createCaseButtonView.frame) + 16.0f);
          CAShapeLayer *containerViewLayer = [CAShapeLayer layer];
          containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.formContainerView.bounds byRoundingCorners: UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
          self.formContainerView.layer.mask = containerViewLayer;
@@ -331,6 +337,5 @@
          self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame));
     }
 }
-
 
 @end

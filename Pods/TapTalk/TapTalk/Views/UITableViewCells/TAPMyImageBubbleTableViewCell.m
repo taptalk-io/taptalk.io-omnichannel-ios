@@ -164,7 +164,7 @@
     
     _maxWidth = (CGRectGetWidth([UIScreen mainScreen].bounds) * 2.0f / 3.0f) - 16.0f; //two third of screen, and 16.0f is right padding.
     _maxHeight = self.maxWidth / 234.0f * 300.0f; //234.0f and 300.0f are width and height constraint on design
-    _minWidth = (self.maxWidth / 3.0f); //one third of max Width
+    _minWidth = (self.maxWidth / 2.0f); //one third of max Width
     _minHeight = self.minWidth / 78.0f * 100.0f; //78.0f and 100.0f are width and height constraint on design
     
     self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
@@ -276,6 +276,7 @@
     [super prepareForReuse];
     
     self.thumbnailBubbleImageView.image = nil;
+    self.bubbleImageView.image = nil;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
     self.openImageButton.alpha = 0.0f;
@@ -284,8 +285,8 @@
     self.starIconBottomImageView.alpha = 0.0f;
     self.checkMarkIconImageView.alpha = 0.0f;
     
-    self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
-    self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
+//    self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
+//    self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
@@ -641,10 +642,15 @@
     CGFloat timestampWidthWithMargin = 0.0f;
     if ([captionString isEqual:@""]) {
         timestampWidthWithMargin = CGRectGetWidth(self.imageTimestampStatusContainerView.frame) + (6.0f * 2);
+        CGFloat radians = atan2f(self.transform.b, self.transform.a);
+        NSInteger degrees = radians * (180 / M_PI);
+        if(degrees == 0){
+            timestampWidthWithMargin += 20.0f;
+        }
     }
     else {
         CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
-        timestampWidthWithMargin = timestampTextSize.width + 4.0f + CGRectGetWidth(self.imageStatusIconImageView.frame);
+        timestampWidthWithMargin = timestampTextSize.width + 4.0f + CGRectGetWidth(self.imageStatusIconImageView.frame) + 50.0f;
     }
     if (self.minWidth < timestampWidthWithMargin) {
         _minWidth = timestampWidthWithMargin;
@@ -721,7 +727,7 @@
     
     NSString *fileID = [dataDictionary objectForKey:@"fileID"];
     fileID = [TAPUtil nullToEmptyString:fileID];
-    
+
     NSString *urlKey = [dataDictionary objectForKey:@"url"];
     if (urlKey == nil || [urlKey isEqualToString:@""]) {
         urlKey = [dataDictionary objectForKey:@"fileURL"];
@@ -731,24 +737,38 @@
         urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
     }
     
+    CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
+    CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
+    [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
+    self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+    self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+    
+    [self setSmallThumbnailFromMessageData:message.data];
     if ((fileID == nil || [fileID isEqualToString:@""]) && (urlKey == nil || [urlKey isEqualToString:@""])) {
-        [TAPImageView imageFromCacheWithKey:message.localID message:message
+        [TAPImageView imageFromCacheWithMessage:message
         success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            [self getImageSizeFromImage:savedImage];
-            
-            self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-            self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-            [self.contentView layoutIfNeeded];
+            if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+            ) {
+                [self getImageSizeFromImage:savedImage];
+                self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+                self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+            }
             [self.bubbleImageView setImage:savedImage];
+            [self.contentView layoutIfNeeded];
         }
-        failure:^(TAPMessageModel *resultMessage) {
+        failure:^(NSError *error, TAPMessageModel *receivedMessage) {
             if (urlKey != nil && ![urlKey isEqualToString:@""]) {
                 [self.bubbleImageView setImageWithURLString:[dataDictionary objectForKey:@"url"]];
-                if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
-                    self.bubbleImageViewWidthConstraint.constant = 240.0f;
-                }
-                if (self.bubbleImageViewHeightConstraint.constant == 0.0f) {
-                    self.bubbleImageViewHeightConstraint.constant = 240.0f;
+                if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                    (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                ) {
+                    if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
+                        self.bubbleImageViewWidthConstraint.constant = 240.0f;
+                    }
+                    if (self.bubbleImageViewHeightConstraint.constant == 0.0f) {
+                        self.bubbleImageViewHeightConstraint.constant = 240.0f;
+                    }
                 }
                 [self.contentView layoutIfNeeded];
             }
@@ -761,11 +781,14 @@
                     PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
                     PHAsset *imageAsset = [fetchResult firstObject];
                     if (imageAsset != nil) {
-                        [self getImageSizeWithWidth:(CGFloat)imageAsset.pixelWidth
-                                             height:(CGFloat)imageAsset.pixelHeight];
-                        
-                        self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-                        self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+                        if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                            (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                        ) {
+                            [self getImageSizeWithWidth:(CGFloat)imageAsset.pixelWidth
+                                                 height:(CGFloat)imageAsset.pixelHeight];
+                            self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+                            self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+                        }
                         
                         PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
                         requestOptions.synchronous = NO;
@@ -788,37 +811,50 @@
                     }
                     else {
                         // Image data not found
-                        self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
-                        self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
-                        [self.contentView layoutIfNeeded];
+                        if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                            (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                        ) {
+                            self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
+                            self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
+                            [self.contentView layoutIfNeeded];
+                        }
                     }
                 }
                 else {
                     // Image data not found
-                    self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
-                    self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
-                    [self.contentView layoutIfNeeded];
+                    if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                        (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                    ) {
+                        self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
+                        self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
+                        [self.contentView layoutIfNeeded];
+                    }
                 }
             }
         }];
     }
     else {
         if (self.currentFileKey == nil || ![self.currentFileKey isEqualToString:fileID] || ![self.currentFileKey isEqualToString:urlKey]) {
-            //Cell is reused for different image, set image to nil first to prevent last image shown when load new image
-            self.bubbleImageView.image = nil;
+            // Cell is reused for different image, set image to nil first to prevent last image shown when load new image
+            //self.bubbleImageView.image = nil;
+            [self setSmallThumbnailFromMessageData:message.data];
         }
-        
+
         //already called fetchImageDataWithMessage function in view controller for fetch image
         //so no need to set the image here
         //just save the height and width constraint
         
-        CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
-        CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
-        [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
-        self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-        self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+        if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+            (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+        ) {
+            CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
+            CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
+            [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
+            self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+            self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+        }
         [self.contentView layoutIfNeeded];
-        
+
         if (![urlKey isEqualToString:@""]) {
             _currentFileKey = urlKey;
         }
@@ -848,6 +884,122 @@
     [self.bubbleImageView.layer removeAllAnimations];
     [self.thumbnailBubbleImageView.layer removeAllAnimations];
     [self.captionLabel.layer removeAllAnimations];
+    [self.imageTimestampStatusContainerView.layer removeAllAnimations];
+    [self.imageTimestampLabel.layer removeAllAnimations];
+    [self.checkMarkIconImageView.layer removeAllAnimations];
+    [self.imageStatusIconImageView.layer removeAllAnimations];
+}
+
+- (void)setSmallThumbnailFromMessageData:(NSDictionary *)messageDataDictionary {
+    NSString *thumbnailImageBase64String = [messageDataDictionary objectForKey:@"thumbnail"];
+    thumbnailImageBase64String = [TAPUtil nullToEmptyString:thumbnailImageBase64String];
+    if ([thumbnailImageBase64String isEqualToString:@""]) {
+        return;
+    }
+    NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    UIImage *image = [UIImage imageWithData:thumbnailImageData];
+    if (image != nil) {
+        self.bubbleImageView.image = image;
+        [self getImageSizeFromImage:image];
+        [self.contentView layoutIfNeeded];
+    }
+}
+
+- (void)editMessage:(TAPMessageModel *)message {
+    if (message == nil) {
+        return;
+    }
+    
+//    _message = message;
+    [super setMessage:message];
+    
+    NSDictionary *dataDictionary = message.data;
+    dataDictionary = [TAPUtil nullToEmptyDictionary:dataDictionary];
+
+    NSString *captionString = [dataDictionary objectForKey:@"caption"];
+    captionString = [TAPUtil nullToEmptyString:captionString];
+    
+    [self setImageCaptionWithString:captionString];
+    
+    CGFloat timestampWidthWithMargin = 0.0f;
+    if ([captionString isEqual:@""]) {
+        timestampWidthWithMargin = CGRectGetWidth(self.imageTimestampStatusContainerView.frame) + (6.0f * 2);
+    }
+    else {
+        CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+        timestampWidthWithMargin = timestampTextSize.width + 4.0f + CGRectGetWidth(self.imageStatusIconImageView.frame) + 50.0f;
+    }
+    if (self.minWidth < timestampWidthWithMargin) {
+        _minWidth = timestampWidthWithMargin;
+    }
+    
+    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
+        [self showForwardView:YES];
+        [self setForwardData:message.forwardFrom];
+        _isShowForwardView = YES;
+    }
+    else {
+        [self showForwardView:NO];
+        _isShowForwardView = NO;
+    }
+    
+    if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
+        //reply to exists
+        
+        //if reply exists check if image in quote exists
+        //if image exists  change view to Quote View
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 11.0f;
+        }
+        [self.contentView layoutIfNeeded];
+        
+        if([message.quote.content isEqualToString:@"🎤 Voice"]){
+            [self showReplyView:YES withMessage:message];
+            [self showQuoteView:NO];
+        }
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+            [self showReplyView:NO withMessage:nil];
+            [self showQuoteView:YES];
+            [self setQuote:message.quote userID:message.replyTo.userID];
+        }
+        else {
+            [self showReplyView:YES withMessage:message];
+            [self showQuoteView:NO];
+        }
+    }
+    else if (![message.quote.title isEqualToString:@""] && message.quote != nil) {
+        //quote exists
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 11.0f;
+        }
+        [self.contentView layoutIfNeeded];
+        
+        [self showReplyView:NO withMessage:nil];
+        [self setQuote:message.quote userID:@""];
+        [self showQuoteView:YES];
+    }
+    else {
+        
+        if (self.isShowForwardView) {
+            self.forwardTitleLabelTopConstraint.constant = 10.0f;
+        }
+        else {
+            self.forwardTitleLabelTopConstraint.constant = 0.0f;
+        }
+        [self.contentView layoutIfNeeded];
+        
+        [self showReplyView:NO withMessage:nil];
+        [self showQuoteView:NO];
+    }
+    
 }
 
 - (void)receiveSentEvent {
@@ -1417,7 +1569,14 @@
         self.imageStatusIconImageView.alpha = 0.0f;
         self.imageTimestampStatusContainerView.alpha = 1.0f;
         self.starIconBottomImageView.alpha = 0.0f;
-        self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+        
+        if(self.message.isMessageEdited){
+            NSString *editedMessageString = [NSString stringWithFormat:@"Edited • %@", [TAPUtil getMessageTimestampText:self.message.created]];
+            self.imageTimestampLabel.text = editedMessageString;
+        }
+        else{
+            self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
+        }
         
         [self setInnerImageStatusIcon];
     }
@@ -1535,8 +1694,10 @@
         return;
     }
     
-    self.bubbleImageView.image = image;
     [self getImageSizeFromImage:image];
+    self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+    self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+    [self.bubbleImageView setImage:image];
     [self.contentView layoutIfNeeded];
 }
 
