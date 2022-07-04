@@ -45,7 +45,7 @@ Pod::Spec.new do |s|
 
     # ――― Prefix Header ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.prefix_header_contents ='#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+DVSecureUserDefaults.h"', '#import "PodAsset.h"', '#import "TTLConfigs.h"', '#import "TTLStyle.h"', '#import "TapTalkLive.h"', '#import "TTLUtil.h"', '#import "TTLImageView.h"', '#import "TTLImage.h"', '#import "TTLCustomDropDownTextFieldView.h"', '#import "TTLFormGrowingTextView.h"', '#import "TTLCustomButtonView.h"', '#import "TTLStyleManager.h"', '#import "TTLAPIManager.h"', '#import "TTLDataManager.h"', '#import "TTLNetworkManager.h"', '#import "TTLUserModel.h"', '#import "TTLCaseModel.h"', '#import "TTLTopicModel.h"'
+    s.prefix_header_contents ='#import "AFNetworkActivityIndicatorManager.h"', '#import "NSUserDefaults+DVSecureUserDefaults.h"', '#import "PodAsset.h"', '#import "TTLConfigs.h"', '#import "TTLStyle.h"', '#import "TapTalkLive.h"', '#import "TTLUtil.h"', '#import "TTLImageView.h"', '#import "TTLImage.h"', '#import "TTLCaseListViewController.h"', '#import "TTLCustomDropDownTextFieldView.h"', '#import "TTLFormGrowingTextView.h"', '#import "TTLCustomButtonView.h"', '#import "TTLStyleManager.h"', '#import "TTLAPIManager.h"', '#import "TTLDataManager.h"', '#import "TTLNetworkManager.h"', '#import "TTLUserModel.h"', '#import "TTLCaseModel.h"', '#import "TTLTopicModel.h"', '#import "TTLTapTalkRoomModel.h"'
     # ――― Bundle ------―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
     
     s.resource_bundles = {

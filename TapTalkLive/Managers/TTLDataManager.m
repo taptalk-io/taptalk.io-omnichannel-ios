@@ -8,6 +8,7 @@
 
 #import "TTLDataManager.h"
 #import "TTLAPIManager.h"
+#import "TTLTapTalkRoomModel.h"
 #import "TAPDataManager.h"
 #import "TAPEncryptorManager.h"
 
