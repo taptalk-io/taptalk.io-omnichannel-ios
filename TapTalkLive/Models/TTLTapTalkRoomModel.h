@@ -6,7 +6,7 @@
 //
 
 #import "TTLBaseModel.h"
-#import "TAPMessageModel.h"
+#import <TapTalk/TAPMessageModel.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

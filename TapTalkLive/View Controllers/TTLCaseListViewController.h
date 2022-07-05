@@ -7,7 +7,7 @@
 //
 
 #import "TTLBaseViewController.h"
-#import "TAPRoomListModel.h"
+#import <TapTalk/TAPRoomListModel.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

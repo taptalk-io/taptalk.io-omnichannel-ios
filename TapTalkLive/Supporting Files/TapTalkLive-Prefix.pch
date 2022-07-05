@@ -22,6 +22,7 @@
 #import "TTLImageView.h"
 #import "TTLImage.h"
 #import "TTLCustomDropDownTextFieldView.h"
+#import "TTLCaseListViewController.h"
 #import "TTLFormGrowingTextView.h"
 #import "TTLCustomButtonView.h"
 #import "TTLStyleManager.h"
@@ -31,6 +32,8 @@
 #import "TTLUserModel.h"
 #import "TTLCaseModel.h"
 #import "TTLTopicModel.h"
+#import "TTLTapTalkRoomModel.h"
+#import "TAPMessageModel.h"
 
 #endif /* TapTalkLive_Prefix_pch */
 
