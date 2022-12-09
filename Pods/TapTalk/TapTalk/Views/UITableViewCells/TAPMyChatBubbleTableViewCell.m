@@ -38,7 +38,13 @@
 @property (strong, nonatomic) IBOutlet UIButton *retryButton;
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
+
+@property (weak, nonatomic) IBOutlet UIView *linkPreviewContainerView;
+@property (weak, nonatomic) IBOutlet UILabel *linkPreviewTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *linkPreviewBodyLabel;
+@property (weak, nonatomic) IBOutlet TAPImageView *linkPreviewImageView;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -74,9 +80,19 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconLeadingConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconTrailingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *timestampLabelTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusIconTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewImageHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *linkPreviewViewHeightConstraint;
+
+
 
 @property (strong, nonatomic) UITapGestureRecognizer *bubbleViewTapGestureRecognizer;
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
@@ -86,6 +102,8 @@
 @property (nonatomic) BOOL isOnSendingAnimation;
 @property (nonatomic) BOOL isShouldChangeStatusAsDelivered;
 @property (nonatomic) BOOL isShouldChangeStatusAsRead;
+
+@property (strong, nonatomic) NSURL *messageURL;
 
 - (IBAction)replyButtonDidTapped:(id)sender;
 - (IBAction)retryButtonDidTapped:(id)sender;
@@ -118,9 +136,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
     
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 1.0f;
@@ -135,6 +151,7 @@
     self.quoteImageView.delegate = self;
     
     self.fileBackgroundView.layer.cornerRadius = 24.0f;
+    
     
     self.swipeReplyView.layer.cornerRadius = CGRectGetHeight(self.swipeReplyView.frame) / 2.0f;
     self.swipeReplyView.backgroundColor = [[[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary] colorWithAlphaComponent:0.3f];
@@ -176,6 +193,8 @@
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
     
+    self.linkPreviewImageView.layer.cornerRadius = 8.0f;
+    
     [self setBubbleCellStyle];
     
     self.mentionIndexesArray = [[NSArray alloc] init];
@@ -207,6 +226,16 @@
     self.forwardCheckmarkButton.alpha = 0.0f;
     self.starIconLeadingConstraint.constant = 0.0f;
     self.starIconWidthConstraint.constant = 0.0f;
+    self.bubbleHighlightView.alpha = 0.0f;
+    self.statusLabelBottomConstraint.constant = 8.0f;
+    self.pinIconTrailingConstraint.constant = 0.0f;
+    self.pinIconImageView.alpha = 0.0f;
+    self.linkPreviewContainerView.alpha = 0.0f;
+    self.timestampLabelTopConstraint.constant = -35.0f;
+    self.statusIconTopConstraint.constant = -35.0f;
+    self.linkPreviewImageHeightConstraint.constant = 0.0f;
+    self.linkPreviewViewHeightConstraint.constant = 0.0f;
+    [self showQuoteView:NO];
     [self.contentView layoutIfNeeded];
 }
 
@@ -493,6 +522,12 @@
     self.timestampLabel.textColor = timestampLabelColor;
     self.timestampLabel.font = timestampLabelFont;
     
+    self.linkPreviewTitleLabel.textColor = quoteTitleColor;
+    self.linkPreviewTitleLabel.font = quoteTitleFont;
+    
+    self.linkPreviewBodyLabel.textColor = quoteContentColor;
+    self.linkPreviewBodyLabel.font = quoteContentFont;
+    
     UIImage *sendingImage = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     self.sendingIconImageView.image = sendingImage;
     
@@ -505,10 +540,8 @@
     if(message == nil) {
         return;
     }
-    
 //    _message = message;
     [super setMessage:message];
-    
     
     if ((![message.replyTo.messageID isEqualToString:@"0"] && ![message.replyTo.messageID isEqualToString:@""]) && ![message.quote.title isEqualToString:@""] && message.quote != nil && message.replyTo != nil) {
         //reply to exists
@@ -518,7 +551,7 @@
             [self showReplyView:YES withMessage:message];
             [self showQuoteView:NO];
         }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             
@@ -606,8 +639,67 @@
 
     self.bubbleLabel.attributedText = attributedString;
     
+    //link preview
+    NSDictionary *data = message.data;
+    NSString *url= [data objectForKey:@"url"];
+    
+    NSString *linkPreviewTitle = [data objectForKey:@"title"];
+    NSString *linkPreviewBody = [data objectForKey:@"description"];
+    NSString *linkPreviewImageUrl= [data objectForKey:@"image"];
+    
+    linkPreviewTitle = [TAPUtil nullToEmptyString:linkPreviewTitle];
+    linkPreviewBody = [TAPUtil nullToEmptyString:linkPreviewBody];
+    linkPreviewImageUrl = [TAPUtil nullToEmptyString:linkPreviewImageUrl];
+    
+    if(url != nil && [[TapUI sharedInstance] getLinkPreviewInMessageEnabled] && (![linkPreviewTitle isEqualToString:@""] || ![linkPreviewBody isEqualToString:@""] || ![linkPreviewImageUrl isEqualToString:@""])) {
+        //show link preview
+        self.linkPreviewContainerView.alpha = 1.0f;
+        self.timestampLabelTopConstraint.constant = 2.0f;
+        self.statusIconTopConstraint.constant = 2.0f;
+        self.messageURL = url;
+        
+        self.linkPreviewTitleLabel.text = linkPreviewTitle;
+        self.linkPreviewBodyLabel.text = linkPreviewBody;
+        
+        if(![linkPreviewImageUrl isEqualToString:@""]) {
+            self.linkPreviewImageHeightConstraint.constant = 170.0f;
+           // [self.linkPreviewImageView setImageWithURLString:linkPreviewImageUrl];
+            NSURL *urlImage = [NSURL URLWithString:linkPreviewImageUrl];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:urlImage];
+            [request addValue:@"image/*" forHTTPHeaderField:@"Accept"];
+            [self.linkPreviewImageView setImageWithURLRequest:request placeholderImage:nil success:^(NSURLRequest *request, NSHTTPURLResponse * _Nullable response, UIImage *image){
+                if(image != nil){
+                    [self.linkPreviewImageView setImage:image];
+                }
+                else{
+                    self.linkPreviewImageHeightConstraint.constant = 0.0f;
+                    self.linkPreviewImageView.image = nil;
+                }
+            } failure:^(NSURLRequest *request, NSHTTPURLResponse * _Nullable response, NSError *error){
+                self.linkPreviewImageHeightConstraint.constant = 0.0f;
+                self.linkPreviewImageView.image = nil;
+            }];
+        }
+        else{
+            self.linkPreviewImageHeightConstraint.constant = 0.0f;
+            self.linkPreviewImageView.image = nil;
+        }
+    }
+    else {
+        //hide link preview
+        self.linkPreviewContainerView.alpha = 0.0f;
+        self.linkPreviewViewHeightConstraint.constant = 0.0f;
+        self.linkPreviewImageHeightConstraint.constant = 0.0f;
+        self.timestampLabelTopConstraint.constant = -35.0f;
+        self.statusIconTopConstraint.constant = -35.0f;
+        self.linkPreviewTitleLabel.text = @"";
+        self.linkPreviewBodyLabel.text = @"";
+        self.linkPreviewImageView.image = nil;
+    }
+    
     //remove animation
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -713,6 +805,11 @@
         [self.delegate myChatQuoteViewDidTapped:self.message];
     }
 }
+- (IBAction)linkPreviewButtonDidTapped:(id)sender {
+    if([self.delegate respondsToSelector:@selector(myChatBubbleDidTappedUrl:originalString:)]) {
+        [self.delegate myChatBubbleDidTappedUrl:[NSURL URLWithString:self.messageURL] originalString:@""];
+    }
+}
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
     if (show) {
@@ -793,25 +890,24 @@
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
         self.starIconLeadingConstraint.constant = 6.0f;
-        self.starIconWidthConstraint.constant = 12.0f;
+        self.starIconWidthConstraint.constant = 10.0f;
     }
     else{
         self.starIconImageView.alpha = 0.0f;
         self.starIconLeadingConstraint.constant = 0.0f;
         self.starIconWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
     }
 }
 
 - (void)showCheckMarkIcon:(BOOL)isShow {
     if(isShow){
         self.checkMarkIconImageView.alpha = 1.0f;
-        self.panGestureRecognizer.enabled = NO;
         self.bubbleViewLongPressGestureRecognizer.enabled = NO;
         self.forwardCheckmarkButton.alpha = 1.0f;
     }
     else{
         self.checkMarkIconImageView.alpha = 0.0f;
-        self.panGestureRecognizer.enabled = YES;
         self.bubbleViewLongPressGestureRecognizer.enabled = YES;
         self.forwardCheckmarkButton.alpha = 0.0f;
     }
@@ -829,8 +925,9 @@
 
 - (void)showSeperator {
     self.seperatorViewHeightConstarint.constant = 1.0f;
-    self.seperatorViewTopConstraint.constant = 16.0f;
-    self.seperatorViewBottomConstraint.constant = 6.0f;
+    //self.seperatorViewTopConstraint.constant = 16.0f;
+    //self.seperatorViewBottomConstraint.constant = 6.0f;
+    self.statusLabelBottomConstraint.constant = 30.0;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }
@@ -895,6 +992,23 @@
         if ([self.delegate respondsToSelector:@selector(myChatBubbleLongPressedWithMessage:)]) {
             [self.delegate myChatBubbleLongPressedWithMessage:self.message];
         }
+    }
+}
+
+- (void)setSwipeGestureEnable:(BOOL)enable {
+    self.panGestureRecognizer.enabled = enable;
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+        self.pinIconTrailingConstraint.constant = 7.0f;
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
     }
 }
 

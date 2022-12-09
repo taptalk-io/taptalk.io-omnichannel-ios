@@ -8,6 +8,7 @@
 
 #import "TAPBaseViewController.h"
 #import "TAPRoomModel.h"
+#import "TAPMessageModel.h"
 #import "TAPMediaPreviewModel.h"
 
 typedef NS_ENUM(NSInteger, TapUIChatViewControllerType) {
@@ -23,6 +24,11 @@ typedef NS_ENUM(NSInteger, TapUIChatViewControllerType) {
  Triggered when chat room will disappear and needs to update unread bubble in TapUIRoomListViewController
  */
 - (void)chatViewControllerShouldUpdateUnreadBubbleForRoomID:(NSString *)roomID;
+
+/**
+ Triggered when chat room will disappear and needs to update last in TapUIRoomListViewController
+ */
+- (void)chatViewControllerDidCloseWithRoomIDLastMessage:(NSString *)roomID lastMeesage:(TAPMessageModel *)lastMessage;
 
 /**
  Triggered to clear unread bubble in TapUIRoomListViewController
@@ -93,5 +99,10 @@ Show left menu icon as keyboard state
 Show left menu icon as custom keyboard option state
 */
 - (void)setKeyboardStateOption;
+
+/**
+Trigger chat view controller's back button tapped
+*/
+- (void)backButtonDidTapped;
 
 @end

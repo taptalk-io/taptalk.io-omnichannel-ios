@@ -358,6 +358,36 @@
     });
 }
 
++ (void)loadForwardRoomListSuccess:(void (^)(NSArray *resultArray))success
+                    failure:(void (^)(NSError *error))failure {
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        RLMRealm *realm = [[TAPDatabaseManager sharedManager] createRealm];
+        
+        RLMResults *results = [TAPMessageRealmModel allObjectsInRealm:realm];
+
+        results = [results objectsWhere:@"isHidden == 0"];
+        results = [results objectsWhere:@"roomIsDeleted == 0"];
+        results = [results sortedResultsUsingKeyPath:@"created" ascending:NO];
+        results = [results distinctResultsUsingKeyPaths:@[@"roomID"]];
+        
+        NSArray *resultArray = [NSArray array];
+        resultArray = [[TAPDatabaseManager sharedManager] convertRealmResultIntoArray:results];
+        
+//        [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+//            // handle error
+//            dispatch_async(dispatch_get_main_queue(), ^{
+//                failure(error);
+//            });
+//        }];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            success(resultArray);
+        });
+    });
+}
+
 + (void)insertDataToDatabaseWithData:(NSArray *)dataArray
                            tableName:(NSString *)tableName
                              success:(void (^)(void))success
@@ -702,7 +732,7 @@
     
     // Set the new schema version. This must be greater than the previously used
     // version (if you've never set a schema version before, the version is 0).
-    configuration.schemaVersion = 7;
+    configuration.schemaVersion = 8;
     
     //NOTES - CHANGES
     //SCHEMA VERSION - 1
@@ -718,12 +748,16 @@
     //Add roomIsDeleted, roomDeleted  in TAPMessageRealmModel
     //SCHEMA VERSION - 6 - 24 January 2019
     //Add roomIsLocked, xcRoomID in TAPMessageRealmModel
-
+    //SCHEMA VERSION - 7
+    //Add roomIsLocked, xcRoomID in TAPMessageRealmModel
+    //SCHEMA VERSION - 8 - 27 July 2022
+    //Add forwardFromRoomID in TAPMessageRealmModel
+    
     // Set the block which will be called automatically when opening a Realm with a
     // schema version lower than the one set above
     configuration.migrationBlock = ^(RLMMigration *migration, uint64_t oldSchemaVersion) {
         // We haven’t migrated anything yet, so oldSchemaVersion == 7
-        if (oldSchemaVersion < 7) {
+        if (oldSchemaVersion < 8) {
             // Nothing to do!
             // Realm will automatically detect new properties and removed properties
             // And will update the schema on disk automatically

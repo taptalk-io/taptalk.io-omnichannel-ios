@@ -13,6 +13,9 @@
 #import "TAPProjectConfigsModel.h"
 #import "TAPCoreConfigsModel.h"
 #import "TAPPhotoListModel.h"
+#import "TAPMutedRoomModel.h"
+#import "TAPScheduledMessageModel.h"
+#import "TAPClearedRoomModel.h"
 
 @import AFNetworking;
 
@@ -31,8 +34,16 @@
 + (TAPCoreConfigsModel *)getCoreConfigs;
 + (void)setUnreadRoomIDs:(NSArray *)roomIDs;
 + (NSArray *)getUnreadRoomIDs;
-
-
++ (void)setLatestPinnedWithMessageRoomID:(TAPMessageModel *)message roomID:(NSInteger)roomID;
++ (NSMutableDictionary *)getLatestPinnedMessage;
++ (void)setPinnedRoomIDs:(NSArray *)roomIDs;
++ (NSArray *)getPinnedRoomIDs;
++ (void)setMutedRoomDictionary:(NSMutableDictionary *)mutedRoomDictionaryList;
++ (NSMutableDictionary *)getMutedRoomDictionary;
++ (void)setLastRoomMessageDeleteTime:(long)timestamp;
++ (long)getLastRoomMessageDeleteTime;
++ (void)setPendingScheduleMessages:(NSArray *)scheduleMessages;
++ (NSArray *)getPendingScheduleMessages;
 + (void)updateMessageToFailedWhenClosedInDatabase;
 + (void)updateMessageToFailedWithLocalID:(NSString *)localID;
 + (void)setMessageLastUpdatedWithRoomID:(NSString *)roomID lastUpdated:(NSNumber *)lastUpdated;
@@ -121,6 +132,8 @@
                         failure:(void (^)(NSError *error))failure;
 + (void)getRoomListSuccess:(void (^)(NSArray *resultArray))success
                    failure:(void (^)(NSError *error))failure;
++ (void)getForwardRoomListSuccess:(void (^)(NSArray *resultArray))success
+                          failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseRecentSearchResultSuccess:(void (^)(NSArray<TAPRecentSearchModel *> *recentSearchArray, NSArray *unreadCountArray, NSDictionary *unreadMentionDictionary))success
                                      failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseAllUnreadMessagesWithSuccess:(void (^)(NSArray *unreadMessages))success
@@ -139,6 +152,16 @@
                                     numberOfItem:(NSInteger)numberOfItem
                                          success:(void (^)(NSArray *mediaMessages))success
                                          failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseFileMessagesInRoomWithRoomID:(NSString *)roomID
+                                   lastTimestamp:(NSString *)lastTimestamp
+                                    numberOfItem:(NSInteger)numberOfItem
+                                         success:(void (^)(NSArray *fileMessages))success
+                                        failure:(void (^)(NSError *error))failure;
++ (void)getDatabaseLinkMessagesInRoomWithRoomID:(NSString *)roomID
+                                   lastTimestamp:(NSString *)lastTimestamp
+                                    numberOfItem:(NSInteger)numberOfItem
+                                         success:(void (^)(NSArray *linkMessages))success
+                                        failure:(void (^)(NSError *error))failure;
 + (void)getDatabaseUnreadRoomCountWithActiveUserID:(NSString *)activeUserID
                                            success:(void (^)(NSArray *unreadRoomIDs))success
                                            failure:(void (^)(NSError *))failure;
@@ -402,7 +425,47 @@
 + (void)callAPIUnStarMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageID success:(void (^)(NSArray *messagesArray))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetStarredMessages:(NSString *)roomID pageNumber:(NSInteger)pageNumber numberOfItems:(NSInteger)numberOfItems success:(void (^)(NSArray *starredMessageIDs,BOOL hasMoreData))success failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetStarredMessageIDs:(NSString *)roomID success:(void (^)(NSMutableArray *starredMessageIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIPinMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageIDs success:(void (^)(NSArray *messageIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIUnPinMessage:(NSString *)roomID messageID:(NSArray<NSString *> *)messageIDs success:(void (^)(NSArray *messagesArray))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetPinnedMessages:(NSString *)roomID pageNumber:(NSInteger)pageNumber numberOfItems:(NSInteger)numberOfItems success:(void (^)(NSMutableArray *pinnedMessageIDs,BOOL hasMoreData))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetPinnedMessageIDs:(NSString *)roomID success:(void (^)(NSMutableArray *pinnedMessageIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPICheckDeleteAccountState:(void (^)(NSNumber *canDelete))success
+                                failure:(void (^)(NSError *error))failure;
++ (void)callAPIRequestVerificationCodeDeleteAccount:(NSString *)channel
+                                              success:(void (^)(NSString *OTPKey, NSString *OTPID, BOOL isSuccess, NSString *channelString, NSString *whatsAppFailureReason, NSInteger nextRequestSeconds, NSString *successMessage))success
+                                            failure:(void (^)(NSError *error))failure;
++ (void)callAPIVerifyDeleteAccoutOTP:(NSString *)OTPcode
+                               OTPID:(NSString *)OTPID
+                              OTPKey:(NSString *)OTPKey deletionReason:(NSString *)deletionReason success:(void (^)(NSNumber *isSuccess))success
+                             failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetSharedContent:(NSString *)roomID
+                     maxCreated:(long)maxCreated
+                     minCreated:(long)minCreated success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
+                        failure:(void (^)(NSError *error))failure;
+
++ (void)callAPIPinRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
+
++ (void)callAPIUnpinRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
+
++ (void)callAPIGetPinnedRoomIDs:(void (^)(NSMutableArray *pinnedRoomIDs))success failure:(void (^)(NSError *error))failure;
+
++ (NSDictionary *)dictionaryFromMessageModel:(TAPMessageModel *)message;
++ (void)callAPIMuteRoom:(NSArray<NSString *> *)roomIDs expiredAt:(NSNumber *)expiredAt success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIUnMuteRoom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetMutedRoomList:(void (^)(NSMutableArray<TAPMutedRoomModel *> *mutedRoomListArray))success failure:(void (^)(NSError *error))failure;
+
++ (void)callAPICreateScheduleMessage:(NSDictionary *)message scheduledTime:(NSNumber *)scheduledTime success:(void (^)(TAPMessageModel *scheduledMessage))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetScheduleMessage:(NSString *)roomID success:(void (^)(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIScheduleMessageSendNow:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID success:(void (^)(NSArray *scheduleIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIEditScheduleMessageTime:(NSNumber *)scheduleID scheduledTime:(NSNumber *)scheduledTime success:(void (^)(BOOL isEditTimeSuccess))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIEditScheduleMessageContent:(NSNumber *)scheduleID updatedMessage:(TAPMessageModel *)updatedMessage success:(void (^)(BOOL isEditContentSuccess))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIDeleteScheduleMessage:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID success:(void (^)(NSArray *deletedIDs))success failure:(void (^)(NSError *error))failure;
+
++ (void)callAPIDeleteChatroom:(NSArray<NSString *> *)roomIDs success:(void (^)(NSArray *roomIDs))success failure:(void (^)(NSError *error))failure;
++ (void)callAPIGetRoomIDsWithState:(void (^)(NSMutableArray<NSString *> *pinnedRoomIDsArray, NSMutableArray<TAPMutedRoomModel *> *mutedRoomModelArray, NSMutableArray<TAPClearedRoomModel *> *clearedRoomModelArray))success failure:(void (^)(NSError *error))failure;
+
 // Used to prevent inserting message to deleted chat room
 @property (strong, nonatomic) NSMutableArray<NSString *> *deletedRoomIDArray;
+
 
 @end

@@ -285,7 +285,7 @@ Obtain main view controller of TapTalk Live
     NSString *apiURLString;
     // FIXME: DEBUG URL CALLED IN PRODUCTION BUILD
 //#ifdef DEBUG
-//    apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor";
+//    apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor"; // DO NOT COMMIT
 //#else
     apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
 //#endif
@@ -319,9 +319,13 @@ Obtain main view controller of TapTalk Live
             [[TapUI sharedInstance] setReplyMessageMenuEnabled:YES];
             [[TapUI sharedInstance] setForwardMessageMenuEnabled:NO];
             [[TapUI sharedInstance] setMentionUsernameEnabled:NO];
-            [[TapUI sharedInstance] setStarMessageMenuEnabled:NO];
-            [[TapUI sharedInstance] setSendVoiceNoteMenuEnabled:NO];
+            [[TapUI sharedInstance] setDeleteMessageMenuEnabled:NO];
             [[TapUI sharedInstance] setEditMessageMenuEnabled:NO];
+            [[TapUI sharedInstance] setLocationAttachmentEnabled:NO];
+            [[TapUI sharedInstance] setSendVoiceNoteMenuEnabled:NO];
+            [[TapUI sharedInstance] setStarMessageMenuEnabled:NO];
+            [[TapUI sharedInstance] setPinMessageMenuEnabled:NO];
+            [[TapUI sharedInstance] setSavedMessagesMenuEnabled:NO];
             
             //Add custom bubble cell
             [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
@@ -410,7 +414,22 @@ Obtain main view controller of TapTalk Live
  
     [TTLDataManager callAPICreateUserWithFullName:fullName email:email success:^(TTLUserModel * _Nonnull user, NSString * _Nonnull ticket) {
         // Get TapTalkLive access token
-        [TTLDataManager callAPIGetAccessTokenWithTicket:ticket success:^{
+        [self requestAccessTokenWithAuthTicket:ticket success:success failure:failure];
+    } failure:^(NSError * _Nonnull error) {
+        // Error create user
+        failure(error);
+    }];
+}
+
+- (void)requestAccessTokenWithAuthTicket:(NSString *)authTicket
+                                 success:(void (^)(NSString *message))success
+                                 failure:(void (^)(NSError *error))failure {
+    
+    [TTLDataManager callAPIGetAccessTokenWithTicket:authTicket success:^{
+        if ([[TapTalk sharedInstance] isAuthenticated]) {
+            success(NSLocalizedString(@"Successfully authenticated.", @""));
+        }
+        else {
             // Obtain TapTalk auth ticket
             [TTLDataManager callAPIGetTapTalkAuthTicketSuccess:^(NSString * _Nonnull tapTalkAuthTicket) {
                 // Authenticate TapTalk.io Chat SDK
@@ -424,12 +443,9 @@ Obtain main view controller of TapTalk Live
                 // Error get TapTalk auth ticket
                 failure(error);
             }];
-        } failure:^(NSError * _Nonnull error) {
-            // Error get access token
-            failure(error);
-        }];
+        }
     } failure:^(NSError * _Nonnull error) {
-        // Error create user
+        // Error get access token
         failure(error);
     }];
 }

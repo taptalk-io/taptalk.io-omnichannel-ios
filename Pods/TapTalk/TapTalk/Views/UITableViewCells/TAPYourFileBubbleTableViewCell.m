@@ -44,6 +44,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *senderProfileImageButton;
 @property (strong, nonatomic) IBOutlet TAPImageView *senderImageView;
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *senderDeletedUserImageView;
 
 @property (strong, nonatomic) IBOutlet UIView *cancelView;
 @property (strong, nonatomic) IBOutlet UIView *downloadView;
@@ -61,6 +62,9 @@
 @property (weak, nonatomic) IBOutlet UIImageView *starIconImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
+@property (weak, nonatomic) IBOutlet UIButton *redirectArrowButton;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
+
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -102,6 +106,8 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
+
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
@@ -172,6 +178,8 @@
     self.statusLabelHeightConstraint.constant = 0.0f;
     self.statusLabel.alpha = 0.0f;
     
+    self.pinIconImageView.image = [self.pinIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorPinBackground]];
+    
     self.progressContainerView.layer.cornerRadius = CGRectGetHeight(self.innerBackgroundView.frame) / 2.0f;
     self.progressBarView.layer.cornerRadius = CGRectGetHeight(self.progressBarView.frame) / 2.0f;
     
@@ -181,9 +189,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
     
     self.replyView.layer.cornerRadius = 4.0f;
     self.replyView.clipsToBounds = YES;
@@ -256,6 +262,14 @@
     self.checkMarkIconImageView.alpha = 0.0f;
     self.senderImageViewLeadingConstraint.constant = 16.0f;
     self.forwardCheckmarkButton.alpha = 0.0f;
+    self.senderDeletedUserImageView.alpha = 0.0f;
+    self.redirectArrowButton.alpha = 0.0f;
+    self.bubbleHighlightView.alpha = 0.0f;
+    
+    self.statusLabelBottomConstraint.constant = 10.0f;
+    
+    self.pinIconImageView.alpha = 0.0f;
+    self.pinIconWidthConstraint.constant = 0.0f;
     
     [self showSenderInfo:NO];
 }
@@ -330,6 +344,7 @@
             self.replyButton.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.statusLabel.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             self.swipeReplyView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
+            self.redirectArrowButton.transform = CGAffineTransformMakeTranslation(translation.x, 0);
             
             self.swipeReplyView.alpha = translation.x / 50.0f;
         }
@@ -351,6 +366,7 @@
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
+                self.redirectArrowButton.transform = CGAffineTransformIdentity;
                 
                 self.swipeReplyView.alpha = 0.0f;
             } completion:^(BOOL finished) {
@@ -371,6 +387,7 @@
                 self.replyButton.transform = CGAffineTransformIdentity;
                 self.statusLabel.transform = CGAffineTransformIdentity;
                 self.swipeReplyView.transform = CGAffineTransformIdentity;
+                self.redirectArrowButton.transform = CGAffineTransformIdentity;
                 
                 self.swipeReplyView.alpha = 0.0f;
             } completion:^(BOOL finished) {
@@ -498,7 +515,9 @@
         
     _message = message;
     
-    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil) {
+    BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:message.room.roomID];
+    
+    if (![message.forwardFrom.localID isEqualToString:@""] && message.forwardFrom != nil && !isSavedMessageRoom) {
         [self showForwardView:YES];
         [self setForwardData:message.forwardFrom];
         _isShowForwardView = YES;
@@ -525,7 +544,7 @@
             [self showReplyView:YES withMessage:message];
             [self showQuoteView:NO];
         }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             [self setQuote:message.quote userID:message.replyTo.userID];
@@ -666,9 +685,9 @@
         if(message.user.deleted.longValue > 0){
             //set deleted account profil pict
             self.senderInitialView.alpha = 1.0f;
-            self.senderImageView.alpha = 1.0f;
-            self.senderImageView.image = [UIImage imageNamed:@"TAPIconDeletedUser" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-            self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+            self.senderImageView.alpha = 0.0f;
+            self.senderDeletedUserImageView.alpha = 1.0f;
+            self.senderInitialView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
             self.senderInitialLabel.text =@"";
         }
         else if ([thumbnailImageString isEqualToString:@""]) {
@@ -692,6 +711,93 @@
 
         self.senderNameLabel.text = fullNameString;
     }
+    else if(isSavedMessageRoom && (![message.forwardFrom.localID isEqualToString:@""] || message.forwardFrom != nil)){
+        [self showSenderInfo:YES];
+        
+        if(self.seperatorViewHeightConstraint.constant == 0){
+            self.redirectArrowButton.alpha = 1.0f;
+        }
+        
+        NSString *thumbnailImageString = @"";
+        
+        NSString *fullNameString = message.forwardFrom.fullname;
+        
+        self.senderNameLabel.text = fullNameString;
+        
+        NSString *userID = message.forwardFrom.userID;
+        
+        TAPUserModel *obtainedUser = [[TAPContactManager sharedManager] getUserWithUserID:userID];
+        
+        if(obtainedUser == nil) {
+            [TAPDataManager callAPIGetUserByUserID:userID success:^(TAPUserModel *user) {
+                NSString *thumbnailImageString = @"";
+                thumbnailImageString = user.imageURL.thumbnail;
+                thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
+                
+                if(message.user.deleted.longValue > 0 || user.deleted.longValue > 0){
+                    //set deleted account profil pict
+                    self.senderInitialView.alpha = 1.0f;
+                    self.senderImageView.alpha = 0.0f;
+                    self.senderDeletedUserImageView.alpha = 1.0f;
+                    self.senderInitialView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+                    self.senderInitialLabel.text =@"";
+                    self.senderNameLabel.text = @"Deleted User";
+                }
+                else if ([thumbnailImageString isEqualToString:@""]) {
+                    //No photo found, get the initial
+                    self.senderInitialView.alpha = 1.0f;
+                    self.senderImageView.alpha = 0.0f;
+                    self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+                    self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullNameString isGroup:NO];
+                }
+                else {
+                    if(![self.currentProfileImageURLString isEqualToString:thumbnailImageString]) {
+                        self.senderImageView.image = nil;
+                    }
+                    
+                    self.senderInitialView.alpha = 0.0f;
+                    self.senderImageView.alpha = 1.0f;
+                    [self.senderImageView setImageWithURLString:thumbnailImageString];
+                    _currentProfileImageURLString = thumbnailImageString;
+                }
+                
+            } failure:^(NSError *error) {
+                
+            }];
+        }
+        else {
+            thumbnailImageString = obtainedUser.imageURL.thumbnail;
+            thumbnailImageString = [TAPUtil nullToEmptyString:thumbnailImageString];
+            
+            if(message.user.deleted.longValue > 0 || obtainedUser.deleted.longValue > 0){
+                //set deleted account profil pict
+                self.senderInitialView.alpha = 1.0f;
+                self.senderImageView.alpha = 0.0f;
+                self.senderDeletedUserImageView.alpha = 1.0f;
+                self.senderInitialView.backgroundColor = [[TAPUtil getColor:@"191919"] colorWithAlphaComponent:0.4f];
+                self.senderInitialLabel.text =@"";
+                self.senderNameLabel.text = @"Deleted User";
+            }
+            else if ([thumbnailImageString isEqualToString:@""]) {
+                //No photo found, get the initial
+                self.senderInitialView.alpha = 1.0f;
+                self.senderImageView.alpha = 0.0f;
+                self.senderInitialView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:fullNameString];
+                self.senderInitialLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:fullNameString isGroup:NO];
+            }
+            else {
+                if(![self.currentProfileImageURLString isEqualToString:thumbnailImageString]) {
+                    self.senderImageView.image = nil;
+                }
+                
+                self.senderInitialView.alpha = 0.0f;
+                self.senderImageView.alpha = 1.0f;
+                [self.senderImageView setImageWithURLString:thumbnailImageString];
+                _currentProfileImageURLString = thumbnailImageString;
+            }
+        }
+        
+    }
     else {
         [self showSenderInfo:NO];
         self.senderImageView.image = nil;
@@ -710,7 +816,11 @@
     [self updateSpacingConstraint];
     
     //remove animation
+    [self.redirectArrowButton.layer removeAllAnimations];
+    [self.senderDeletedUserImageView.layer removeAllAnimations];
+    [self.senderInitialView.layer removeAllAnimations];
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -804,6 +914,13 @@
 - (IBAction)senderProfileImageButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(yourFileBubbleDidTappedProfilePictureWithMessage:)]) {
         [self.delegate yourFileBubbleDidTappedProfilePictureWithMessage:self.message];
+    }
+}
+
+
+- (IBAction)redirectArrowButtonDidTapped:(id)sender {
+    if ([self.delegate respondsToSelector:@selector(yourFileBubbleDidTappedRedirectArrowWithMessage:)]) {
+        [self.delegate yourFileBubbleDidTappedRedirectArrowWithMessage: self.message];
     }
 }
 
@@ -1217,14 +1334,12 @@
     if(isShow){
         self.checkMarkIconImageView.alpha = 1.0f;
         self.senderImageViewLeadingConstraint.constant = 40.0f;
-        self.panGestureRecognizer.enabled = NO;
         self.bubbleViewLongPressGestureRecognizer.enabled = NO;
         self.forwardCheckmarkButton.alpha = 1.0f;
     }
     else{
         self.checkMarkIconImageView.alpha = 0.0f;
         self.senderImageViewLeadingConstraint.constant = 16.0f;
-        self.panGestureRecognizer.enabled = YES;
         self.bubbleViewLongPressGestureRecognizer.enabled = YES;
         self.forwardCheckmarkButton.alpha = 0.0f;
     }
@@ -1240,9 +1355,25 @@
     }
 }
 
+- (void)setSwipeGestureEnable:(BOOL)enable {
+    self.panGestureRecognizer.enabled = enable;
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
+    }
+}
+
 - (void)showSeperator {
     self.seperatorViewHeightConstraint.constant = 1.0f;
     self.statusLabelBottomConstraint.constant = 33.0f;
+    self.redirectArrowButton.alpha = 0.0f;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }

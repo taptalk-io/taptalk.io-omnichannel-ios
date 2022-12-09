@@ -58,6 +58,13 @@
 @property (nonatomic) BOOL isSendVoiceNoteMenuDisabled;
 @property (nonatomic) BOOL isEditMessageMenuDisabled;
 @property (nonatomic) BOOL isDeleteAccountButtonVisible;
+@property (nonatomic) BOOL isSavedMessagesMenuDisabled;
+@property (nonatomic) BOOL isPinMessageMenuDisabled;
+@property (nonatomic) BOOL isMuteRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isPinRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isDeleteRoomListSwipeMenuDisabled;
+@property (nonatomic) BOOL isLinkPreviewInMessageDisabled;
+@property (nonatomic) BOOL isScheduledMessageFeatureDisabled;
 
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
@@ -355,6 +362,21 @@ scrollToMessageWithLocalID:(NSString *)messageLocalID
     chatViewController.delegate = [[TapUI sharedInstance] roomListViewController];
     chatViewController.scrollToMessageLocalIDString = messageLocalID;
     success(chatViewController);
+}
+
+- (void)createSavedMessagesChatRoom:(void (^)(TapUIChatViewController *chatViewController))success failure:(void (^)(NSError *error))failure {
+    //Open room
+    NSString *userID = [TAPDataManager getActiveUser].userID;
+    NSString *savedMessageRoomID = [NSString stringWithFormat:@"%@-%@", userID, userID];
+    TAPRoomModel *savedMessageRoom = [TAPRoomModel createPersonalRoomIDWithID:savedMessageRoomID name:@"Saved Messages" imageURL:nil];
+    
+    [[TAPCoreChatRoomManager sharedManager] getSavedMessagesChatRoom:^(TAPRoomModel *room){
+        [self createRoomWithRoom:savedMessageRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            success(chatViewController);
+        }];
+    } failure:^(NSError *error){
+        failure(error);
+    }];
 }
 
 /**
@@ -982,6 +1004,107 @@ Get current visibility state of  delete account button in my account
 */
 - (BOOL)getDeleteAccountButtonVisible {
     return self.isDeleteAccountButtonVisible;
+}
+
+/**
+Show or hide saved messages menu
+*/
+- (void)setSavedMessagesMenuEnabled:(BOOL)isEnabled {
+    _isSavedMessagesMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of saved messages menu
+*/
+- (BOOL)isSavedMessagesMenuEnabled{
+    return !self.isSavedMessagesMenuDisabled;
+}
+
+/**
+Show or hide pin messages menu
+*/
+- (void)setPinMessageMenuEnabled:(BOOL)isEnabled {
+    _isPinMessageMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of pin messages menu
+*/
+- (BOOL)isPinMessageMenuEnabled{
+    return !self.isPinMessageMenuDisabled;
+}
+
+/**
+ Enable or disable mute/unmute swipe in chat room list
+*/
+- (void)setMuteRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isMuteRoomListSwipeMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of  mute/unmute swipe in chat room list
+*/
+- (BOOL)getMuteRoomListSwipeMenuEnabled {
+    return !self.isMuteRoomListSwipeMenuDisabled;
+}
+
+/**
+Enable or disable pin room swipe in chat room list
+*/
+- (void)setPinRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isPinRoomListSwipeMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of link preview in chat room
+*/
+- (BOOL)getLinkPreviewInMessageEnabled {
+    return !self.isLinkPreviewInMessageDisabled;
+}
+
+/**
+Enable or disable link preview in chat room
+*/
+- (void)setLinkPreviewInMessageEnabled:(BOOL)isEnabled {
+    _isLinkPreviewInMessageDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of pin room swipe in chat room list
+*/
+- (BOOL)getPinRoomListSwipeMenuEnabled {
+    return !self.isPinRoomListSwipeMenuDisabled;
+}
+
+/**
+<<<<<<< HEAD
+Enable or disable Scheduled Message Feature
+*/
+- (void)setScheduledMessageFeatureEnabled:(BOOL)isEnabled {
+    _isScheduledMessageFeatureDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of pin room swipe in chat room list
+*/
+- (BOOL)getScheduledMessageFeatureEnabled {
+    return !self.isScheduledMessageFeatureDisabled;
+}
+
+/**
+ Enable or disable delete chatroom swipe in chat room list
+*/
+- (void)setDeleteRoomListSwipeMenuEnabled:(BOOL)isEnabled {
+    _isDeleteRoomListSwipeMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of  delete chatroom swipe in chat room list
+*/
+- (BOOL)getDeleteRoomListSwipeMenuEnabled {
+    return !self.isDeleteRoomListSwipeMenuDisabled;
 }
 
 

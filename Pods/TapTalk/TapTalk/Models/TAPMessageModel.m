@@ -43,16 +43,22 @@
     currentUserID = [TAPUtil nullToEmptyString:currentUserID];
     
     if (room.type == RoomTypePersonal) {
-        NSString *otherUserID = @"";
-        NSArray *userIDArray = [roomID componentsSeparatedByString:@"-"];
-        
-        for (NSString *userID in userIDArray) {
-            if (![userID isEqualToString:currentUserID]) {
-                otherUserID = userID;
-            }
+        if([TAPUtil isSaveMessageRoom:roomID]){
+            //saved message room
+            messageForReturn.recipientID = currentUserID;
         }
-        
-        messageForReturn.recipientID = otherUserID;
+        else{
+            NSString *otherUserID = @"";
+            NSArray *userIDArray = [roomID componentsSeparatedByString:@"-"];
+            
+            for (NSString *userID in userIDArray) {
+                if (![userID isEqualToString:currentUserID]) {
+                    otherUserID = userID;
+                }
+            }
+            
+            messageForReturn.recipientID = otherUserID;
+        }
     }
     else {
         //If group or channel set recipientID to 0
@@ -116,6 +122,9 @@
     quote.imageURL = [TAPUtil nullToEmptyString:[quotedMessage.data objectForKey:@"url"]];
     if (quote.imageURL == @"") {
         quote.imageURL = [TAPUtil nullToEmptyString:[quotedMessage.data objectForKey:@"imageURL"]];
+    }
+    if (quotedMessage.type == TAPChatMessageTypeLink) {
+        quote.imageURL = [TAPUtil nullToEmptyString:[quotedMessage.data objectForKey:@"image"]];
     }
     if (quotedMessage.type == TAPChatMessageTypeImage) {
         quote.fileType = @"image";

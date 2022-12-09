@@ -13,6 +13,7 @@
 @interface TAPNotificationManager () <TAPChatManagerDelegate, TAPCustomNotificationAlertViewControllerDelegate>
 
 @property (nonatomic) BOOL isViewIsAddedToSubview;
+@property (nonatomic) BOOL isScheduleMessage;
 
 @end
 
@@ -47,10 +48,17 @@
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
+    self.isScheduleMessage = NO;
+    [self handleIncomingMessage:message shouldShowNotification:YES];
+}
+
+- (void)chatManagerDidReceiveNewScheduleMessage:(TAPMessageModel *)message {
+    self.isScheduleMessage = YES;
     [self handleIncomingMessage:message shouldShowNotification:YES];
 }
 
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message {
+    self.isScheduleMessage = NO;
     [self handleIncomingMessage:message shouldShowNotification:NO];
 }
 
@@ -101,6 +109,11 @@
     
     TAPMessageModel *message = [TAPDataManager messageModelFromPayloadWithUserInfo:messageDictionary];
     
+    if (message.isRead || message.isDeleted || message.isHidden) {
+        // Remove notification if received message is read/deleted/hidden
+        [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:@[message.messageID]];
+    }
+    
     [[TAPNotificationManager sharedManager] handleIncomingMessage:message shouldShowNotification:NO];
 }
 
@@ -109,12 +122,7 @@
         return;
     }
     
-    if (message.type == TAPChatMessageTypeSystemMessage &&
-        [message.action isEqualToString:@"room/addParticipant"] &&
-        ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
-    ) {
-        [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:message.room.roomID];
-    }
+    [TAPUtil handleReceivedSystemMessage:message];
     
     //Insert message to database
     [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[message] success:^{
@@ -201,11 +209,23 @@
     //        return;
     //    }
     
+    //check is in muted
+    NSDictionary *mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
+    long currentTime = [TAPUtil currentTimeInMillis].longValue;
+    NSNumber *mutedExpiredAt = [mutedRoomDictionary objectForKey:message.room.roomID];
+    
+    if(mutedExpiredAt != nil && mutedExpiredAt.longValue > currentTime) {
+        //muted room
+        return;
+    }
+    
+    
+    
     if (!self.isViewIsAddedToSubview) {
         [self initCustomNotificationAlertViewController];
     }
     
-    [[TapUI sharedInstance].customNotificationAlertViewController showWithMessage:message];
+    [[TapUI sharedInstance].customNotificationAlertViewController showWithMessage:message isSchedule:self.isScheduleMessage];
 }
 
 - (void)initCustomNotificationAlertViewController {
@@ -224,10 +244,17 @@
     if (message == nil) {
         return;
     }
-
-    if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
-        [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];
-    }
+    
+    //Insert message to database
+    [TAPDataManager updateOrInsertDatabaseMessageInMainThreadWithData:@[message] success:^{
+        if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
+            [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];
+        }
+    } failure:^(NSError *error) {
+        if ([self.delegate respondsToSelector:@selector(notificationManagerDidHandleTappedNotificationWithMessage:)]) {
+            [self.delegate notificationManagerDidHandleTappedNotificationWithMessage:message];
+        }
+    }];
 }
 
 

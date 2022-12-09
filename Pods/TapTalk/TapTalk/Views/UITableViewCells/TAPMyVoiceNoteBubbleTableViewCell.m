@@ -57,7 +57,7 @@
 @property (weak, nonatomic) IBOutlet UISlider *audioSlider;
 @property (weak, nonatomic) IBOutlet UIImageView *checkMarkIconImageView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardCheckmarkButton;
-
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
 
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *statusLabelTopConstraint;
@@ -95,6 +95,11 @@
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *statusLabelBottomConstraint;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconTrailingConstraint;
+
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *bubbleViewLongPressGestureRecognizer;
 @property (strong, nonatomic) UIPanGestureRecognizer *panGestureRecognizer;
@@ -177,9 +182,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
     
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
     
     self.retryIconImageView.alpha = 0.0f;
     self.retryButton.alpha = 0.0f;
@@ -257,6 +260,11 @@
     self.retryButton.alpha = 0.0f;
     self.starIconImageView.alpha = 0.0f;
     self.checkMarkIconImageView.alpha = 0.0f;
+    self.pinIconImageView.alpha = 0.0f;
+    
+    self.pinIconWidthConstraint.constant = 0.0f;
+    self.starIconWidthConstraint.constant = 0.0f;
+    self.pinIconTrailingConstraint.constant = 0.0f;
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
@@ -264,6 +272,8 @@
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
+    
+    self.statusLabelBottomConstraint.constant = 10.0f;
     
     self.lastProgress = 0.0f;
     self.progressLayer.strokeEnd = 0.0f;
@@ -282,7 +292,7 @@
     documentsImage = [documentsImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconFileWhite]];
     self.voiceNoteImageView.image = documentsImage;
     self.doneDownloadImageView.image = documentsImage;
-    
+    self.bubbleHighlightView.alpha = 0.0f;
 }
 
 
@@ -554,7 +564,7 @@
             [self showReplyView:YES withMessage:message];
             [self showQuoteView:NO];
         }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             [self setQuote:message.quote userID:message.replyTo.userID];
@@ -678,6 +688,7 @@
     
     //remove animation
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -1235,22 +1246,26 @@
 - (void)showStarMessageView {
     if(self.starIconImageView.alpha == 0){
         self.starIconImageView.alpha = 1.0f;
+        self.starIconWidthConstraint.constant = 10.0f;
+        if(self.pinIconImageView.alpha > 0){
+            self.pinIconTrailingConstraint.constant = 7.0f;
+        }
     }
     else{
         self.starIconImageView.alpha = 0.0f;
+        self.starIconWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
     }
 }
 
 - (void)showCheckMarkIcon:(BOOL)isShow {
     if(isShow){
         self.checkMarkIconImageView.alpha = 1.0f;
-        self.panGestureRecognizer.enabled = NO;
         self.bubbleViewLongPressGestureRecognizer.enabled = NO;
         self.forwardCheckmarkButton.alpha = 1.0f;
     }
     else{
         self.checkMarkIconImageView.alpha = 0.0f;
-        self.panGestureRecognizer.enabled = YES;
         self.bubbleViewLongPressGestureRecognizer.enabled = YES;
         self.forwardCheckmarkButton.alpha = 0.0f; 
     }
@@ -1282,10 +1297,28 @@
     return [NSString stringWithFormat:@"%@.%@", minuteString, secondString];
 }
 
+- (void)setSwipeGestureEnable:(BOOL)enable {
+    self.panGestureRecognizer.enabled = enable;
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+        if(self.starIconImageView.alpha > 0){
+            self.pinIconTrailingConstraint.constant = 7.0f;
+        }
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingConstraint.constant = 0.0f;
+    }
+}
 
 - (void)showSeperator{
     self.seperatorViewHeightConstraint.constant = 1.0f;
-    self.statusLabelBottomConstraint.constant = 33.0f;
+    self.statusLabelBottomConstraint.constant = 32.0f;
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }

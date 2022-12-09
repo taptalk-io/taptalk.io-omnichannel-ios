@@ -122,6 +122,19 @@ Called when user click mention in the bubble chat.
 - (void)tapTalkMessageQuoteTappedWithUserInfo:(NSDictionary *)userInfo;
 
 /**
+ Called when multiple message selection (e.g. forward) is shown in active chat room
+ 
+ @param selectedMessages (NSArray<TAPMessageModel *> *) array of currently selected messages
+ */
+- (void)tapTalkChatRoomDidShowMessageSelection:(NSArray<TAPMessageModel *> *)selectedMessages;
+
+/**
+ Called when multiple message selection is hidden or cancelled in active chat room
+ 
+ */
+- (void)tapTalkChatRoomDidHideMessageSelection;
+
+/**
  Called when user click product bubble cell left option or single option button
  
  @param product (TAPProductModel *) selected product data
@@ -164,6 +177,15 @@ Called when user click mention in the bubble chat.
  @param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
  */
 - (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
+  currentShownNavigationController:(UINavigationController *)currentNavigationController;
+
+/**
+ Called when user click the close button on the top left side of room list view.
+ 
+ @param currentViewController (UIViewController *) current shown view controller
+ @param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
+ */
+- (void)tapTalkCloseRoomListButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController;
 
 @end
@@ -245,6 +267,58 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
                                                                recipient:(TAPUserModel * _Nullable)recipient;
 @end
 
+//==========================================================
+//         TapUIChatRoomCustomNavigationBarDelegate
+//==========================================================
+@protocol TapUIChatRoomCustomNavigationBarDelegate <NSObject>
+@optional
+
+/**
+Use to set custom title view for chat room navigation bar.
+ 
+@param currentChatViewController (TapUIChatViewController *) current shown chat view controller
+@param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
+@param room (TAPRoomModel *) current room
+@param activeUser (TapUserModel *) active user data
+@param recipientUser (TapUserModel *) recipient user data
+*/
+- (UIView *)setCustomChatRoomNavigationBarTitleView:(TapUIChatViewController *)currentChatViewController
+                        currentNavigationController:(UINavigationController *)currentNavigationController
+                                               room:(TAPRoomModel * _Nonnull)room
+                                         activeUser:(TAPUserModel * _Nonnull)activeUser
+                                      recipientUser:(TAPUserModel * _Nullable)recipientUser;
+
+/**
+Use to set custom left bar button view for chat room navigation bar.
+ 
+@param currentChatViewController (TapUIChatViewController *) current shown chat view controller
+@param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
+@param room (TAPRoomModel *) current room
+@param activeUser (TapUserModel *) active user data
+@param recipientUser (TapUserModel *) recipient user data
+*/
+- (NSArray<UIBarButtonItem *> *)setCustomChatRoomNavigationBarLeftBarButtonItems:(TapUIChatViewController *)currentChatViewController
+                                                     currentNavigationController:(UINavigationController *)currentNavigationController
+                                                                            room:(TAPRoomModel * _Nonnull)room
+                                                                      activeUser:(TAPUserModel * _Nonnull)activeUser
+                                                                   recipientUser:(TAPUserModel * _Nullable)recipientUser;
+
+/**
+Use to set custom right bar button view for chat room navigation bar.
+ 
+@param currentChatViewController (TapUIChatViewController *) current shown chat view controller
+@param currentNavigationController (UINavigationController *) current shown navigation controller, you can handle push or push using this navigation controller
+@param room (TAPRoomModel *) current room
+@param activeUser (TapUserModel *) active user data
+@param recipientUser (TapUserModel *) recipient user data
+*/
+- (NSArray<UIBarButtonItem *> *)setCustomChatRoomNavigationBarRightBarButtonItems:(TapUIChatViewController *)currentChatViewController
+                                                      currentNavigationController:(UINavigationController *)currentNavigationController
+                                                                             room:(TAPRoomModel * _Nonnull)room
+                                                                       activeUser:(TAPUserModel * _Nonnull)activeUser
+                                                                    recipientUser:(TAPUserModel * _Nullable)recipientUser;
+@end
+
 
 //==========================================================
 //             TapUIInAppNotificationDelegate
@@ -270,6 +344,7 @@ https://developer.taptalk.io/docs/event-delegate#section-tapuicustomkeyboarddele
 @property (weak, nonatomic) id<TapUIMyAccountDelegate> myAccountDelegate;
 @property (weak, nonatomic) id<TapUIChatProfileDelegate> chatProfileDelegate;
 @property (weak, nonatomic) id<TapUICustomKeyboardDelegate> customKeyboardDelegate;
+@property (weak, nonatomic) id<TapUIChatRoomCustomNavigationBarDelegate> chatRoomCustomNavigationBarDelegate;
 @property (weak, nonatomic) id<TapUIInAppNotificationDelegate> inAppNotificationDelegate;
 
 //Initalization
@@ -520,6 +595,13 @@ Get current visibility state of new group menu option
 - (void)createRoomWithRoom:(TAPRoomModel *)room
 scrollToMessageWithLocalID:(NSString *)messageLocalID
                    success:(void (^)(TapUIChatViewController *chatViewController))success;
+
+/**
+ Create saved message room
+ 
+
+ */
+- (void)createSavedMessagesChatRoom:(void (^)(TapUIChatViewController *chatViewController))success failure:(void (^)(NSError *error))failure;
 
 /**
 Show or hide profile button view in top right navigation in chat room view
@@ -806,7 +888,6 @@ Show or hide bio in user/group profile page
 - (BOOL)getEditBioTextFieldVisible;
 
 /**
-<<<<<<< HEAD
 Enable or disable mark as read swipe in chat room list
 */
 - (void)setMarkAsReadRoomListSwipeMenuEnabled:(BOOL)isEnabled;
@@ -866,6 +947,78 @@ Show or hide delete account button in my account
 Get current visibility state of  delete account button in my account
 */
 - (BOOL)getDeleteAccountButtonVisible;
+
+/**
+Show or hide saved messages menu
+*/
+- (void)setSavedMessagesMenuEnabled:(BOOL)isEnabled;
+
+
+/**
+Get current status of saved messages menu
+*/
+- (BOOL)isSavedMessagesMenuEnabled;
+
+/**
+Show or hide pin messages menu
+*/
+- (void)setPinMessageMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current status of pin messages menu
+*/
+- (BOOL)isPinMessageMenuEnabled;
+
+/**
+ Enable or disable mute/unmute swipe in chat room list
+*/
+- (void)setMuteRoomListSwipeMenuEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of  mute/unmute swipe in chat room list
+*/
+- (BOOL)getMuteRoomListSwipeMenuEnabled;
+
+/**
+Enable or disable pin room swipe in chat room list
+*/
+- (void)setPinRoomListSwipeMenuEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of pin room swipe in chat room list
+*/
+- (BOOL)getPinRoomListSwipeMenuEnabled;
+
+/**
+ Enable or disable delete chatroom swipe in chat room list
+*/
+- (void)setDeleteRoomListSwipeMenuEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of  delete chatroom swipe in chat room list
+*/
+- (BOOL)getDeleteRoomListSwipeMenuEnabled;
+
+/**
+Enable or disable link preview in chat room
+*/
+- (void)setLinkPreviewInMessageEnabled:(BOOL)isEnabled;
+
+/**
+<<<<<<< HEAD
+Enable or disable Scheduled Message Feature
+*/
+- (void)setScheduledMessageFeatureEnabled:(BOOL)isEnabled;
+
+/**
+ Get current isEnabled state of pin room swipe in chat room list
+*/
+- (BOOL)getScheduledMessageFeatureEnabled;
+
+/**
+ Get current isEnabled state of message bubble link preview in chat room
+*/
+- (BOOL)getLinkPreviewInMessageEnabled;
 
 
 @end

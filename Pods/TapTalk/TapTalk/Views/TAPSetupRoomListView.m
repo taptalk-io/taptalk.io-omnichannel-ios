@@ -68,7 +68,7 @@
         UIColor *popupBodyLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorPopupDialogBody];
         _descriptionFirstLoadLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleFirstLoadLabel.frame), CGRectGetMaxY(self.titleFirstLoadLabel.frame), CGRectGetWidth(self.titleFirstLoadLabel.frame), 18.0f)];
         self.descriptionFirstLoadLabel.textAlignment = NSTextAlignmentCenter;
-        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable conection", nil, [TAPUtil currentBundle], @"");
+        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable connection", nil, [TAPUtil currentBundle], @"");
         self.descriptionFirstLoadLabel.textColor = popupBodyLabelColor;
         self.descriptionFirstLoadLabel.font = popupBodyLabelFont;
         NSMutableDictionary *descriptionFirstLoadAttributesDictionary = [NSMutableDictionary dictionary];
@@ -119,9 +119,11 @@
         return;
     }
     
+    self.firstLoadView.backgroundColor = [UIColor whiteColor];
+    
     if (type == TAPSetupRoomListViewTypeSettingUp) {
         self.titleFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Setting up Your Chat Room", nil, [TAPUtil currentBundle], @"");
-        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable conection", nil, [TAPUtil currentBundle], @"");
+        self.descriptionFirstLoadLabel.text = NSLocalizedStringFromTableInBundle(@"Make sure you have a stable connection", nil, [TAPUtil currentBundle], @"");
         self.firstLoadImageView.image = [UIImage imageNamed:@"TAPIconLoaderProgress" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         self.firstLoadImageView.image = [self.firstLoadImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
         self.firstLoadCenterIconImageView.image = [UIImage imageNamed:@"TAPIconNewSettingUp" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -155,6 +157,35 @@
         self.retryLabel.alpha = 1.0f;
         self.retryIconImageView.alpha = 1.0f;
         self.retryButton.alpha = 1.0f;
+    }
+    else if (type == TAPSetupRoomListViewTypeLoading) {
+        self.titleFirstLoadLabel.alpha = 0.0f;
+        self.firstLoadImageView.alpha = 0.0f;
+        self.firstLoadImageView.image = [self.firstLoadImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconLoadingProgressPrimary]];
+        self.firstLoadCenterIconImageView.image = [UIImage imageNamed:@"TAPIconLoadingSmall" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+       // self.firstLoadCenterIconImageView.image = [self.firstLoadCenterIconImageView.image setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIcon]];
+
+        self.descriptionFirstLoadLabel.alpha = 0.0f;
+        self.retryLabel.alpha = 0.0f;
+        self.retryIconImageView.alpha = 0.0f;
+        self.retryButton.alpha = 0.0f;
+        
+        self.firstLoadView.backgroundColor = [UIColor clearColor];
+        
+        if ([self.firstLoadCenterIconImageView.layer animationForKey:@"SpinAnimation"] != nil) {
+            [self.firstLoadCenterIconImageView.layer removeAnimationForKey:@"SpinAnimation"];
+        }
+        
+        //Add Animation
+        if ([self.firstLoadCenterIconImageView.layer animationForKey:@"SpinAnimation"] == nil) {
+            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+            animation.fromValue = [NSNumber numberWithFloat:0.0f];
+            animation.toValue = [NSNumber numberWithFloat: 2 * M_PI];
+            animation.duration = 1.5f;
+            animation.repeatCount = INFINITY;
+            animation.removedOnCompletion = NO;
+            [self.firstLoadCenterIconImageView.layer addAnimation:animation forKey:@"FirstLoadSmallSpinAnimation"];
+        }
     }
 }
 
@@ -196,6 +227,9 @@
             //Remove Animation
             if ([self.firstLoadImageView.layer animationForKey:@"SpinAnimation"] != nil) {
                 [self.firstLoadImageView.layer removeAnimationForKey:@"SpinAnimation"];
+            }
+            if ([self.firstLoadCenterIconImageView.layer animationForKey:@"SpinAnimation"] != nil) {
+                [self.firstLoadCenterIconImageView.layer removeAnimationForKey:@"SpinAnimation"];
             }
         }];
     }

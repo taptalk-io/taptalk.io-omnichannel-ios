@@ -416,6 +416,14 @@
             return font;
             break;
         }
+        case TAPComponentFontChatProfileSharedMediaTabActiveLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_TABLEVIEW_SECTION_HEADER_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
         case TAPComponentFontContactListName:
         {
             
@@ -540,6 +548,30 @@
             
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:TAP_CHAT_PROFILE_MENU_DESTRUCTIVE_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontChatProfileSharedMediaSectionLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_CHAT_PROFILE_MENU_SHARED_MEDIA_SECTION_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontChatProfileSharedMediaEmptyTitleLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_CHAT_PROFILE_MENU_SHARED_MEDIA_EMPTY_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TAPComponentFontChatProfileSharedMediaEmptyBodyLabel:
+        {
+            
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_CHAT_PROFILE_MENU_SHARED_MEDIA_EMPTY_LABEL_FONTSIZE_STYLE];
             return font;
             break;
         }
@@ -1240,6 +1272,20 @@
             return font;
             break;
         }
+        case TAPComponentFontDatePickerTitleLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontBold];
+            font = [font fontWithSize:TAP_DATE_PICKER_TITLE_LABEL];
+            return font;
+            break;
+        }
+        case TAPComponentFontDatePickerCancelLabel:
+        {
+            UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
+            font = [font fontWithSize:TAP_DATE_PICKER_CANCEL_LABEL];
+            return font;
+            break;
+        }
         default: {
             UIFont *font = [[TAPStyleManager sharedManager] getDefaultFontForType:TAPDefaultFontRegular];
             font = [font fontWithSize:[UIFont systemFontSize]];
@@ -1513,8 +1559,18 @@
             return color;
             break;
         }
+        case TAPTextColorActionSheetButtonLabelPrimary: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
         case TAPTextColorTableViewSectionHeaderLabel: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorIconGray];
+            return color;
+            break;
+        }
+        case TAPTextColorSharedMediaSectionHeaderLabel: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorTextDark];
             return color;
             break;
         }
@@ -1544,6 +1600,11 @@
             break;
         }
         case TAPTextColorRoomListNameHighlighted: {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
+        case TAPTextColorChatRoomPinTitleLabel: {
             UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
@@ -2181,7 +2242,7 @@
         }
         case TAPComponentColorPopupDialogPrimaryButtonSuccessBackground:
         {
-            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorSuccess];
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
             return color;
             break;
         }
@@ -2293,6 +2354,12 @@
             return color;
             break;
         }
+        case TAPComponentColorPinBackground:
+        {
+            UIColor *color = [[TAPStyleManager sharedManager] getDefaultColorForType:TAPDefaultColorPrimary];
+            return color;
+            break;
+        }
         case TAPComponentColorRightVoiceNoteButtonBackground:
         {
             UIColor *color = [TAPUtil getColor:TAP_RIGHT_BUBBLE_VOICE_NOTE_BUTTON_COLOR];
@@ -2356,6 +2423,12 @@
         case TAPComponentColorSearchConnectionLostBackgroundColor:
         {
             UIColor *color = [TAPUtil getColor:TAP_SEARCH_CONNECTION_LOST_BACKGROUND_COLOR];
+            return color;
+            break;
+        }
+        case TAPComponentColorChatBubbleHighlightBackgroundColor:
+        {
+            UIColor *color = [TAPUtil getColor:TAP_CHAT_BUBBLE_HIGHLIGHT_BACKGROUND_COLOR];
             return color;
             break;
         }

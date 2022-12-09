@@ -87,6 +87,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorSelectedMediaPreviewThumbnailBorder,
     TAPComponentColorMediaPreviewWarningBackgroundColor,
     TAPComponentColorSearchConnectionLostBackgroundColor,
+    TAPComponentColorChatBubbleHighlightBackgroundColor,
     TAPComponentColorButtonIcon,
     TAPComponentColorButtonIconPrimary,
     TAPComponentColorButtonIconDestructive,
@@ -219,6 +220,7 @@ typedef NS_ENUM(NSInteger, TAPComponentColor) {
     TAPComponentColorIconCheckmarkSendToContactProfile, //Share Extension Profile Image with checkMark
     TAPComponentColorBackgroundCheckmarkSendToContact, //Share Extension backgroundColor checkmark on Profile Image with checkMark
     TAPComponentColorDefaultBackgroundTableView,
+    TAPComponentColorPinBackground,
 };
 
 typedef NS_ENUM(NSInteger, TAPTextColor) {
@@ -254,7 +256,9 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorActionSheetDefaultLabel,
     TAPTextColorActionSheetDestructiveLabel,
     TAPTextColorActionSheetCancelButtonLabel,
+    TAPTextColorActionSheetButtonLabelPrimary,
     TAPTextColorTableViewSectionHeaderLabel,
+    TAPTextColorSharedMediaSectionHeaderLabel,
     TAPTextColorContactListName,
     TAPTextColorContactListNameHighlighted,
     TAPTextColorContactListUsername,
@@ -358,6 +362,7 @@ typedef NS_ENUM(NSInteger, TAPTextColor) {
     TAPTextColorTableViewProfileNameSendToContactLabel,
     TAPTextColorRecordingTimeLabel,
     TAPTextColorWarningLabel,
+    TAPTextColorChatRoomPinTitleLabel,
 };
 
 typedef NS_ENUM(NSInteger, TAPComponentFont) {
@@ -409,6 +414,10 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontChatProfileMenuLabel,
     TAPComponentFontChatProfileTitleLabelStyle,
     TAPComponentFontChatProfileMenuDestructiveLabel,
+    TAPComponentFontChatProfileSharedMediaSectionLabel,
+    TAPComponentFontChatProfileSharedMediaEmptyTitleLabel,
+    TAPComponentFontChatProfileSharedMediaEmptyBodyLabel,
+    TAPComponentFontChatProfileSharedMediaTabActiveLabel,
     TAPComponentFontSearchNewContactResultName,
     TAPComponentFontSearchNewContactResultUsername,
     TAPComponentFontAlbumNameLabel,
@@ -496,6 +505,8 @@ typedef NS_ENUM(NSInteger, TAPComponentFont) {
     TAPComponentFontTableViewProfileNameSendToContactLabel,
     TAPComponentFontDeleteAccountTitleLabel,
     TAPComponentFontDeleteAccountWarningLabel,
+    TAPComponentFontDatePickerTitleLabel,
+    TAPComponentFontDatePickerCancelLabel,
 };
 
 @interface TAPStyleManager : NSObject

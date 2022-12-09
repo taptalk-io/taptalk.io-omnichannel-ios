@@ -8,7 +8,13 @@
 
 #import "TAPUtil.h"
 #import <CoreServices/UTType.h>
+#import <CoreServices/UTCoreTypes.h>
 #import <objc/runtime.h>
+#import <LinkPresentation/LPMetadataProvider.h>
+#import <LinkPresentation/LPLinkMetadata.h>
+#import <LinkPresentation/LPFoundation.h>
+#import <LinkPresentation/LPLinkView.h>
+#import <LinkPresentation/LinkPresentation.h>
 
 static const char kBundleKey = 0;
 
@@ -77,7 +83,8 @@ static const char kBundleKey = 0;
 
     NSDate *messageDate = [NSDate dateWithTimeIntervalSince1970:messageTimeInterval];
     NSString *messageDateString = @"";
-    if (timeGap <= midnightTimeGap) {
+    
+    if (timeGap <= midnightTimeGap && timeGap > 0) {
         // Today
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";
@@ -86,7 +93,7 @@ static const char kBundleKey = 0;
         NSString *today = NSLocalizedStringFromTableInBundle(@"Today", nil, [TAPUtil currentBundle], @"");
         messageDateString = [NSString stringWithFormat:@"%@ • %@", today, dateString];
     }
-    else if (timeGap <= 86400.0f + midnightTimeGap) {
+    else if (timeGap <= 86400.0f + midnightTimeGap && timeGap > 0) {
         // Yesterday
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateFormat = @"HH:mm";
@@ -104,6 +111,56 @@ static const char kBundleKey = 0;
         NSString *dateString = [dateFormatter stringFromDate:messageDate];
         NSString *timeString = [timeFormatter stringFromDate:messageDate];
         messageDateString = [NSString stringWithFormat:@"%@ • %@", dateString, timeString];
+    }
+    return messageDateString;
+}
+
++ (NSString *)getMutedTimestampText:(NSNumber *)createdTime {
+    NSDate *currentDate = [NSDate date];
+    NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
+    NSTimeInterval messageTimeInterval = [createdTime doubleValue] / 1000.0f; //change to second from milisecond
+
+    NSTimeInterval timeGap = messageTimeInterval - currentTimeInterval;
+    NSDateFormatter *midnightDateFormatter = [[NSDateFormatter alloc] init];
+    [midnightDateFormatter setLocale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]]; // POSIX to avoid weird issues
+    midnightDateFormatter.dateFormat = @"dd-MMM-yyyy";
+    NSString *midnightFormattedCreatedDate = [midnightDateFormatter stringFromDate:currentDate];
+
+    NSDate *todayMidnightDate = [midnightDateFormatter dateFromString:midnightFormattedCreatedDate];
+    NSTimeInterval midnightTimeInterval = [todayMidnightDate timeIntervalSince1970];
+
+    NSTimeInterval midnightTimeGap = currentTimeInterval - midnightTimeInterval;
+
+    NSDate *messageDate = [NSDate dateWithTimeIntervalSince1970:messageTimeInterval];
+    NSString *messageDateString = @"";
+    if (timeGap <= midnightTimeGap) {
+        // Today
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"HH:mm";
+        NSString *dateString = [dateFormatter stringFromDate:messageDate];
+        
+        NSString *until = NSLocalizedStringFromTableInBundle(@"until", nil, [TAPUtil currentBundle], @"");
+        messageDateString = [NSString stringWithFormat:@"%@ %@", until, dateString];
+    }
+    else if (timeGap <= 86400.0f + midnightTimeGap) {
+        // Yesterday
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"HH:mm";
+        NSString *dateString = [dateFormatter stringFromDate:messageDate];
+        NSString *yesterday = NSLocalizedStringFromTableInBundle(@"Tommorow", nil, [TAPUtil currentBundle], @"");
+        messageDateString = [NSString stringWithFormat:@"%@ %@", yesterday, dateString];
+    }
+    else {
+        // Set date and time
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"dd/MM/yy";
+        NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
+        timeFormatter.dateFormat = @"HH:mm";
+
+        NSString *dateString = [dateFormatter stringFromDate:messageDate];
+        
+        NSString *until = NSLocalizedStringFromTableInBundle(@"until", nil, [TAPUtil currentBundle], @"");
+        messageDateString = [NSString stringWithFormat:@"%@ %@", until, dateString];
     }
     return messageDateString;
 }
@@ -727,6 +784,26 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return NO;
 }
 
++ (BOOL)isSaveMessageRoom:(NSString *)roomID {
+    TAPUserModel *user = [TAPDataManager getActiveUser];
+    NSString *userID = user.userID;
+    
+    NSArray *roomIDItems = [roomID componentsSeparatedByString:@"-"];
+    
+    if(roomIDItems.count < 2){
+        return NO;
+    }
+    
+    NSString *roomID1=[roomIDItems objectAtIndex:0];
+    NSString *roomID2=[roomIDItems objectAtIndex:1];
+    
+    if([roomID1 isEqualToString:userID] && [roomID2 isEqualToString:userID]){
+        return YES;
+    }
+    
+    return NO;
+}
+
 + (BOOL)validatePhoneNumber:(NSString *)candidate {
     NSString *phoneNumberRegex = @"^\\+?[0-9]*$";
     NSPredicate *phoneNumberTest = [NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", phoneNumberRegex];
@@ -1061,6 +1138,64 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return topViewController;
 }
 
++ (void)getContentDataFromURL:(NSURL *)url success:(void (^)(NSString *title, NSString *body, NSURL*imageUrl))success failure:(void (^)(NSError *error))failure {
+    LPMetadataProvider * metaData = [[LPMetadataProvider alloc] init];
+    
+    [metaData startFetchingMetadataForURL:url completionHandler:^(LPLinkMetadata *metaData, NSError *error){
+        if(metaData != nil){
+            NSString *title = metaData.title;
+            NSString *body = metaData.description;
+            
+            NSDictionary *LPLinkMetaDataDict = [self objectToDictionary:metaData];
+            
+            NSDictionary *LPImageMetaDataDict = [LPLinkMetaDataDict objectForKey:@"imageMetadata"];
+            NSDictionary *LPImageDict = [self objectToDictionary:LPImageMetaDataDict];
+            
+            NSString *imageURL = [LPImageDict objectForKey:@"URL"];
+            
+        }
+        else {
+            failure(error);
+        }
+        
+    }];
+    
+    
+}
+
++ (NSDictionary *) objectToDictionary:(id)object {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+    unsigned count;
+    objc_property_t *properties = class_copyPropertyList([object class], &count);
+
+    for (int i = 0; i < count; i++) {
+        NSString *key = [NSString stringWithUTF8String:property_getName(properties[i])];
+        if([object valueForKey:key] != nil){
+            [dict setObject:[object valueForKey:key] forKey:key];
+        }
+    }
+
+    free(properties);
+
+    return [NSDictionary dictionaryWithDictionary:dict];
+}
+
+
++ (NSArray *)getUrlsFromString:(NSString *)text {
+    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
+    
+    NSArray *urlMatches = [linkDetector matchesInString:text options:0 range:NSMakeRange(0, text.length)];
+    
+    NSMutableArray *urlMatchesString = [[NSMutableArray alloc] init];
+    
+    for(NSTextCheckingResult *urlMatch in urlMatches){
+        NSURL *url = [urlMatch URL];
+        [urlMatchesString addObject:[url absoluteString]];
+    }
+    
+    return urlMatchesString;
+}
 
 
 #pragma mark - TapTalk
@@ -1128,7 +1263,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         return NO;
     }
     
-    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
+    if (message.type == TAPChatMessageTypeText || message.type == TAPChatMessageTypeLink || message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
                 
         NSString *firstPredicateString = [NSString stringWithFormat:@" @%@ ", activeUserUsername];
         NSString *secondPredicateString = [NSString stringWithFormat:@" @%@\n", activeUserUsername];
@@ -1207,6 +1342,66 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     }
     
     return key;
+}
+
++ (void)handleReceivedSystemMessage:(TAPMessageModel *)message {
+    if (message.type != TAPChatMessageTypeSystemMessage) {
+        return;
+    }
+    if ([message.action isEqualToString:@"room/addParticipant"] &&
+        ([message.target.targetID isEqualToString:[TAPDataManager getActiveUser].userID])
+    ) {
+        [[TAPDataManager sharedManager].deletedRoomIDArray removeObject:message.room.roomID];
+    }
+    else if ([message.action isEqualToString:@"user/delete"]) {
+        // Save user data
+        [[TAPContactManager sharedManager] addContactWithUserModel:message.user saveToDatabase:NO saveActiveUser:YES];
+        
+        // Set value for message.user.deleted for existing messages from the deleted user
+        NSString *queryString = [NSString stringWithFormat:@"userID == '%@'", message.user.userID];
+        [TAPDataManager getAllMessageWithQuery:queryString
+                                     sortByKey:@"created"
+                                     ascending:NO
+        success:^(NSArray<TAPMessageModel *> *deletedUserMessageArray) {
+            NSMutableArray<TAPMessageModel *> *updatedArray = [NSMutableArray array];
+            for (TAPMessageModel *deletedUserMessage in deletedUserMessageArray) {
+                deletedUserMessage.user.deleted = message.user.deleted;
+                [updatedArray addObject:deletedUserMessage];
+            }
+            [TAPDataManager updateOrInsertDatabaseMessageWithData:updatedArray success:^{
+                // Set value for message.room.deleted for existing messages in deleted user's room
+                TAPRoomModel *deletedUserRoom = [TAPRoomModel createPersonalRoomIDWithOtherUser:message.user];
+                [TAPDataManager getAllMessageWithRoomID:deletedUserRoom.roomID
+                                              sortByKey:@"created"
+                                              ascending:NO
+                success:^(NSArray<TAPMessageModel *> *deletedRoomMessageArray) {
+                    NSMutableArray<TAPMessageModel *> *updatedArray = [NSMutableArray array];
+                    for (TAPMessageModel *deletedRoomMessage in deletedRoomMessageArray) {
+                        deletedRoomMessage.room.isLocked = YES;
+                        deletedRoomMessage.room.isDeleted = YES;
+                        deletedRoomMessage.room.deleted = message.user.deleted;
+                        [updatedArray addObject:deletedRoomMessage];
+                    }
+                    [TAPDataManager updateOrInsertDatabaseMessageWithData:updatedArray success:^{
+                        
+                    }
+                    failure:^(NSError *error) {
+                        
+                    }];
+                        
+                }
+                failure:^(NSError *error) {
+                    
+                }];
+            }
+            failure:^(NSError *error) {
+                
+            }];
+        }
+        failure:^(NSError *error) {
+            
+        }];
+    }
 }
 
 @end

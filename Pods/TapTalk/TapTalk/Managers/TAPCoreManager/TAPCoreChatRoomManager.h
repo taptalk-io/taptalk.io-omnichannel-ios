@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TAPCoreChatRoomManagerDelegate <NSObject>
 
+@optional
+- (void)tapTalkDidReceiveUpdatedChatRoomData:(TAPRoomModel *)room recipientUser:(TAPUserModel *_Nullable)recipientUser;
 - (void)tapTalkDidStartTypingWithUser:(TAPUserModel *)user roomID:(NSString *)roomID;
 - (void)tapTalkDidStopTypingWithUser:(TAPUserModel *)user roomID:(NSString *)roomID;
 - (void)tapTalkDidReceiveOnlineStatusWithUser:(TAPUserModel *)user onlineStatus:(BOOL)isOnline lastActive:(NSNumber *)lastActive;
@@ -37,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getChatRoomByXCRoomID:(NSString *)xcRoomID
                       success:(void (^)(TAPRoomModel *room))success
                       failure:(void (^)(NSError *error))failure;
+- (void)getSavedMessagesChatRoom:(void (^)(TAPRoomModel *room))success
+                         failure:(void (^)(NSError *error))failure;
 - (void)createGroupChatRoomWithGroupName:(NSString *)groupName
             listOfParticipantUserIDs:(NSArray *)participantUserIDArray
                              success:(void (^)(TAPRoomModel *room))success
@@ -83,6 +87,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)sendStartTypingEmitWithRoomID:(NSString *)roomID;
 - (void)sendStopTypingEmitWithRoomID:(NSString *)roomID;
+
+- (void)deleteAllChatRoomMessages:(NSString *)roomID success:(void (^)(NSArray *deletedRoomIDs))success failure:(void (^)(NSError *error))error;
 
 @end
 
