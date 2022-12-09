@@ -29,6 +29,7 @@ typedef NS_ENUM(NSInteger, TAPYourFileBubbleTableViewCellStateType) {
 - (void)yourFileCancelButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourFileOpenFileButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourFileBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage;
+- (void)yourFileBubbleDidTappedRedirectArrowWithMessage:(TAPMessageModel *)tappedMessage;
 - (void)yourFileBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
 
 @end
@@ -53,6 +54,8 @@ typedef NS_ENUM(NSInteger, TAPYourFileBubbleTableViewCellStateType) {
 - (void)showSeperator;
 - (void)showCheckMarkIcon:(BOOL)isShow;
 - (void)setCheckMarkState:(BOOL)isSelected;
+- (void)setSwipeGestureEnable:(BOOL)enable;
+- (void)showPinIcon:(BOOL)isShow;
 
 @end
 

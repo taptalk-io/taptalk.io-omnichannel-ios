@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TAPScheduledMessageModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -40,6 +41,53 @@ NS_ASSUME_NONNULL_BEGIN
                   start:(void (^)(TAPMessageModel *message))start
                 success:(void (^)(TAPMessageModel *message))success
                 failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendLinkMessage:(NSString *)message
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendLinkMessage:(NSString *)message
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  siteName:(NSString *_Nullable)siteName
+                  type:(NSString *_Nullable)type
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendLinkMessage:(NSString *)message
+          quotedMessage:(TAPMessageModel *)quotedMessage
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)sendLinkMessage:(NSString *)message
+          quotedMessage:(TAPMessageModel *)quotedMessage
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  siteName:(NSString *_Nullable)siteName
+                  type:(NSString *_Nullable)type
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
 - (void)sendLocationMessageWithLatitude:(CGFloat)latitude
                               longitude:(CGFloat)longitude
                                 address:(nullable NSString *)address
@@ -351,11 +399,82 @@ NS_ASSUME_NONNULL_BEGIN
                              success:(void (^)(NSArray<NSString *> *unstarredMessagesIDs))success
                              failure:(void (^)(NSError *error))failure;
 
-- (void)editMessage:(TAPMessageModel *)message
-        updatedText:(NSString *)updatedText
+- (void)editMessage:(TAPMessageModel *)updatedMessage
             start:(void (^)(TAPMessageModel *message))start
             success:(void (^)(TAPMessageModel *message))success
             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)editMessage:(TAPMessageModel *)previousMessage
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure;
+
+- (void)pinMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID;
+
+- (void)pinMessageWithMessageID:(NSString *)messageID
+                          roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                        failure:(void (^)(NSError *error))failure;
+
+- (void)pinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID;
+
+- (void)pinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                          failure:(void (^)(NSError *error))failure;
+
+- (void)unpinMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID;
+
+- (void)unpinMessageWithMessageID:(NSString *)messageID
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *unpinnedMessageIDs))success
+                          failure:(void (^)(NSError *error))failure;
+
+- (void)unpinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID;
+
+- (void)unpinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                              roomID:(NSString *)roomID
+                             success:(void (^)(NSArray<NSString *> *unpinnedMessageIDs))success
+                            failure:(void (^)(NSError *error))failure;
+- (void)getPinnedMessagesWithRoomID:(NSString *)roomID
+                          pageNumber:(NSInteger)pageNumber
+                       numberOfItems:(NSInteger)numberOfItems
+                         success:(void (^)(NSArray<TAPMessageModel *> *pinnedMessagesArray,BOOL hasMoreData))success
+                            failure:(void (^)(NSError *error))failure;
+- (void)getPinnedMessageIDsWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                              failure:(void (^)(NSError *error))failure;
+
+- (void)createScheduleMessage:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure;
+
+- (void)getScheduledMessagesWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray))success
+                             failure:(void (^)(NSError *error))failure;
+
+- (void)sendScheduledMessagesNow:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *sentIDs))success
+                                      failure:(void (^)(NSError *error))failure;
+
+- (void)sendScheduledMessageNow:(NSNumber *)scheduleID roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *sentIDs))success
+                                     failure:(void (^)(NSError *error))failure;
+- (void)editScheduledMessageTime:(NSNumber *)scheduleID scheduledTime:(NSNumber *)scheduledTime
+                         success:(void (^)(BOOL isEditTimeSuccess))success
+                        failure:(void (^)(NSError *error))failure;
+- (void)editScheduledMessageContent:(NSNumber *)scheduleID updatedMessage:(TAPMessageModel *)updatedMessage
+                         success:(void (^)(BOOL isEditContentSuccess))success
+                           failure:(void (^)(NSError *error))failure;
+
+- (void)deleteScheduledMessages:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *deletedIDs))success
+                                     failure:(void (^)(NSError *error))failure;
+- (void)deleteScheduledMessage:(NSNumber *)scheduleID roomID:(NSString *)roomID
+                                    success:(void (^)(NSArray<NSNumber *> *deletedIDs))success
+                                    failure:(void (^)(NSError *error))failure;
+- (void)getSharedContentMessagesWithRoomID:(NSString *)roomID maxCreated:(long)maxCreated minCreated:(long)minCreated
+                           success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
+                                   failure:(void (^)(NSError *error))failure;
+
 @end
 
 NS_ASSUME_NONNULL_END

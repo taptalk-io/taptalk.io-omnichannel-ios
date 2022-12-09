@@ -248,10 +248,6 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/message/unstar";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
-    else if (type == TAPAPIManagerTypeUnStarMessage) {
-        NSString *apiPath = @"chat/message/unstar";
-        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
-    }
     else if (type == TAPAPIManagerTypeGetStarredMessages) {
         NSString *apiPath = @"chat/message/get_starred_list";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
@@ -260,7 +256,98 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"chat/message/get_starred_ids";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
+    else if (type == TAPAPIManagerTypeGetDeleteAccountState) {
+        NSString *apiPath = @"client/user/delete_account/check_state";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeRequestDeleteAccountOTP) {
+        NSString *apiPath = @"client/user/delete_account/request_otp";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeVerifyDeleteAccountOTP) {
+        NSString *apiPath = @"client/user/delete_account/verify_otp";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypePinMessage) {
+        NSString *apiPath = @"chat/message/pin";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUnPinMessage) {
+        NSString *apiPath = @"chat/message/unpin";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetPinnedMessages) {
+        NSString *apiPath = @"chat/message/get_pinned_list";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetPinnedMessagesIDs) {
+        NSString *apiPath = @"chat/message/get_pinned_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetSharedContent) {
+        NSString *apiPath = @"chat/room/get_shared_content";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
 
+    else if (type == TAPAPIManagerTypePinRoom) {
+        NSString *apiPath = @"client/room/pin";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUnpinRoom) {
+        NSString *apiPath = @"client/room/unpin";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetPinnedRoomIDs) {
+        NSString *apiPath = @"client/room/get_pinned_room_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    
+
+    else if (type == TAPAPIManagerTypeMuteRoom) {
+        NSString *apiPath = @"client/room/mute";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeUnMuteRoom) {
+        NSString *apiPath = @"client/room/unmute";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetMutedRoom) {
+        NSString *apiPath = @"client/room/get_muted_room_ids";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeCreateScheduleMessage) {
+        NSString *apiPath = @"chat/scheduled_message/create";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetScheduleMessages) {
+        NSString *apiPath = @"chat/scheduled_message/get_scheduled_list";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeScheduleMessageSendNow) {
+        NSString *apiPath = @"chat/scheduled_message/send_now";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeScheduleMessageEditTime) {
+        NSString *apiPath = @"chat/scheduled_message/edit_scheduled_time";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeEditScheduleMessageContent) {
+        NSString *apiPath = @"chat/scheduled_message/edit_content";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeDeleteScheduleMessage) {
+        NSString *apiPath = @"chat/scheduled_message/delete";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeDeleteChatroom) {
+        NSString *apiPath = @"client/room/clear_chat";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    else if (type == TAPAPIManagerTypeGetRoomIDsWithState) {
+        NSString *apiPath = @"client/room/get_room_ids_with_state";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
+    
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }
 

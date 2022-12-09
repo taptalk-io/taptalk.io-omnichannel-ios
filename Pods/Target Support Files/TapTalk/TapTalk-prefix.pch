@@ -47,3 +47,5 @@
 #import "TAPImageView.h"
 #import "TAPSearchBarView.h"
 #import "UIImage+Color.h"
+#import "TAPBaseTableView.h"
+#import "TAPScheduledMessageModel.h"

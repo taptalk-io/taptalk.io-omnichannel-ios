@@ -29,6 +29,8 @@ typedef NS_ENUM(NSInteger, TAPProfileCollectionViewCellType) {
     profileCollectionViewCellTypeEditGroup = 16,
     profileCollectionViewCellTypeUserDetail = 17,
     profileCollectionViewCellTypeStarMessage = 18,
+    profileCollectionViewCellTypeShareMedia = 19,
+    profileCollectionViewCellTypeMute = 20,
 };
 
 @interface TAPProfileCollectionViewCell : TAPBaseCollectionViewCell
@@ -36,6 +38,7 @@ typedef NS_ENUM(NSInteger, TAPProfileCollectionViewCellType) {
 - (void)setUserDetailString:(NSString *)title detail:(NSString *)detail;
 - (void)showSeparatorView:(BOOL)isShowed;
 - (void)setProfileCollectionViewCellType:(TAPProfileCollectionViewCellType) type;
+- (void)setMuteDurationInfo:(BOOL)isMuted duration:(NSString *)duration;
 
 @end
 

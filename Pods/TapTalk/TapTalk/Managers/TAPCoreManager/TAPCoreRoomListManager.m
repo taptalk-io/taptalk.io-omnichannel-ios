@@ -9,6 +9,10 @@
 #import "TAPCoreRoomListManager.h"
 #import "TAPRoomListModel.h"
 
+@interface TAPCoreRoomListManager () <TAPChatManagerDelegate>
+
+@end
+
 @implementation TAPCoreRoomListManager
 #pragma mark - Lifecycle
 + (TAPCoreRoomListManager *)sharedManager {
@@ -31,14 +35,60 @@
     self = [super init];
     
     if (self) {
-
+        //Add chat manager delegate
+        [[TAPChatManager sharedManager] addDelegate:self];
     }
     
     return self;
 }
 
 - (void)dealloc {
+    //Remove chat manager delegate
+    [[TAPChatManager sharedManager] removeDelegate:self];
+}
 
+#pragma mark - Delegate
+#pragma mark TAPChatManager
+
+- (void)chatManagerDidReceiveDeleteChatroom:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidDeleteChatRoom:)]) {
+        [self.delegate tapTalkDidDeleteChatRoom:roomID];
+    }
+}
+
+- (void)chatManagerDidReceivePinChatroom:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidPinChatRoom:)]) {
+        [self.delegate tapTalkDidPinChatRoom:roomID];
+    }
+}
+
+- (void)chatManagerDidReceiveUnpinChatroom:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidUnpinChatRoom:)]) {
+        [self.delegate tapTalkDidUnpinChatRoom:roomID];
+    }
+}
+
+- (void)chatManagerDidReceiveMuteChatroom:(NSString *)roomID expiredAt:(NSNumber *)expiredAt {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidMuteChatRoom:expiredAt:)]) {
+        [self.delegate tapTalkDidMuteChatRoom:roomID expiredAt:expiredAt];
+    }
+}
+
+- (void)chatManagerDidReceiveUnmuteChatroom:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidUnmuteChatRoom:)]) {
+        [self.delegate tapTalkDidUnmuteChatRoom:roomID];
+    }
+}
+
+- (void)chatManagerDidReceiveMarkChatRoomAsUnread:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidMarkChatRoomAsUnread:)]) {
+        [self.delegate tapTalkDidMarkChatRoomAsUnread:roomID];
+    }
+}
+- (void)chatManagerDidReceiveMarkChatRoomAsRead:(NSString *)roomID {
+    if ([self.delegate respondsToSelector:@selector(tapTalkDidMarkChatRoomAsRead:)]) {
+        [self.delegate tapTalkDidMarkChatRoomAsRead:roomID];
+    }
 }
 
 #pragma mark - Custom Method
@@ -445,4 +495,143 @@
     }];
 }
 
+
+- (void)muteChatRoomsWithRoomIDs:(NSArray<NSString *> *)roomIDs
+                       expiredAt:(NSNumber *)expiredAt
+                         success:(void (^)(NSArray *roomIDs))success
+                         failure:(void (^)(NSError *error))failure {
+
+    [TAPDataManager callAPIMuteRoom:roomIDs expiredAt:expiredAt
+    success:^(NSArray *roomIDs) {
+        success(roomIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+
+- (void)unmuteChatRoomsWithRoomIDs:(NSArray<NSString *> *)roomIDs
+                           success:(void (^)(NSArray *roomIDs))success
+                           failure:(void (^)(NSError *error))failure {
+
+    [TAPDataManager callAPIUnMuteRoom:roomIDs
+    success:^(NSArray *roomIDs) {
+        success(roomIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)muteChatRoomWithRoomID:(NSString *)roomID
+                     expiredAt:(NSNumber *)expiredAt
+                       success:(void (^)(NSArray *roomIDs))success
+                       failure:(void (^)(NSError *error))failure {
+    
+    [self muteChatRoomsWithRoomIDs:@[roomID] expiredAt:expiredAt success:success failure:failure];
+}
+
+- (void)unmuteChatRoomWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray *roomIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [self unmuteChatRoomsWithRoomIDs:@[roomID] success:success failure:failure];
+}
+
+- (void)getMutedChatRoomListWithSuccess:(void (^)(NSMutableArray<TAPMutedRoomModel *> *mutedRoomListArray))success
+                                failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetMutedRoomList:^(NSMutableArray<TAPMutedRoomModel *> *mutedRoomListArray) {
+        success(mutedRoomListArray);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (NSInteger)getMaxPinnedRoom {
+    TAPCoreConfigsModel *coreConfigs = [TAPDataManager getCoreConfigs];
+    if (coreConfigs != nil && coreConfigs.roomMaxPinned != nil) {
+        return [coreConfigs.roomMaxPinned integerValue];
+    }
+    return TAP_DEFAULT_MAX_PINNED_ROOM;
+}
+
+- (void)pinChatRoomsWithRoomIDs:(NSArray<NSString *> *)roomIDs
+                        success:(void (^)(NSArray<NSString *> *roomIDs))success
+                        failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIPinRoom:roomIDs success:^(NSArray *roomIDs) {
+        NSMutableArray *mutedRoomIDsArray = [NSMutableArray array];
+        NSArray *mutedRoomIDs = [TAPDataManager getPinnedRoomIDs];
+        
+        if (mutedRoomIDs != nil) {
+            mutedRoomIDsArray = [mutedRoomIDs mutableCopy];
+        }
+        
+        for (NSString *roomID in roomIDs) {
+            [mutedRoomIDsArray addObject:roomID];
+        }
+        
+        [TAPDataManager setPinnedRoomIDs:[mutedRoomIDsArray copy]];
+        
+        success(roomIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)pinChatRoomWithRoomID:(NSString *)roomID
+                      success:(void (^)(NSArray<NSString *> *roomIDs))success
+                      failure:(void (^)(NSError *error))failure {
+    
+     [self pinChatRoomsWithRoomIDs:@[roomID] success:success failure:failure];
+ }
+
+- (void)unpinChatRoomsWithRoomIDs:(NSArray<NSString *> *)roomIDs
+                          success:(void (^)(NSArray<NSString *> *roomIDs))success
+                          failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIUnpinRoom:roomIDs success:^(NSArray *roomIDs) {
+        NSMutableArray *mutedRoomIDsArray = [NSMutableArray array];
+        NSArray *mutedRoomIDs = [TAPDataManager getPinnedRoomIDs];
+        
+        if (mutedRoomIDs != nil) {
+            mutedRoomIDsArray = [mutedRoomIDs mutableCopy];
+        }
+        
+        for (NSString *roomID in roomIDs) {
+            [mutedRoomIDsArray removeObject:roomID];
+        }
+        
+        [TAPDataManager setPinnedRoomIDs:[mutedRoomIDsArray copy]];
+        
+        success(roomIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+
+- (void)unpinChatRoomWithRoomID:(NSString *)roomID
+                        success:(void (^)(NSArray<NSString *> *pinnedRoomIDs))success
+                        failure:(void (^)(NSError *error))failure {
+    
+    [self unpinChatRoomsWithRoomIDs:@[roomID] success:success failure:failure];
+}
+
+- (void)getPinnedChatRoomIDsWithSuccess:(void (^)(NSArray *pinnedRoomIDs))success
+                                failure:(void (^)(NSError *error))failure {
+    
+     [TAPDataManager callAPIGetPinnedRoomIDs:^(NSArray *pinnedRoomIDs) {
+         success(pinnedRoomIDs);
+     }
+     failure:^(NSError *error) {
+         failure(error);
+     }];
+ }
+             
 @end

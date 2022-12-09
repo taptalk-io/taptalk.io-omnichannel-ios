@@ -184,6 +184,13 @@ Authenticate and log in user with name and email
                              failure:(void (^)(NSError *error))failure;
 
 /**
+Authenticate with existing auth ticket
+*/
+- (void)requestAccessTokenWithAuthTicket:(NSString *)authTicket
+                                 success:(void (^)(NSString *message))success
+                                 failure:(void (^)(NSError *error))failure;
+    
+/**
 Clear all data from TapTalk Live when user logs out
 */
 - (void)clearAllTapLiveData;

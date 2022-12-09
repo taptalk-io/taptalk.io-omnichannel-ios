@@ -38,6 +38,7 @@ typedef NS_ENUM(NSInteger, TAPYourVideoBubbleTableViewCellStateType) {
 - (void)yourVideoRetryDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourVideoDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage;
 - (void)yourVideoBubbleDidTappedProfilePictureWithMessage:(TAPMessageModel *)tappedMessage;
+- (void)yourVideoBubbleDidTappedRedirectArrowWithMessage:(TAPMessageModel *)tappedMessage;
 - (void)yourVideoBubbleDidTriggerSwipeToReplyWithMessage:(TAPMessageModel *)message;
 - (void)yourVideoBubblePressedMentionWithWord:(NSString*)word
                                tappedAtIndex:(NSInteger)index
@@ -77,6 +78,8 @@ typedef NS_ENUM(NSInteger, TAPYourVideoBubbleTableViewCellStateType) {
 - (void)showSeperator;
 - (void)showCheckMarkIcon:(BOOL)isShow;
 - (void)setCheckMarkState:(BOOL)isSelected;
+- (void)setSwipeGestureEnable:(BOOL)enable;
+- (void)showPinIcon:(BOOL)isShow;
 
 @end
 

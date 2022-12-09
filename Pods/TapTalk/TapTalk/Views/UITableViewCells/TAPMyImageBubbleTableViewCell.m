@@ -93,6 +93,17 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *swipeReplyViewHeightConstraint;
 
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *starIconBottomWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconBottomWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconBottomTrailingConstraint;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *pinIconBottomImageView;
+
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconWidthConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *pinIconTrailingContsraint;
+
+
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewConstraintHeight;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *seperatorViewBottomConstraint;
@@ -174,9 +185,7 @@
     self.bubbleView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
     self.bubbleView.clipsToBounds = YES;
 
-    self.bubbleHighlightView.layer.cornerRadius = 16.0f;
-    self.bubbleHighlightView.layer.maskedCorners = kCALayerMaxXMaxYCorner | kCALayerMinXMinYCorner | kCALayerMinXMaxYCorner;
-    self.bubbleHighlightView.clipsToBounds = YES;
+    self.bubbleHighlightView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorChatBubbleHighlightBackgroundColor];
 
     self.imageTimestampStatusContainerView.layer.cornerRadius = 10.0f;
     self.imageTimestampStatusContainerView.clipsToBounds = YES;
@@ -285,8 +294,9 @@
     self.starIconBottomImageView.alpha = 0.0f;
     self.checkMarkIconImageView.alpha = 0.0f;
     
-//    self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
-//    self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
+    self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
+    self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
+    
     self.swipeReplyViewHeightConstraint.constant = 30.0f;
     self.swipeReplyViewWidthConstraint.constant = 30.0f;
     self.swipeReplyView.layer.cornerRadius = self.swipeReplyViewHeightConstraint.constant / 2.0f;
@@ -295,6 +305,16 @@
     self.starImageViewWidthConstarint.constant = 0.0f;
     self.starImageViewLeadingConstarint.constant = 4.0f;
     
+    self.starIconBottomWidthConstraint.constant = 0.0f;
+    self.pinIconBottomWidthConstraint.constant = 0.0f;
+    self.pinIconBottomTrailingConstraint.constant = 0.0f;
+    
+    self.pinIconWidthConstraint.constant = 0.0f;
+    self.pinIconTrailingContsraint.constant = 0.0f;
+    
+    self.pinIconImageView.alpha = 0.0f;
+    self.pinIconBottomImageView.alpha = 0.0f;
+    
     self.lastProgress = 0.0f;
     self.progressLayer.strokeEnd = 0.0f;
     self.progressLayer.strokeStart = 0.0f;
@@ -302,8 +322,16 @@
     [self.syncProgressSubView removeFromSuperview];
     _progressLayer = nil;
     _syncProgressSubView = nil;
+    self.bubbleHighlightView.alpha = 0.0f;
     
     self.mentionIndexesArray = nil;
+    
+    self.seperatorViewBottomConstraint.constant = 0.0f;
+    
+    self.seperatorViewTopConstraint.constant = 10.0f;
+    self.seperatorViewConstraintHeight.constant = 0.0f;
+    
+    self.imageTimestampStatusContainerView.alpha = 0.0f;
     
     [self showReplyView:NO withMessage:nil];
     [self showQuoteView:NO];
@@ -439,6 +467,8 @@
     if (![[TapUI sharedInstance] isReplyMessageMenuEnabled]) {
         return;
     }
+    
+    NSLog(@"isEnable%ld", self.bubbleViewLongPressGestureRecognizer.isEnabled);
     
      if (recognizer.state == UIGestureRecognizerStateBegan) {
             _disableTriggerHapticFeedbackOnDrag = NO;
@@ -684,7 +714,7 @@
             [self showReplyView:YES withMessage:message];
             [self showQuoteView:NO];
         }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.fileID isEqualToString:@""])) {
+        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
             [self showReplyView:NO withMessage:nil];
             [self showQuoteView:YES];
             [self setQuote:message.quote userID:message.replyTo.userID];
@@ -737,39 +767,39 @@
         urlKey = [[urlKey componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]] componentsJoinedByString:@""];
     }
     
-    CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
-    CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
-    [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
-    self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
-    self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+//    CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
+//    CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
+//    [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
+//    self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+//    self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
     
     [self setSmallThumbnailFromMessageData:message.data];
     if ((fileID == nil || [fileID isEqualToString:@""]) && (urlKey == nil || [urlKey isEqualToString:@""])) {
         [TAPImageView imageFromCacheWithMessage:message
         success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
-            if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-            ) {
+            //if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+             //   (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+           // ) {
                 [self getImageSizeFromImage:savedImage];
                 self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
                 self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-            }
+          //  }
             [self.bubbleImageView setImage:savedImage];
             [self.contentView layoutIfNeeded];
         }
         failure:^(NSError *error, TAPMessageModel *receivedMessage) {
             if (urlKey != nil && ![urlKey isEqualToString:@""]) {
                 [self.bubbleImageView setImageWithURLString:[dataDictionary objectForKey:@"url"]];
-                if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                    (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-                ) {
+               // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+               //     (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+               // ) {
                     if (self.bubbleImageViewWidthConstraint.constant == 0.0f) {
                         self.bubbleImageViewWidthConstraint.constant = 240.0f;
                     }
                     if (self.bubbleImageViewHeightConstraint.constant == 0.0f) {
                         self.bubbleImageViewHeightConstraint.constant = 240.0f;
                     }
-                }
+              //  }
                 [self.contentView layoutIfNeeded];
             }
             else {
@@ -781,14 +811,14 @@
                     PHFetchResult<PHAsset *> *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:assetIdentifierArray options:nil];
                     PHAsset *imageAsset = [fetchResult firstObject];
                     if (imageAsset != nil) {
-                        if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                            (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-                        ) {
+                       // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                      //      (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                      //  ) {
                             [self getImageSizeWithWidth:(CGFloat)imageAsset.pixelWidth
                                                  height:(CGFloat)imageAsset.pixelHeight];
                             self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
                             self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-                        }
+                     //   }
                         
                         PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
                         requestOptions.synchronous = NO;
@@ -811,24 +841,24 @@
                     }
                     else {
                         // Image data not found
-                        if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                            (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-                        ) {
+                       // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                          //  (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                        //) {
                             self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
                             self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
                             [self.contentView layoutIfNeeded];
-                        }
+                        //}
                     }
                 }
                 else {
                     // Image data not found
-                    if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-                        (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-                    ) {
+                   // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+                       // (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+                    //) {
                         self.bubbleImageViewWidthConstraint.constant = self.maxWidth;
                         self.bubbleImageViewHeightConstraint.constant = self.maxHeight;
                         [self.contentView layoutIfNeeded];
-                    }
+                    //}
                 }
             }
         }];
@@ -844,15 +874,15 @@
         //so no need to set the image here
         //just save the height and width constraint
         
-        if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
-            (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
-        ) {
+       // if ((self.cellWidth == 0.0f && self.cellHeight == 0.0f) ||
+           // (self.cellWidth == self.maxWidth && self.cellHeight == self.maxHeight)
+        //) {
             CGFloat obtainedCellWidth = [[message.data objectForKey:@"width"] floatValue];
             CGFloat obtainedCellHeight = [[message.data objectForKey:@"height"] floatValue];
             [self getResizedImageSizeWithHeight:obtainedCellHeight width:obtainedCellWidth];
             self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
             self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
-        }
+        //}
         [self.contentView layoutIfNeeded];
 
         if (![urlKey isEqualToString:@""]) {
@@ -869,6 +899,8 @@
     
     //remove animation
     [self.bubbleView.layer removeAllAnimations];
+    [self.pinIconImageView.layer removeAllAnimations];
+    [self.pinIconBottomImageView.layer removeAllAnimations];
     [self.timestampLabel.layer removeAllAnimations];
     [self.quoteView.layer removeAllAnimations];
     [self.quoteDecorationView.layer removeAllAnimations];
@@ -1689,7 +1721,7 @@
     }
 }
 
-- (void)setFullImage:(UIImage *)image {
+- (void)setFullImage:(UIImage *_Nullable)image {
     if (image == nil) {
         return;
     }
@@ -1900,33 +1932,43 @@
     if(self.starIconImageView.alpha == 0){
         
         self.starIconImageView.alpha = 1.0f;
-        self.starImageViewWidthConstarint.constant = 12.0f;
-        self.starImageViewLeadingConstarint.constant = 8.0f;
+        self.starImageViewWidthConstarint.constant = 10.0f;
+        //self.starImageViewLeadingConstarint.constant = 8.0f;
+        
+        if(self.pinIconImageView.alpha > 0){
+            self.pinIconTrailingContsraint.constant = 4.0f;
+        }
         
         if(self.imageTimestampStatusContainerView.alpha == 0){
             self.starIconBottomImageView.alpha = 1.0f;
+            self.starIconBottomWidthConstraint.constant = 10.0f;
+            if(self.pinIconBottomImageView.alpha > 0){
+                self.pinIconBottomTrailingConstraint.constant = 4.0f;
+            }
         }
-        
-        
+        else{
+            self.starIconBottomImageView.alpha = 0.0f;
+        }
     }
     else{
         self.starIconImageView.alpha = 0.0f;
         self.starIconBottomImageView.alpha = 0.0f;
         self.starImageViewWidthConstarint.constant = 0.0f;
-        self.starImageViewLeadingConstarint.constant = 4.0f;
+       // self.starImageViewLeadingConstarint.constant = 4.0f;
+        self.pinIconTrailingContsraint.constant = 0.0f;
+        self.starIconBottomWidthConstraint.constant = 0.0f;
+        self.pinIconBottomTrailingConstraint.constant = 4.0f;
     }
 }
 
 - (void)showCheckMarkIcon:(BOOL)isShow {
     if(isShow){
         self.checkMarkIconImageView.alpha = 1.0f;
-        self.panGestureRecognizer.enabled = NO;
         self.bubbleViewLongPressGestureRecognizer.enabled = NO;
         self.forwardCheckmarkButton.alpha = 1.0f;
     }
     else{
         self.checkMarkIconImageView.alpha = 0.0f;
-        self.panGestureRecognizer.enabled = YES;
         self.bubbleViewLongPressGestureRecognizer.enabled = YES;
         self.forwardCheckmarkButton.alpha = 0.0f;
     }
@@ -1942,13 +1984,48 @@
     }
 }
 
+- (void)setSwipeGestureEnable:(BOOL)enable {
+    self.panGestureRecognizer.enabled = enable;
+}
+
 - (void)showSeperatorView {
     self.seperatorViewTopConstraint.constant = 16.0f;
-    self.seperatorViewBottomConstraint.constant = 13.0f;
+    self.seperatorViewBottomConstraint.constant = 15.0f;
     self.seperatorViewConstraintHeight.constant = 1.0f;
     
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
+    }
+}
+
+- (void)showPinIcon:(BOOL)isShow {
+    if(isShow){
+        self.pinIconImageView.alpha = 1.0f;
+        self.pinIconWidthConstraint.constant = 10.0f;
+        
+        if(self.starIconImageView.alpha > 0){
+            self.pinIconTrailingContsraint.constant = 4.0f;
+        }
+        
+        if(self.imageTimestampStatusContainerView.alpha < 1){
+            self.pinIconBottomImageView.alpha = 1.0f;
+            self.pinIconBottomWidthConstraint.constant = 10.0f;
+            if(self.starIconBottomImageView.alpha > 0){
+                self.pinIconBottomTrailingConstraint.constant = 7.0f;
+            }
+        }
+        else{
+            self.pinIconBottomImageView.alpha = 0.0f;
+        }
+        
+    }
+    else{
+        self.pinIconImageView.alpha = 0.0f;
+        self.pinIconWidthConstraint.constant = 0.0f;
+        self.pinIconTrailingContsraint.constant = 0.0f;
+        self.pinIconBottomTrailingConstraint.constant = 0.0f;
+        self.pinIconBottomImageView.alpha = 0.0f;
+        self.pinIconBottomWidthConstraint.constant = 0.0f;
     }
 }
 

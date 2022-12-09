@@ -65,6 +65,7 @@
 #pragma mark - Time
 + (NSString *)stringFromTimeInterval:(NSTimeInterval)interval;
 + (NSString *)getMessageTimestampText:(NSNumber *)createdTime;
++ (NSString *)getMutedTimestampText:(NSNumber *)createdTime;
 + (NSNumber *)currentTimeInMillis;
 
 #pragma mark - Null Handler
@@ -122,6 +123,7 @@
 + (BOOL)validateEmail:(NSString *)candidate;
 + (BOOL)validateUsername:(NSString *)candidate;
 + (BOOL)validatePassword:(NSString *)candidate;
++ (BOOL)isSaveMessageRoom:(NSString *)roomID;
 
 #pragma mark - Taptic Feedback
 + (void)tapticImpactFeedbackGenerator;
@@ -143,6 +145,8 @@
 + (CGFloat)topGapPresentingViewController;
 + (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay;
 + (UIViewController *_Nullable) topViewController;
++ (NSDictionary *) objectToDictionary:(id)object;
++ (NSArray *)getUrlsFromString:(NSString *)text;
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;
@@ -151,5 +155,6 @@
 + (BOOL)isActiveUserMentionedWithMessage:(TAPMessageModel *)message
                               activeUser:(TAPUserModel *)activeUser;
 + (NSString *)getFileKeyFromMessage:(TAPMessageModel *)message;
++ (void)handleReceivedSystemMessage:(TAPMessageModel *)message;
 
 @end

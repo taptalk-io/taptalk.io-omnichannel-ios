@@ -16,6 +16,9 @@
 #import "TAPConnectionStatusViewController.h"
 #import "TAPSearchViewController.h"
 #import "TAPMyAccountViewController.h"
+#import "TAPMutedRoomModel.h"
+#import "TAPClearedRoomModel.h"
+
 
 #import <AFNetworking/AFNetworking.h>
 
@@ -28,6 +31,7 @@
 @property (strong, nonatomic) TAPSearchBarView *searchBarView;
 @property (strong, nonatomic) TAPImageView *profileImageView;
 @property (strong, nonatomic) UIView *leftBarView;
+@property (strong, nonatomic) UIView *rightBarView;
 @property (strong, nonatomic) UIView *leftBarInitialNameView;
 @property (strong, nonatomic) UILabel *leftBarInitialNameLabel;
 @property (strong, nonatomic) UIButton *leftBarInitialNameButton;
@@ -35,11 +39,18 @@
 @property (strong, nonatomic) UIButton *myAccountButton;
 @property (strong, nonatomic) UIButton *rightBarButton;
 @property (strong, nonatomic) NSMutableArray *unreadRoomIDs;
+@property (strong, nonatomic) NSMutableArray *pinnedRoomIDs;
+@property (strong, nonatomic) NSMutableArray *clearedRoomModelArray;
+@property (strong, nonatomic) NSMutableDictionary *mutedRoomDictionary;
 
 @property (strong, nonatomic) NSMutableDictionary *unreadMentionDictionary;
 
 @property (nonatomic) NSInteger firstUnreadProcessCount;
 @property (nonatomic) NSInteger firstUnreadTotalCount;
+@property (nonatomic) NSInteger counterOnSuccess;
+
+@property (nonatomic) BOOL isPinRoomDataChange;
+@property (nonatomic) BOOL isMuteRoomDataChange;
 @property (strong, nonatomic) NSString *readUnreadStateString;
 @property (strong, nonatomic) UIImage *readUnreadStateImage;
 
@@ -100,8 +111,20 @@
     [[TAPChatManager sharedManager] addDelegate:self];
     
     _unreadRoomIDs = [NSMutableArray array];
+    _pinnedRoomIDs = [NSMutableArray array];
+    _clearedRoomModelArray = [NSMutableArray array];
+    
+    self.pinnedRoomIDs = [TAPDataManager getPinnedRoomIDs];
+    self.mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
+    
+    if(self.mutedRoomDictionary == nil){
+        _mutedRoomDictionary = [NSMutableDictionary dictionary];
+    }
+    
+    self.unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
     
     _setupRoomListView = [[TAPSetupRoomListView alloc] initWithFrame:[TAPBaseView frameWithoutNavigationBar]];
+    
     [self.navigationController.view addSubview:self.setupRoomListView];
     [self.navigationController.view bringSubviewToFront:self.setupRoomListView];
         
@@ -110,30 +133,32 @@
     
     _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     _myAccountButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
-    _leftBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
-    _leftBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftBarInitialNameView.frame), CGRectGetHeight(self.leftBarInitialNameView.frame))];
+    _leftBarInitialNameView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 10.0f, 42.0f, 42.0f)];
+    _leftBarInitialNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(
+        CGRectGetMinX(self.leftBarInitialNameView.frame),
+        CGRectGetMinY(self.leftBarInitialNameView.frame),
+        CGRectGetWidth(self.leftBarInitialNameView.frame),
+        CGRectGetHeight(self.leftBarInitialNameView.frame))
+    ];
     _leftBarInitialNameButton = [[UIButton alloc] initWithFrame:self.leftBarInitialNameView.frame];
-    _profileImageView = [[TAPImageView alloc] initWithFrame:CGRectMake(5.0f, 5.0f, 30.0f, 30.0f)];
+    _profileImageView = [[TAPImageView alloc] initWithFrame:self.leftBarInitialNameView.frame];
     _leftBarView = [[UIView alloc] initWithFrame:CGRectMake(
         0.0f,
         0.0f,
         CGRectGetMaxX(self.myAccountButton.frame),
         40.0f
     )];
+    _rightBarView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     _rightBarButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     _searchBarView = [[TAPSearchBarView alloc] initWithFrame:CGRectMake(
         0.0f,
         0.0f,
         CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.leftBarView.frame) - CGRectGetWidth(self.rightBarButton.frame) - 36.0f,
-        30.0f
+        36.0f
     )];
     [self setUpNavigationBar];
     
     self.roomListView.roomListTableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
-    
-    if (@available(iOS 15.0, *)) {
-        [self.roomListView.roomListTableView setSectionHeaderTopPadding:0.0f];
-    }
     
     self.roomListView.roomListTableView.delegate = self;
     self.roomListView.roomListTableView.dataSource = self;
@@ -154,9 +179,6 @@
     }
     
     [self.setupRoomListView.retryButton addTarget:self action:@selector(viewLoadedSequence) forControlEvents:UIControlEventTouchUpInside];
-    
-    //fetch pref
-    self.unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
     
     //View appear sequence
     [self viewLoadedSequence];
@@ -276,6 +298,7 @@
         static NSString *cellID = @"TAPRoomListTableViewCell";
         
         TAPRoomListTableViewCell *cell = [[TAPRoomListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
+        
         TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
         cell.tableView = tableView;
         [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:NO];
@@ -392,7 +415,17 @@
 
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    UIContextualAction *archivedAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+    BOOL isPinnedRoom = NO;
+    
+    TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
+    TAPMessageModel *selectedMessage = roomList.lastMessage;
+    TAPRoomModel *selectedRoom = selectedMessage.room;
+    
+    if([self.pinnedRoomIDs containsObject:selectedRoom.roomID]){
+        isPinnedRoom = YES;
+    }
+    
+    UIContextualAction *readUnreadAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         [self.view endEditing:YES];
         completionHandler(YES);
         
@@ -400,7 +433,7 @@
         TAPMessageModel *selectedMessage = roomList.lastMessage;
         TAPRoomModel *selectedRoom = selectedMessage.room;
         
-        if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread){
+        if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) {
             roomList.numberOfUnreadMessages = 0;
             roomList.isMarkedAsUnread = NO;
             [self.unreadRoomIDs removeObject:selectedRoom.roomID];
@@ -435,40 +468,308 @@
         [self getAndUpdateNumberOfUnreadToDelegate];
     }];
     
-    if(![[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled] && ![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+    UIContextualAction *pinUnpinAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self.view endEditing:YES];
+        completionHandler(YES);
         
-        return nil;
-        
-    }
-    
-    TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
-    if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread){
-        if(![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
-            return nil;
+        if(isPinnedRoom) {
+            [self.pinnedRoomIDs removeObject:selectedRoom.roomID];
+            [TAPDataManager setPinnedRoomIDs:[self.pinnedRoomIDs copy]];
+                
+            [self showPinRoom:NO roomID:selectedRoom.roomID];
+            [TAPDataManager callAPIUnpinRoom:@[selectedRoom.roomID] success:^(NSArray *roomIDs){
+                
+                
+                
+            } failure:^(NSError *error){
+                    
+            }];
+            
             
         }
+        else {
+            NSInteger roomMaxPinned = [[TAPCoreRoomListManager sharedManager] getMaxPinnedRoom];
+            
+            if([self.pinnedRoomIDs count] < roomMaxPinned){
+                [self.pinnedRoomIDs insertObject:selectedRoom.roomID atIndex:0];
+                [TAPDataManager setPinnedRoomIDs:[self.pinnedRoomIDs copy]];
+                
+                [self showPinRoom:YES roomID:selectedRoom.roomID];
+                [TAPDataManager callAPIPinRoom:@[selectedRoom.roomID] success:^(NSArray *roomIDs){
+                    
+                } failure:^(NSError *error){
+                    
+                }];
+                
+            }
+            else{
+                [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TAPUtil currentBundle], @"") detailInformation:@"You have reached the maximum of pinned chat rooms." leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            }
+        }
+        
+    }];
+    
+
+    if(roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread){
+        /**
+        if(![[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+            return nil;
+       
+        }
+        */
         self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Read", nil, [TAPUtil currentBundle], @"");
         self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMarkRead" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     }
     else{
+        /**
         if(![[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]){
             return nil;
             
         }
+        */
         self.readUnreadStateString = NSLocalizedStringFromTableInBundle(@"Unread", nil, [TAPUtil currentBundle], @"");
         self.readUnreadStateImage = [UIImage imageNamed:@"TAPIconMarkUnread" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
     }
     
-    UIImage *imageRendered = [self createImageFromView:[self addedUIViewSwipeAction]];
-    archivedAction.image = imageRendered;
-    archivedAction.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListSwipeButtonBackground];
+    UIImage *readUnreadImageRendered = [self createImageFromView:[self addedUIViewSwipeAction:self.readUnreadStateImage title:self.readUnreadStateString]];
+    readUnreadAction.image = readUnreadImageRendered;
+    readUnreadAction.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListSwipeButtonBackground];
     
-    NSArray *rowActionArray = @[archivedAction];
+    UIImage *pinUnpinImageRendered = nil;
+    
+    if(isPinnedRoom) {
+        pinUnpinImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconUnpinRoom" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Unpin"]];
+    }
+    else {
+        pinUnpinImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconPinRoom" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Pin"]];
+    }
+    
+    
+    pinUnpinAction.image = pinUnpinImageRendered;
+    pinUnpinAction.backgroundColor = [TAPUtil getColor:@"BB5C00"];
+    
+    
+    NSMutableArray *rowActionArray = [NSMutableArray array];
+    
+    
+    if([[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled] && [[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+        [rowActionArray addObject:readUnreadAction];
+    }
+    else {
+        if((roomList.numberOfUnreadMessages > 0 || roomList.isMarkedAsUnread) && [[TapUI sharedInstance] getMarkAsReadRoomListSwipeMenuEnabled]){
+            [rowActionArray addObject:readUnreadAction];
+        }
+        else if([[TapUI sharedInstance] getMarkAsUnreadRoomListSwipeMenuEnabled]){
+            [rowActionArray addObject:readUnreadAction];
+        }
+    }
+    
+    if([[TapUI sharedInstance] getPinRoomListSwipeMenuEnabled]){
+        [rowActionArray addObject:pinUnpinAction];
+    }
     
     return [UISwipeActionsConfiguration configurationWithActions:rowActionArray];
 }
 
-//- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
+    TAPRoomListModel *roomList = [self.roomListArray objectAtIndex:indexPath.row];
+    TAPMessageModel *selectedMessage = roomList.lastMessage;
+    TAPRoomModel *selectedRoom = selectedMessage.room;
+    
+    BOOL isMutedRoom = NO;
+    NSNumber *mutedExpired = [self.mutedRoomDictionary objectForKey:selectedRoom.roomID];
+    if(mutedExpired != nil){
+        isMutedRoom = YES;
+    }
+    
+    UIContextualAction *muteUnmuteAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self.view endEditing:YES];
+        completionHandler(YES);
+        
+        if(isMutedRoom) {
+            [self callApiUnmuteRoom:selectedRoom.roomID];
+        }
+        else {
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+            
+            long oneHourinSecond = 3600;
+            long oneHourInMili = oneHourinSecond * 1000;
+            long oneDayInMili = (oneHourinSecond *24) * 1000;
+            
+            UIAlertAction *oneHourAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"1 Hour", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                long currentMilisecond = [TAPUtil currentTimeInMillis].longValue;
+                
+                currentMilisecond += oneHourInMili;
+                
+                [self callApiMuteRoom:selectedRoom.roomID expiredAt:@(currentMilisecond)];
+                                           }];
+            
+            UIAlertAction *eightHoursAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"8 Hours", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                long currentMilisecond = [TAPUtil currentTimeInMillis].longValue;
+                
+                currentMilisecond += oneHourInMili * 8;
+                
+                [self callApiMuteRoom:selectedRoom.roomID expiredAt:@(currentMilisecond)];
+               
+                                           }];
+            
+            UIAlertAction *threeDaysAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"3 Days", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                long currentMilisecond = [TAPUtil currentTimeInMillis].longValue;
+                
+                currentMilisecond += oneDayInMili * 3;
+                
+                [self callApiMuteRoom:selectedRoom.roomID expiredAt:@(currentMilisecond)];
+               
+                                           }];
+            
+            UIAlertAction *alwaysAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Always", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                long always = 0;
+                [self callApiMuteRoom:selectedRoom.roomID expiredAt:@(always)];
+                                           }];
+            
+            UIAlertAction *cancelAction = [UIAlertAction
+                                           actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                           style:UIAlertActionStyleCancel
+                                           handler:^(UIAlertAction * action) {
+                                               //Do some thing here
+                                           }];
+            
+            UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetButtonLabelPrimary];
+            UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+            
+            [oneHourAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+            [eightHoursAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+            [threeDaysAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+            [alwaysAction setValue:actionSheetDefaultColor forKey:@"titleTextColor"];
+            [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+            
+            [alertController addAction:oneHourAction];
+            [alertController addAction:eightHoursAction];
+            [alertController addAction:threeDaysAction];
+            [alertController addAction:alwaysAction];
+            [alertController addAction:cancelAction];
+            
+            [self presentViewController:alertController animated:YES completion:nil];
+        }
+        
+    }];
+    
+    UIContextualAction *deleteChatRoomAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self.view endEditing:YES];
+        completionHandler(YES);
+        
+        
+        NSString *deleteDescriptionString = NSLocalizedStringFromTableInBundle(@"Are you sure you want to delete this conversation?", nil, [TAPUtil currentBundle], @"");
+        
+        BOOL isPinnedRoom = NO;
+        
+        if([self.pinnedRoomIDs containsObject:selectedRoom.roomID]) {
+            deleteDescriptionString = NSLocalizedStringFromTableInBundle(@"Are you sure you want to unpin and delete this conversation?", nil, [TAPUtil currentBundle], @"");
+            isPinnedRoom = YES;
+        }
+    
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:@"" preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        UIAlertAction *deleteAction = [UIAlertAction
+                                       actionWithTitle:NSLocalizedStringFromTableInBundle(@"Delete for me", nil, [TAPUtil currentBundle], @"")
+                                       style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction * action) {
+            [self.setupRoomListView showSetupViewWithType:TAPSetupRoomListViewTypeLoading];
+            [self.setupRoomListView showFirstLoadingView:YES withType:TAPSetupRoomListViewTypeLoading];
+            
+            if(isPinnedRoom) {
+                [self.pinnedRoomIDs removeObject:selectedRoom.roomID];
+                [TAPDataManager setPinnedRoomIDs:[self.pinnedRoomIDs copy]];
+            }
+            
+            [self callApiDeleteRoom:selectedRoom.roomID];
+            
+           
+        }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction
+                                       actionWithTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"")
+                                       style:UIAlertActionStyleCancel
+                                       handler:^(UIAlertAction * action) {
+                                           //Do some thing here
+            
+        }];
+        
+        UIColor *actionSheetDefaultColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorTitleLabel];
+        UIColor *actionSheetCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorActionSheetCancelButtonLabel];
+        
+        NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] initWithString:deleteDescriptionString];
+        
+        NSRange messageStringRange = [deleteDescriptionString rangeOfString:deleteDescriptionString];
+        
+        // Set background color, again for entire range
+        [mutableAttributedString addAttribute:NSForegroundColorAttributeName
+                                        value:actionSheetDefaultColor
+                                        range:messageStringRange];
+        UIFont *descriptionLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontImageDetailMessageStatus];
+        NSDictionary *textAttributes = @{NSFontAttributeName: descriptionLabelFont,
+                                     NSForegroundColorAttributeName: actionSheetDefaultColor};
+        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:deleteDescriptionString];
+        
+        NSMutableAttributedString *descriptionStringAtributed = [NSMutableAttributedString new];
+        
+        [attributedString addAttributes:textAttributes range:NSMakeRange(0, attributedString.length)];
+        
+        [descriptionStringAtributed appendAttributedString:attributedString];
+        
+       
+        [deleteAction setValue:[TAPUtil getColor:@"E02E2E"] forKey:@"titleTextColor"];
+        [cancelAction setValue:actionSheetCancelColor forKey:@"titleTextColor"];
+        
+        [alertController addAction:deleteAction];
+        [alertController addAction:cancelAction];
+        [alertController setValue:descriptionStringAtributed forKey:@"attributedMessage"];
+        
+        [self presentViewController:alertController animated:YES completion:nil];
+      
+        
+    }];
+    
+    UIImage *muteUnmuteImageRendered = nil;
+    if(!isMutedRoom){
+        muteUnmuteImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconMute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Mute"]];
+    }
+    else{
+        muteUnmuteImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconUnmute" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Unmute"]];
+    }
+    
+    muteUnmuteAction.image = muteUnmuteImageRendered;
+    muteUnmuteAction.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorRoomListSwipeButtonBackground];
+    
+    UIImage *deleteChatroomImageRendered = [self createImageFromView:[self addedUIViewSwipeAction: [UIImage imageNamed:@"TAPIconTrashRoomList" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil] title:@"Delete"]];
+    
+    deleteChatRoomAction.image = deleteChatroomImageRendered;
+    deleteChatRoomAction.backgroundColor = [UIColor redColor];
+    
+    NSMutableArray *rowActionArray = [[NSMutableArray alloc] init];
+    
+    if([[TapUI sharedInstance] getMuteRoomListSwipeMenuEnabled]){
+        [rowActionArray addObject:muteUnmuteAction];
+    }
+    
+    if([[TapUI sharedInstance] getDeleteRoomListSwipeMenuEnabled]){
+        [rowActionArray addObject:deleteChatRoomAction];
+    }
+    
+    return [UISwipeActionsConfiguration configurationWithActions:rowActionArray];
+}
 
 #pragma mark TAPChatManager
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
@@ -481,6 +782,96 @@
 
 - (void)chatManagerDidReceiveNewMessageInActiveRoom:(TAPMessageModel *)message {
     [self processMessageFromSocket:message isNewMessage:YES];
+}
+
+- (void)chatManagerDidReceiveUpdateRoom:(NSString *)eventName data:(NSDictionary *)data {
+    NSDictionary *room = [data objectForKey:@"room"];
+    NSString *roomID = [room objectForKey:@"roomID"];
+    NSMutableArray *pinnedRoomIDs = [[TAPDataManager getPinnedRoomIDs] mutableCopy];
+    if([eventName isEqualToString:@"room/clearChat"]) {
+        TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+        
+        if([pinnedRoomIDs containsObject:roomID]) {
+            [pinnedRoomIDs removeObject:roomID];
+            [TAPDataManager setPinnedRoomIDs:[pinnedRoomIDs copy]];
+            self.pinnedRoomIDs = pinnedRoomIDs;
+        }
+        
+        if(roomList != nil) {
+            [self deleteChatRoomLocally:roomID];
+        }
+    }
+    else if([eventName isEqualToString:@"room/pin"]) {
+        if([pinnedRoomIDs containsObject:roomID]){
+            return;
+        }
+        
+        [pinnedRoomIDs insertObject:roomID atIndex:0];
+        [TAPDataManager setPinnedRoomIDs:[pinnedRoomIDs copy]];
+        self.pinnedRoomIDs = pinnedRoomIDs;
+        [self showPinRoom:YES roomID:roomID];
+    }
+    else if([eventName isEqualToString:@"room/unpin"]) {
+        if(![pinnedRoomIDs containsObject:roomID]){
+            return;
+        }
+        
+        [pinnedRoomIDs removeObject:roomID];
+        [TAPDataManager setPinnedRoomIDs:[pinnedRoomIDs copy]];
+        self.pinnedRoomIDs = pinnedRoomIDs;
+        [self showPinRoom:NO roomID:roomID];
+    }
+    else if([eventName isEqualToString:@"room/mute"]) {
+        NSNumber *expired = [self.mutedRoomDictionary objectForKey:roomID];
+        
+        if(expired != nil) {
+            return;
+        }
+        
+        NSNumber *expiredAt = [data objectForKey:@"expiredAt"];
+        [self.mutedRoomDictionary setObject:expiredAt forKey:roomID];
+        [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+        TAPRoomModel *roomList = [self.roomListDictionary objectForKey:roomID];
+        
+        if(roomList == nil) {
+            return;
+        }
+        
+        NSInteger index = [self.roomListArray indexOfObject:roomList];
+        NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
+        
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+           [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+        completion:^(BOOL finished) {
+            
+        }];
+    }
+    else if([eventName isEqualToString:@"room/unmute"]) {
+        NSNumber *expired = [self.mutedRoomDictionary objectForKey:roomID];
+        
+        if(expired == nil) {
+            return;
+        }
+        
+        [self.mutedRoomDictionary removeObjectForKey:roomID];
+        [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+        TAPRoomModel *roomList = [self.roomListDictionary objectForKey:roomID];
+        
+        if(roomList == nil) {
+            return;
+        }
+        
+        NSInteger index = [self.roomListArray indexOfObject:roomList];
+        NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
+        
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+           [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+        completion:^(BOOL finished) {
+            
+        }];
+    }
 }
 
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message {
@@ -514,26 +905,36 @@
         self.leftBarView.alpha = 0.0f;
     }];
     
+    BOOL showCloseButton = [[TapUI sharedInstance] getCloseRoomListButtonVisibleState];
+    BOOL showMyAccountButton = [[TapUI sharedInstance] getMyAccountButtonInRoomListViewVisibleState];
+    CGFloat searchBarViewX = 0.0f;
+    if (showCloseButton && showMyAccountButton) {
+        searchBarViewX = -54.0f;
+    }
+    if (showMyAccountButton) {
+        searchBarViewX = -48.0f;
+    }
+    if (showCloseButton) {
+        searchBarViewX = -32.0f;
+    }
     [UIView animateWithDuration:0.2f animations:^{
-        self.searchBarView.frame = CGRectMake(
-            -55.0f,
-            CGRectGetMinY(self.searchBarView.frame),
-            CGRectGetWidth([UIScreen mainScreen].bounds) - 73.0f - 16.0f,
-            CGRectGetHeight(self.searchBarView.frame)
-        );
-
         UIFont *searchBarCancelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontSearchBarTextCancelButton];
         UIColor *searchBarCancelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorSearchBarTextCancelButton];
-        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 51.0f, 40.0f);
-        [self.rightBarButton setTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TAPUtil currentBundle], @"") forState:UIControlStateNormal];
+        self.rightBarView.frame = CGRectMake(0.0f, 0.0f, 56.0f, 40.0f);
+        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 56.0f, 40.0f);
         [self.rightBarButton setTitleColor:searchBarCancelColor forState:UIControlStateNormal];
-        self.rightBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
         self.rightBarButton.titleLabel.font = searchBarCancelFont;
         [self.rightBarButton setImage:nil forState:UIControlStateNormal];
         [self.rightBarButton addTarget:self action:@selector(cancelButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
         [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
         
+        self.searchBarView.frame = CGRectMake(
+            searchBarViewX,
+            CGRectGetMinY(self.searchBarView.frame),
+            CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.rightBarView.frame) - 36.0f,
+            CGRectGetHeight(self.searchBarView.frame)
+        );
     } completion:^(BOOL finished) {
         TAPSearchViewController *searchViewController = [[TAPSearchViewController alloc] init];
         searchViewController.delegate = self;
@@ -579,7 +980,7 @@
 - (void)chatViewControllerDidLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room {
     //Delete room & refresh the UI
     TAPRoomListModel *deletedRoomList = [self.roomListDictionary objectForKey:room.roomID];
-    if (deletedRoomList) {
+    if (deletedRoomList != nil) {
         NSInteger deletedIndex = [self.roomListArray indexOfObject:deletedRoomList];
         [self.roomListArray removeObjectAtIndex:deletedIndex];
         [self.roomListDictionary removeObjectForKey:room.roomID];
@@ -617,6 +1018,42 @@
     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
 }
 
+- (void)chatViewControllerDidCloseWithRoomIDLastMessage:(NSString *)roomID lastMeesage:(TAPMessageModel *)lastMessage {
+    BOOL isSavedMessageRoom = [TAPUtil isSaveMessageRoom:roomID];
+    
+    
+    if(isSavedMessageRoom){
+        if(lastMessage != nil) {
+            TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+            
+            roomList.lastMessage = lastMessage;
+            
+            NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+            NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+            [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:NO];
+        }
+        else {
+            TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+            
+            if(roomList != nil){
+                NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+                NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+                
+                [self.roomListDictionary removeObjectForKey:roomID];
+                [self.roomListArray removeObject:roomList];
+                
+                
+                [self.roomListView.roomListTableView beginUpdates];
+                
+                [self.roomListView.roomListTableView deleteRowsAtIndexPaths:@[cellIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                
+                [self.roomListView.roomListTableView endUpdates];
+            }
+            
+        }
+    }
+}
+
 - (void)chatViewControllerShouldClearUnreadBubbleForRoomID:(NSString *)roomID {
     //Force mark unread bubble and unread mention to 0
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
@@ -635,6 +1072,7 @@
 
 #pragma mark TAPSearchViewController
 - (void)searchViewControllerDidTappedSearchCancelButton {
+    [self checkAndUpdateActiveUserProfile];
     [UIView animateWithDuration:0.2f animations:^{
         self.leftBarView.alpha = 1.0f;
     }];
@@ -648,49 +1086,12 @@
 }
 
 - (void)myAccountViewControllerDoneChangingImageProfile {
-    NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
-    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        if ([TAPChatManager sharedManager].activeUser.fullname == nil || [[TAPChatManager sharedManager].activeUser.fullname isEqualToString:@""]) {
-            self.leftBarInitialNameView.alpha = 0.0f;
-            self.profileImageView.alpha = 1.0f;
-            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        }
-        else {
-            self.leftBarInitialNameView.alpha = 1.0f;
-            self.leftBarInitialNameView.userInteractionEnabled = NO;
-            self.profileImageView.alpha = 0.0f;
-            self.leftBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:[TAPChatManager sharedManager].activeUser.fullname];
-            self.leftBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:[TAPChatManager sharedManager].activeUser.fullname isGroup:NO];
-        }
-    }
-    else {
-        self.leftBarInitialNameView.alpha = 0.0f;
-        self.profileImageView.alpha = 1.0f;
-        [self.profileImageView setImageWithURLString:profileImageURL];
-    }
+    [self checkAndUpdateActiveUserProfile];
 }
 
 #pragma mark UIAdaptivePresentationController
 - (void)presentationControllerWillDismiss:(UIPresentationController *)presentationController {
-    NSString *profileImageURL = [TAPChatManager sharedManager].activeUser.imageURL.thumbnail;
-    if (profileImageURL == nil || [profileImageURL isEqualToString:@""]) {
-        if ([TAPChatManager sharedManager].activeUser.fullname == nil || [[TAPChatManager sharedManager].activeUser.fullname isEqualToString:@""]) {
-            self.leftBarInitialNameView.alpha = 0.0f;
-            self.profileImageView.alpha = 1.0f;
-            self.profileImageView.image = [UIImage imageNamed:@"TAPIconDefaultAvatar" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
-        }
-        else {
-            self.leftBarInitialNameView.alpha = 1.0f;
-            self.profileImageView.alpha = 0.0f;
-            self.leftBarInitialNameView.backgroundColor = [[TAPStyleManager sharedManager] getRandomDefaultAvatarBackgroundColorWithName:[TAPChatManager sharedManager].activeUser.fullname];
-            self.leftBarInitialNameLabel.text = [[TAPStyleManager sharedManager] getInitialsWithName:[TAPChatManager sharedManager].activeUser.fullname isGroup:NO];
-        }
-    }
-    else {
-        self.leftBarInitialNameView.alpha = 0.0f;
-        self.profileImageView.alpha = 1.0f;
-        [self.profileImageView setImageWithURLString:profileImageURL];
-    }
+    [self checkAndUpdateActiveUserProfile];
 }
 
 #pragma mark - Custom Method
@@ -705,24 +1106,27 @@
         if (showCloseButton) {
             UIImage *buttonImage = [UIImage imageNamed:@"TAPIconClose" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             buttonImage = [buttonImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconNavigationBarCloseButton]];
-            self.closeButton.frame = CGRectMake(-20.0f, 0.0f, 40.0f, 40.0f);
-            self.closeButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
+            self.closeButton.frame = CGRectMake(-10.0f, 0.0f, 40.0f, 40.0f);
             [self.closeButton setImage:buttonImage forState:UIControlStateNormal];
             [self.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+            [self.leftBarView addSubview:self.closeButton];
+        }
+        else {
+            self.closeButton.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
         }
         
         if (showMyAccountButton) {
             CGFloat myAccountButtonX;
             if (showCloseButton) {
-                myAccountButtonX = CGRectGetMaxX(self.closeButton.frame) + 8.0f;
+                myAccountButtonX = CGRectGetMaxX(self.closeButton.frame); + 4.0f;
             }
             else {
-                myAccountButtonX = 0.0f;
+                myAccountButtonX = -4.0f;
             }
             
             self.myAccountButton.frame = CGRectMake(myAccountButtonX, 0.0f, 40.0f, 40.0f);
 
-            self.leftBarInitialNameView.frame = CGRectMake(5.0f, 5.0f, 30.0f, 30.0f);
+            self.leftBarInitialNameView.frame = CGRectMake(4.0f, 4.0f, 32.0f, 32.0f);
             self.leftBarInitialNameView.alpha = 0.0f;
             self.leftBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameView.frame) / 2.0f;
             self.leftBarInitialNameView.clipsToBounds = YES;
@@ -730,60 +1134,60 @@
             
             UIFont *initialNameLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontRoomAvatarSmallLabel];
             UIColor *initialNameLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorRoomAvatarSmallLabel];
-            self.leftBarInitialNameLabel.frame = CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.leftBarInitialNameView.frame), CGRectGetHeight(self.leftBarInitialNameView.frame));
+            self.leftBarInitialNameLabel.frame = CGRectMake(
+                0.0f,
+                0.0f,
+                CGRectGetWidth(self.leftBarInitialNameView.frame),
+                CGRectGetHeight(self.leftBarInitialNameView.frame)
+            );
             self.leftBarInitialNameLabel.font = initialNameLabelFont;
             self.leftBarInitialNameLabel.textColor = initialNameLabelColor;
             self.leftBarInitialNameLabel.textAlignment = NSTextAlignmentCenter;
+            self.leftBarInitialNameView.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameView.frame) / 2.0f;
+            self.leftBarInitialNameView.clipsToBounds = YES;
             [self.leftBarInitialNameView addSubview:self.leftBarInitialNameLabel];
             
-            self.leftBarInitialNameButton.frame = self.leftBarInitialNameView.frame;
+            self.leftBarInitialNameButton.frame = self.leftBarInitialNameLabel.frame;
             self.leftBarInitialNameButton.alpha = 0.0f;
             self.leftBarInitialNameButton.userInteractionEnabled = NO;
             self.leftBarInitialNameButton.layer.cornerRadius = CGRectGetHeight(self.leftBarInitialNameButton.frame) / 2.0f;
             [self.leftBarInitialNameButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
             [self.leftBarInitialNameView addSubview:self.leftBarInitialNameButton];
             
-            self.profileImageView.frame = CGRectMake(5.0f, 5.0f, 30.0f, 30.0f);
+            self.profileImageView.frame = self.leftBarInitialNameView.frame;
             self.profileImageView.layer.cornerRadius = CGRectGetHeight(self.profileImageView.bounds) / 2.0f;
             self.profileImageView.clipsToBounds = YES;
             self.profileImageView.contentMode = UIViewContentModeScaleAspectFill;
             [self.myAccountButton addSubview:self.profileImageView];
-        
             [self.myAccountButton addTarget:self action:@selector(leftBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+            [self.leftBarView addSubview:self.myAccountButton];
+        }
+        else {
+            self.myAccountButton.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
         }
         
-        if (showCloseButton && showMyAccountButton) {
-            self.leftBarView.frame = CGRectMake(
-                0.0f,
-                0.0f,
-                CGRectGetMaxX(self.myAccountButton.frame),
-                40.0f
-            );
-            [self.leftBarView addSubview:self.closeButton];
-            [self.leftBarView addSubview:self.myAccountButton];
-        }
-        else if (showMyAccountButton) {
-            self.leftBarView.frame = CGRectMake(
-                0.0f,
-                0.0f,
-                CGRectGetMaxX(self.myAccountButton.frame),
-                40.0f
-            );
-            [self.leftBarView addSubview:self.myAccountButton];
-        }
-        else if (showCloseButton) {
+        if (!showMyAccountButton) {
             self.leftBarView.frame = CGRectMake(
                 0.0f,
                 0.0f,
                 CGRectGetMaxX(self.closeButton.frame),
                 40.0f
             );
-            [self.leftBarView addSubview:self.closeButton];
         }
+        else {
+            self.leftBarView.frame = CGRectMake(
+                0.0f,
+                0.0f,
+                CGRectGetMaxX(self.myAccountButton.frame),
+                40.0f
+            );
+        }
+        
         UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.leftBarView];
         [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
     }
     else {
+        self.leftBarView.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
         [self.navigationItem setLeftBarButtonItem:nil];
     }
         
@@ -792,17 +1196,18 @@
         UIImage *rightBarImage = [UIImage imageNamed:@"TAPIconAddEditItem" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
         rightBarImage = [rightBarImage setImageTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorIconStartNewChatButton]];
 
+        self.rightBarView.frame = CGRectMake(0.0f, 0.0f, 30.0f, 40.0f);
         self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 40.0f, 40.0f);
-        self.rightBarButton.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, -9.0f);
         [self.rightBarButton setImage:rightBarImage forState:UIControlStateNormal];
         [self.rightBarButton setTitle:nil forState:UIControlStateNormal];
         [self.rightBarButton addTarget:self action:@selector(rightBarButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarButton];
+        [self.rightBarView addSubview:self.rightBarButton];
+        UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.rightBarView];
         
         [self.navigationItem setRightBarButtonItem:rightBarButtonItem];
     }
     else {
-        self.rightBarButton.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
+        self.rightBarView.frame = CGRectMake(0.0f, 0.0f, 0.0f, 0.0f);
         [self.navigationItem setRightBarButtonItem:nil];
     }
     
@@ -811,14 +1216,16 @@
         self.searchBarView.frame = CGRectMake(
             0.0f,
             0.0f,
-            CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.leftBarView.frame) - CGRectGetWidth(self.rightBarButton.frame) - 36.0f,
-            30.0f
+            CGRectGetWidth([UIScreen mainScreen].bounds) - CGRectGetWidth(self.leftBarView.frame) - CGRectGetWidth(self.rightBarView.frame) - 36.0f,
+            36.0f
         );
         self.searchBarView.searchTextField.delegate = self;
         
         [self.navigationItem setTitleView:self.searchBarView];
+        self.title = @"";
     }
     else {
+        [self.navigationItem setTitleView:nil];
         self.title = NSLocalizedStringFromTableInBundle(@"Chats", nil, [TAPUtil currentBundle], @"");
     }
 }
@@ -853,6 +1260,19 @@
 //    self.searchBarView.searchTextField.text = @"";
 }
 
+- (void)closeButtonDidTapped {
+    id <TapUIRoomListDelegate> roomListDelegate = [TapUI sharedInstance].roomListDelegate;
+    if ([roomListDelegate respondsToSelector:@selector(tapTalkCloseRoomListButtonTapped:currentShownNavigationController:)]) {
+        [roomListDelegate tapTalkCloseRoomListButtonTapped:self currentShownNavigationController:self.navigationController];
+    }
+    else {
+        // FIXME:
+        [self dismissViewControllerAnimated:YES completion:^{
+            
+        }];
+    }
+}
+
 - (void)mappingMessageArrayToRoomListArrayAndDictionary:(NSArray *)messageArray {
     if (_roomListArray != nil) {
         [self.roomListArray removeAllObjects];
@@ -883,6 +1303,8 @@
         [self insertRoomListToArrayAndDictionary:roomList atIndex:[self.roomListArray count]];
     }
     
+    self.roomListArray = [[self sortPinnedRoomToTop:self.roomListArray] mutableCopy];
+    
     [self getAndUpdateNumberOfUnreadToDelegate];
     
 }
@@ -890,6 +1312,53 @@
 - (void)insertRoomListToArrayAndDictionary:(TAPRoomListModel *)roomList atIndex:(NSInteger)index {
     [self.roomListArray insertObject:roomList atIndex:index];
     [self.roomListDictionary setObject:roomList forKey:roomList.lastMessage.room.roomID];
+}
+
+- (NSArray *)sortPinnedRoomToTop:(NSArray *)resultArray {
+    NSMutableArray *newArray = [resultArray mutableCopy];
+    
+    if(resultArray == nil || [resultArray count] == 0){
+        return [newArray copy];
+    }
+    
+    NSInteger pinIndexCounter = 0;
+    NSArray *pinRoomIDs = [TAPDataManager getPinnedRoomIDs];
+    
+    if(pinRoomIDs == nil || [pinRoomIDs count] == 0){
+        return resultArray;
+    }
+    
+    for(TAPRoomListModel *roomList in resultArray) {
+        TAPMessageModel *message = roomList.lastMessage;
+        BOOL isPinRoom = [pinRoomIDs containsObject:message.room.roomID];
+        if(pinIndexCounter >= [pinRoomIDs count]){
+            break;
+        }
+        if(isPinRoom){
+            //saved room
+            //NSInteger pinnedIndex = [self.pinnedRoomIDs indexOfObject:message.room.roomID];
+            [newArray removeObject:roomList];
+            [newArray insertObject:roomList atIndex:pinIndexCounter];
+            pinIndexCounter += 1;
+        }
+    }
+    NSInteger counter = 0;
+    
+    for(NSString *roomID in pinRoomIDs) {
+        
+        TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+        
+        if(roomList != nil) {
+            TAPMessageModel *message = roomList.lastMessage;
+            
+            [newArray removeObject:roomList];
+            [newArray insertObject:roomList atIndex:counter];
+            
+            counter += 1;
+        }
+    }
+    
+    return [newArray copy];
 }
 
 - (void)viewLoadedSequence {
@@ -942,6 +1411,7 @@
         
         [TAPDataManager getRoomListSuccess:^(NSArray *resultArray) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                
                 BOOL isShouldAnimate = YES;
                 
                 if (self.roomListArray == nil || [self.roomListArray count] <= 0) {
@@ -949,7 +1419,6 @@
                 }
                 
                 [self refreshViewAndQueryUnreadLogicWithMessageArray:resultArray animateReloadData:isShouldAnimate];
-                
                 
                 [self fetchDataFromAPI];
             });
@@ -1008,12 +1477,91 @@
 }
 
 - (void)handleRommlistAndUnreadSuccess:(NSArray *)messageArray{
+    //fetch pref
+    self.unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
+
+    self.pinnedRoomIDs = [[TAPDataManager getPinnedRoomIDs] mutableCopy];
+
+    self.mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
+    
+    if(self.mutedRoomDictionary == nil){
+        _mutedRoomDictionary = [NSMutableDictionary dictionary];
+    }
+    
+    self.counterOnSuccess = 0;
+    
+    self.isMuteRoomDataChange = NO;
+    self.isPinRoomDataChange = NO;
+    
+    [TAPDataManager callAPIGetRoomIDsWithState:^(NSMutableArray<NSString *> *pinnedRoomIDsArray, NSMutableArray<TAPMutedRoomModel *> *mutedRoomModelArray, NSMutableArray<TAPClearedRoomModel *> *clearedRoomModelArray) {
+           //muted room
+           NSDictionary *mutedDictPref = [[TAPDataManager getMutedRoomDictionary] copy];
+           [self.mutedRoomDictionary removeAllObjects];
+           for(TAPMutedRoomModel *mutedRooom in mutedRoomModelArray) {
+               [self.mutedRoomDictionary setObject:mutedRooom.expired forKey:mutedRooom.roomID];
+               
+               NSNumber *expiredPref = [mutedDictPref objectForKey:mutedRooom.roomID];
+               if(expiredPref == nil) {
+                   self.isMuteRoomDataChange = YES;
+               }
+               
+           }
+           
+           if([self.mutedRoomDictionary count] != [mutedDictPref count]) {
+               self.isMuteRoomDataChange = YES;
+           }
+           
+           [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+           
+           //pinned room
+           NSArray *pinRoomPref = [TAPDataManager getPinnedRoomIDs];
+           if([pinRoomPref count] != [pinnedRoomIDsArray count]){
+               self.isPinRoomDataChange = YES;
+           }
+           else {
+               NSInteger counter = 0;
+               for(NSString *roomID in pinnedRoomIDsArray) {
+                   NSString *roomIDPref = [pinRoomPref objectAtIndex:counter];
+                   if(![roomID isEqualToString:roomIDPref]) {
+                       self.isPinRoomDataChange = YES;
+                       break;
+                   }
+                   counter += 1;
+               }
+           }
+           // Saved to preference
+           [TAPDataManager setPinnedRoomIDs:pinnedRoomIDsArray];
+           self.pinnedRoomIDs = [pinnedRoomIDsArray mutableCopy];
+           NSInteger counter = 0;
+           self.roomListArray = [[self sortPinnedRoomToTop:self.roomListArray] mutableCopy];
+           
+           if(self.isMuteRoomDataChange || self.isPinRoomDataChange) {
+               [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
+                   [self.roomListView.roomListTableView reloadData];
+                   [self.roomListView.roomListTableView layoutIfNeeded];
+               }];
+           }
+           
+           //cleared room
+           long currentTime = [TAPUtil currentTimeInMillis].longValue;
+           [TAPDataManager setLastRoomMessageDeleteTime:currentTime];
+           
+       } failure:^(NSError *error) {
+           NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+           errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+           [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+       }];
+
+    
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
         [[NSUserDefaults standardUserDefaults] synchronize];
     });
     
     [self insertReloadMessageAndUpdateUILogicWithMessageArray:messageArray];
+    
+    
 }
 
 - (void)handleNewAndUpdatedSuccess:(NSArray *)messageArray{
@@ -1026,6 +1574,91 @@
     if ([messageArray count] != 0) {
         [[TAPMessageStatusManager sharedManager] filterAndUpdateBulkMessageStatusToDeliveredWithArray:messageArray];
     }
+    
+    //fetch pref
+    self.unreadRoomIDs = [[TAPDataManager getUnreadRoomIDs] mutableCopy];
+
+    self.pinnedRoomIDs = [[TAPDataManager getPinnedRoomIDs] mutableCopy];
+
+    self.mutedRoomDictionary = [[TAPDataManager getMutedRoomDictionary] mutableCopy];
+    
+    if(self.mutedRoomDictionary == nil){
+        _mutedRoomDictionary = [NSMutableDictionary dictionary];
+    }
+    
+    self.isMuteRoomDataChange = NO;
+    
+    self.isPinRoomDataChange = NO;
+    
+    
+    [TAPDataManager callAPIGetRoomIDsWithState:^(NSMutableArray<NSString *> *pinnedRoomIDsArray, NSMutableArray<TAPMutedRoomModel *> *mutedRoomModelArray, NSMutableArray<TAPClearedRoomModel *> *clearedRoomModelArray) {
+            //muted room
+            NSDictionary *mutedDictPref = [[TAPDataManager getMutedRoomDictionary] copy];
+            [self.mutedRoomDictionary removeAllObjects];
+            for(TAPMutedRoomModel *mutedRooom in mutedRoomModelArray) {
+                [self.mutedRoomDictionary setObject:mutedRooom.expired forKey:mutedRooom.roomID];
+                
+                NSNumber *expiredPref = [mutedDictPref objectForKey:mutedRooom.roomID];
+                if(expiredPref == nil) {
+                    self.isMuteRoomDataChange = YES;
+                }
+                
+            }
+            
+            if([self.mutedRoomDictionary count] != [mutedDictPref count]) {
+                self.isMuteRoomDataChange = YES;
+            }
+            
+            [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+            
+            //pinned room
+            NSArray *pinRoomPref = [TAPDataManager getPinnedRoomIDs];
+            if([pinRoomPref count] != [pinnedRoomIDsArray count]){
+                self.isPinRoomDataChange = YES;
+            }
+            else {
+                NSInteger counter = 0;
+                for(NSString *roomID in pinnedRoomIDsArray) {
+                    NSString *roomIDPref = [pinRoomPref objectAtIndex:counter];
+                    if(![roomID isEqualToString:roomIDPref]) {
+                        self.isPinRoomDataChange = YES;
+                        break;
+                    }
+                    counter += 1;
+                }
+            }
+            // Saved to preference
+            [TAPDataManager setPinnedRoomIDs:pinnedRoomIDsArray];
+            self.pinnedRoomIDs = [pinnedRoomIDsArray mutableCopy];
+            NSInteger counter = 0;
+            self.roomListArray = [[self sortPinnedRoomToTop:self.roomListArray] mutableCopy];
+            
+            if(self.isMuteRoomDataChange || self.isPinRoomDataChange) {
+                [UIView performWithoutAnimation:^{ //Try to remove table view reload data flicker
+                    [self.roomListView.roomListTableView reloadData];
+                    [self.roomListView.roomListTableView layoutIfNeeded];
+                }];
+            }
+            
+            //cleared room
+            long lastRoomDeleteTime = [TAPDataManager getLastRoomMessageDeleteTime];
+            for(TAPClearedRoomModel *clearedModel in clearedRoomModelArray) {
+                long clearTime = clearedModel.clearTime.longValue;
+                if(clearTime > lastRoomDeleteTime) {
+                    [self deleteChatRoomLocally:clearedModel.roomID];
+                }
+                else {
+                    break;
+                }
+            }
+            
+        } failure:^(NSError *error) {
+            NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+            errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+            [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        }];
+
+    
     
     //Delete physical files when isDeleted = 1 (message is deleted)
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -1289,13 +1922,31 @@
 
 - (void)processMessageFromSocket:(TAPMessageModel *)message isNewMessage:(BOOL)isNewMessage {
     NSString *messageRoomID = message.room.roomID;
-    
     //Check need to update user data or not
-    if (message.type == TAPChatMessageTypeSystemMessage && ([message.action isEqualToString:@"user/update"] || [message.action isEqualToString:@"room/update"])) {
+    if (message.type == TAPChatMessageTypeSystemMessage &&
+        ([message.action isEqualToString:@"user/update"] ||
+         [message.action isEqualToString:@"room/update"] ||
+         [message.action isEqualToString:@"user/delete"])
+    ) {
         [self checkUpdatedUserProfileWithMessage:message];
     }
     
     TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:messageRoomID];
+    
+    BOOL hasPinnedRoom = NO;
+    BOOL isPinnedRoom = NO;
+    NSInteger pinnedRoomListIndex = [self.pinnedRoomIDs indexOfObject:message.room.roomID];
+    NSInteger unpinnedRoomListIndex = [self.pinnedRoomIDs count];
+    
+    NSInteger pinnedIndex = [self.pinnedRoomIDs indexOfObject:message.room.roomID];
+    
+    if([self.pinnedRoomIDs containsObject:message.room.roomID]){
+        isPinnedRoom = YES;
+    }
+    
+    if(self.pinnedRoomIDs.count > 0) {
+        hasPinnedRoom = YES;
+    }
     
     if (roomList != nil) {
         //Room is on the list
@@ -1311,6 +1962,8 @@
             return;
         }
         
+        
+        
         if ([roomLastMessage.localID isEqualToString:message.localID]) {
             //Last message is same, just updated, update the data only
             roomLastMessage.updated = message.updated;
@@ -1321,7 +1974,7 @@
             roomLastMessage.isDelivered = message.isDelivered;
             roomLastMessage.isHidden = message.isHidden;
             roomLastMessage.body = message.body;
-            
+            roomLastMessage.user.deleted = message.user.deleted;
             
             NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
@@ -1340,7 +1993,7 @@
                     roomList.numberOfUnreadMentions++;
                 }
             }
-
+            
             NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
             NSIndexPath *currentIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
 
@@ -1348,11 +2001,34 @@
 
             if (currentIndexPath != 0 && isNewMessage) {
                 //Move cell to top
-                [self.roomListArray removeObject:roomList];
-                [self.roomListArray insertObject:roomList atIndex:0];
+                if(hasPinnedRoom){
+                    if(isPinnedRoom){
+                        [self.roomListArray removeObject:roomList];
+                        [self.roomListArray insertObject:roomList atIndex:pinnedRoomListIndex];
+                    }
+                    else{
+                        [self.roomListArray removeObject:roomList];
+                        [self.roomListArray insertObject:roomList atIndex:unpinnedRoomListIndex];
+                    }
+                }
+                else{
+                    [self.roomListArray removeObject:roomList];
+                    [self.roomListArray insertObject:roomList atIndex:0];
+                }
+                
                 [self.roomListView.roomListTableView performBatchUpdates:^{
                     //changing beginUpdates and endUpdates with this because of deprecation
-                    [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                    if(hasPinnedRoom){
+                        if(isPinnedRoom){
+                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]];
+                        }
+                        else{
+                            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]];
+                        }
+                    }
+                    else{
+                        [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+                    }
                 } completion:^(BOOL finished) {
                 }];
             }
@@ -1386,10 +2062,32 @@
             newRoomList.numberOfUnreadMentions = 0;
         }
         
-        [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
+        if(hasPinnedRoom){
+            if(isPinnedRoom){
+                [self insertRoomListToArrayAndDictionary:newRoomList atIndex:pinnedRoomListIndex];
+            }
+            else{
+                [self insertRoomListToArrayAndDictionary:newRoomList atIndex:unpinnedRoomListIndex];
+            }
+        }
+        else{
+            [self insertRoomListToArrayAndDictionary:newRoomList atIndex:0];
+        }
+        
         [self.roomListView.roomListTableView performBatchUpdates:^{
             //changing beginUpdates and endUpdates with this because of deprecation
-            [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            if(hasPinnedRoom){
+                if(isPinnedRoom){
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:pinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
+                else{
+                    [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:unpinnedRoomListIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
+            }
+            else{
+                [self.roomListView.roomListTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            }
+            
         } completion:^(BOOL finished) {
             [self.roomListView showNoChatsView:NO];
         }];
@@ -1547,11 +2245,11 @@
     return image;
 }
 
-- (UIView *)addedUIViewSwipeAction {
+- (UIView *)addedUIViewSwipeAction:(UIImage *)image title:(NSString *)title {
     //Create UIVIEW as you want view for Action Button
     NSString *descriptionActionString = @"";
     
-    descriptionActionString = self.readUnreadStateString;
+    descriptionActionString = title;
     
     UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 74.0f, 86.0f)];
     containerView.backgroundColor = [UIColor clearColor];
@@ -1559,7 +2257,7 @@
     UIImageView *iconImageview = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(containerView.frame) - 32.0f) / 2.0f, (CGRectGetHeight(containerView.frame) - 32.0f - 6.0f - 16.0f) / 2.0f, 32.0f, 32.0f)];
     iconImageview.contentMode = UIViewContentModeScaleAspectFit;
     iconImageview.backgroundColor = [UIColor clearColor];
-    iconImageview.image = self.readUnreadStateImage;
+    iconImageview.image = image;
     [containerView addSubview:iconImageview];
     
     UILabel *descriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(iconImageview.frame) + 6.0f, CGRectGetWidth(containerView.frame), 16.0f)];
@@ -1573,11 +2271,187 @@
     return containerView;
 }
 
+- (void)callApiDeleteRoom:(NSString *)roomID {
+    if(roomID == nil) {
+        return;
+    }
+    
+    [TAPDataManager callAPIDeleteChatroom:@[roomID] success:^(NSArray *deletedRoomIDs){
+        [self deleteChatRoomLocally:roomID];
+    } failure:^(NSError *error){
+        [self.setupRoomListView showFirstLoadingView:NO withType:TAPSetupRoomListViewTypeLoading];
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group" title:NSLocalizedStringFromTableInBundle(@"Oops! Failed to delete chat room", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    }];
+}
+
+- (void)showPinRoom:(BOOL)isShow roomID:(NSString *)roomID {
+    if(isShow) {
+        TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+        
+        if(roomList == nil) {
+            return;
+        }
+        
+        NSInteger index = [self.roomListArray indexOfObject:roomList];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+        
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+           [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+           
+        }
+        completion:^(BOOL finished) {
+            [self.roomListView.roomListTableView performBatchUpdates:^{
+                [self.roomListView.roomListTableView moveRowAtIndexPath:indexPath toIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+            }
+            completion:^(BOOL finished) {
+             [self.roomListView.roomListTableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
+                
+            }];
+        }];
+        
+        [self.roomListArray removeObject:roomList];
+        [self.roomListArray insertObject:roomList atIndex:0];
+    }
+    else {
+        TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+        
+        if(roomList == nil) {
+            return;
+        }
+            
+        NSInteger index = [self.roomListArray indexOfObject:roomList];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+            
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+            [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+        completion:^(BOOL finished) {
+                
+        }];
+        
+        TAPMessageModel *lastMessage = roomList.lastMessage;
+        long lastMessageCreated = lastMessage.created.longValue;
+        
+        NSInteger unpinnedIndex = 0;
+        NSInteger counter = -1;
+        NSInteger pinnedCount = [self.pinnedRoomIDs count] - 1;
+        for(TAPRoomListModel *roomList in self.roomListArray) {
+            long created = roomList.lastMessage.created.longValue;
+            if(counter > pinnedCount && lastMessageCreated > created){
+                unpinnedIndex = counter;
+                break;
+            }
+            counter += 1;
+            unpinnedIndex = counter;
+        }
+        
+        
+        
+        NSInteger cellRow = [self.roomListArray indexOfObject:roomList];
+        NSIndexPath *currentIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
+        
+        [self.roomListView.roomListTableView performBatchUpdates:^{
+            [self.roomListView.roomListTableView moveRowAtIndexPath:currentIndexPath toIndexPath:[NSIndexPath indexPathForRow:unpinnedIndex inSection:0]];
+        }completion:^(BOOL finished) {
+            
+        }];
+        [self.roomListArray removeObject:roomList];
+        [self.roomListArray insertObject:roomList atIndex:unpinnedIndex];
+    }
+}
+
+- (void)deleteChatRoomLocally:(NSString *)roomID {
+    [TAPDataManager deleteAllMessageAndPhysicalFilesInRoomWithRoomID:roomID success:^{
+        TAPRoomListModel *deletedRoomList = [self.roomListDictionary objectForKey:roomID];
+        if (deletedRoomList != nil) {
+            NSInteger deletedIndex = [self.roomListArray indexOfObject:deletedRoomList];
+            [self.roomListArray removeObjectAtIndex:deletedIndex];
+            [self.roomListDictionary removeObjectForKey:roomID];
+            
+            NSIndexPath *deletedIndexPath = [NSIndexPath indexPathForRow:deletedIndex inSection:0];
+            [self.roomListView.roomListTableView deleteRowsAtIndexPaths:@[deletedIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+        [self.setupRoomListView showFirstLoadingView:NO withType:TAPSetupRoomListViewTypeLoading];
+        long currentTime = [TAPUtil currentTimeInMillis].longValue;
+        [TAPDataManager setLastRoomMessageDeleteTime:currentTime];
+        //Throw view to room list
+        [TAPUtil performBlock:^{
+            
+        } afterDelay:1.2f];
+        
+    } failure:^(NSError *error) {
+        [self.setupRoomListView showFirstLoadingView:NO withType:TAPSetupRoomListViewTypeLoading];
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+      //  [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error Delete Group Manually" title:NSLocalizedStringFromTableInBundle(@"Oops! Failed to delete chat room", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    }];
+}
+
+
 - (void)callApiGetMarkedUnreadIDs{
     [TAPDataManager callAPIGetMarkedAsUnreadChatRoomList:^(NSArray <NSString *> *roomIDs){
         // Saved to preference
     }
     failure:^(NSError *error) {
+    }];
+}
+
+- (void)callApiMuteRoom:(NSString *)roomID expiredAt:(NSNumber *)expiredAt {
+    [self.mutedRoomDictionary setObject:expiredAt forKey:roomID];
+    [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+    
+    TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+    
+    if(roomList == nil) {
+        return;
+    }
+    
+    NSInteger index = [self.roomListArray indexOfObject:roomList];
+    NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    
+    [self.roomListView.roomListTableView performBatchUpdates:^{
+       [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
+    completion:^(BOOL finished) {
+        
+    }];
+    
+    [TAPDataManager callAPIMuteRoom:@[roomID] expiredAt:expiredAt  success:^(NSArray *roomIDs) {
+        
+    } failure:^(NSError *error) {
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+    }];
+}
+
+- (void)callApiUnmuteRoom:(NSString *)roomID {
+    [self.mutedRoomDictionary removeObjectForKey:roomID];
+    [TAPDataManager setMutedRoomDictionary:self.mutedRoomDictionary];
+    
+    TAPRoomListModel *roomList = [self.roomListDictionary objectForKey:roomID];
+    
+    if(roomList == nil) {
+        return;
+    }
+    
+    NSInteger index = [self.roomListArray indexOfObject:roomList];
+    NSIndexPath *messageIndexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    
+    [self.roomListView.roomListTableView performBatchUpdates:^{
+       [self.roomListView.roomListTableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:messageIndexPath, nil] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
+    completion:^(BOOL finished) {
+        
+    }];
+    [TAPDataManager callAPIUnMuteRoom:@[roomID] success:^(NSArray *roomIDs) {
+        
+    } failure:^(NSError *error) {
+        NSString *errorMessage = [error.userInfo objectForKey:@"message"];
+        errorMessage = [TAPUtil nullToEmptyString:errorMessage];
+        [self showPopupViewWithPopupType:TAPPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Error" title:NSLocalizedStringFromTableInBundle(@"Failed", nil, [TAPUtil currentBundle], @"") detailInformation:errorMessage leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
     }];
 }
 

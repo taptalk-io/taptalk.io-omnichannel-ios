@@ -215,6 +215,79 @@
     [self sendTextMessage:message room:room start:start success:success failure:failure];
 }
 
+- (void)sendLinkMessage:(NSString *)message
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *firstUrl = [urls objectAtIndex:0];
+    NSDictionary *messageData = @{@"url":firstUrl, @"urls":urls, @"title":title, @"description":description, @"image":image};
+    [[TAPChatManager sharedManager] sendLinkMessage:message messageData:messageData room:room success:^(TAPMessageModel *message) {
+        void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+        NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+        [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+        start(message);
+    }];
+}
+
+- (void)sendLinkMessage:(NSString *)message
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  siteName:(NSString *_Nullable)siteName
+                  type:(NSString *_Nullable)type
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    NSString *firstUrl = [urls objectAtIndex:0];
+    NSDictionary *messageData = @{@"url":firstUrl, @"urls":urls, @"title":title, @"description":description, @"image":image, @"siteName":siteName, @"type":type};
+    [[TAPChatManager sharedManager] sendLinkMessage:message messageData:messageData room:room success:^(TAPMessageModel *message) {
+        void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+        NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+        [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+        start(message);
+    }];
+}
+
+- (void)sendLinkMessage:(NSString *)message
+          quotedMessage:(TAPMessageModel *)quotedMessage
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
+    [self sendLinkMessage:message room:room urls:urls title:title description:description image:image start:start success:success failure:failure];
+}
+
+- (void)sendLinkMessage:(NSString *)message
+          quotedMessage:(TAPMessageModel *)quotedMessage
+                   room:(TAPRoomModel *)room
+                   urls:(NSArray<NSString *> *)urls
+                   title:(NSString *)title
+                   description:(NSString *)description
+                  image:(NSString *_Nullable)image
+                  siteName:(NSString *_Nullable)siteName
+                  type:(NSString *_Nullable)type
+                  start:(void (^)(TAPMessageModel *message))start
+                success:(void (^)(TAPMessageModel *message))success
+                failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    [[TAPChatManager sharedManager] saveToQuotedMessage:quotedMessage userInfo:nil roomID:room.roomID];
+    [self sendLinkMessage:message room:room urls:urls title:title description:description image:image siteName:siteName type:type start:start success:success failure:failure];
+}
+
+
 - (void)sendLocationMessageWithLatitude:(CGFloat)latitude
                               longitude:(CGFloat)longitude
                                 address:(nullable NSString *)address
@@ -1060,9 +1133,8 @@
     if (message.isDelivered) {
         return;
     }
-
-    message.isDelivered = YES;
     [[TAPMessageStatusManager sharedManager] markMessageAsDeliveredWithMessage:message];
+    message.isDelivered = YES;
 }
 
 - (void)markMessagesAsDelivered:(NSArray<TAPMessageModel *> *)messageArray {
@@ -1075,8 +1147,8 @@
     if (message.isRead) {
         return;
     }
-    message.isRead = YES;
     [[TAPMessageStatusManager sharedManager] markMessageAsReadWithMessage:message];
+    message.isRead = YES;
 }
 
 - (void)markMessagesAsRead:(NSArray<TAPMessageModel *> *)messageArray {
@@ -1709,68 +1781,263 @@
     }];
 }
 
-- (void)editMessage:(TAPMessageModel *)message
-        updatedText:(NSString *)updatedText
+- (void)editMessage:(TAPMessageModel *)previousMessage
+        updatedText:(NSString *)updatedMessage
             start:(void (^)(TAPMessageModel *message))start
             success:(void (^)(TAPMessageModel *message))success
             failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
     
-    if (message.type == TAPChatMessageTypeText) {
-        if (updatedText.length > kCharacterLimit) {
-            NSString *errorMessage = [NSString stringWithFormat:@"Message exceeds the %ld character limit", (long)kCharacterLimit];
-            NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
-            failure(message, error);
-            return;
-        }
-        message.body = updatedText;
+    [[TAPChatManager sharedManager] editMessage:previousMessage
+                                           updatedText:updatedMessage isMessageTypeChange:NO
+    start:^(TAPMessageModel * _Nonnull message) {
+        start(message);
     }
-    else if (message.type == TAPChatMessageTypeImage || message.type == TAPChatMessageTypeVideo) {
-        NSInteger length = updatedText.length;
-        NSInteger max = [[TapTalk sharedInstance] getMaxCaptionLength];
-        if (updatedText.length > [[TapTalk sharedInstance] getMaxCaptionLength]) {
-            NSString *errorMessage = [NSString stringWithFormat:@"Caption exceeds the %ld character limit", (long)[[TapTalk sharedInstance] getMaxCaptionLength]];
-            NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90306 errorMessage:errorMessage];
-            failure(message, error);
-            return;
-        }
-        NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
-        dataDictionary = [message.data mutableCopy];
-        dataDictionary = [[TAPUtil nullToEmptyDictionary:dataDictionary] mutableCopy];
-        [dataDictionary setObject:updatedText forKey:@"caption"];
-        
-        message.data = dataDictionary;
-        
-        if (message.type == TAPChatMessageTypeImage) {
-            if ([updatedText isEqualToString:@""]) {
-                message.body = @"🖼 Photo";
-            }
-            else {
-                message.body = [NSString stringWithFormat:@"🖼 %@", updatedText];
-            }
-        }
-        else if (message.type == TAPChatMessageTypeVideo) {
-            if ([updatedText isEqualToString:@""]) {
-                message.body = @"🎥 Video";
-            }
-            else {
-                message.body = [NSString stringWithFormat:@"🎥 %@", updatedText];
-            }
-        }
+    success:^(TAPMessageModel * _Nonnull message) {
+        void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+        NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+        [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
     }
-    else {
-        NSString *errorMessage = @"Invalid message type. Allowed types are text (1001), image (1002), video (1003)";
-        NSError *error = [[TAPCoreErrorManager sharedManager] generateLocalizedErrorWithErrorCode:90309 errorMessage:errorMessage];
-        failure(message, error);
-        return;
-    }
+    failure:^(TAPMessageModel * _Nullable message, NSError *error) {
+        failure(message,error);
+    }];
     
-    start(message);
-    
-    [[TAPChatManager sharedManager] sendEmitWithEditedMessage:message];
-    void (^handlerSuccess)(TAPMessageModel *) = [success copy];
-    NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
-    [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
-    [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+   
 }
+
+- (void)editMessage:(TAPMessageModel *)updatedMessage
+            start:(void (^)(TAPMessageModel *message))start
+            success:(void (^)(TAPMessageModel *message))success
+            failure:(void (^)(TAPMessageModel * _Nullable message, NSError *error))failure {
+    
+    [[TAPChatManager sharedManager] editMessage:updatedMessage
+    start:^(TAPMessageModel * _Nonnull message) {
+        start(message);
+    }
+    success:^(TAPMessageModel * _Nonnull message) {
+        void (^handlerSuccess)(TAPMessageModel *) = [success copy];
+        NSMutableDictionary *blockTypeDictionary = [[NSMutableDictionary alloc] init];
+        [blockTypeDictionary setObject:handlerSuccess forKey:@"successBlock"];
+        [self.blockDictionary setObject:blockTypeDictionary forKey:message.localID];
+    }
+    failure:^(TAPMessageModel * _Nullable message, NSError *error) {
+        failure(message,error);
+    }];
+    
+   
+}
+
+- (void)pinMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID{
+    [self pinMessagesWithMessageIDs:@[messageID] roomID:roomID
+    success:^(NSArray<NSString *> *pinnedMessagesIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)pinMessageWithMessageID:(NSString *)messageID
+                          roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    NSArray<NSString *> *messageIDs = @[messageID];
+    [self pinMessagesWithMessageIDs:messageIDs roomID:roomID success:success failure:failure];
+}
+
+- (void)pinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID {
+    [self pinMessagesWithMessageIDs:messageIDs roomID:roomID
+    success:^(NSArray<NSString *> *pinnedMessagesIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)pinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                           failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIPinMessage:roomID messageID:messageIDs
+    success:^(NSArray *pinnedMessageIDs) {
+        success(pinnedMessageIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)unpinMessageWithMessageID:(NSString *)messageID roomID:(NSString *)roomID{
+    [self unpinMessageWithMessageID:messageID roomID:roomID
+    success:^(NSArray<NSString *> *unpinnedMessageIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)unpinMessageWithMessageID:(NSString *)messageID
+                            roomID:(NSString *)roomID
+                           success:(void (^)(NSArray<NSString *> *unpinnedMessageIDs))success
+                           failure:(void (^)(NSError *error))failure {
+    NSArray<NSString *> *messageIDs = @[messageID];
+    [self unpinMessagesWithMessageIDs:messageIDs roomID:roomID success:success failure:failure];
+}
+
+- (void)unpinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs roomID:(NSString *)roomID {
+    [self unpinMessagesWithMessageIDs:messageIDs roomID:roomID
+    success:^(NSArray<NSString *> *unpinnedMessageIDs) {
+        
+    }
+    failure:^(NSError *error) {
+        
+    }];
+}
+
+- (void)unpinMessagesWithMessageIDs:(NSArray<NSString *> *)messageIDs
+                              roomID:(NSString *)roomID
+                             success:(void (^)(NSArray<NSString *> *unpinnedMessageIDs))success
+                             failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIUnPinMessage:roomID messageID:messageIDs
+    success:^(NSArray *unpinnedMessageIDs) {
+        success(unpinnedMessageIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)getPinnedMessagesWithRoomID:(NSString *)roomID
+                          pageNumber:(NSInteger)pageNumber
+                       numberOfItems:(NSInteger)numberOfItems
+                         success:(void (^)(NSArray<TAPMessageModel *> *pinnedMessagesArray,BOOL hasMoreData))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetPinnedMessages:roomID pageNumber:pageNumber numberOfItems:numberOfItems
+    success:^(NSArray *pinnedMessagesArray,BOOL hasMore) {
+        success(pinnedMessagesArray,hasMore);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)getPinnedMessageIDsWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSString *> *pinnedMessagesIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetPinnedMessageIDs:roomID
+    success:^(NSArray *pinnedMessagesIDs) {
+        success(pinnedMessagesIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)createScheduleMessage:(TAPMessageModel *)message scheduleTime:(NSNumber *)scheduleTime success:(void (^)(TAPMessageModel *message))success failure:(void (^)(NSError *error))failure {
+    NSDictionary *encryptedMessageDictionary = [TAPEncryptorManager encryptToDictionaryFromMessageModelForAPI:message];
+    [TAPDataManager callAPICreateScheduleMessage:encryptedMessageDictionary scheduledTime:scheduleTime success:^(TAPMessageModel *scheduledMessage) {
+        success(scheduledMessage);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+    
+}
+
+- (void)getScheduledMessagesWithRoomID:(NSString *)roomID
+                         success:(void (^)(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIGetScheduleMessage:roomID
+    success:^(NSArray<TAPScheduledMessageModel *> *scheduleMessageArray) {
+        success(scheduleMessageArray);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)sendScheduledMessagesNow:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *sentIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIScheduleMessageSendNow:scheduleIDs roomID:roomID
+    success:^(NSArray<NSNumber *> *sentIDs) {
+        success(sentIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)sendScheduledMessageNow:(NSNumber *)scheduleID roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *sentIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    [self sendScheduledMessagesNow:@[scheduleID] roomID:roomID success:^(NSArray<NSNumber *> *sentIDs) {
+        success(sentIDs);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)editScheduledMessageTime:(NSNumber *)scheduleID scheduledTime:(NSNumber *)scheduledTime
+                         success:(void (^)(BOOL isEditTimeSuccess))success
+                         failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIEditScheduleMessageTime:scheduleID scheduledTime:scheduledTime success:^(BOOL isEditTimeSuccess) {
+        success(isEditTimeSuccess);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)editScheduledMessageContent:(NSNumber *)scheduleID updatedMessage:(TAPMessageModel *)updatedMessage
+                         success:(void (^)(BOOL isEditContentSuccess))success
+                         failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIEditScheduleMessageContent:scheduleID updatedMessage:updatedMessage success:^(BOOL isEditContentSuccess) {
+        success(isEditContentSuccess);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)deleteScheduledMessages:(NSArray<NSNumber *> *)scheduleIDs roomID:(NSString *)roomID
+                         success:(void (^)(NSArray<NSNumber *> *deletedIDs))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    [TAPDataManager callAPIDeleteScheduleMessage:scheduleIDs roomID:roomID
+    success:^(NSArray<NSNumber *> *deletedIDs) {
+        success(deletedIDs);
+    }
+    failure:^(NSError *error) {
+        failure(error);
+    }];
+}
+
+- (void)deleteScheduledMessage:(NSNumber *)scheduleID roomID:(NSString *)roomID
+                                    success:(void (^)(NSArray<NSNumber *> *deletedIDs))success
+                                    failure:(void (^)(NSError *error))failure {
+    [self deleteScheduledMessages:@[scheduleID] roomID:roomID success:^(NSArray<NSNumber *> *deletedIDs) {
+        success(deletedIDs);
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+    
+}
+
+- (void)getSharedContentMessagesWithRoomID:(NSString *)roomID maxCreated:(long)maxCreated minCreated:(long)minCreated
+                           success:(void (^)(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray))success
+                           failure:(void (^)(NSError *error))failure {
+    [TAPDataManager callAPIGetSharedContent:roomID maxCreated:maxCreated  minCreated:minCreated success:^(NSArray <TAPMessageModel *> *mediaMessagesArray, NSArray <TAPMessageModel *> *linkMessagesArray, NSArray <TAPMessageModel *> *fileMessagesArray) {
+        success(mediaMessagesArray, fileMessagesArray, linkMessagesArray);
+        
+    } failure:^(NSError *error) {
+        failure(error);
+    }];
+    
+}
+
 
 @end
