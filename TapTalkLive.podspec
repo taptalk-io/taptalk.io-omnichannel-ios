@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
-    s.source       = { :git => 'https://github.com/taptalk-io/taptalk.io-omnichannel-ios.git', :tag => s.version }
+    s.source       = { :git => 'https://git.taptalk.io/taptalk-io/onetalk-livechat-ios.git', :tag => s.version }
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
 
