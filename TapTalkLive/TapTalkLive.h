@@ -11,6 +11,7 @@
 #import <UserNotifications/UserNotifications.h>
 #import "TTLCreateCaseViewController.h"
 #import "TTLCaseListViewController.h"
+#import "TTLHomeLauncherViewController.h"
 
 //! Project version number for TapTalkLive.
 FOUNDATION_EXPORT double TapTalkLiveVersionNumber;
@@ -42,6 +43,7 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 
 //Property
 - (TTLCaseListViewController *_Nonnull)roomListViewController;
+- (TTLHomeLauncherViewController *)getHomeLauncherVC;
 
 //==========================================================
 //            UIApplicationDelegate Handling
@@ -160,6 +162,8 @@ Called to show TapTalk Live view with present animation
 - (void)presentTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
                                                      animated:(BOOL)animated;
 
+- (void)presentCreateCaseViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated;
+
 /**
 Called to show TapTalk Live view with push animation
 
@@ -168,6 +172,8 @@ Called to show TapTalk Live view with push animation
 */
 - (void)pushTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
                                                   animated:(BOOL)animated;
+
+- (void)presentHomeLauncherViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated;
 
 /**
 Obtain main view controller of TapTalk Live

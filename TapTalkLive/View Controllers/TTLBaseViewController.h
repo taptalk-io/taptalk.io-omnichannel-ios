@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString * _Nonnull)popupIdentifier;
 - (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString * _Nonnull)popupIdentifier;
 - (void)showNavigationSeparator:(BOOL)show;
+- (void)showFooterView:(BOOL)show;
 
 @end
 

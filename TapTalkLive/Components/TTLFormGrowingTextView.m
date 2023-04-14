@@ -15,6 +15,7 @@
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *placeholderLabel;
 @property (nonatomic) BOOL isActive;
+@property (nonatomic) BOOL isError;
 
 - (void)initialSetup;
 - (void)checkHeight;
@@ -120,6 +121,22 @@
             
         [self.containerView addSubview:self.textView];
     }
+    
+    _errorInfoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.containerView.frame) + 8.0f, 16.0f, 16.0f)];
+    self.errorInfoImageView.image = [UIImage imageNamed:@"IconInfo" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    self.errorInfoImageView.alpha = 0.0f;
+    [self addSubview:self.errorInfoImageView];
+
+    UIFont *formErrorInfoLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormErrorInfoLabel];
+    UIColor *formErrorInfoLabelColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFormErrorInfoLabel];
+    
+    _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.errorInfoImageView.frame), CGRectGetMaxY(self.containerView.frame) + 5.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 20.0f)];
+    self.errorInfoLabel.font = formErrorInfoLabelFont;
+    self.errorInfoLabel.textColor = formErrorInfoLabelColor;
+    self.errorInfoLabel.numberOfLines = 0;
+    self.errorInfoLabel.text = @"This field is required";
+    self.errorInfoLabel.alpha = 0.0f;
+    [self addSubview:self.errorInfoLabel];
     
     self.textView.textContainerInset = UIEdgeInsetsZero;
     
@@ -324,8 +341,79 @@
     }
 }
 
+- (void)showErrorInfoText {
+    self.errorInfoLabel.alpha = 1.0f;
+    self.errorInfoImageView.alpha = 1.0f;
+}
+
+- (void)setAsEnabled:(BOOL)enabled {
+    
+    UIColor *textFieldColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFormTextField];
+    UIColor *textFieldPlaceholderColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFormTextFieldPlaceholder];
+    
+    if (enabled) {
+        self.textView.textColor = textFieldColor;
+        self.textView.userInteractionEnabled = YES;
+        self.containerView.backgroundColor = [UIColor whiteColor];
+    }
+    else {
+        self.textView.textColor = textFieldPlaceholderColor;
+        self.textView.userInteractionEnabled = NO;
+        self.containerView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f];
+    }
+}
+
+- (void)setAsError:(BOOL)error animated:(BOOL)animated {
+    _isError = error;
+    
+    if (self.isActive && !error) {
+        [self setAsActive:YES animated:animated];
+        return;
+    }
+    
+    if (animated) {
+        if (error) {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.shadowView.alpha = 0.0f;
+                self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderError].CGColor;
+                self.errorInfoLabel.alpha = 1.0f;
+                self.errorInfoImageView.alpha = 1.0f;
+            }];
+        }
+        else {
+            [UIView animateWithDuration:0.2f animations:^{
+                self.shadowView.alpha = 0.0f;
+                self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderInactive].CGColor;
+                self.errorInfoLabel.alpha = 0.0f;
+                self.errorInfoImageView.alpha = 0.0f;
+                
+            }];
+        }
+    }
+    else {
+        if (error) {
+            self.shadowView.alpha = 0.0f;
+            self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderError].CGColor;
+            self.errorInfoLabel.alpha = 1.0f;
+            self.errorInfoImageView.alpha = 1.0f;
+        }
+        else {
+            self.shadowView.alpha = 0.0f;
+            self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderInactive].CGColor;
+            self.errorInfoLabel.alpha = 0.0f;
+            self.errorInfoImageView.alpha = 0.0f;
+        }
+    }
+}
+
+
 - (CGFloat)getHeight {
-    return CGRectGetMaxY(self.containerView.frame);
+    if(self.errorInfoLabel.alpha == 0) {
+        return CGRectGetMaxY(self.containerView.frame);
+    }
+    else {
+        return CGRectGetMaxY(self.errorInfoLabel.frame);
+    }
 }
 
 - (NSString *)getText {
@@ -342,7 +430,10 @@
                 self.shadowView.alpha = 1.0f;
                 self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
                 self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
+                self.errorInfoLabel.alpha = 0.0f;
+                self.errorInfoImageView.alpha = 0.0f;
             }];
+            
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
@@ -356,6 +447,8 @@
             self.shadowView.alpha = 1.0f;
             self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
             self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
+            self.errorInfoLabel.alpha = 0.0f;
+            self.errorInfoImageView.alpha = 0.0f;
         }
         else {
             self.shadowView.alpha = 0.0f;

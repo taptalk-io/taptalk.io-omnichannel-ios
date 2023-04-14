@@ -40,8 +40,13 @@ typedef NS_ENUM(NSInteger,TTLCreateCaseViewType) {
 - (void)showCloseButton:(BOOL)isShow;
 - (void)showCreateCaseButtonAsLoading:(BOOL)loading;
 - (void)setCreateCaseViewType:(TTLCreateCaseViewType)createCaseViewType;
-
-
+- (void)showErrorEmailWithInfo:(NSString *)errorInfo;
+- (void)showErrorFullnameWithInfo:(NSString *)errorInfo;
+- (void)showErrorTopicWithInfo:(NSString *)errorInfo;
+- (void)showErrorMessageTextWithInfo:(NSString *)errorInfo;
+- (void)resetMessagePosition;
+- (void)resetFieldState;
+- (void)repositionFieldPosition;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -209,9 +209,10 @@
                 gradient.colors = [NSArray arrayWithObjects:(id)[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonInactiveBackgroundGradientLight].CGColor, (id)[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonInactiveBackgroundGradientDark].CGColor, nil];
                 gradient.startPoint = CGPointMake(0.0f, 0.0f);
                 gradient.endPoint = CGPointMake(0.0f, 1.0f);
-                [self.buttonContainerView.layer replaceSublayer:[self.buttonContainerView.layer.sublayers objectAtIndex:0] with:gradient];
+                //[self.buttonContainerView.layer replaceSublayer:[self.buttonContainerView.layer.sublayers objectAtIndex:0] with:gradient];
                 
-                self.buttonContainerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonInactiveBorder].CGColor;
+               // self.buttonContainerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonInactiveBorder].CGColor;
+                self.buttonContainerView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f];
                 self.button.userInteractionEnabled = NO;
                 
                 self.shadowView.layer.shadowColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonInactiveBorder].CGColor;

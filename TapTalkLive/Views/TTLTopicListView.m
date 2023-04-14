@@ -21,7 +21,7 @@
     if (self) {
         self.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         
-        _tableView = [[UITableView alloc] initWithFrame: CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame))];
+        _tableView = [[UITableView alloc] initWithFrame: CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) - 35.0f)];
         self.tableView.backgroundColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorDefaultBackground];
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         [self.tableView setSectionIndexColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTableViewSectionIndex]];

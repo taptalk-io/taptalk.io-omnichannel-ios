@@ -83,6 +83,13 @@
 
 - (BOOL)formGrowingTextView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     NSString *newString = [textView.text stringByReplacingCharactersInRange:range withString:text];
+    if(newString.length >= 1000) {
+        return NO;
+    }
+    else {
+        NSString *charCounter = [NSString stringWithFormat:@"(%ld/1000)",newString.length];
+        self.ratingView.characterCounterLabel.text = charCounter;
+    }
     newString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (![newString isEqualToString:@""] && self.isRatingStarTapped) {
         [self.ratingView setSubmitButtonAsActive:YES];
@@ -111,21 +118,32 @@
     NSString *additionalNotes = [self.ratingView.commentTextView getText];
     additionalNotes = [TTLUtil nullToEmptyString:additionalNotes];
     
+    [self.ratingView setLoadingState:YES];
     [TTLDataManager callAPIRateConversionWithCaseID:caseID rating:self.starRatingValue notes:additionalNotes success:^(BOOL isSuccess) {
         [self.ratingView.submitButtonView setAsLoading:NO animated:YES];
-        
+        [self.ratingView setLoadingState:NO];
         if (isSuccess) {
             //Success
-            [self closeButtonDidTapped];
+            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeSuccessMessage popupIdentifier:@"success" title:NSLocalizedStringFromTableInBundle(@"Thank You!", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Your feedback is highly appreciated and will help us to improve our ability to serve you and other users!", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:@"OK"];
+            //[self closeButtonDidTapped];
         }
         else {
             //Failed
+            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"fail" title:NSLocalizedStringFromTableInBundle(@"Failed to Submit", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"There’s an error while submitting, please try to resubmit your rating of this conversation.", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:@"OK"];
         }
     } failure:^(NSError * _Nonnull error) {
+        [self.ratingView setLoadingState:NO];
         [self.ratingView.submitButtonView setAsLoading:NO animated:YES];
+        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"fail" title:NSLocalizedStringFromTableInBundle(@"Failed to Submit", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"There’s an error while submitting, please try to resubmit your rating of this conversation.", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:@"OK"];
     }];
     
     
+}
+
+- (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
+    if([popupIdentifier isEqualToString:@"success"]) {
+        [self closeButtonDidTapped];
+    }
 }
 
 #pragma mark - Custom Method
@@ -152,25 +170,47 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void)submitButtonDidTapped {
+    
+}
+
 - (void)firstStarRatingDidTapped {
+    if(![self.ratingView.commentTextView.text isEqualToString:@""]) {
+        [self.ratingView setSubmitButtonAsActive:YES];
+    }
+    else {
+        [self.ratingView setSubmitButtonAsActive:NO];
+    }
     _isRatingStarTapped = YES;
     _starRatingValue = 1;
+    self.ratingView.commentLabel.alpha = 0.0f;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
-    [self.ratingView setSubmitButtonAsActive:YES];
 }
 
 - (void)secondStarRatingDidTapped {
     _isRatingStarTapped = YES;
     _starRatingValue = 2;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
-    [self.ratingView setSubmitButtonAsActive:YES];
+    self.ratingView.commentLabel.alpha = 0.0f;
+    if(![self.ratingView.commentTextView.text isEqualToString:@""]) {
+        [self.ratingView setSubmitButtonAsActive:YES];
+    }
+    else {
+        [self.ratingView setSubmitButtonAsActive:NO];
+    }
 }
 
 - (void)thirdStarRatingDidTapped {
     _isRatingStarTapped = YES;
     _starRatingValue = 3;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
-    [self.ratingView setSubmitButtonAsActive:YES];
+    self.ratingView.commentLabel.alpha = 0.0f;
+    if(![self.ratingView.commentTextView.text isEqualToString:@""]) {
+        [self.ratingView setSubmitButtonAsActive:YES];
+    }
+    else {
+        [self.ratingView setSubmitButtonAsActive:NO];
+    }
 }
 
 - (void)fourthStarRatingDidTapped {
@@ -178,6 +218,7 @@
     _starRatingValue = 4;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
+    self.ratingView.commentLabel.alpha = 1.0f;
 }
 
 - (void)fifthStarRatingDidTapped {
@@ -185,6 +226,7 @@
     _starRatingValue = 5;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
+    self.ratingView.commentLabel.alpha = 1.0f;
 }
 
 @end

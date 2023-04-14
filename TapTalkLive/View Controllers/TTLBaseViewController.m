@@ -12,6 +12,7 @@
 @interface TTLBaseViewController ()
 
 @property (strong, nonatomic) UIImage *navigationShadowImage;
+@property (strong, nonatomic) UIView *footerView;
 @property (nonatomic) CGFloat navigationBarShadowOpacity;
 
 - (void)backButtonDidTapped;
@@ -64,6 +65,16 @@
     if (@available(iOS 13, *)) {
         self.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
     }
+    
+    self.footerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight([UIScreen mainScreen].bounds) - 33.0f - [TTLUtil safeAreaBottomPadding], CGRectGetWidth([UIScreen mainScreen].bounds), 33.0f)];
+    self.footerView.backgroundColor = [UIColor whiteColor];
+    self.footerView.alpha = 0.0f;
+    
+    UIImageView *footerImage = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.footerView.frame) - 168.0f) / 2, 4.0f, 168.0f, 25.0f)];
+    footerImage.image = [UIImage imageNamed:@"TTLImageFooter" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    [self.footerView addSubview:footerImage];
+    
+    [self.view addSubview:self.footerView];
 }
 
 - (void)viewDidUnload {
@@ -263,6 +274,15 @@
         [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
         [self.navigationController.navigationBar setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
         self.navigationController.navigationBar.layer.shadowOpacity = 0.0f;
+    }
+}
+
+- (void)showFooterView:(BOOL)show {
+    if(show) {
+        self.footerView.alpha = 1.0f;
+    }
+    else {
+        self.footerView.alpha = 0.0f;
     }
 }
 

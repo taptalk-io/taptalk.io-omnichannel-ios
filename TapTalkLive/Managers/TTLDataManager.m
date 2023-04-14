@@ -11,6 +11,7 @@
 #import "TTLTapTalkRoomModel.h"
 #import "TAPDataManager.h"
 #import "TAPEncryptorManager.h"
+#import "TTLChannelModel.h"
 
 @interface TTLDataManager()
 
@@ -976,9 +977,12 @@
         NSString *tapTalkAppKeySecret = [tapTalkConfigsDictionary objectForKey:@"appKeySecret"];
         tapTalkAppKeySecret = [TTLUtil nullToEmptyString:tapTalkAppKeySecret];
         
+        NSArray *channelList = [dataDictionary objectForKey:@"channelLinks"];
+        
         [[NSUserDefaults standardUserDefaults] setSecureObject:tapTalkAPIURLString forKey:TTL_PREFS_TAPTALK_API_URL];
         [[NSUserDefaults standardUserDefaults] setSecureObject:tapTalkAppKeyID forKey:TTL_PREFS_TAPTALK_APP_KEY_ID];
         [[NSUserDefaults standardUserDefaults] setSecureObject:tapTalkAppKeySecret forKey:TTL_PREFS_TAPTALK_APP_KEY_SECRET];
+        [[NSUserDefaults standardUserDefaults] setSecureObject:channelList forKey:TTL_PREFS_CHANNEL_LIST];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         success(tapTalkConfigsDictionary);
@@ -1983,5 +1987,128 @@
     }];
 }
 
++ (void)callAPIGetFaqPath:(void (^)(TTLFaqModel *faqModel))success
+                                failure:(void (^)(NSError *error))failure {
+    /**
+    NSString *jsonString = @"{\"itemID\":35,\"pathID\":10,\"parentID\":0,\"sequence\":0,\"title\":\"Selamat datang di TapTalk.io! Apa itu OmniChannel? Selamat datang di TapTalk.io! Apa itu OmniChannel? Selamat datang di TapTalk.io! Apa itu OmniChannel? Selamat datang di TapTalk.io! Apa itu OmniChann\",\"content\":\"Omnichannel adalah platform integrasi berbagai saluran yang digabungkan menjadi satu sistem manajemen untuk meningkatkan kepuasan pelanggan dan pengalaman pelanggan.\\n\\nDalam hal customer support, omnichannel menyatukan berbagai saluran perpesanan dalam platform yang sama. Omnichannel fokus pada perjalanan pelanggan dalam berkomunikasi dengan perusahaan, sehingga kualitas pengalaman yang didapatkan menjadi lebih mulus.\\nOmnichannel adalah platform integrasi berbagai saluran yang digabungkan menjadi satu sistem manajemen untuk meningkatkan kepuasan pelanggan dan pengalaman pelanggan.\\n\\nDalam hal customer support, omnichannel menyatukan berbagai saluran perpesanan dalam platform yang sama. Omnichannel fokus pada perjalanan pelanggan dalam berkomunikasi dengan perusahaan, sehingga kualitas pengalaman yang didapatkan menjadi lebih mulus.\\nOmnichannel adalah platform integrasi berbagai saluran yang digabungkan menjadi satu sistem manajemen untuk meningkatkan kepuasan pelanggan dan pengalaman pel\",\"type\":\"qna\",\"createdTime\":1641534357255,\"updatedTime\":1669876981058,\"deletedTime\":0,\"childItems\":[{\"itemID\":50,\"pathID\":10,\"parentID\":35,\"sequence\":2,\"title\":\"How to know what's the best subscription plan for your business?\",\"content\":\"How to know what's the best subscription plan for your business?\\n\\ndi atas ini kosong\\nHow to know what's the best subscription plan for your business\\n\",\"type\":\"talk_to_agent\",\"createdTime\":1641792012566,\"updatedTime\":1642671098853,\"deletedTime\":0,\"topics\":[{\"id\":1,\"name\":\"Billing kepotong gak??\"},{\"id\":96,\"name\":\"General yang panjanggggg yaaa coba dehhhhhhh\"},{\"id\":362,\"name\":\"new topic 2\"},{\"id\":361,\"name\":\"tes topic namanya panjang tes topic namanya\"}]},{\"itemID\":57,\"pathID\":10,\"parentID\":35,\"sequence\":3,\"title\":\"Why our company is the best choice for you?\",\"content\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae interdum sem, et congue turpis. Donec efficitur porttitor mauris, tempor dapibus ligula commodo tempus. Suspendisse congue nibh sit amet leo ultrices dictum. Proin pretium ornare sagittis. Donec vitae neque a lectus euismod rutrum. Proin a porta risus. Nullam semper velit sapien, sed venenatis metus pulvinar et. Etiam mollis tristique erat, nec vestibulum eros molestie nec. Fusce pulvinar est non quam iaculis gravida. Nulla tincidunt vulputate diam, varius vulputate lacus lobortis vel. Sed volutpat enim in iaculis imperdiet. Nulla semper sagittis porttitor. Nam rutrum lacus ligula, eu accumsan urna aliquam et.\\n.\\n.\\n.\\nullamcorper mollis metus, volutpat porta augue sodales fermentum. Cras vel elit ac urna ultrices tempor at nec nibh. Curabitur convallis augue non accumsan mollis. In quis elit ipsum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed tristique enim nec mauris\",\"type\":\"qna\",\"createdTime\":1641803736932,\"updatedTime\":0,\"deletedTime\":0,\"childItems\":[{\"itemID\":58,\"pathID\":10,\"parentID\":57,\"sequence\":1,\"title\":\"More About Our Company\",\"content\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae interdum sem, et congue turpis. Donec efficitur porttitor mauris, tempor dapibus ligula commodo tempus. Suspendisse congue nibh sit amet leo ultrices dictum. Proin pretium ornare sagittis. Donec vitae neque a lectus euismod rutrum. Proin a porta risus. Nullam semper velit sapien, sed venenatis metus pulvinar et. Etiam mollis tristique erat, nec vestibulum eros molestie nec. Fusce pulvinar est non quam iaculis gravida. Nulla tincidunt vulputate diam, varius vulputate lacus lobortis vel. Sed volutpat enim in iaculis imperdiet. Nulla semper sagittis porttitor. Nam rutrum lacus ligula, eu accumsan urna aliquam\",\"type\":\"qna\",\"createdTime\":1641803770519,\"updatedTime\":0,\"deletedTime\":0},{\"itemID\":91,\"pathID\":10,\"parentID\":57,\"sequence\":2,\"title\":\"q\",\"content\":\"b\",\"type\":\"qna\",\"createdTime\":1642138351639,\"updatedTime\":0,\"deletedTime\":0},{\"itemID\":92,\"pathID\":10,\"parentID\":57,\"sequence\":3,\"title\":\"b\",\"content\":\"b\",\"type\":\"qna\",\"createdTime\":1642138359112,\"updatedTime\":0,\"deletedTime\":0},{\"itemID\":93,\"pathID\":10,\"parentID\":57,\"sequence\":4,\"title\":\"What is OmniChannel? \",\"content\":\"What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? What is OmniChannel? \",\"type\":\"qna\",\"createdTime\":1642138365487,\"updatedTime\":1655196511440,\"deletedTime\":0},{\"itemID\":94,\"pathID\":10,\"parentID\":57,\"sequence\":5,\"title\":\"asd\",\"content\":\"123\",\"type\":\"qna\",\"createdTime\":1642138378117,\"updatedTime\":0,\"deletedTime\":0}]},{\"itemID\":59,\"pathID\":10,\"parentID\":35,\"sequence\":4,\"title\":\"Services we provide:\",\"content\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae interdum sem, et congue turpis. Donec efficitur porttitor mauris, tempor dapibus ligula commodo tempus. Suspendisse congue nibh sit amet leo ultrices dictum. Proin pretium ornare sagittis. Donec vitae neque a lectus euismod rutrum. Proin a porta risus. Nullam semper velit sapien, sed venenatis metus pulvinar et. Etiam mollis tristique erat, nec vestibulum eros molestie nec. Fusce pulvinar est non quam iaculis gravida. Nulla tincidunt vulputate diam, varius vulputate lacus lobortis vel. Sed volutpat enim in iaculis imperdiet. Nulla semper sagittis porttitor. Nam rutrum lacus ligula, eu accumsan urna aliquam et.\\n.\\n.\\n.\\nullamcorper mollis metus, volutpat porta augue sodales fermentum. Cras vel elit ac urna ultrices tempor at nec nibh. Curabitur convallis augue non accumsan mollis. In quis elit ipsum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed tristique enim nec mauris\",\"type\":\"talk_to_agent\",\"createdTime\":1641803843242,\"updatedTime\":0,\"deletedTime\":0,\"topics\":[{\"id\":1,\"name\":\"Billing kepotong gak??\"},{\"id\":96,\"name\":\"General yang panjanggggg yaaa coba dehhhhhhh\"}]},{\"itemID\":86,\"pathID\":10,\"parentID\":35,\"sequence\":5,\"title\":\"Apa itu Chatbot? Fitur apa saja yang tersedia? Apa itu Chatbot? Fitur apa saja yang tersedia? Apa itu Chatbot? Fitur apa saja yang tersedia? Apa itu Chatbot? Fitur apa saja yang tersedia? \",\"content\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\n\\n!\\\"#$%\\u0026'()*+,-./:;\\u003c=\\u003e?@[\\\\]^_`{|}~ ❌❤️ !\\\"#$%\\u0026'()*+,-./:;\\u003c=\\u003e?@[\\\\]^_`{|}~ ä § ‡ © Æ ¥\\n\\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\",\"type\":\"talk_to_agent\",\"createdTime\":1641963693002,\"updatedTime\":1669877155294,\"deletedTime\":0,\"topics\":[{\"id\":361,\"name\":\"tes topic namanya panjang tes topic namanya\"},{\"id\":362,\"name\":\"new topic 2\"}]},{\"itemID\":89,\"pathID\":10,\"parentID\":35,\"sequence\":6,\"title\":\"title\",\"content\":\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\",\"type\":\"qna\",\"createdTime\":1642138135467,\"updatedTime\":1669877212847,\"deletedTime\":0},{\"itemID\":101,\"pathID\":10,\"parentID\":35,\"sequence\":7,\"title\":\"child 1 talk to agent\",\"content\":\"child 1 talk to agent\",\"type\":\"qna\",\"createdTime\":1642579154210,\"updatedTime\":0,\"deletedTime\":0,\"childItems\":[{\"itemID\":102,\"pathID\":10,\"parentID\":101,\"sequence\":1,\"title\":\"child 1a talk to agent\",\"content\":\"child 1a talk to agent\",\"type\":\"qna\",\"createdTime\":1642579161459,\"updatedTime\":0,\"deletedTime\":0,\"childItems\":[{\"itemID\":103,\"pathID\":10,\"parentID\":102,\"sequence\":1,\"title\":\"child 1a-1 talk to agent\",\"content\":\"child 1a-1 talk to agent\",\"type\":\"talk_to_agent\",\"createdTime\":1642579192033,\"updatedTime\":0,\"deletedTime\":0,\"topics\":[{\"id\":96,\"name\":\"General yang panjanggggg yaaa coba dehhhhhhh\"}]}]},{\"itemID\":111,\"pathID\":10,\"parentID\":101,\"sequence\":2,\"title\":\"child 1b \",\"content\":\"child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b child 1b \",\"type\":\"qna\",\"createdTime\":1655196597467,\"updatedTime\":0,\"deletedTime\":0},{\"itemID\":112,\"pathID\":10,\"parentID\":101,\"sequence\":3,\"title\":\"child 1c  \",\"content\":\"child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  child 1c  \",\"type\":\"talk_to_agent\",\"createdTime\":1655196621531,\"updatedTime\":0,\"deletedTime\":0,\"topics\":[{\"id\":1,\"name\":\"Billing kepotong gak??\"},{\"id\":3,\"name\":\"Career\"},{\"id\":96,\"name\":\"General yang panjanggggg yaaa coba dehhhhhhh\"},{\"id\":378,\"name\":\"Instagram\"},{\"id\":104,\"name\":\"Logistic\"},{\"id\":362,\"name\":\"new topic 2\"},{\"id\":361,\"name\":\"tes topic namanya panjang tes topic namanya\"}]},{\"itemID\":113,\"pathID\":10,\"parentID\":101,\"sequence\":4,\"title\":\"child 1d \",\"content\":\"child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d child 1d \",\"type\":\"qna\",\"createdTime\":1655196642144,\"updatedTime\":0,\"deletedTime\":0}]}]}\n";
+    NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    TTLFaqModel *faqModel = [self dictionaryToFaqModel:json];
+    success(faqModel);
+    return;
+    */
+    NSString *requestURL = [[TTLAPIManager sharedManager] urlForType:TTLAPIManagerTypeFaqPath];
+        
+    NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
+    
+    [[TTLNetworkManager sharedManager] post:requestURL parameters:parameterDictionary progress:^(NSProgress *uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *dataTask, NSDictionary *responseObject) {
+        if (![self isResponseSuccess:responseObject]) {
+            NSDictionary *errorDictionary = [responseObject objectForKey:@"error"];
+            NSString *errorMessage = [errorDictionary objectForKey:@"message"];
+            errorMessage = [TTLUtil nullToEmptyString:errorMessage];
+            
+            NSString *errorStatusCodeString = [responseObject objectForKey:@"status"];
+            errorStatusCodeString = [TTLUtil nullToEmptyString:errorStatusCodeString];
+            NSInteger errorStatusCode = [errorStatusCodeString integerValue];
+            
+            if (errorStatusCode == 401) {
+                //Call refresh token
+                [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
+                    [TTLDataManager callAPIGetFaqPath:success failure:failure];
+                } failure:^(NSError *error) {
+                    failure(error);
+                }];
+                return;
+            }
+            
+            NSInteger errorCode = [[responseObject valueForKeyPath:@"error.code"] integerValue];
+            
+            if (errorMessage == nil || [errorMessage isEqualToString:@""]) {
+                errorCode = 999;
+            }
+            
+            NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
+            failure(error);
+            return;
+        }
+        
+        if ([self isDataEmpty:responseObject]) {
+            success(false);
+            return;
+        }
+        
+        NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
+        dataDictionary = [TTLUtil nullToEmptyDictionary:dataDictionary];
+        
+        TTLFaqModel *faqModel = [self dictionaryToFaqModel:dataDictionary];
+        
+        success(faqModel);
+        
+    } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
+        [TTLDataManager logErrorStringFromError:error];
+        
+    #ifdef DEBUG
+        NSString *errorDomain = error.domain;
+        NSString *newDomain = [NSString stringWithFormat:@"%@ ~ %@", requestURL, errorDomain];
+        
+        NSError *newError = [NSError errorWithDomain:newDomain code:error.code userInfo:error.userInfo];
+        
+        failure(newError);
+    #else
+        NSError *localizedError = [NSError errorWithDomain:NSLocalizedStringFromTableInBundle(@"We are experiencing problem to connect to our server, please try again later...", nil, [TTLUtil currentBundle], @"") code:999 userInfo:@{@"message": NSLocalizedStringFromTableInBundle(@"Failed to connect to our server, please try again later...", nil, [TTLUtil currentBundle], @"")}];
+        failure(localizedError);
+    #endif
+    }];
+}
+
++ (TTLFaqModel *)dictionaryToFaqModel:(NSDictionary *)faqDictionary {
+    NSNumber *itemID = [faqDictionary objectForKey:@"itemID"];
+    NSNumber *pathID = [faqDictionary objectForKey:@"pathID"];
+    NSNumber *parentID = [faqDictionary objectForKey:@"parentID"];
+    NSNumber *sequence = [faqDictionary objectForKey:@"sequence"];
+    NSString *title = [faqDictionary objectForKey:@"title"];
+    NSString *content = [faqDictionary objectForKey:@"content"];
+    NSString *type = [faqDictionary objectForKey:@"type"];
+    NSArray *childItems = [faqDictionary objectForKey:@"childItems"];
+    TTLFaqModel *faq = [TTLFaqModel new];
+    faq.itemID = itemID;
+    faq.pathID = pathID;
+    faq.parentID = parentID;
+    faq.sequence = sequence;
+    faq.title = title;
+    faq.content = content;
+    faq.type = type;
+    faq.childItems = childItems;
+    return faq;
+}
+
++ (NSArray *)dictionaryToChannelModelList:(NSArray *)channelListDictionary {
+    NSMutableArray *channelModelList = [NSMutableArray array];
+    for(NSDictionary *channelLink in channelListDictionary) {
+        NSString *channelID = [channelLink objectForKey:@"id"];
+        channelID = [TTLUtil nullToEmptyString:channelID];
+        NSNumber *sequence = [channelLink objectForKey:@"sequence"];
+        sequence = [TTLUtil nullToEmptyString:sequence];
+        NSString *channel = [channelLink objectForKey:@"channel"];
+        channel = [TTLUtil nullToEmptyString:channel];
+        NSString *url = [channelLink objectForKey:@"url"];
+        url = [TTLUtil nullToEmptyString:url];
+        NSNumber *isEnabled = [channelLink objectForKey:@"isEnabled"];
+        
+        TTLChannelModel *channelModel = [TTLChannelModel new];
+        channelModel.channelID = channelID;
+        channelModel.channel = channel;
+        channelModel.sequence = sequence;
+        channelModel.url = url;
+        channelModel.isEnabled = [isEnabled integerValue];
+        
+        [channelModelList addObject:channelModel];
+        
+    }
+    
+    return [channelModelList copy];
+}
 
 @end
