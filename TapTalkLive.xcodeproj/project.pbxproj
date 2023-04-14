@@ -9,6 +9,27 @@
 /* Begin PBXBuildFile section */
 		0A5B807F2872EDD4002BA4BC /* TTLTapTalkRoomModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A5B807D2872EDD4002BA4BC /* TTLTapTalkRoomModel.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0A5B80802872EDD5002BA4BC /* TTLTapTalkRoomModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A5B807E2872EDD4002BA4BC /* TTLTapTalkRoomModel.m */; };
+		0AF7E2CB29E947FF00899392 /* HomeLauncherViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AF7E2C529E947FE00899392 /* HomeLauncherViewController.xib */; };
+		0AF7E2CC29E947FF00899392 /* TTLFaqViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF7E2C629E947FE00899392 /* TTLFaqViewController.h */; };
+		0AF7E2CD29E947FF00899392 /* TTLHomeLauncherViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF7E2C729E947FE00899392 /* TTLHomeLauncherViewController.h */; };
+		0AF7E2CE29E947FF00899392 /* TTLFaqViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AF7E2C829E947FE00899392 /* TTLFaqViewController.xib */; };
+		0AF7E2CF29E947FF00899392 /* TTLHomeLauncherViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF7E2C929E947FE00899392 /* TTLHomeLauncherViewController.m */; };
+		0AF7E2D029E947FF00899392 /* TTLFaqViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF7E2CA29E947FF00899392 /* TTLFaqViewController.m */; };
+		0AF7E2D529E9484100899392 /* TTLChannelModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF7E2D129E9484100899392 /* TTLChannelModel.m */; };
+		0AF7E2D629E9484100899392 /* TTLFaqModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF7E2D229E9484100899392 /* TTLFaqModel.m */; };
+		0AF7E2D729E9484100899392 /* TTLFaqModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF7E2D329E9484100899392 /* TTLFaqModel.h */; };
+		0AF7E2D829E9484100899392 /* TTLChannelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF7E2D429E9484100899392 /* TTLChannelModel.h */; };
+		0AF7E2DF29E9489800899392 /* FaqChildTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF7E2D929E9489800899392 /* FaqChildTableViewCell.m */; };
+		0AF7E2E029E9489800899392 /* FaqParentTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF7E2DA29E9489800899392 /* FaqParentTableViewCell.h */; };
+		0AF7E2E129E9489800899392 /* FaqParentTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AF7E2DB29E9489800899392 /* FaqParentTableViewCell.xib */; };
+		0AF7E2E229E9489800899392 /* FaqChildTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AF7E2DC29E9489800899392 /* FaqChildTableViewCell.xib */; };
+		0AF7E2E329E9489800899392 /* TTLHomeHeaderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF7E2DD29E9489800899392 /* TTLHomeHeaderTableViewCell.m */; };
+		0AF7E2E429E9489800899392 /* FaqParentTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF7E2DE29E9489800899392 /* FaqParentTableViewCell.m */; };
+		0AF7E2E829E948A900899392 /* TTLChannelCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AF7E2E529E948A800899392 /* TTLChannelCollectionViewCell.m */; };
+		0AF7E2E929E948A900899392 /* TTLChannelCollectionViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF7E2E629E948A800899392 /* TTLChannelCollectionViewCell.h */; };
+		0AF7E2EA29E948A900899392 /* TTLChannelCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AF7E2E729E948A900899392 /* TTLChannelCollectionViewCell.xib */; };
+		0AF7E2EC29E948E500899392 /* TTLHomeHeaderTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF7E2EB29E948E500899392 /* TTLHomeHeaderTableViewCell.h */; };
+		0AF7E2EE29E9490100899392 /* FaqChildTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 0AF7E2ED29E9490100899392 /* FaqChildTableViewCell.h */; };
 		9479E2AB33982A90FE74FC36 /* libPods-TapTalkLive.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 434603578946F28D58AE828C /* libPods-TapTalkLive.a */; };
 		D7054C7723A0B0BA00B20950 /* TapTalkLive.h in Headers */ = {isa = PBXBuildFile; fileRef = D7054C7523A0B0BA00B20950 /* TapTalkLive.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D7054C7823A0B0BA00B20950 /* TapTalkLive.m in Sources */ = {isa = PBXBuildFile; fileRef = D7054C7623A0B0BA00B20950 /* TapTalkLive.m */; };
@@ -111,6 +132,27 @@
 /* Begin PBXFileReference section */
 		0A5B807D2872EDD4002BA4BC /* TTLTapTalkRoomModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLTapTalkRoomModel.h; sourceTree = "<group>"; };
 		0A5B807E2872EDD4002BA4BC /* TTLTapTalkRoomModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLTapTalkRoomModel.m; sourceTree = "<group>"; };
+		0AF7E2C529E947FE00899392 /* HomeLauncherViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HomeLauncherViewController.xib; sourceTree = "<group>"; };
+		0AF7E2C629E947FE00899392 /* TTLFaqViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLFaqViewController.h; sourceTree = "<group>"; };
+		0AF7E2C729E947FE00899392 /* TTLHomeLauncherViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLHomeLauncherViewController.h; sourceTree = "<group>"; };
+		0AF7E2C829E947FE00899392 /* TTLFaqViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLFaqViewController.xib; sourceTree = "<group>"; };
+		0AF7E2C929E947FE00899392 /* TTLHomeLauncherViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLHomeLauncherViewController.m; sourceTree = "<group>"; };
+		0AF7E2CA29E947FF00899392 /* TTLFaqViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLFaqViewController.m; sourceTree = "<group>"; };
+		0AF7E2D129E9484100899392 /* TTLChannelModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLChannelModel.m; sourceTree = "<group>"; };
+		0AF7E2D229E9484100899392 /* TTLFaqModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLFaqModel.m; sourceTree = "<group>"; };
+		0AF7E2D329E9484100899392 /* TTLFaqModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLFaqModel.h; sourceTree = "<group>"; };
+		0AF7E2D429E9484100899392 /* TTLChannelModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLChannelModel.h; sourceTree = "<group>"; };
+		0AF7E2D929E9489800899392 /* FaqChildTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FaqChildTableViewCell.m; sourceTree = "<group>"; };
+		0AF7E2DA29E9489800899392 /* FaqParentTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FaqParentTableViewCell.h; sourceTree = "<group>"; };
+		0AF7E2DB29E9489800899392 /* FaqParentTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FaqParentTableViewCell.xib; sourceTree = "<group>"; };
+		0AF7E2DC29E9489800899392 /* FaqChildTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FaqChildTableViewCell.xib; sourceTree = "<group>"; };
+		0AF7E2DD29E9489800899392 /* TTLHomeHeaderTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLHomeHeaderTableViewCell.m; sourceTree = "<group>"; };
+		0AF7E2DE29E9489800899392 /* FaqParentTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FaqParentTableViewCell.m; sourceTree = "<group>"; };
+		0AF7E2E529E948A800899392 /* TTLChannelCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTLChannelCollectionViewCell.m; sourceTree = "<group>"; };
+		0AF7E2E629E948A800899392 /* TTLChannelCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLChannelCollectionViewCell.h; sourceTree = "<group>"; };
+		0AF7E2E729E948A900899392 /* TTLChannelCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TTLChannelCollectionViewCell.xib; sourceTree = "<group>"; };
+		0AF7E2EB29E948E500899392 /* TTLHomeHeaderTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTLHomeHeaderTableViewCell.h; sourceTree = "<group>"; };
+		0AF7E2ED29E9490100899392 /* FaqChildTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FaqChildTableViewCell.h; sourceTree = "<group>"; };
 		434603578946F28D58AE828C /* libPods-TapTalkLive.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-TapTalkLive.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		47C6BAE8C45228CC9E71B516 /* Pods-TapTalkLive.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.debug.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.debug.xcconfig"; sourceTree = "<group>"; };
 		D4DB80AC0E047821EE6C64EB /* Pods-TapTalkLive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TapTalkLive.release.xcconfig"; path = "Target Support Files/Pods-TapTalkLive/Pods-TapTalkLive.release.xcconfig"; sourceTree = "<group>"; };
@@ -269,6 +311,14 @@
 				D79EDBA023DECA8B0009B13C /* TTLCaseCloseBubbleTableViewCell.h */,
 				D79EDBA223DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.m */,
 				D79EDBA123DECA8C0009B13C /* TTLCaseCloseBubbleTableViewCell.xib */,
+				0AF7E2ED29E9490100899392 /* FaqChildTableViewCell.h */,
+				0AF7E2D929E9489800899392 /* FaqChildTableViewCell.m */,
+				0AF7E2DC29E9489800899392 /* FaqChildTableViewCell.xib */,
+				0AF7E2DA29E9489800899392 /* FaqParentTableViewCell.h */,
+				0AF7E2DE29E9489800899392 /* FaqParentTableViewCell.m */,
+				0AF7E2DB29E9489800899392 /* FaqParentTableViewCell.xib */,
+				0AF7E2EB29E948E500899392 /* TTLHomeHeaderTableViewCell.h */,
+				0AF7E2DD29E9489800899392 /* TTLHomeHeaderTableViewCell.m */,
 			);
 			path = UITableViewCells;
 			sourceTree = "<group>";
@@ -278,6 +328,9 @@
 			children = (
 				D7485FA023D1B287001770FA /* TTLBaseCollectionViewCell.h */,
 				D7485FA123D1B287001770FA /* TTLBaseCollectionViewCell.m */,
+				0AF7E2E629E948A800899392 /* TTLChannelCollectionViewCell.h */,
+				0AF7E2E529E948A800899392 /* TTLChannelCollectionViewCell.m */,
+				0AF7E2E729E948A900899392 /* TTLChannelCollectionViewCell.xib */,
 			);
 			path = UICollectionViewCells;
 			sourceTree = "<group>";
@@ -295,6 +348,10 @@
 				0A5B807E2872EDD4002BA4BC /* TTLTapTalkRoomModel.m */,
 				D79A7DA323D4C8CC00862E57 /* TTLTopicModel.h */,
 				D79A7DA423D4C8CC00862E57 /* TTLTopicModel.m */,
+				0AF7E2D429E9484100899392 /* TTLChannelModel.h */,
+				0AF7E2D129E9484100899392 /* TTLChannelModel.m */,
+				0AF7E2D329E9484100899392 /* TTLFaqModel.h */,
+				0AF7E2D229E9484100899392 /* TTLFaqModel.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -368,6 +425,12 @@
 		D7A96BAF23B9C66F00654C71 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				0AF7E2C529E947FE00899392 /* HomeLauncherViewController.xib */,
+				0AF7E2C629E947FE00899392 /* TTLFaqViewController.h */,
+				0AF7E2CA29E947FF00899392 /* TTLFaqViewController.m */,
+				0AF7E2C829E947FE00899392 /* TTLFaqViewController.xib */,
+				0AF7E2C729E947FE00899392 /* TTLHomeLauncherViewController.h */,
+				0AF7E2C929E947FE00899392 /* TTLHomeLauncherViewController.m */,
 				D7A96BC923B9C96A00654C71 /* TTLBaseViewController.h */,
 				D7A96BCA23B9C96A00654C71 /* TTLBaseViewController.m */,
 				D76D884923C71B37009F87B8 /* TTLCreateCaseViewController.h */,
@@ -468,6 +531,8 @@
 				D79A7DA523D4C8CC00862E57 /* TTLTopicModel.h in Headers */,
 				D74C322923D2CE1C00626C9D /* TTLImage.h in Headers */,
 				D7485FB223D2C349001770FA /* TTLNetworkManager.h in Headers */,
+				0AF7E2CD29E947FF00899392 /* TTLHomeLauncherViewController.h in Headers */,
+				0AF7E2E029E9489800899392 /* FaqParentTableViewCell.h in Headers */,
 				D72740D623D4C14D0073784E /* TTLCaseModel.h in Headers */,
 				D74C323D23D3059600626C9D /* TTLTopicListViewController.h in Headers */,
 				D785CF0023D171C200651638 /* TTLFormGrowingTextView.h in Headers */,
@@ -475,6 +540,7 @@
 				D7A96BCF23B9CA4A00654C71 /* TTLUtil.h in Headers */,
 				D7E397AE23D4D9AF0028FC60 /* NSUserDefaults+DVSecureUserDefaults.h in Headers */,
 				D7485FA223D1B287001770FA /* TTLBaseCollectionViewCell.h in Headers */,
+				0AF7E2D829E9484100899392 /* TTLChannelModel.h in Headers */,
 				D7E4911023D368BB0021F13D /* TTLPopUpInfoViewController.h in Headers */,
 				D7C55F6223D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.h in Headers */,
 				D7485FA623D1B2C0001770FA /* TTLDataManager.h in Headers */,
@@ -483,19 +549,24 @@
 				D7054C7D23A0B14100B20950 /* TTLConfigs.h in Headers */,
 				D74C324123D305B400626C9D /* TTLRatingView.h in Headers */,
 				D79D999C23E014D500A08D49 /* TTLPopUpHandlerViewController.h in Headers */,
+				0AF7E2D729E9484100899392 /* TTLFaqModel.h in Headers */,
 				D747615C23D0ABEC00515869 /* TTLCustomDropDownTextFieldView.h in Headers */,
 				D74C322D23D2CF7200626C9D /* TTLCustomButtonView.h in Headers */,
 				0A5B807F2872EDD4002BA4BC /* TTLTapTalkRoomModel.h in Headers */,
 				D7A96BBA23B9C8D600654C71 /* TTLBaseView.h in Headers */,
+				0AF7E2EC29E948E500899392 /* TTLHomeHeaderTableViewCell.h in Headers */,
 				D74C323523D3057800626C9D /* TTLTopicOptionTableViewCell.h in Headers */,
 				D76D884B23C71B37009F87B8 /* TTLCreateCaseViewController.h in Headers */,
 				D7A96BCB23B9C96A00654C71 /* TTLBaseViewController.h in Headers */,
 				D7E4911823D36EA40021F13D /* TTLKeyboardAccessoryView.h in Headers */,
 				D72740C823D4A9260073784E /* TTLUserModel.h in Headers */,
 				D74C323923D3058A00626C9D /* TTLTopicListView.h in Headers */,
+				0AF7E2E929E948A900899392 /* TTLChannelCollectionViewCell.h in Headers */,
 				D7485F9E23D1B277001770FA /* TTLBaseTableViewCell.h in Headers */,
 				D708887623D866AE009B591C /* TTLRoomListViewController.h in Headers */,
 				D74C324523D305C500626C9D /* TTLRatingViewController.h in Headers */,
+				0AF7E2CC29E947FF00899392 /* TTLFaqViewController.h in Headers */,
+				0AF7E2EE29E9490100899392 /* FaqChildTableViewCell.h in Headers */,
 				D7054C7B23A0B13B00B20950 /* TapTalkLive-Prefix.pch in Headers */,
 				D75080F223F15D1000F9EBA6 /* TTLCaseListViewController.h in Headers */,
 				D73506F123AB3F990076E7A6 /* TTLAPIManager.h in Headers */,
@@ -585,7 +656,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF7E2E229E9489800899392 /* FaqChildTableViewCell.xib in Resources */,
+				0AF7E2E129E9489800899392 /* FaqParentTableViewCell.xib in Resources */,
+				0AF7E2EA29E948A900899392 /* TTLChannelCollectionViewCell.xib in Resources */,
 				D7DC6A0E240F7600001F6A7C /* Localizable.strings in Resources */,
+				0AF7E2CE29E947FF00899392 /* TTLFaqViewController.xib in Resources */,
+				0AF7E2CB29E947FF00899392 /* HomeLauncherViewController.xib in Resources */,
 				D7C55F6423D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.xib in Resources */,
 				D75080F423F15D1000F9EBA6 /* TTLCaseListViewController.xib in Resources */,
 				D7F103AB23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.xib in Resources */,
@@ -649,6 +725,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF7E2CF29E947FF00899392 /* TTLHomeLauncherViewController.m in Sources */,
 				D7E4911523D368C60021F13D /* TTLPopUpInfoView.m in Sources */,
 				D7E4911123D368BB0021F13D /* TTLPopUpInfoViewController.m in Sources */,
 				D708887723D866AE009B591C /* TTLRoomListViewController.m in Sources */,
@@ -668,10 +745,12 @@
 				D75080F323F15D1000F9EBA6 /* TTLCaseListViewController.m in Sources */,
 				D74C322A23D2CE1C00626C9D /* TTLImage.m in Sources */,
 				D74C324B23D3066F00626C9D /* TTLBaseModel.m in Sources */,
+				0AF7E2E329E9489800899392 /* TTLHomeHeaderTableViewCell.m in Sources */,
 				D76D884C23C71B37009F87B8 /* TTLCreateCaseViewController.m in Sources */,
 				D7E397AF23D4D9AF0028FC60 /* NSUserDefaults+DVSecureUserDefaults.m in Sources */,
 				D785CF0123D171C200651638 /* TTLFormGrowingTextView.m in Sources */,
 				D7485FB323D2C349001770FA /* TTLNetworkManager.m in Sources */,
+				0AF7E2E829E948A900899392 /* TTLChannelCollectionViewCell.m in Sources */,
 				D74C324623D305C500626C9D /* TTLRatingViewController.m in Sources */,
 				D74C323E23D3059600626C9D /* TTLTopicListViewController.m in Sources */,
 				D7485F9F23D1B277001770FA /* TTLBaseTableViewCell.m in Sources */,
@@ -681,13 +760,18 @@
 				D72740D723D4C14D0073784E /* TTLCaseModel.m in Sources */,
 				D7485FAF23D2C00F001770FA /* TTLImageView.m in Sources */,
 				D7F103AA23DF4542009653C6 /* TTLDoneReviewBubbleTableViewCell.m in Sources */,
+				0AF7E2DF29E9489800899392 /* FaqChildTableViewCell.m in Sources */,
 				D74C323623D3057800626C9D /* TTLTopicOptionTableViewCell.m in Sources */,
 				D74C323A23D3058A00626C9D /* TTLTopicListView.m in Sources */,
 				D7A96BBB23B9C8D600654C71 /* TTLBaseView.m in Sources */,
+				0AF7E2D629E9484100899392 /* TTLFaqModel.m in Sources */,
 				D74C324223D305B400626C9D /* TTLRatingView.m in Sources */,
 				D7C55F6323D9A33F008B4CC3 /* TTLReviewBubbleTableViewCell.m in Sources */,
+				0AF7E2D529E9484100899392 /* TTLChannelModel.m in Sources */,
+				0AF7E2E429E9489800899392 /* FaqParentTableViewCell.m in Sources */,
 				D7E4911923D36EA40021F13D /* TTLKeyboardAccessoryView.m in Sources */,
 				D7A96BD023B9CA4A00654C71 /* TTLUtil.m in Sources */,
+				0AF7E2D029E947FF00899392 /* TTLFaqViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -867,7 +951,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.taptalk.TapTalkLive;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
@@ -897,7 +981,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 2.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.taptalk.TapTalkLive;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;

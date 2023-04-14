@@ -23,6 +23,7 @@
 
 //@property (strong, nonatomic) TTLRoomListViewController *roomListViewController;
 @property (strong, nonatomic) TTLCaseListViewController *caseListViewController;
+@property (strong, nonatomic) TTLHomeLauncherViewController *homeLauncherViewController;
 @property (strong, nonatomic) NSMutableDictionary<NSString * /*xcRoomID*/, TTLCaseModel *> *caseDictionary;
 @property (nonatomic) BOOL isTapTalkInitializationCompleted;
 @property (nonatomic) BOOL isGetCaseListCompleted;
@@ -76,6 +77,14 @@
         self.caseListViewController.modalPresentationStyle = UIModalPresentationFullScreen;
     }
     return self.caseListViewController;
+}
+
+- (TTLHomeLauncherViewController *)getHomeLauncherVC {
+    if (self.homeLauncherViewController == nil) {
+        _homeLauncherViewController = [[TTLHomeLauncherViewController alloc] initWithNibName:@"HomeLauncherViewController" bundle:[TTLUtil currentBundle]];
+        self.homeLauncherViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+    }
+    return self.homeLauncherViewController;
 }
 
 #pragma mark - AppDelegate Handling
@@ -149,13 +158,49 @@ Called to show TapTalk Live view with present animation
     if ([self roomListViewController].isViewAppear) {
         return;
     }
-    [self roomListViewController].navigationType = TTLCaseListViewControllerNavigationTypePresent;
+   // [self roomListViewController].navigationType = TTLCaseListViewControllerNavigationTypePresent;
     UINavigationController *caseListNavigationController = [[UINavigationController alloc] initWithRootViewController:[self roomListViewController]];
     caseListNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [caseListNavigationController setNavigationBarHidden:YES animated:NO];
     [navigationController presentViewController:caseListNavigationController animated:animated completion:^{
     }];
     [[self roomListViewController] openCreateCaseFormViewIfNeeded];
+}
+
+- (void)presentCreateCaseViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
+    if ([self roomListViewController].isViewAppear) {
+        return;
+    }
+   // [self roomListViewController].navigationType = TTLCaseListViewControllerNavigationTypePresent;
+    UINavigationController *caseListNavigationController = [[UINavigationController alloc] initWithRootViewController:[self roomListViewController]];
+    caseListNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [caseListNavigationController setNavigationBarHidden:YES animated:NO];
+    
+    [navigationController presentViewController:caseListNavigationController animated:animated completion:^{
+        TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
+        createCaseViewController.previousNavigationController = caseListNavigationController;
+        [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeDefault];
+        createCaseViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+        createCaseViewController.closeRoomListWhenCreateCaseIsClosed = NO;
+        UINavigationController *createCaseNavigationController = [[UINavigationController alloc] initWithRootViewController:createCaseViewController];
+        createCaseNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+        [createCaseNavigationController setNavigationBarHidden:YES animated:NO];
+        [caseListNavigationController presentViewController:createCaseNavigationController animated:NO completion:nil];
+    }];
+   // [[self roomListViewController] openCreateCaseFormViewIfNeeded];
+}
+
+- (void)presentHomeLauncherViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
+    if ([self getHomeLauncherVC].isViewAppear) {
+        return;
+    }
+   // [self roomListViewController].navigationType = TTLCaseListViewControllerNavigationTypePresent;
+    UINavigationController *homeLauncherNavigationController = [[UINavigationController alloc] initWithRootViewController:[self getHomeLauncherVC]];
+    homeLauncherNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    [homeLauncherNavigationController setNavigationBarHidden:YES animated:NO];
+    [navigationController presentViewController:homeLauncherNavigationController animated:animated completion:^{
+    }];
+   // [[self roomListViewController] openCreateCaseFormViewIfNeeded];
 }
 
 /**
@@ -169,7 +214,7 @@ Called to show TapTalk Live view with push animation
     }
     [self roomListViewController].navigationType = TTLCaseListViewControllerNavigationTypePush;
     [navigationController pushViewController:[self roomListViewController] animated:animated];
-    [[self roomListViewController] openCreateCaseFormViewIfNeeded];
+    //[[self roomListViewController] openCreateCaseFormViewIfNeeded];
 }
 
 /**
@@ -285,9 +330,9 @@ Obtain main view controller of TapTalk Live
     NSString *apiURLString;
     // FIXME: DEBUG URL CALLED IN PRODUCTION BUILD
 //#ifdef DEBUG
-//    apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor"; // DO NOT COMMIT
+    apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor"; // DO NOT COMMIT
 //#else
-    apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
+  //  apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
 //#endif
 
     [[TTLNetworkManager sharedManager] setSecretKey:secretKey];

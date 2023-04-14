@@ -81,7 +81,13 @@
     //Not yet review view
     self.notReviewLabel.font = buttonFont;
     self.notReviewLabel.textColor = buttonColor;
-    self.notReviewView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonActiveBackgroundGradientLight];
+    //self.notReviewView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonActiveBackgroundGradientLight];
+    CAGradientLayer *gradient = [CAGradientLayer layer];
+    gradient.frame = self.notReviewView.bounds;
+    gradient.colors = [NSArray arrayWithObjects:(id)[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonActiveBackgroundGradientLight].CGColor, (id)[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonActiveBackgroundGradientDark].CGColor, nil];
+    gradient.startPoint = CGPointMake(0.0f, 0.0f);
+    gradient.endPoint = CGPointMake(0.0f, 1.0f);
+    [self.notReviewView.layer insertSublayer:gradient atIndex:0];
     
     //Done review view
     self.doneReviewLabel.font = buttonFont;

@@ -23,6 +23,7 @@ typedef NS_ENUM(NSInteger, TTLAPIManagerType) {
     TTLAPIManagerTypeGetCaseList,
     TTLAPIManagerTypeGetCaseDetails,
     TTLAPIManagerTypeRateConversation,
+    TTLAPIManagerTypeFaqPath,
 };
 
 @interface TTLAPIManager : NSObject

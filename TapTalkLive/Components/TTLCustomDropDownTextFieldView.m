@@ -14,6 +14,7 @@
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *infoDescriptionLabel;
 @property (strong, nonatomic) UILabel *errorInfoLabel;
+@property (strong, nonatomic) UIImageView *errorInfoImageView;
 
 @property (strong, nonatomic) UIView *containerView;
 @property (strong, nonatomic) UIView *shadowView;
@@ -88,10 +89,16 @@
         self.infoDescriptionLabel.textColor = formDescriptionLabelBodyColor;
         self.infoDescriptionLabel.numberOfLines = 0;
         [self addSubview:self.infoDescriptionLabel];
+        
+        _errorInfoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame), 16.0f, 16.0f)];
+        self.errorInfoImageView.image = [UIImage imageNamed:@"IconInfo" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.errorInfoImageView.alpha = 0.0f;
+        [self addSubview:self.errorInfoImageView];
 
         UIFont *formErrorInfoLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormErrorInfoLabel];
         UIColor *formErrorInfoLabelColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFormErrorInfoLabel];
-        _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
+        
+        _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.errorInfoImageView.frame), CGRectGetMinY(self.errorInfoImageView.frame), CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
         self.errorInfoLabel.font = formErrorInfoLabelFont;
         self.errorInfoLabel.textColor = formErrorInfoLabelColor;
         self.errorInfoLabel.numberOfLines = 0;
@@ -100,6 +107,7 @@
         _containerButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.containerView.frame), CGRectGetHeight(self.containerView.frame))];
         [self.containerButton addTarget:self action:@selector(containerButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.containerView addSubview:self.containerButton];
+        
     }
     
     return self;
@@ -113,7 +121,7 @@
         self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Select Topic", nil, [TTLUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         [self setInfoDescriptionText:@""];
-        [self setErrorInfoText:@""];
+       // [self setErrorInfoText:@""];
     }
 }
 
@@ -144,7 +152,14 @@
     }
     
     CGSize size = [self.errorInfoLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.errorInfoLabel.frame), CGFLOAT_MAX)];
-    self.errorInfoLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + ySpacing, CGRectGetWidth(self.errorInfoLabel.frame), size.height);
+    
+    if([string isEqualToString:@""]) {
+        self.errorInfoImageView.alpha = 0.0f;
+    }
+    else {
+        self.errorInfoImageView.alpha = 1.0f;
+    }
+    self.errorInfoLabel.frame = CGRectMake(CGRectGetMaxX(self.errorInfoImageView.frame) + 4.0f, CGRectGetMaxY(self.infoDescriptionLabel.frame) + ySpacing, CGRectGetWidth(self.errorInfoLabel.frame), size.height);
 }
 
 - (CGFloat)getTextFieldHeight {
@@ -195,10 +210,12 @@
     if (enabled) {
         self.textField.textColor = textFieldColor;
         self.textField.userInteractionEnabled = YES;
+        self.containerView.backgroundColor = [UIColor whiteColor];
     }
     else {
         self.textField.textColor = textFieldPlaceholderColor;
         self.textField.userInteractionEnabled = NO;
+        self.containerView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f];
     }
 }
 
@@ -240,6 +257,8 @@
 - (void)setAsFilled:(BOOL)isFilled {
     if (isFilled) {
         self.textField.placeholder = @"";
+        [self setErrorInfoText:@""];
+        [self setAsError:NO animated:NO];
     }
     else {
         self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Select Topic", nil, [TTLUtil currentBundle], @"");

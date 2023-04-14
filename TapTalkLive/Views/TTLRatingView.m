@@ -62,7 +62,7 @@
         self.titleLabel.font = titleLabelFont;
         self.titleLabel.textColor = titleLabelColor;
         self.titleLabel.textAlignment = NSTextAlignmentCenter;
-        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Leave a review", nil, [TTLUtil currentBundle], @"");
+        self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Rate your conversation", nil, [TTLUtil currentBundle], @"");
         [self.containerView addSubview:self.titleLabel];
         
         //DV Note
@@ -70,10 +70,11 @@
         //(5 * star width) + (4 * spacing gap)
         //END DV Note
         CGFloat starRatingContainerXPosition = (CGRectGetWidth(self.containerView.frame) - 264.0f) / 2.0f;
-        _starRatingContainerView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.containerView.frame) - 264.0f) / 2.0f, CGRectGetMaxY(self.titleLabel.frame) + 28.0f, 264.0f, 40.0f)];
+        _starRatingContainerView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.containerView.frame) - 264.0f) / 2.0f, CGRectGetMaxY(self.titleLabel.frame) + 32.0f, 264.0f, 40.0f)];
         [self.containerView addSubview:self.starRatingContainerView];
 
         TTLImage *starRatingInactiveImage = [TTLImage imageNamed:@"TTLIconStarInactive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        starRatingInactiveImage = [starRatingInactiveImage setImageTintColor:[TTLUtil getColor:@"F4C12A"]];
 
         _starRating1ImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
         self.starRating1ImageView.image = starRatingInactiveImage;
@@ -131,23 +132,44 @@
         self.subtitleLabel.font = subtitleLabelFont;
         self.subtitleLabel.textColor = subtitleLabelColor;
         self.subtitleLabel.textAlignment = NSTextAlignmentCenter;
-        self.subtitleLabel.text = @"";
+        self.subtitleLabel.text = @"No Rating";
         [self.containerView addSubview:self.subtitleLabel];
         
-        _commentTextView = [[TTLFormGrowingTextView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.subtitleLabel.frame) + 16.0f, CGRectGetWidth(self.containerView.frame), 0.0f)];
+        _commentTextView = [[TTLFormGrowingTextView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.subtitleLabel.frame) + 53.0f, CGRectGetWidth(self.containerView.frame), 0.0f)];
         [self.commentTextView setTtlFormGrowingTextViewType:TTLFormGrowingTextViewTypeComment];
         [self.commentTextView showTitleLabel:NO];
-        self.commentTextView.frame = CGRectMake(CGRectGetMinX(self.commentTextView.frame), CGRectGetMinY(self.commentTextView.frame), CGRectGetWidth(self.commentTextView.frame), [self.commentTextView getHeight]);
-        [self.commentTextView setPlaceholderText:NSLocalizedStringFromTableInBundle(@"Leave a comment", nil, [TTLUtil currentBundle], @"")];
+        self.commentTextView.frame = CGRectMake(CGRectGetMinX(self.commentTextView.frame), CGRectGetMinY(self.commentTextView.frame), CGRectGetWidth(self.commentTextView.frame), 100);
+        [self.commentTextView setPlaceholderText:NSLocalizedStringFromTableInBundle(@"Leave a review...", nil, [TTLUtil currentBundle], @"")];
         [self.commentTextView setPlaceholderColor:[TTLUtil getColor:@"C7C7CD"]];
         UIFont *textFieldFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormTextField];
         [self.commentTextView setPlaceholderFont:textFieldFont];
         [self.containerView addSubview:self.commentTextView];
+        
+        UIFont *headerLabelTitleFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelTitle];
+        _commentLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.commentTextView.frame) + 16.0f, CGRectGetMinY(self.commentTextView.frame) - 8.0f - 25.0f, 150.0f, 25.0f)];
+        self.commentLabel.text = @"Comment (Optional)";
+        self.commentLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBodyBold];
+        
+        UIFont *opsionalLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBody];
+        NSRange range = [self.commentLabel.text rangeOfString:@"(Optional)"];
+        NSMutableAttributedString *charCounterAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.commentLabel.text];
+        [charCounterAttribuetdString addAttribute:NSFontAttributeName
+                                      value:opsionalLabelFont
+                                      range:range];
+        self.commentLabel.attributedText = charCounterAttribuetdString;
+        [self.containerView addSubview:self.commentLabel];
+        
+        _characterCounterLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.commentTextView.frame) - 16.0f - 134.0f, CGRectGetMinY(self.commentLabel.frame), 134.0f, 25.0f)];
+        self.characterCounterLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontAlbumCountLabel];
+        self.characterCounterLabel.textColor = [[UIColor blackColor] colorWithAlphaComponent:0.4f];
+        self.characterCounterLabel.text = @"(0/1000)";
+        self.characterCounterLabel.textAlignment = NSTextAlignmentRight;
+        [self.containerView addSubview:self.characterCounterLabel];
     
         _submitButtonView = [[TTLCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.commentTextView.frame) + 24.0f, CGRectGetWidth(self.containerView.frame), 48.0f)];
         [self.submitButtonView setCustomButtonViewStyleType:TTLCustomButtonViewStyleTypePlain];
         [self.submitButtonView setCustomButtonViewType:TTLCustomButtonViewTypeInactive];
-        [self.submitButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Submit Review", nil, [TTLUtil currentBundle], @"")];
+        [self.submitButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Submit", nil, [TTLUtil currentBundle], @"")];
         [self.containerView addSubview:self.submitButtonView];
         
         CGFloat bottomGap = 16.0f;
@@ -175,7 +197,9 @@
 }
 - (void)setStarRatingWithValue:(NSInteger)starValue {
     TTLImage *starRatingInactiveImage = [TTLImage imageNamed:@"TTLIconStarInactive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    starRatingInactiveImage = [starRatingInactiveImage setImageTintColor:[TTLUtil getColor:@"F4C12A"]];
     TTLImage *starRatingActiveImage = [TTLImage imageNamed:@"TTLIconStarActive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    starRatingActiveImage = [starRatingActiveImage setImageTintColor:[TTLUtil getColor:@"F4C12A"]];
 
     switch (starValue) {
         case 1:
@@ -254,7 +278,7 @@
     }
     
     [UIView animateWithDuration:0.2f animations:^{
-        self.commentTextView.frame = CGRectMake(CGRectGetMinX(self.commentTextView.frame), CGRectGetMinY(self.commentTextView.frame), CGRectGetWidth(self.commentTextView.frame), [self.commentTextView getHeight]);
+        self.commentTextView.frame = CGRectMake(CGRectGetMinX(self.commentTextView.frame), CGRectGetMinY(self.commentTextView.frame), CGRectGetWidth(self.commentTextView.frame), 100);
         self.submitButtonView.frame = CGRectMake(CGRectGetMinX(self.submitButtonView.frame), CGRectGetMaxY(self.commentTextView.frame) + 24.0f, CGRectGetWidth(self.submitButtonView.frame), CGRectGetHeight(self.submitButtonView.frame));
         self.containerView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.submitButtonView.frame) - bottomGap - additionalHeight, CGRectGetWidth(self.containerView.frame), CGRectGetMaxY(self.submitButtonView.frame) + bottomGap + additionalHeight);
         CAShapeLayer *containerViewLayer = [CAShapeLayer layer];
@@ -269,6 +293,23 @@
 
 - (void)setSubmitButtonAsActive:(BOOL)active {
     [self.submitButtonView setAsActiveState:active animated:YES];
+}
+
+- (void)setLoadingState:(BOOL)isLoading {
+    if(isLoading) {
+        self.starRating1Button.userInteractionEnabled = NO;
+        self.starRating2Button.userInteractionEnabled = NO;
+        self.starRating3Button.userInteractionEnabled = NO;
+        self.starRating4Button.userInteractionEnabled = NO;
+        self.starRating5Button.userInteractionEnabled = NO;
+    }
+    else {
+        self.starRating1Button.userInteractionEnabled = YES;
+        self.starRating2Button.userInteractionEnabled = YES;
+        self.starRating3Button.userInteractionEnabled = YES;
+        self.starRating4Button.userInteractionEnabled = YES;
+        self.starRating5Button.userInteractionEnabled = YES;
+    }
 }
 
 @end

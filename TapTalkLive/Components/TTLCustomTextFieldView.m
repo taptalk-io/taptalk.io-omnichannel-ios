@@ -19,6 +19,7 @@
 @property (strong, nonatomic) UIView *containerSeparatorView;
 
 @property (strong, nonatomic) UIImageView *passwordShowImageView;
+@property (strong, nonatomic) UIImageView *errorInfoImageView;
 
 @property (strong, nonatomic) UIButton *showPasswordButton;
 
@@ -95,12 +96,18 @@
         self.infoDescriptionLabel.numberOfLines = 0;
         [self addSubview:self.infoDescriptionLabel];
         
+        _errorInfoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame), 16.0f, 16.0f)];
+        self.errorInfoImageView.image = [UIImage imageNamed:@"IconInfo" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.errorInfoImageView.alpha = 0.0f;
+        [self addSubview:self.errorInfoImageView];
+        
         UIFont *formErrorInfoLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormErrorInfoLabel];
         UIColor *formErrorInfoLabelColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFormErrorInfoLabel];
         _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
         self.errorInfoLabel.font = formErrorInfoLabelFont;
         self.errorInfoLabel.textColor = formErrorInfoLabelColor;
         self.errorInfoLabel.numberOfLines = 0;
+        
         [self addSubview:self.errorInfoLabel];
                 
     }
@@ -300,7 +307,14 @@
     }
     
     CGSize size = [self.errorInfoLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.errorInfoLabel.frame), CGFLOAT_MAX)];
-    self.errorInfoLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + ySpacing, CGRectGetWidth(self.errorInfoLabel.frame), size.height);
+    if(![string isEqualToString:@""]) {
+        self.errorInfoImageView.alpha = 1.0f;
+    }
+    else {
+        self.errorInfoImageView.alpha = 0.0f;
+    }
+   
+    self.errorInfoLabel.frame = CGRectMake(CGRectGetMaxX(self.errorInfoImageView.frame) + 4.0f, CGRectGetMaxY(self.infoDescriptionLabel.frame) + ySpacing, CGRectGetWidth(self.errorInfoLabel.frame), size.height);
 }
 
 - (CGFloat)getTextFieldHeight {
@@ -312,7 +326,7 @@
     _isActive = active;
     
     if (self.isError) {
-        return;
+    //    return;
     }
     
     if (animated) {
@@ -323,6 +337,7 @@
                 self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderActive].CGColor;
                 self.containerSeparatorView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderActive];
             }];
+            [self setErrorInfoText:@""];
         }
         else {
             [UIView animateWithDuration:0.2f animations:^{
@@ -355,10 +370,12 @@
     if (enabled) {
         self.textField.textColor = textFieldColor;
         self.textField.userInteractionEnabled = YES;
+        self.containerView.backgroundColor = [UIColor whiteColor];
     }
     else {
         self.textField.textColor = textFieldPlaceholderColor;
         self.textField.userInteractionEnabled = NO;
+        self.containerView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.1f];
     }
 }
 

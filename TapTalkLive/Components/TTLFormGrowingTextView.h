@@ -35,6 +35,8 @@ typedef NS_ENUM(NSInteger,TTLFormGrowingTextViewType) {
 @property (strong, nonatomic) UITextView *textView;
 @property (strong, nonatomic) UIView *containerView;
 @property (strong, nonatomic) UIView *shadowView;
+@property (strong, nonatomic) UILabel *errorInfoLabel;
+@property (strong, nonatomic) UIImageView *errorInfoImageView;
 
 
 @property (strong, nonatomic) UIFont *font;
@@ -58,6 +60,9 @@ typedef NS_ENUM(NSInteger,TTLFormGrowingTextViewType) {
 - (NSString *)getText;
 - (void)setAsActive:(BOOL)active animated:(BOOL)animated;
 - (void)showTitleLabel:(BOOL)isShow;
+- (void)showErrorInfoText;
+- (void)setAsError:(BOOL)error animated:(BOOL)animated;
+- (void)setAsEnabled:(BOOL)enabled;
 
 @end
 

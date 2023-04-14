@@ -54,7 +54,7 @@
     [self.createCaseView.keyboardAccessoryView.doneKeyboardButton addTarget:self action:@selector(doneKeyboardButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
     [self.createCaseView.closeButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
 //    [self.createCaseView.leftCloseButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    
+    [self showFooterView:YES];
     
     //DV Note
     //Check if already logged-in do not show full name and email form
@@ -66,6 +66,7 @@
         [self.createCaseView showUserDataForm:YES];
     }
     else {
+       // [self.createCaseView showUserDataForm:YES];
         [self.createCaseView showUserDataForm:NO];
     }
     //END DV Note
@@ -119,6 +120,12 @@
     
     return YES;
 }
+- (BOOL)customTextFieldViewTextFieldShouldBeginEditing:(UITextField *)textField {
+    [TTLUtil performBlock:^{
+        [self.createCaseView repositionFieldPosition];
+    } afterDelay:0.05f];
+    return YES;
+}
 
 #pragma mark TTLCustomDropDownTextFieldView
 - (void)customDropDownTextFieldViewDidTapped {
@@ -150,6 +157,7 @@
 #pragma mark TTLCustomButtonView
 - (void)customButtonViewDidTappedButton {
     //DV Note - Validation checking
+    [self.view endEditing:YES];
     NSString *fullNameTextFieldString = [self.createCaseView.fullNameTextField getText];
     fullNameTextFieldString = [fullNameTextFieldString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSString *emailTextFieldString = [self.createCaseView.emailTextField getText];
@@ -166,35 +174,50 @@
     TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
     NSString *currentActiveUserID = currentActiveUser.userID;
     currentActiveUserID = [TTLUtil nullToEmptyString:currentActiveUserID];
-
+    
+    BOOL fieldValidation = YES;
     if ([currentAccessToken isEqualToString:@""] || [currentActiveUserID isEqualToString:@""]) {
         if ([self.obtainedFullNameString isEqualToString:@""]) {
             //Validation failed - show error full name must be filled
-            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Full Name" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please enter your name", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            //[self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Full Name" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please enter your name", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self.createCaseView showErrorFullnameWithInfo:@"This field is required"];
+            fieldValidation = NO;
         }
-        else if ([self.obtainedEmailString isEqualToString:@""]) {
+        if ([self.obtainedEmailString isEqualToString:@""]) {
             //Validation failed - show error email must be filled
-            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please enter your email", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
-
+            //[self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please enter your email", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self.createCaseView showErrorEmailWithInfo:@"This field is required"];
+            fieldValidation = NO;
         }
-        else if (!isEmailValid) {
+        if (!isEmailValid) {
             //Validation failed - show error invalid email format
-            [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email Format" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Email address format is invalid", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            [self.createCaseView showErrorEmailWithInfo:@"Email address format is invalid"];
+           // [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email Format" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Email address format is invalid", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+            fieldValidation = NO;
         }
     }
 
     if (!self.isTopicSelected) {
         //Validation failed - show error topic must be selected
-        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Topic" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please select your topic", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+      //  [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Topic" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please select your topic", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self.createCaseView showErrorTopicWithInfo:@"This field is required"];
+        fieldValidation = NO;
 
     }
-    else if ([self.obtainedMessageString isEqualToString:@""]) {
+    if ([self.obtainedMessageString isEqualToString:@""]) {
         //Validation failed - show error message must be filled
-        [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Message" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please enter your message", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+      //  [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Message" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Please enter your message", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
+        [self.createCaseView showErrorMessageTextWithInfo:@""];
+        fieldValidation = NO;
 
     }
-    else {
+    if(fieldValidation) {
         //Validation success
+       
+        if(![[TapTalkLive sharedInstance] getHomeLauncherVC].isViewAppear) {
+            
+        }
+       
         NSString *currentAccessToken = [TTLDataManager getAccessToken];
         TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
         NSString *currentActiveUserID = currentActiveUser.userID;
@@ -215,6 +238,7 @@
     NSString *topicName = self.selectedTopic.topicName;
     topicName = [TTLUtil nullToEmptyString:topicName];
     [self.createCaseView.topicDropDownView setTextFieldWithData:topicName];
+    [self.createCaseView repositionFieldPosition];
 }
 
 #pragma mark - Custom Method
@@ -237,7 +261,7 @@
         yDifference = keyboardHeight - containerViewDistanceToBottom;
     }
     [UIView animateWithDuration:0.2f animations:^{
-        self.createCaseView.scrollView.frame = CGRectMake(CGRectGetMinX(self.createCaseView.scrollView.frame), CGRectGetMinY(self.createCaseView.scrollView.frame), CGRectGetWidth(self.createCaseView.scrollView.frame), CGRectGetHeight(self.createCaseView.frame) - yDifference);
+        self.createCaseView.scrollView.frame = CGRectMake(CGRectGetMinX(self.createCaseView.scrollView.frame), CGRectGetMinY(self.createCaseView.scrollView.frame), CGRectGetWidth(self.createCaseView.scrollView.frame), CGRectGetHeight(self.createCaseView.frame) - yDifference - 30.0f);
     }];
     [self.createCaseView.scrollView setContentOffset:CGPointMake(self.createCaseView.scrollView.contentOffset.x, self.createCaseView.scrollView.contentOffset.y + yDifference) animated:YES];
 }
@@ -393,6 +417,7 @@
                 if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
                     self.createCaseView.closeButton.userInteractionEnabled = YES;
 //                    self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
+                    
                 }
                 
                 [self.createCaseView showCreateCaseButtonAsLoading:NO];

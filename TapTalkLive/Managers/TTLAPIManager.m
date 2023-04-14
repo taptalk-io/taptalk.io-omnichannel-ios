@@ -100,7 +100,10 @@ static NSString * const kAPIVersionString = @"v1";
         NSString *apiPath = @"client/case/rate";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
-
+    else if (type == TTLAPIManagerTypeFaqPath) {
+        NSString *apiPath = @"client/scf/get_path";
+        return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
+    }
     
     return [NSString stringWithFormat:@"%@", self.APIBaseURL];
 }

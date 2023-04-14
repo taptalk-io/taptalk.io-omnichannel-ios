@@ -1816,7 +1816,7 @@
             break;
         }
         case TTLTextColorRatingBodyLabel: {
-            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextDark];
             return color;
             break;
         }

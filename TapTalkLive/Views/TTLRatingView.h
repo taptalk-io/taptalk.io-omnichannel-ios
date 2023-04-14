@@ -22,12 +22,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) UIButton *starRating3Button;
 @property (strong, nonatomic) UIButton *starRating4Button;
 @property (strong, nonatomic) UIButton *starRating5Button;
+@property (strong, nonatomic) UILabel *characterCounterLabel;
+@property (strong, nonatomic) UILabel *commentLabel;
 
 - (void)setStarRatingWithValue:(NSInteger)starValue;
 - (void)adjustGrowingContentViewWithAdditionalHeight:(CGFloat)additionalHeight;
 - (void)setCommentTextViewAsActive:(BOOL)active animated:(BOOL)animated;
 - (void)setSubmitButtonAsActive:(BOOL)active;
 - (void)animateOpeningView;
+- (void)setLoadingState:(BOOL)isLoading;
 
 @end
 

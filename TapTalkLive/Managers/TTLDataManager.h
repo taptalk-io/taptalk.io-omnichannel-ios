@@ -10,7 +10,8 @@
 #import "TTLUserModel.h"
 #import "TTLCaseModel.h"
 #import "TTLTopicModel.h"
-
+#import "TTLChannelModel.h"
+#import "TTLFaqModel.h"
 @import AFNetworking;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -27,7 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)getRefreshToken;
 + (TTLCaseModel *)caseDataModelFromDictionary:(NSDictionary *)dictionary;
 + (NSDictionary *)dictionaryFromCaseDataModel:(TTLCaseModel *)caseData;
-
++ (NSArray *)dictionaryToChannelModelList:(NSArray *)channelListDictionary;
++ (TTLFaqModel *)dictionaryToFaqModel:(NSDictionary *)faqDictionary;
 
 //API Call
 + (void)callAPICreateUserWithFullName:(NSString *)fullName
@@ -68,6 +70,9 @@ NS_ASSUME_NONNULL_BEGIN
                                   notes:(NSString *)notes
                                 success:(void (^)(BOOL isSuccess))success
                                 failure:(void (^)(NSError *error))failure;
+
++ (void)callAPIGetFaqPath:(void (^)(TTLFaqModel *faqModel))success
+                  failure:(void (^)(NSError *error))failure;
 @end
 
 NS_ASSUME_NONNULL_END

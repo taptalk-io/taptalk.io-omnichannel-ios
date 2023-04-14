@@ -15,6 +15,7 @@
 #import <TapTalk/TAPMessageStatusManager.h>
 #import <TapTalk/TapUIChatViewController.h>
 #import <TapTalk/TAPRoomListTableViewCell.h>
+#import "TTLHomeLauncherViewController.h"
 //#import <TapTalk/TapUIRoomListViewController.h>
 //#import <TapTalk/TAPRoomListView.h>
 
@@ -65,6 +66,8 @@
         [self.caseListTableView setSectionHeaderTopPadding:0.0f];
     }
     
+    [self showFooterView:YES];
+    
     self.caseListTableView.delegate = self;
     self.caseListTableView.dataSource = self;
     self.caseListTableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f);
@@ -74,7 +77,7 @@
     _caseListDictionary = [NSMutableDictionary dictionary];
     _unreadMentionDictionary = [NSMutableDictionary dictionary];
     
-    // Fetch unread room IDs from preference
+    // Fetch unread room IDs from preferene
 //    _unreadRoomIDs = [TAPDataManager getUnreadRoomIDs];
     
     self.brandBackgroundView.backgroundColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
@@ -107,6 +110,21 @@
     self.caseListTopSeparatorView.layer.cornerRadius = 8.0f;
     self.caseListTopSeparatorView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
     
+    self.caseListView.clipsToBounds = YES;
+    self.caseListView.layer.cornerRadius = 8.0f;
+    self.caseListView.layer.cornerRadius = 8.0f;
+    
+    [TTLUtil performBlock:^{
+        self.caseListView.layer.shadowColor = [UIColor blackColor].CGColor;
+        self.caseListView.layer.shadowOffset = CGSizeMake(0, 2.0f);
+        self.caseListView.layer.shadowRadius = 2.0f;
+        self.caseListView.layer.shadowOpacity = 0.1f;
+        self.caseListView.layer.masksToBounds = NO;
+        self.caseListView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.caseListView.bounds cornerRadius:self.caseListView.layer.cornerRadius].CGPath;
+    } afterDelay:0.1f];
+    
+
+    
     // View appear sequence
     [self viewLoadedSequence];
 }
@@ -122,6 +140,17 @@
             
         }];
     }
+    
+    [TTLUtil performBlock:^{
+        self.caseListView.layer.shadowColor = [UIColor blackColor].CGColor;
+        self.caseListView.layer.shadowOffset = CGSizeMake(0, 2.0f);
+        self.caseListView.layer.shadowRadius = 2.0f;
+        self.caseListView.layer.shadowOpacity = 0.1f;
+        self.caseListView.layer.masksToBounds = NO;
+        self.caseListView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.caseListView.bounds cornerRadius:self.caseListView.layer.cornerRadius].CGPath;
+    } afterDelay:0.1f];
+    
+    [self.navigationController setNavigationBarHidden:YES];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -917,5 +946,6 @@
     [createCaseNavigationController setNavigationBarHidden:YES animated:YES];
     [self.navigationController presentViewController:createCaseNavigationController animated:YES completion:nil];
 }
+
 
 @end
