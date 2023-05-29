@@ -9,8 +9,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol TTLFaqViewControllerDelegate <NSObject>
+- (void)faqViewControllercreateCaseSucceed;
+@optional
+
+
+@end
+
 @interface TTLFaqViewController : TTLBaseViewController
 @property (nonatomic, strong) TTLFaqModel *faqPathModel;
+@property (weak, nonatomic) id<TTLFaqViewControllerDelegate> delegate;
 @end
 
 NS_ASSUME_NONNULL_END

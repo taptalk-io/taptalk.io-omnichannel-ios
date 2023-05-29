@@ -154,7 +154,7 @@ Called to show TapTalk Live view with present animation
 
 @param navigationController (UINavigationController *) your current navigation controller
 */
-- (void)presentTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
+- (void)presentCaseListViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
     if ([self roomListViewController].isViewAppear) {
         return;
     }
@@ -208,7 +208,7 @@ Called to show TapTalk Live view with push animation
 
 @param navigationController (UINavigationController *) your current navigation controller
 */
-- (void)pushTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
+- (void)pushCaseListViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
     if ([self roomListViewController].isViewAppear) {
         return;
     }
@@ -326,14 +326,14 @@ Obtain main view controller of TapTalk Live
 - (void)initWithSecretKey:(NSString *_Nonnull)secretKey
                   success:(void (^)(void))success
                   failure:(void (^)(NSString *errorMessage))failure {
+    
+    [self initWithSecretKey:secretKey apiURL:@"https://taplive-cstd.taptalk.io/api/visitor" success:success failure:failure];
+}
 
-    NSString *apiURLString;
-    // FIXME: DEBUG URL CALLED IN PRODUCTION BUILD
-//#ifdef DEBUG
-    apiURLString = @"https://taplive-api-dev.taptalk.io/api/visitor"; // DO NOT COMMIT
-//#else
-  //  apiURLString = @"https://taplive-cstd.taptalk.io/api/visitor";
-//#endif
+- (void)initWithSecretKey:(NSString *_Nonnull)secretKey
+                   apiURL:(NSString *)apiURLString
+                  success:(void (^)(void))success
+                  failure:(void (^)(NSString *errorMessage))failure {
 
     [[TTLNetworkManager sharedManager] setSecretKey:secretKey];
     [[TTLAPIManager sharedManager] setBaseAPIURLString:apiURLString];
@@ -479,7 +479,25 @@ Obtain main view controller of TapTalk Live
             [TTLDataManager callAPIGetTapTalkAuthTicketSuccess:^(NSString * _Nonnull tapTalkAuthTicket) {
                 // Authenticate TapTalk.io Chat SDK
                 [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
-                    success(NSLocalizedString(@"Successfully authenticated.", @""));
+                    [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
+                        BOOL isContainCaseList = NO;
+                        if ([caseListArray count] > 0) {
+                            isContainCaseList = YES;
+                            for (TTLCaseModel *caseModel in caseListArray) {
+                                [self.caseDictionary setObject:caseModel forKey:caseModel.tapTalkXCRoomID];
+                            }
+                        }
+                        
+                        [[NSUserDefaults standardUserDefaults] setSecureBool:isContainCaseList forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+                        [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
+                        [[NSUserDefaults standardUserDefaults] synchronize];
+                        
+                        _isGetCaseListCompleted = YES;
+                        success(NSLocalizedString(@"Successfully authenticated.", @""));
+                    } failure:^(NSError * _Nonnull error) {
+                        _isGetCaseListCompleted = YES;
+                        success(NSLocalizedString(@"Successfully authenticated.", @""));
+                    }];
                 } failure:^(NSError * _Nonnull error) {
                     // Error authenticate TapTalk.io Chat SDK
                     failure(error);
