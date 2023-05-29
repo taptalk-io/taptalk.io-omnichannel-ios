@@ -12,8 +12,9 @@
 #import "FaqChildTableViewCell.h"
 #import "TTLCaseListViewController.h"
 #import <TapTalk/TAPChatManager.h>
+#import <TapTalk/TapUI.h>
 
-@interface TTLHomeLauncherViewController ()<UITableViewDataSource, UITableViewDelegate, TAPChatManagerDelegate, TTLHomeHeaderTableViewCellDelegate, FaqParentTableViewCellDelegate>
+@interface TTLHomeLauncherViewController () <UITableViewDataSource, UITableViewDelegate, TAPChatManagerDelegate, TTLHomeHeaderTableViewCellDelegate, FaqParentTableViewCellDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic) BOOL showCaseListSection;
@@ -37,8 +38,6 @@
     } failure:^(NSError * _Nonnull error) {
         
     }];
-    
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -71,6 +70,9 @@
         NSArray *channelListDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_CHANNEL_LIST valid:nil];
         if(channelListDictionary.count == 0) {
             [cell hideChannelList];
+            if(self.showCaseListSection){
+                [cell hideChannelContainer];
+            }
         }
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -128,10 +130,16 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if(indexPath.row > 1) {
-        TTLFaqViewController *faqViewController = [[TTLFaqViewController alloc] initWithNibName:@"TTLFaqViewController" bundle:[TTLUtil currentBundle]];
         NSDictionary *faqSequenceDict = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 2];
-        faqViewController.faqPathModel = [TTLDataManager dictionaryToFaqModel:faqSequenceDict];
-        [self.navigationController pushViewController:faqViewController animated:YES];
+        id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+        if ([tapTalkLiveDelegate respondsToSelector:@selector(faqChildDidTapped:currentShownNavigationController:)]) {
+                [tapTalkLiveDelegate faqChildDidTapped:[TTLDataManager dictionaryToFaqModel:faqSequenceDict] currentShownNavigationController:self.navigationController];
+            }
+        else {
+            TTLFaqViewController *faqViewController = [[TTLFaqViewController alloc] initWithNibName:@"TTLFaqViewController" bundle:[TTLUtil currentBundle]];
+            faqViewController.faqPathModel = [TTLDataManager dictionaryToFaqModel:faqSequenceDict];
+            [self.navigationController pushViewController:faqViewController animated:YES];
+        }
     }
 }
 
@@ -141,24 +149,64 @@
 
 #pragma mark TTLHomeHeaderTableViewCellDelegate
 - (void)homeHeaderCellSeeAllMessagesButtonTapped {
-    [self openCaseList];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(seeAllMessagesButtonDidTappedWithCurrentShownNavigationController:)]) {
+        [tapTalkLiveDelegate seeAllMessagesButtonDidTappedWithCurrentShownNavigationController:self.navigationController];
+    }
+    else {
+        [self openCaseList];
+    }
 }
 
 - (void)homeHeaderOpenNewMessageForm {
-    [self openNewMessageForm];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+        if ([tapTalkLiveDelegate respondsToSelector:@selector(createNewMessageButtonDidTappedWithCurrentShownNavigationController:)]) {
+            [tapTalkLiveDelegate createNewMessageButtonDidTappedWithCurrentShownNavigationController:self.navigationController];
+        }
+        else {
+            [self openNewMessageForm];
+        }
 }
 
 - (void)homeHeaderCellCloseButtonTapped {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:)]) {
+        [tapTalkLiveDelegate didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:self.navigationController];
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)homeHeaderCaseListTapped:(TAPMessageModel *)lastMessage {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(caseListItemDidTappedWithCurrentShownNavigationController:lastMessage:)]) {
+            [tapTalkLiveDelegate caseListItemDidTappedWithCurrentShownNavigationController:self.navigationController lastMessage:lastMessage];
+        }
+    else {
+        [[TapUI sharedInstance] createRoomWithRoom:lastMessage.room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            chatViewController.delegate = self;
+            chatViewController.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:chatViewController animated:YES];
+        }];
+    }
 }
 
 #pragma mark FaqParentTableViewCellDelegate
 - (void)faqParentBackButtonDidTapped {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:)]) {
+        [tapTalkLiveDelegate didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:self.navigationController];
+    }
     [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)faqParentTalkToAgentButtonDidTapped {
-    [self openNewMessageForm];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(talkToAgentButtonDidTapped:currentShownNavigationController:)]) {
+            [tapTalkLiveDelegate talkToAgentButtonDidTapped:self.faqPathModel currentShownNavigationController:self.navigationController];
+        }
+    else {
+        [self openNewMessageForm];
+    }
 }
 
 
@@ -192,11 +240,11 @@
 }
 
 - (void)openCaseList {
-    [[TapTalkLive sharedInstance] presentTapTalkLiveViewWithCurrentNavigationController:self.navigationController animated:YES];
+    [[TapTalkLive sharedInstance] presentCaseListViewWithCurrentNavigationController:self.navigationController animated:YES];
 }
 
 - (void)openNewMessageForm {
-    /**
+    
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
     createCaseViewController.previousNavigationController = self.navigationController;
     [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeDefault];
@@ -206,7 +254,8 @@
     createCaseNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
     [createCaseNavigationController setNavigationBarHidden:YES animated:YES];
     [self.navigationController presentViewController:createCaseNavigationController animated:YES completion:nil];
-    */
+    
+    /**
     NSString *currentAccessToken = [TTLDataManager getAccessToken];
     TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
     NSString *currentActiveUserID = currentActiveUser.userID;
@@ -227,6 +276,7 @@
         [createCaseNavigationController setNavigationBarHidden:YES animated:YES];
         [self.navigationController presentViewController:createCaseNavigationController animated:YES completion:nil];
     }
+    */
     
 }
 

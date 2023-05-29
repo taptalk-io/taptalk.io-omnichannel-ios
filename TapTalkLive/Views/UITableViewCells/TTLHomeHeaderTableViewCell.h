@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)homeHeaderCellSeeAllMessagesButtonTapped;
 - (void)homeHeaderOpenNewMessageForm;
 - (void)homeHeaderCellCloseButtonTapped;
+- (void)homeHeaderCaseListTapped:(TAPMessageModel *)lastMessage;
 
 @end
 

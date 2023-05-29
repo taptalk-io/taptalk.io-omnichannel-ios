@@ -82,13 +82,14 @@
     
     self.brandBackgroundView.backgroundColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
     
+    TTLImage *backButtonImage;
     if (self.navigationType == TTLCaseListViewControllerNavigationTypePresent) {
-        self.backButtonImageView.image = [UIImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        backButtonImage = [UIImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     }
     else if (self.navigationType == TTLCaseListViewControllerNavigationTypePush) {
-        self.backButtonImageView.image = [UIImage imageNamed:@"TTLIconBackArrow" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        backButtonImage = [UIImage imageNamed:@"TTLIconBackArrow" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     }
-    self.backButtonImageView.image = [self.backButtonImageView.image imageWithTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconWhite]];
+    self.backButtonImageView.image = [backButtonImage setImageTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconWhite]];
     
     CAGradientLayer *gradient = [CAGradientLayer layer];
     gradient.frame = self.sendMessageButtonContainerView.bounds;
@@ -243,11 +244,17 @@
     TAPRoomListModel *selectedRoomList = [self.caseListArray objectAtIndex:indexPath.row];
     TAPRoomModel *selectedRoom = selectedRoomList.lastMessage.room;
     
-    [[TapUI sharedInstance] createRoomWithRoom:selectedRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
-        chatViewController.delegate = self;
-        chatViewController.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:chatViewController animated:YES];
-    }];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(caseListItemDidTappedWithCurrentShownNavigationController:lastMessage:)]) {
+            [tapTalkLiveDelegate caseListItemDidTappedWithCurrentShownNavigationController:self.navigationController lastMessage:selectedRoomList.lastMessage];
+        }
+    else {
+        [[TapUI sharedInstance] createRoomWithRoom:selectedRoom success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            chatViewController.delegate = self;
+            chatViewController.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:chatViewController animated:YES];
+        }];
+    }
 }
 
 #pragma mark TAPChatManagerDelegate
@@ -355,7 +362,7 @@
     if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:)]) {
         [tapTalkLiveDelegate didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:self.navigationController];
     }
-    else if (self.navigationType == TTLCaseListViewControllerNavigationTypePresent) {
+    if (self.navigationType == TTLCaseListViewControllerNavigationTypePresent) {
         [self dismissViewControllerAnimated:YES completion:^{
             
         }];
@@ -366,7 +373,13 @@
 }
 
 - (IBAction)sendNewChatButtonDidTapped:(id)sender {
-    [self showCreateCaseFormView];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(createNewMessageButtonDidTappedWithCurrentShownNavigationController:)]) {
+        [tapTalkLiveDelegate createNewMessageButtonDidTappedWithCurrentShownNavigationController:self.navigationController];
+    }
+    else {
+        [self showCreateCaseFormView];
+    }
 }
 
 - (void)mapMessagesToCaseListArrayAndDictionary:(NSArray *)messageArray {

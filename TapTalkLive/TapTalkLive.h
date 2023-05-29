@@ -12,6 +12,8 @@
 #import "TTLCreateCaseViewController.h"
 #import "TTLCaseListViewController.h"
 #import "TTLHomeLauncherViewController.h"
+#import "TTLCaseModel.h"
+#import "TTLFaqModel.h"
 
 //! Project version number for TapTalkLive.
 FOUNDATION_EXPORT double TapTalkLiveVersionNumber;
@@ -30,6 +32,42 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
  Called when user tapped the close button in case list view
 */
 - (void)didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped the close button in homepage view
+*/
+- (void)didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped the see all message button in homepage view
+*/
+- (void)seeAllMessagesButtonDidTappedWithCurrentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped the create message button in homepage view
+*/
+- (void)createNewMessageButtonDidTappedWithCurrentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped the case list item in case list view
+*/
+- (void)caseListItemDidTappedWithCurrentShownNavigationController:(UINavigationController *)navigationController lastMessage:(TAPMessageModel *)lastMessage;
+
+/**
+ Called when user tapped the faq child list item in faq view
+*/
+- (void)faqChildDidTapped:(TTLFaqModel *)faqModel currentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped the close button in faq details view
+*/
+- (void)closeButtonInFaqDetailsViewDidTapped:(TTLFaqModel *)faqModel currentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped the taptalk to agent button in faq details view
+*/
+- (void)talkToAgentButtonDidTapped:(TTLFaqModel *)faqModel currentShownNavigationController:(UINavigationController *)navigationController;
+
 
 @end
 
@@ -135,6 +173,10 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
                   success:(void (^)(void))success
                   failure:(void (^)(NSString *errorMessage))failure;
 
+- (void)initWithSecretKey:(NSString *_Nonnull)secretKey
+                   apiURL:(NSString *)apiURLString
+                  success:(void (^)(void))success
+                  failure:(void (^)(NSString *errorMessage))failure;
 /**
  Set Google Places API Key to pick and obtain location when send location chat
  */
@@ -159,7 +201,7 @@ Called to show TapTalk Live view with present animation
  @param navigationController (UINavigationController *) your current navigation controller
  @param animated (BOOL) make the present animated or not
 */
-- (void)presentTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
+- (void)presentCaseListViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
                                                      animated:(BOOL)animated;
 
 - (void)presentCreateCaseViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated;
@@ -170,7 +212,7 @@ Called to show TapTalk Live view with push animation
  @param navigationController (UINavigationController *) your current navigation controller
  @param animated (BOOL) make the present animated or not
 */
-- (void)pushTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
+- (void)pushCaseListViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
                                                   animated:(BOOL)animated;
 
 - (void)presentHomeLauncherViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated;

@@ -38,8 +38,7 @@
 @property (weak, nonatomic) IBOutlet UICollectionView *channelCollectionView;
 @property (weak, nonatomic) IBOutlet UITableView *recentCaseListTableView;
 @property (weak, nonatomic) IBOutlet UIImageView *messageUsButtonImageView;
-
-
+@property (weak, nonatomic) IBOutlet UIView *orView;
 
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryViewHeightConstraint;
@@ -47,9 +46,10 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelListCollectionTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *collectionViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryContainerTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *orViewHeightConstraint;
 
 @property (nonatomic) CGFloat cellSize;
-@property (strong, nonatomic) NSArray *channelList;
+@property (strong, nonatomic) NSMutableArray *filteredChannelList;
 @property (strong, nonatomic) TAPMessageModel *latestMessage;
 @property (nonatomic) BOOL isShouldNotLoadFromAPI;
 @property (nonatomic) BOOL isViewAppear;
@@ -61,9 +61,16 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     
-    
     NSArray *channelListDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_CHANNEL_LIST valid:nil];
-    _channelList = [TTLDataManager dictionaryToChannelModelList:channelListDictionary];
+    _filteredChannelList = [NSMutableArray array];
+    
+    NSArray *channelList = [TTLDataManager dictionaryToChannelModelList:channelListDictionary];
+    
+    for(TTLChannelModel *channel in channelList) {
+        if(channel.isEnabled) {
+            [self.filteredChannelList addObject:channel];
+        }
+    }
     
     _cellSize = CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f - 40.0f;
     self.cellSize = self.cellSize / 5;
@@ -74,7 +81,13 @@
     self.recentCaseListTableView.dataSource = self;
     self.recentCaseListTableView.delegate = self;
     
-    self.collectionViewHeightConstraint.constant = (3 * self.cellSize) + (3 * 10);
+    NSInteger channelrow = self.filteredChannelList.count / 5;
+    
+    if (self.filteredChannelList.count % 5 > 0) {
+        channelrow += 1;
+    }
+    
+    self.collectionViewHeightConstraint.constant = (channelrow * self.cellSize) + (channelrow * 10);
     
     self.needHelpTitleLabel.textColor = [UIColor whiteColor];
     self.needHelpTitleLabel.font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:20];
@@ -87,11 +100,8 @@
     self.messageDirectlyContainerView.layer.borderWidth = 1.0f;
     self.messageDirectlyContainerView.layer.borderColor = [TTLUtil getColor:@"FF7E00"].CGColor;
     
-    if (@available(iOS 13.0, *)) {
-        self.messageDirectlyImageView.image = [self.messageDirectlyImageView.image imageWithTintColor:[TTLUtil getColor:@"FF7E00"]];
-    } else {
-        // Fallback on earlier versions
-    }
+    TTLImage *messageDirectlyImage = self.messageDirectlyImageView.image;
+    self.messageDirectlyImageView.image = [messageDirectlyImage setImageTintColor:[TTLUtil getColor:@"FF7E00"]];
     
     self.messageDirectlyLabel.textColor = [TTLUtil getColor:@"FF7E00"];
     self.messageDirectlyLabel.font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:16.0f];
@@ -103,15 +113,16 @@
     self.homeNewMessageLabel.textColor = [TTLUtil getColor:@"FF7E00"];
     self.homeNewMessageLabel.font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:16.0f];
     
-    self.closeIconImageView.image = [self.closeIconImageView.image imageWithTintColor:[UIColor whiteColor]];
-    self.messageUsButtonImageView.image = [self.messageUsButtonImageView.image imageWithTintColor:[TTLUtil getColor:@"FF7E00"]];
+    TTLImage *closeIconImage = self.closeIconImageView.image;
+    self.closeIconImageView.image = [closeIconImage setImageTintColor:[UIColor whiteColor]];
+    
+    TTLImage *messageUsButtonImage = self.messageUsButtonImageView.image;
+    self.messageUsButtonImageView.image = [messageUsButtonImage setImageTintColor:[TTLUtil getColor:@"FF7E00"]];
     //[self.channelCollectionView registerNib:[UINib nibWithNibName:@"TTLChannelCollectionViewCell" bundle:[TTLUtil currentBundle]]   forCellWithReuseIdentifier: @"TTLChannelCollectionViewCell"];
     
     // [self hideSendDirectly];
     //[self hideChannelList];
     // [self hideChannelContainer];
-    
-    
     
     [self addShadow];
     [self viewLoadedSequence];
@@ -140,7 +151,6 @@
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-    
 }
 
 - (void)addShadow {
@@ -177,13 +187,11 @@
     }
 }
 
-
 - (IBAction)newMessageButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(homeHeaderOpenNewMessageForm)]) {
         [self.delegate homeHeaderOpenNewMessageForm];
     }
 }
-
 
 - (void)hideMessageHistoryView {
     self.messageHistoryViewHeightConstraint.constant = 0.0f;
@@ -198,6 +206,10 @@
 - (void)hideChannelList {
     self.channelListCollectionTopConstraint.constant = 0.0f;
     self.collectionViewHeightConstraint.constant = 0.0f;
+    self.clickOneChannelTitleLabel.alpha = 0.0f;
+    self.orView.alpha = 0.0f;
+    self.orViewHeightConstraint.constant = 15.0f;
+    self.sendMessageDirectlyViewHeightConstraint.constant = 72.0f;
 }
 
 - (void)hideSendDirectly {
@@ -211,14 +223,13 @@
     }
 }
 
-
 - (nonnull __kindof UICollectionViewCell *)collectionView:(nonnull UICollectionView *)collectionView cellForItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
     static NSString *cellIdentifier = @"TTLChannelCollectionViewCell";
     UINib *cellNib = [UINib nibWithNibName:@"TTLChannelCollectionViewCell" bundle:[TTLUtil currentBundle]];
     [collectionView registerNib:cellNib forCellWithReuseIdentifier:@"TTLChannelCollectionViewCell"];
     TTLChannelCollectionViewCell *headerTabCell = (TTLChannelCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifier forIndexPath:indexPath];
     
-    TTLChannelModel *channel = [self.channelList objectAtIndex:indexPath.row];
+    TTLChannelModel *channel = [self.filteredChannelList objectAtIndex:indexPath.row];
     NSString *channelName = channel.channel;
     UIImage *channelImage;
     
@@ -256,7 +267,7 @@
 }
 
 - (NSInteger)collectionView:(nonnull UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.channelList.count;
+    return self.filteredChannelList.count;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView
@@ -266,7 +277,7 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    TTLChannelModel *channel = [self.channelList objectAtIndex:indexPath.row];
+    TTLChannelModel *channel = [self.filteredChannelList objectAtIndex:indexPath.row];
     NSString *channelLink = channel.url;
     NSURL *channelLinkUrl = [NSURL URLWithString:channelLink];
     
@@ -280,18 +291,15 @@
     if (indexPath.section == 0) {
         return 74.0f;
     }
-    
     return 0.0f;
 }
-
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
         static NSString *cellID = @"TAPRoomListTableViewCell";
         
         TAPRoomListTableViewCell *cell = [[TAPRoomListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
-        
-        
+       
         TAPRoomModel *room = self.latestMessage.room;
         NSString *roomID = room.roomID;
         roomID = [TAPUtil nullToEmptyString:roomID];
@@ -320,8 +328,13 @@
     if (section == 0 && self.latestMessage != nil){
         return 1;
     }
-    
     return 0;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self.delegate respondsToSelector:@selector(homeHeaderCaseListTapped:)]) {
+        [self.delegate homeHeaderCaseListTapped:self.latestMessage];
+    }
 }
 
 - (void)viewLoadedSequence {
@@ -387,8 +400,6 @@
             
         }];
     });
-    
-    
 }
 
 - (void)fetchDataFromAPI {
@@ -470,6 +481,5 @@
     self.latestMessage = message;
     [self.recentCaseListTableView reloadData];
 }
-
 
 @end

@@ -78,7 +78,7 @@
     else {
         [self.createCaseView setCreateCaseViewType:TTLCreateCaseViewTypeDefault];
         
-        id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+//        id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
 //        if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
 //            //Show Close Button
             [self.createCaseView showCloseButton:YES];
@@ -291,16 +291,14 @@
     if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:)]) {
         [tapTalkLiveDelegate didTappedCloseButtonInCreateCaseViewWithCurrentShownNavigationController:self.navigationController];
     }
-    else {
-        if (self.closeRoomListWhenCreateCaseIsClosed) {
-            UIViewController *vc = self.presentingViewController;
-            while (vc.presentingViewController) {
-                vc = vc.presentingViewController;
-            }
-            [vc dismissViewControllerAnimated:YES completion:nil];
+    if (self.closeRoomListWhenCreateCaseIsClosed) {
+        UIViewController *vc = self.presentingViewController;
+        while (vc.presentingViewController) {
+            vc = vc.presentingViewController;
         }
-        [self dismissViewControllerAnimated:YES completion:nil];
+        [vc dismissViewControllerAnimated:YES completion:nil];
     }
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)doneKeyboardButtonDidTapped {
@@ -420,15 +418,25 @@
                     
                 }
                 
-                [self.createCaseView showCreateCaseButtonAsLoading:NO];
-                [[TapTalkLive sharedInstance] roomListViewController].isShouldNotLoadFromAPI = NO;
-                [[[TapTalkLive sharedInstance] roomListViewController] viewLoadedSequence];
-                [self.navigationController dismissViewControllerAnimated:NO completion:^{
-                    [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
-                        chatViewController.delegate = [[TapTalkLive sharedInstance] roomListViewController];
-                        [self.previousNavigationController pushViewController:chatViewController animated:YES];
+                if ([self.delegate respondsToSelector:@selector(createCaseViewControllercreateCaseSucceed)]) {
+                    [self.delegate createCaseViewControllercreateCaseSucceed];
+                }
+                
+                [TTLUtil performBlock:^{
+                    [self.createCaseView showCreateCaseButtonAsLoading:NO];
+                    [[TapTalkLive sharedInstance] roomListViewController].isShouldNotLoadFromAPI = NO;
+                    [[[TapTalkLive sharedInstance] roomListViewController] viewLoadedSequence];
+
+                    [self.navigationController dismissViewControllerAnimated:NO completion:^{
+                        [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                            chatViewController.delegate = [[TapTalkLive sharedInstance] roomListViewController];
+                            [self.previousNavigationController pushViewController:chatViewController animated:YES];
+                            
+                           // [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_CREATE_CASE_SUCCEED object:nil];
+                        }];
                     }];
-                }];
+                } afterDelay:1.0f];
+                
             } failure:^(NSError * _Nonnull error) {
                 //Error get chat room from TapTalk
                 if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
@@ -467,12 +475,12 @@
                     [self.createCaseView showCreateCaseButtonAsLoading:NO];
                     if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
                         [self.navigationController dismissViewControllerAnimated:YES completion:^{
-                            [[TapTalkLive sharedInstance] presentTapTalkLiveViewWithCurrentNavigationController:self.previousNavigationController animated:YES];
+                            [[TapTalkLive sharedInstance] presentCaseListViewWithCurrentNavigationController:self.previousNavigationController animated:YES];
                         }];
                     }
                     else {
                         [self.navigationController dismissViewControllerAnimated:YES completion:^{
-                            [[TapTalkLive sharedInstance] presentTapTalkLiveViewWithCurrentNavigationController:self.navigationController animated:YES];
+                            [[TapTalkLive sharedInstance] presentCaseListViewWithCurrentNavigationController:self.navigationController animated:YES];
                         }];
                     }
                 } failure:^(NSError * _Nonnull error) {

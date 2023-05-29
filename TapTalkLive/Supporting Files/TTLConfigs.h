@@ -22,6 +22,7 @@
 
 //Notification
 #define TTL_NOTIFICATION_REACHABILITY_STATUS_CHANGED @"Notification.TapTalkLiveReachabilityStatusChanged"
+#define TTL_NOTIFICATION_CREATE_CASE_SUCCEED @"Notification.TapTalkLiveCreateCaseSucceed"
 
 //Channel
 #pragma mark CHANNEL / MEDIUM

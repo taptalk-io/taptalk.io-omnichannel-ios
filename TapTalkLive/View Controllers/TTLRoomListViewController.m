@@ -102,9 +102,7 @@
     if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:)]) {
         [tapTalkLiveDelegate didTappedCloseButtonInCaseListViewWithCurrentShownNavigationController:self.navigationController];
     }
-    else {
-        [self dismissViewControllerAnimated:YES completion:nil];
-    }
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

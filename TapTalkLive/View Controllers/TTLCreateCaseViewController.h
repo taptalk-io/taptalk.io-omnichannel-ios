@@ -15,11 +15,18 @@ typedef NS_ENUM(NSInteger, TTLCreateCaseViewControllerType) {
     TTLCreateCaseViewControllerTypeAlreadyLogin = 1
 };
 
+@protocol TTLCreateCaseViewControllerDelegate <NSObject>
+- (void)createCaseViewControllercreateCaseSucceed;
+@optional
+@end
+
 @interface TTLCreateCaseViewController : TTLBaseViewController
 
 @property (strong, nonatomic) UINavigationController *previousNavigationController;
 @property (nonatomic) TTLCreateCaseViewControllerType createCaseViewControllerType;
 @property (nonatomic) BOOL closeRoomListWhenCreateCaseIsClosed;
+@property (weak, nonatomic) id<TTLCreateCaseViewControllerDelegate> delegate;
+
 
 - (void)setCreateCaseViewControllerType:(TTLCreateCaseViewControllerType)createCaseViewControllerType;
 

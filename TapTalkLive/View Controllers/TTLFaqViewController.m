@@ -9,9 +9,9 @@
 #import "FaqParentTableViewCell.h"
 #import "FaqChildTableViewCell.h"
 
-@interface TTLFaqViewController ()<UITableViewDataSource, UITableViewDelegate, FaqParentTableViewCellDelegate>
+@interface TTLFaqViewController ()<UITableViewDataSource, UITableViewDelegate, FaqParentTableViewCellDelegate, TTLCreateCaseViewControllerDelegate, TTLFaqViewControllerDelegate>
 @property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
-
+@property (nonatomic) BOOL isClose;
 @end
 
 @implementation TTLFaqViewController
@@ -23,15 +23,36 @@
     self.tableView.backgroundColor = [TTLUtil getColor:@"FAFAFA"];
     
     [self showFooterView:YES];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(closeViewController) name:TTL_NOTIFICATION_CREATE_CASE_SUCCEED object:nil];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES];
+    if(self.isClose) {
+        [self.navigationController popViewControllerAnimated:NO];
+    }
 }
 
 #pragma mark FaqParentTableViewCellDelegate
 - (void)faqParentBackButtonDidTapped {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(closeButtonInFaqDetailsViewDidTapped:currentShownNavigationController:)]) {
+            [tapTalkLiveDelegate closeButtonInFaqDetailsViewDidTapped:self.faqPathModel currentShownNavigationController:self.navigationController];
+        }
+
     [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)faqParentTalkToAgentButtonDidTapped {
-    [self openNewMessageForm];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(talkToAgentButtonDidTapped:currentShownNavigationController:)]) {
+            [tapTalkLiveDelegate talkToAgentButtonDidTapped:self.faqPathModel currentShownNavigationController:self.navigationController];
+        }
+    else {
+        [self openNewMessageForm];
+    }
 }
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -74,15 +95,25 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if(indexPath.row > 0) {
-        TTLFaqViewController *faqViewController = [[TTLFaqViewController alloc] initWithNibName:@"TTLFaqViewController" bundle:[TTLUtil currentBundle]];
         NSDictionary *faqSequenceDict = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 1];
-        faqViewController.faqPathModel = [TTLDataManager dictionaryToFaqModel:faqSequenceDict];
-        [self.navigationController pushViewController:faqViewController animated:YES];
+        id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+        if ([tapTalkLiveDelegate respondsToSelector:@selector(faqChildDidTapped:currentShownNavigationController:)]) {
+                [tapTalkLiveDelegate faqChildDidTapped:[TTLDataManager dictionaryToFaqModel:faqSequenceDict] currentShownNavigationController:self.navigationController];
+            }
+        else {
+            TTLFaqViewController *faqViewController = [[TTLFaqViewController alloc] initWithNibName:@"TTLFaqViewController" bundle:[TTLUtil currentBundle]];
+            faqViewController.faqPathModel = [TTLDataManager dictionaryToFaqModel:faqSequenceDict];
+            faqViewController.delegate = self;
+            [self.navigationController pushViewController:faqViewController animated:YES];
+        }
     }
 }
 
+- (void)closeViewController {
+    self.isClose = YES;
+}
+
 - (void)openNewMessageForm {
-    /**
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
     createCaseViewController.previousNavigationController = self.navigationController;
     [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeDefault];
@@ -90,9 +121,10 @@
     createCaseViewController.closeRoomListWhenCreateCaseIsClosed = NO;
     UINavigationController *createCaseNavigationController = [[UINavigationController alloc] initWithRootViewController:createCaseViewController];
     createCaseNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+    createCaseViewController.delegate = self;
     [createCaseNavigationController setNavigationBarHidden:YES animated:YES];
     [self.navigationController presentViewController:createCaseNavigationController animated:YES completion:nil];
-    */
+    /**
     NSString *currentAccessToken = [TTLDataManager getAccessToken];
     TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
     NSString *currentActiveUserID = currentActiveUser.userID;
@@ -103,9 +135,24 @@
     }
     else {
         //[self handleSubmitCaseFormFlow];
-        [[TapTalkLive sharedInstance] presentTapTalkLiveViewWithCurrentNavigationController:self.navigationController animated:NO];
+        [[TapTalkLive sharedInstance] presentCaseListViewWithCurrentNavigationController:self.navigationController animated:NO];
     }
+    */
     
+}
+
+- (void)createCaseViewControllercreateCaseSucceed {
+    [self.navigationController popViewControllerAnimated:NO];
+    if ([self.delegate respondsToSelector:@selector(faqViewControllercreateCaseSucceed)]) {
+        [self.delegate faqViewControllercreateCaseSucceed];
+    }
+}
+
+- (void)faqViewControllercreateCaseSucceed {
+    [self.navigationController popViewControllerAnimated:NO];
+    if ([self.delegate respondsToSelector:@selector(faqViewControllercreateCaseSucceed)]) {
+        [self.delegate faqViewControllercreateCaseSucceed];
+    }
 }
 
 @end

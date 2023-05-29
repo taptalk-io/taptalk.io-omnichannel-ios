@@ -31,16 +31,13 @@
     self.talkToAgentButtonView.layer.cornerRadius = 8.0f;
     self.talkToAgentButtonView.layer.borderWidth = 1.0f;
     self.talkToAgentButtonView.layer.borderColor = [TTLUtil getColor:@"FF7E00"].CGColor;
-    self.backButton.imageView.image = [self.backButton.imageView.image imageWithTintColor:[UIColor whiteColor]];
     
-    
-   
+    TTLImage *backButtonImage = self.backButton.imageView.image;
+    self.backButton.imageView.image = [backButtonImage setImageTintColor:[UIColor whiteColor]];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-    
-    
 }
 
 - (void)setFaqParentData:(TTLFaqModel *)faqModel {
