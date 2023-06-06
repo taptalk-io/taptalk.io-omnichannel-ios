@@ -27,6 +27,7 @@ typedef NS_ENUM(NSInteger, TTLCaseListViewControllerNavigationType) {
 
 - (void)viewLoadedSequence;
 - (void)openCreateCaseFormViewIfNeeded;
+- (void)clearAllData;
 
 @end
 
