@@ -72,18 +72,18 @@
 //}
 
 - (TTLCaseListViewController *)roomListViewController {
-    if (self.caseListViewController == nil) {
+//    if (self.caseListViewController == nil) {
         _caseListViewController = [[TTLCaseListViewController alloc] initWithNibName:@"TTLCaseListViewController" bundle:[TTLUtil currentBundle]];
         self.caseListViewController.modalPresentationStyle = UIModalPresentationFullScreen;
-    }
+//    }
     return self.caseListViewController;
 }
 
 - (TTLHomeLauncherViewController *)getHomeLauncherVC {
-    if (self.homeLauncherViewController == nil) {
+//    if (self.homeLauncherViewController == nil) {
         _homeLauncherViewController = [[TTLHomeLauncherViewController alloc] initWithNibName:@"HomeLauncherViewController" bundle:[TTLUtil currentBundle]];
         self.homeLauncherViewController.modalPresentationStyle = UIModalPresentationFullScreen;
-    }
+//    }
     return self.homeLauncherViewController;
 }
 
@@ -521,9 +521,14 @@ Obtain main view controller of TapTalk Live
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_REFRESH_TOKEN_EXPIRED_TIME];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACCESS_TOKEN_EXPIRED_TIME];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_CHANNEL_LIST]; // FIXME: Channel links
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_API_URL];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_ID];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_SECRET];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     [[TapTalk sharedInstance] clearAllTapTalkData];
+//    [self.roomListViewController clearAllData];
 }
 
 @end
