@@ -304,9 +304,10 @@
          if([message.room.deleted longValue] != 0) {
              profileImageURL = @"";
          }
-         else if (obtainedUser != nil && ![obtainedUser.imageURL.thumbnail isEqualToString:@""]) {
+         else if (obtainedUser != nil) {
              profileImageURL = obtainedUser.imageURL.thumbnail;
              profileImageURL = [TAPUtil nullToEmptyString:profileImageURL];
+             
          }
          else {
              profileImageURL = message.room.imageURL.thumbnail;
@@ -601,7 +602,7 @@
         NSString *lastMessageUserID = message.user.userID;
         if ([lastMessageUserID isEqualToString:currentUserID]) {
             //last message is from ourselves
-            lastMessage = NSLocalizedStringFromTableInBundle(@"You deleted this message.", nil, [TAPUtil currentBundle], @"");
+            lastMessage = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
         }
         else {
             lastMessage = NSLocalizedStringFromTableInBundle(@"This message was deleted.", nil, [TAPUtil currentBundle], @"");
