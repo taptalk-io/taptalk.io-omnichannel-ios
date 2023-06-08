@@ -64,8 +64,15 @@
 @property (nonatomic) BOOL isPinRoomListSwipeMenuDisabled;
 @property (nonatomic) BOOL isDeleteRoomListSwipeMenuDisabled;
 @property (nonatomic) BOOL isLinkPreviewInMessageDisabled;
+@property (nonatomic) BOOL isMessageInfoMenuDisabled;
+@property (nonatomic) BOOL isReadStatusHidden;
+@property (nonatomic) BOOL isBlockUserMenuEnabled;
+@property (nonatomic) BOOL isReportMessageMenuEnabled;
+@property (nonatomic) BOOL isReportButtonInUserProfileVisible;
+@property (nonatomic) BOOL isReportButtonInGroupProfileVisible;
 @property (nonatomic) BOOL isScheduledMessageFeatureDisabled;
-
+@property (nonatomic) BOOL isGroupInCommonMenuDisabled;
+@property (nonatomic) BOOL isAllowDeleteOthersMessageForAdminDisabled;
 
 - (UIViewController *)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
@@ -919,7 +926,6 @@ Show or hide bio in user/group profile page
 }
 
 /**
-<<<<<<< HEAD
 Enable or disable mark as read swipe in chat room list
 */
 - (void)setMarkAsReadRoomListSwipeMenuEnabled:(BOOL)isEnabled {
@@ -1079,7 +1085,6 @@ Enable or disable link preview in chat room
 }
 
 /**
-<<<<<<< HEAD
 Enable or disable Scheduled Message Feature
 */
 - (void)setScheduledMessageFeatureEnabled:(BOOL)isEnabled {
@@ -1107,5 +1112,103 @@ Enable or disable Scheduled Message Feature
     return !self.isDeleteRoomListSwipeMenuDisabled;
 }
 
+/**
+ Enable or disable group in common menu
+*/
+- (void)setGroupInCommonMenuEnabled:(BOOL)isEnabled {
+    _isGroupInCommonMenuDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of group in common menu
+*/
+- (BOOL)getGroupInCommonMenuEnabled{
+    return !self.isGroupInCommonMenuDisabled;
+}
+
+/**
+Show or hide message info menu
+*/
+- (void)setMessageInfoMenuEnabled:(BOOL)isEnabled {
+    _isMessageInfoMenuDisabled = !isEnabled;
+}
+
+
+/**
+Get current status of message info menu
+*/
+- (BOOL)isMessageInfoMenuEnabled{
+    return !self.isMessageInfoMenuDisabled;
+}
+
+/**
+ Enable or disable block user
+*/
+- (void)setBlockUserMenuEnabled:(BOOL)isEnabled {
+    _isBlockUserMenuEnabled = isEnabled;
+}
+
+/**
+Get current isEnabled state of  block user
+*/
+- (BOOL)getBlockUserMenuEnabled {
+    return self.isBlockUserMenuEnabled;
+}
+
+/**
+ Enable or disable report message menu in chat longpress
+*/
+- (void)setReportMessageMenuEnabled:(BOOL)isEnabled {
+    _isReportMessageMenuEnabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of   report message menu in chat longpress
+*/
+- (BOOL)getReportMessageMenuEnabled {
+    return !self.isReportMessageMenuEnabled;
+}
+
+/**
+ Enable or disable report user button in profile page
+*/
+- (void)setReportButtonInUserProfileVisible:(BOOL)isVisible {
+    _isReportButtonInUserProfileVisible = !isVisible;
+}
+
+/**
+ Get current isVisible state of report user button in profile page
+*/
+- (BOOL)getReportButtonInUserProfileVisible {
+    return !self.isReportButtonInUserProfileVisible;
+}
+
+/**
+ Enable or disable report group button in profile page
+*/
+- (void)setReportButtonInGroupProfileVisible:(BOOL)isVisible {
+    _isReportButtonInGroupProfileVisible = !isVisible;
+}
+
+/**
+ Get current isVisible state of report group button in profile page
+*/
+- (BOOL)getReportButtonInGroupProfileVisible {
+    return !self.isReportButtonInGroupProfileVisible;
+}
+
+/**
+ Enable or disable Delete Others Message For Admin
+*/
+- (void)setAllowDeleteOthersMessageForAdminEnabled:(BOOL)isEnabled {
+    _isAllowDeleteOthersMessageForAdminDisabled = !isEnabled;
+}
+
+/**
+ Get current isEnabled state of Delete Others Message For Admin
+*/
+- (BOOL)getAllowDeleteOthersMessageForAdminEnabled {
+    return !self.isAllowDeleteOthersMessageForAdminDisabled;
+}
 
 @end

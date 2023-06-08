@@ -65,7 +65,7 @@ static NSString * const kAPIVersionString = @"v1";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     else if (type == TTLAPIManagerTypeLogout) {
-        NSString *apiPath = @"logout";
+        NSString *apiPath = @"client/logout";
         return [NSString stringWithFormat:@"%@/%@/%@", self.APIBaseURL, kAPIVersionString, apiPath];
     }
     else if (type == TTLAPIManagerTypeCreateUser) {

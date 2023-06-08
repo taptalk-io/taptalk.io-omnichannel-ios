@@ -239,7 +239,20 @@ Authenticate with existing auth ticket
                                  failure:(void (^)(NSError *error))failure;
     
 /**
-Clear all data from TapTalk Live when user logs out
+Clear user data from TapTalk Live when user logs out
+*/
+- (void)logout:(void (^)(NSString *message))success
+       failure:(void (^)(NSError *error))failure;
+    
+
+/**
+Logout from TapTalk Live and clear all existing TapTalk Live data
+*/
+- (void)logoutAndClearAllTapLiveData:(void (^)(NSString *message))success
+                             failure:(void (^)(NSError *error))failure;
+
+/**
+Clear all data from TapTalk Live
 */
 - (void)clearAllTapLiveData;
 
