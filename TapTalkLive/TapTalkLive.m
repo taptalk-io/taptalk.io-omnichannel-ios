@@ -53,8 +53,6 @@
         
         _activeWindow = [[UIWindow alloc] init];
         
-        _caseDictionary = [NSMutableDictionary dictionary];
-        
         //Hide setup loading view flow in room list
 //        [[TapUI sharedInstance] hideSetupLoadingFlowInSetupRoomListView:YES];
         
@@ -338,6 +336,8 @@ Obtain main view controller of TapTalk Live
     [[TTLNetworkManager sharedManager] setSecretKey:secretKey];
     [[TTLAPIManager sharedManager] setBaseAPIURLString:apiURLString];
     
+    _caseDictionary = [NSMutableDictionary dictionary];
+    
     //Call API project configs
     [TTLDataManager callAPIGetTapTalkLiveProjectConfigsSuccess:^(NSDictionary * _Nonnull tapTalkConfigsDictionary) {
         //Obtain TapTalk.io Chat SDK credential configs
@@ -361,6 +361,7 @@ Obtain main view controller of TapTalk Live
             
             // Remove disabled features from chat room
             [[TapUI sharedInstance] setHideReadStatus:YES];
+            [[TapUI sharedInstance] setProfileButtonInChatRoomVisible:NO];
             [[TapUI sharedInstance] setReplyMessageMenuEnabled:YES];
             [[TapUI sharedInstance] setForwardMessageMenuEnabled:NO];
             [[TapUI sharedInstance] setMentionUsernameEnabled:NO];
@@ -371,6 +372,10 @@ Obtain main view controller of TapTalk Live
             [[TapUI sharedInstance] setStarMessageMenuEnabled:NO];
             [[TapUI sharedInstance] setPinMessageMenuEnabled:NO];
             [[TapUI sharedInstance] setSavedMessagesMenuEnabled:NO];
+            [[TapUI sharedInstance] setScheduledMessageFeatureEnabled:NO];
+            [[TapUI sharedInstance] setReportMessageMenuEnabled:NO];
+            [[TapUI sharedInstance] setBlockUserMenuEnabled:NO];
+            [[TapUI sharedInstance] setMessageInfoMenuEnabled:NO];
             
             //Add custom bubble cell
             [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
@@ -427,6 +432,13 @@ Obtain main view controller of TapTalk Live
             success();
         }
     }
+    
+    // Get FAQ / SCF Path
+    [TTLDataManager callAPIGetFaqPath:^(TTLFaqModel * _Nonnull faqModel) {
+        
+    } failure:^(NSError * _Nonnull error) {
+        
+    }];
 }
 
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {
@@ -513,22 +525,57 @@ Obtain main view controller of TapTalk Live
     }];
 }
 
-- (void)clearAllTapLiveData {
-    //Remove all preference
+- (void)logout:(void (^)(NSString *message))success
+       failure:(void (^)(NSError *error))failure {
+    
+    [TTLDataManager callAPILogoutSuccess:^(BOOL isSuccess) {
+        [self clearUserData];
+        success(@"You have logged out");
+    }
+    failure:^(NSError * _Nonnull error) {
+        [self clearUserData];
+        failure(error);
+    }];
+}
+
+- (void)logoutAndClearAllTapLiveData:(void (^)(NSString *message))success
+                             failure:(void (^)(NSError *error))failure {
+    
+    [TTLDataManager callAPILogoutSuccess:^(BOOL isSuccess) {
+        [self clearAllTapLiveData];
+        success(@"You have logged out");
+    }
+    failure:^(NSError * _Nonnull error) {
+        [self clearAllTapLiveData];
+        failure(error);
+    }];
+}
+
+- (void)clearUserData {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACTIVE_USER];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACCESS_TOKEN];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_REFRESH_TOKEN];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_REFRESH_TOKEN_EXPIRED_TIME];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACCESS_TOKEN_EXPIRED_TIME];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
-//    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_CHANNEL_LIST]; // FIXME: Channel links
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [[TapTalk sharedInstance] clearAllTapTalkData];
+    [self.roomListViewController clearAllData];
+    
+    _isGetCaseListCompleted = NO;
+    _isTapTalkInitializationCompleted = NO;
+}
+
+- (void)clearAllTapLiveData {
+    // Remove all preference
+    [self clearUserData];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_CHANNEL_LIST];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_API_URL];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_ID];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_SECRET];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    [[TapTalk sharedInstance] clearAllTapTalkData];
-//    [self.roomListViewController clearAllData];
 }
 
 @end

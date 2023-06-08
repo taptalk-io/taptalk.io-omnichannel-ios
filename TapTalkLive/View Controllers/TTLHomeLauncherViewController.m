@@ -33,11 +33,7 @@
     self.tableView.backgroundColor = [TTLUtil getColor:@"FAFAFA"];
     [self showFooterView:YES];
     
-    [TTLDataManager callAPIGetFaqPath:^(TTLFaqModel * _Nonnull faqModel) {
-        self.faqPathModel = faqModel;
-    } failure:^(NSError * _Nonnull error) {
-        
-    }];
+    _faqPathModel = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_FAQ valid:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

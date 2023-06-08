@@ -2042,6 +2042,9 @@
         NSDictionary *dataDictionary = [responseObject objectForKey:@"data"];
         dataDictionary = [TTLUtil nullToEmptyDictionary:dataDictionary];
         
+        [[NSUserDefaults standardUserDefaults] setSecureObject:dataDictionary forKey:TTL_PREFS_FAQ];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
         TTLFaqModel *faqModel = [self dictionaryToFaqModel:dataDictionary];
         
         success(faqModel);
