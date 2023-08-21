@@ -33,7 +33,9 @@
     self.tableView.backgroundColor = [TTLUtil getColor:@"FAFAFA"];
     [self showFooterView:YES];
     
-    _faqPathModel = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_FAQ valid:nil];
+    NSDictionary *faqDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_FAQ valid:nil];
+    faqDictionary = [TTLUtil nullToEmptyDictionary:faqDictionary];
+    _faqPathModel = [TTLDataManager dictionaryToFaqModel:faqDictionary];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -169,7 +171,12 @@
     if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:)]) {
         [tapTalkLiveDelegate didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:self.navigationController];
     }
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if (self.isModal) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+    else {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 - (void)homeHeaderCaseListTapped:(TAPMessageModel *)lastMessage {
@@ -192,7 +199,12 @@
     if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:)]) {
         [tapTalkLiveDelegate didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:self.navigationController];
     }
-    [self.navigationController popViewControllerAnimated:YES];
+    if (self.isModal) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
+    else {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 - (void)faqParentTalkToAgentButtonDidTapped {

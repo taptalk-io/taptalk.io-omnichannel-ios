@@ -315,6 +315,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPICreateUserWithFullName:fullName email:email success:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -462,6 +463,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPIGetCurrentUserProfileSuccess:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -941,6 +943,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPIGetTapTalkLiveProjectConfigsSuccess:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -1026,6 +1029,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPIGetTapTalkAuthTicketSuccess:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -1094,6 +1098,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPIGetTopicListSuccess:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -1192,6 +1197,7 @@
                     [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                         [TTLDataManager callAPIGetCaseListSuccess:success failure:failure];
                     } failure:^(NSError *error) {
+                        [[TapTalkLive sharedInstance] clearUserData];
                         failure(error);
                     }];
                     return;
@@ -1413,6 +1419,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPICreateCaseWithTopicID:topicID message:message success:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -1566,6 +1573,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPICloseCaseWithCaseID:caseID success:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -1640,6 +1648,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPIGetCaseDetailWithCaseID:caseID success:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -1789,6 +1798,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPIGetServerTimeSuccess:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -1861,6 +1871,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPILogoutSuccess:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -1939,6 +1950,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPIRateConversionWithCaseID:caseID rating:rating notes:notes success:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
@@ -1994,9 +2006,13 @@
     NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
     TTLFaqModel *faqModel = [self dictionaryToFaqModel:json];
+    NSDictionary *faqDict = [faqModel toDictionary];
+    [[NSUserDefaults standardUserDefaults] setSecureObject:faqDict forKey:TTL_PREFS_FAQ];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     success(faqModel);
     return;
     */
+    
     NSString *requestURL = [[TTLAPIManager sharedManager] urlForType:TTLAPIManagerTypeFaqPath];
         
     NSMutableDictionary *parameterDictionary = [NSMutableDictionary dictionary];
@@ -2018,6 +2034,7 @@
                 [[TTLDataManager sharedManager] callAPIRefreshAccessTokenSuccess:^{
                     [TTLDataManager callAPIGetFaqPath:success failure:failure];
                 } failure:^(NSError *error) {
+                    [[TapTalkLive sharedInstance] clearUserData];
                     failure(error);
                 }];
                 return;
