@@ -152,6 +152,11 @@ Called to show TapTalk Live view with present animation
 
 @param navigationController (UINavigationController *) your current navigation controller
 */
+
+- (void)presentTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
+    [self presentHomeLauncherViewWithCurrentNavigationController:navigationController animated:animated];
+}
+
 - (void)presentCaseListViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
     if ([self roomListViewController].isViewAppear) {
         return;
@@ -206,6 +211,10 @@ Called to show TapTalk Live view with push animation
 
 @param navigationController (UINavigationController *) your current navigation controller
 */
+- (void)pushTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
+    [self pushHomeLauncherViewWithCurrentNavigationController:navigationController animated:animated];
+}
+
 - (void)pushCaseListViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
     if ([self roomListViewController].isViewAppear) {
         return;
@@ -213,6 +222,13 @@ Called to show TapTalk Live view with push animation
     [self roomListViewController].navigationType = TTLCaseListViewControllerNavigationTypePush;
     [navigationController pushViewController:[self roomListViewController] animated:animated];
     //[[self roomListViewController] openCreateCaseFormViewIfNeeded];
+}
+
+- (void)pushHomeLauncherViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated {
+    if ([self getHomeLauncherVC].isViewAppear) {
+        return;
+    }
+    [navigationController pushViewController:[self getHomeLauncherVC] animated:animated];
 }
 
 /**

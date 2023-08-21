@@ -196,26 +196,39 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 //                   TapTalk Live View
 //==========================================================
 /**
-Called to show TapTalk Live view with present animation
+Call to show TapTalk Live view with present animation
 
  @param navigationController (UINavigationController *) your current navigation controller
  @param animated (BOOL) make the present animated or not
 */
+
+- (void)presentTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
+                                                     animated:(BOOL)animated;
+
 - (void)presentCaseListViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
                                                      animated:(BOOL)animated;
 
-- (void)presentCreateCaseViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated;
+- (void)presentCreateCaseViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
+                                                    animated:(BOOL)animated;
+
+- (void)presentHomeLauncherViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
+                                                      animated:(BOOL)animated;
 
 /**
-Called to show TapTalk Live view with push animation
+Call to show TapTalk Live view with push animation
 
  @param navigationController (UINavigationController *) your current navigation controller
  @param animated (BOOL) make the present animated or not
 */
+
+- (void)pushTapTalkLiveViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
+                                                  animated:(BOOL)animated;
+
 - (void)pushCaseListViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
                                                   animated:(BOOL)animated;
 
-- (void)presentHomeLauncherViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController animated:(BOOL)animated;
+- (void)pushHomeLauncherViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
+                                                   animated:(BOOL)animated;
 
 /**
 Obtain main view controller of TapTalk Live
@@ -254,6 +267,9 @@ Logout from TapTalk Live and clear all existing TapTalk Live data
 /**
 Clear all data from TapTalk Live
 */
+
+- (void)clearUserData;
+
 - (void)clearAllTapLiveData;
 
 @end
