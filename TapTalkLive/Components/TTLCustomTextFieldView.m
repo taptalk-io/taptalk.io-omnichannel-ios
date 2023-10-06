@@ -185,7 +185,7 @@
         [self setInfoDescriptionText:@""];
         [self setErrorInfoText:@""];
         self.textField.keyboardType = UIKeyboardTypeDefault;
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Full Name", nil, [TTLUtil currentBundle], @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Enter Full Name", nil, [TTLUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         [self showShowPasswordButton:NO];
     }

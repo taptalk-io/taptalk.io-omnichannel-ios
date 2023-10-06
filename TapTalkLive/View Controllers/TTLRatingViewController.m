@@ -183,7 +183,7 @@
     }
     _isRatingStarTapped = YES;
     _starRatingValue = 1;
-    self.ratingView.commentLabel.alpha = 0.0f;
+    self.ratingView.commentLabel.text = @"Comment";
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
 }
 
@@ -191,7 +191,7 @@
     _isRatingStarTapped = YES;
     _starRatingValue = 2;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
-    self.ratingView.commentLabel.alpha = 0.0f;
+    self.ratingView.commentLabel.text = @"Comment";
     if(![self.ratingView.commentTextView.text isEqualToString:@""]) {
         [self.ratingView setSubmitButtonAsActive:YES];
     }
@@ -204,8 +204,7 @@
     _isRatingStarTapped = YES;
     _starRatingValue = 3;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
-    self.ratingView.commentLabel.alpha = 0.0f;
-    if(![self.ratingView.commentTextView.text isEqualToString:@""]) {
+    self.ratingView.commentLabel.text = @"Comment";    if(![self.ratingView.commentTextView.text isEqualToString:@""]) {
         [self.ratingView setSubmitButtonAsActive:YES];
     }
     else {
@@ -218,7 +217,14 @@
     _starRatingValue = 4;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
-    self.ratingView.commentLabel.alpha = 1.0f;
+    self.ratingView.commentLabel.text = @"Comment (Optional)";
+    UIFont *opsionalLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBody];
+    NSRange range = [self.ratingView.commentLabel.text rangeOfString:@"(Optional)"];
+    NSMutableAttributedString *charCounterAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.ratingView.commentLabel.text];
+    [charCounterAttribuetdString addAttribute:NSFontAttributeName
+                                  value:opsionalLabelFont
+                                  range:range];
+    self.ratingView.commentLabel.attributedText = charCounterAttribuetdString;
 }
 
 - (void)fifthStarRatingDidTapped {
@@ -226,7 +232,14 @@
     _starRatingValue = 5;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
-    self.ratingView.commentLabel.alpha = 1.0f;
+    self.ratingView.commentLabel.text = @"Comment (Optional)";
+    UIFont *opsionalLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBody];
+    NSRange range = [self.ratingView.commentLabel.text rangeOfString:@"(Optional)"];
+    NSMutableAttributedString *charCounterAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.ratingView.commentLabel.text];
+    [charCounterAttribuetdString addAttribute:NSFontAttributeName
+                                  value:opsionalLabelFont
+                                  range:range];
+    self.ratingView.commentLabel.attributedText = charCounterAttribuetdString;
 }
 
 @end

@@ -28,8 +28,8 @@ PODS:
   - SDWebImage (5.12.3):
     - SDWebImage/Core (= 5.12.3)
   - SDWebImage/Core (5.12.3)
-  - SocketRocket (0.6.0)
-  - TapTalk (2.10.2):
+  - SocketRocket (0.7.0)
+  - TapTalk (2.14.1):
     - AFNetworking (~> 4.0.0)
     - GoogleMaps
     - GooglePlaces
@@ -69,10 +69,10 @@ SPEC CHECKSUMS:
   PodAsset: 161b57cdf4d7307b0fb652cccab32fa8d5dc580b
   Realm: 100df88a0faf5328f48477427e4b3e1a1598bae3
   SDWebImage: 53179a2dba77246efa8a9b85f5c5b21f8f43e38f
-  SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
-  TapTalk: 4bd1a8fe51e15689c12bad943d53546398247e46
+  SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
+  TapTalk: bdc356fe9a8f1625f1181c1efab46adcd01e1606
   ZSWTappableLabel: cff84c0a55e30f2141f7dac24e5903302a7e35ec
 
 PODFILE CHECKSUM: 56a7fa198994979e30a2588ca3328a59831f3748
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.12.0

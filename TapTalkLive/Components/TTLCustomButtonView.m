@@ -107,6 +107,8 @@
     }
     else if (self.customButtonViewType == TTLCustomButtonViewTypeInactive) {
         if (self.customButtonViewStyleType == TTLCustomButtonViewStyleTypePlain || self.customButtonViewStyleType == TTLCustomButtonViewStyleTypeWithIcon) {
+//            self.buttonContainerView.backgroundColor = [TTLUtil getColor:@"191919"];
+//            self.buttonContainerView.layer.borderWidth = 0.0f;
             //grey gradient background
             CAGradientLayer *gradient = [CAGradientLayer layer];
             gradient.frame = self.buttonContainerView.bounds;
@@ -286,7 +288,18 @@
         if (animated) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.buttonLoadingImageView.alpha = 1.0f;
-                self.buttonTitleLabel.alpha = 0.0f;
+                self.buttonTitleLabel.alpha = 1.0f;
+                
+                CGSize size = [self.buttonTitleLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, 20.0f)];
+                CGFloat maximumLabelWidth = CGRectGetWidth(self.frame) - 10.0f - 10.0f - 4.0f - 32.0f; //10 - left&right gap, 4 - gap to image view, 32 image view width
+                CGFloat newWidth = size.width;
+                if (newWidth > maximumLabelWidth) {
+                    newWidth = maximumLabelWidth;
+                }
+                CGFloat newMinX = (CGRectGetWidth(self.buttonContainerView.frame) - (newWidth + 4.0f + 32.0f))/2.0f;
+                
+                self.buttonLoadingImageView.frame = CGRectMake(newMinX - 20.0f,CGRectGetMinY(self.buttonLoadingImageView.frame), CGRectGetWidth(self.buttonLoadingImageView.frame), CGRectGetHeight(self.buttonLoadingImageView.frame));
+               // self.buttonTitleLabel.frame = CGRectMake(CGRectGetMaxX(self.buttonIconImageView.frame) + 4.0f, CGRectGetMinY(self.buttonTitleLabel.frame), newWidth, CGRectGetHeight(self.buttonTitleLabel.frame));
                 
                 if (self.customButtonViewStyleType == TTLCustomButtonViewStyleTypeWithIcon) {
                     self.buttonIconImageView.alpha = 0.0f;

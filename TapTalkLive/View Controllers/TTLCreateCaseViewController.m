@@ -130,6 +130,8 @@
 #pragma mark TTLCustomDropDownTextFieldView
 - (void)customDropDownTextFieldViewDidTapped {
     [self.createCaseView.emailTextField.textField resignFirstResponder];
+    [self.createCaseView.fullNameTextField.textField resignFirstResponder];
+    [self.createCaseView.messageTextView.textView resignFirstResponder];
     TTLTopicListViewController *topicListViewController = [[TTLTopicListViewController alloc] init];
     topicListViewController.delegate = self;
     topicListViewController.topicListArray = self.topicListDataArray;
@@ -189,7 +191,7 @@
             [self.createCaseView showErrorEmailWithInfo:@"This field is required"];
             fieldValidation = NO;
         }
-        if (!isEmailValid) {
+        else if (!isEmailValid) {
             //Validation failed - show error invalid email format
             [self.createCaseView showErrorEmailWithInfo:@"Email address format is invalid"];
            // [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"Create Case Form Email Format" title:NSLocalizedStringFromTableInBundle(@"Error", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"Email address format is invalid", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:nil];
@@ -307,9 +309,9 @@
 
 - (void)handleSubmitCaseFormFlow {
     self.createCaseView.closeButton.userInteractionEnabled = NO;
+    self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = NO;
 //    self.createCaseView.leftCloseButton.userInteractionEnabled = NO;
     [self.createCaseView showCreateCaseButtonAsLoading:YES];
-    
     [[TapTalkLive sharedInstance] authenticateUserWithFullName:self.obtainedFullNameString
                                                          email:self.obtainedEmailString
     success:^(NSString *message) {
@@ -318,6 +320,7 @@
     failure:^(NSError *error) {
         if (self.createCaseViewControllerType == TTLCreateCaseViewControllerTypeAlreadyLogin) {
             self.createCaseView.closeButton.userInteractionEnabled = YES;
+            self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
 //            self.createCaseView.leftCloseButton.userInteractionEnabled = YES;
         }
         
@@ -402,6 +405,7 @@
 
 - (void)handleSubmitCaseFormFlowAfterLogin {
     self.createCaseView.closeButton.userInteractionEnabled = NO;
+    self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = NO;
     [self.createCaseView showCreateCaseButtonAsLoading:YES];
     BOOL isTapTalkAuthenticate = [TapTalk sharedInstance].isAuthenticated;
     if (isTapTalkAuthenticate) {
@@ -418,11 +422,13 @@
             } failure:^(NSError * _Nonnull error) {
                 //Error authenticate TapTalk.io Chat SDK
                 self.createCaseView.closeButton.userInteractionEnabled = YES;
+                self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
                 [self.createCaseView showCreateCaseButtonAsLoading:NO];
             }];
         } failure:^(NSError * _Nonnull error) {
             //Error get TapTalk auth ticket
             self.createCaseView.closeButton.userInteractionEnabled = YES;
+            self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
             [self.createCaseView showCreateCaseButtonAsLoading:NO];
         }];
     }
@@ -436,6 +442,7 @@
         
         [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
             self.createCaseView.closeButton.userInteractionEnabled = YES;
+            self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
             
             if ([self.delegate respondsToSelector:@selector(createCaseViewControllercreateCaseSucceed)]) {
                 [self.delegate createCaseViewControllercreateCaseSucceed];
@@ -459,6 +466,7 @@
         } failure:^(NSError * _Nonnull error) {
             //Error get chat room from TapTalk
             self.createCaseView.closeButton.userInteractionEnabled = YES;
+            self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
             [self.createCaseView showCreateCaseButtonAsLoading:NO];
         }];
     } failure:^(NSError * _Nonnull error) {
@@ -468,6 +476,7 @@
             return;
         }
         self.createCaseView.closeButton.userInteractionEnabled = YES;
+        self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
         [self.createCaseView showCreateCaseButtonAsLoading:NO];
     }];
 }

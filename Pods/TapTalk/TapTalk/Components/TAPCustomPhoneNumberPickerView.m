@@ -18,6 +18,8 @@
 @property (strong, nonatomic) UIView *phoneNumberContainerView;
 @property (strong, nonatomic) UIView *shadowView;
 
+@property (nonatomic) BOOL isVerif;
+
 - (void)doneKeyboardButtonDidTapped;
 
 @end
@@ -28,9 +30,11 @@
     self = [super initWithFrame:frame];
     
     if (self) {
-        _countryCodeContainerView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, 0.0f, 106.0f, 50.0f)];
+       _countryCodeContainerView = [[UIView alloc] initWithFrame:CGRectMake(16.0f, 0.0f, 106.0f, 50.0f)];
+            self.countryCodeContainerView.layer.borderWidth = 1.0f;
+        
         self.countryCodeContainerView.layer.cornerRadius = 8.0f;
-        self.countryCodeContainerView.layer.borderWidth = 1.0f;
+        //        self.countryCodeContainerView.layer.borderWidth = 0.0f;
         self.countryCodeContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         self.countryCodeContainerView.clipsToBounds = YES;
         self.countryCodeContainerView.backgroundColor = [UIColor whiteColor];
@@ -40,7 +44,7 @@
         self.countryFlagImageView.contentMode = UIViewContentModeScaleAspectFill;
         [self.countryCodeContainerView addSubview:self.countryFlagImageView];
         
-        UIFont *countryCodeFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextFieldPlaceholder];
+        UIFont *countryCodeFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
         UIColor *countryCodeColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextFieldPlaceholder];
         CGFloat countryCodeWidth = CGRectGetWidth(self.countryCodeContainerView.frame) - CGRectGetMaxX(self.countryFlagImageView.frame) - 10.0f - 15.0f;
         _countryCodeLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryFlagImageView.frame) + 10.0f, CGRectGetMinY(self.countryFlagImageView.frame) - 1.0f, countryCodeWidth, 20.0f)];
@@ -64,11 +68,16 @@
         self.shadowView.layer.shadowOpacity = 1.0f;
         self.shadowView.layer.masksToBounds = NO;
         self.shadowView.alpha = 0.0f;
-//        [self addSubview:self.shadowView];
-        
+        //        [self addSubview:self.shadowView];
+       
+       
         _phoneNumberContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame) + 10.0f, CGRectGetMinY(self.countryCodeContainerView.frame), phoneNumberContainerViewWidth, 50.0f)];
+            self.phoneNumberContainerView.layer.borderWidth = 1.0f;
+        
+        
+        // _phoneNumberContainerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame), CGRectGetMinY(self.countryCodeContainerView.frame), phoneNumberContainerViewWidth, 50.0f)];
         self.phoneNumberContainerView.layer.cornerRadius = 8.0f;
-        self.phoneNumberContainerView.layer.borderWidth = 1.0f;
+        //     self.phoneNumberContainerView.layer.borderWidth = 0.0f;
         self.phoneNumberContainerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
         self.phoneNumberContainerView.backgroundColor = [UIColor whiteColor];
         self.phoneNumberContainerView.clipsToBounds = YES;
@@ -76,10 +85,13 @@
         
         UIFont *textFieldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
         UIColor *textFieldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
-        _phoneNumberTextField = [[UITextField alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.phoneNumberContainerView.frame) - 16.0f - 16.0f, CGRectGetHeight(self.phoneNumberContainerView.frame))];
+    
+        
+        _phoneNumberTextField = [[UITextField alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.phoneNumberContainerView.frame) - 16.0f, CGRectGetHeight(self.phoneNumberContainerView.frame))];
+        
         self.phoneNumberTextField.delegate = self;
         self.phoneNumberTextField.keyboardType = UIKeyboardTypePhonePad;
-        self.phoneNumberTextField.placeholder = @"12345678910";
+        self.phoneNumberTextField.placeholder = @"8XXX XXX XXX";
         [self.phoneNumberTextField setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
         self.phoneNumberTextField.textColor = textFieldColor;
         self.phoneNumberTextField.font = textFieldFont;
@@ -97,6 +109,33 @@
     }
 
     return self;
+}
+
+- (void)setVerifState {
+    self.layer.cornerRadius = 8.0f;
+    self.layer.borderWidth = 1.0f;
+    self.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
+    self.countryCodeContainerView.frame = CGRectMake(0.0f, 0.0f, 105.0f, 50.0f);
+    self.countryCodeContainerView.layer.borderWidth = 0.0f;
+    self.countryCodeContainerView.layer.cornerRadius = 0.0f;
+    
+    UIImageView *dropdownImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.countryFlagImageView.frame) + 7.0f, 15.0f, 16.0f, 16.0f)];
+   [dropdownImageView setImage:[UIImage imageNamed:@"TAPIconArrowDown" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil]];
+    dropdownImageView.image = [dropdownImageView.image setImageTintColor:[UIColor blackColor]];
+    [self.countryCodeContainerView addSubview:dropdownImageView];
+    
+    self.countryCodeLabel.frame = CGRectMake(CGRectGetMaxX(dropdownImageView.frame) + 8.0f, CGRectGetMinY(self.countryCodeLabel.frame), CGRectGetWidth(self.countryCodeLabel.frame), 20.0f);
+    
+    self.loadingImageView.frame = CGRectMake(CGRectGetMinX(self.countryFlagImageView.frame), CGRectGetMinY(self.countryFlagImageView.frame), 20.0f, 20.0f);
+    
+    self.phoneNumberContainerView.frame = CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame), CGRectGetMinY(self.countryCodeContainerView.frame), CGRectGetWidth( self.phoneNumberContainerView.frame), 50.0f);
+    self.phoneNumberContainerView.layer.borderWidth = 0.0f;
+    self.phoneNumberContainerView.layer.cornerRadius = 0.0f;
+    
+    self.phoneNumberTextField.frame = CGRectMake(0.0f, -1.0f, CGRectGetWidth(self.phoneNumberContainerView.frame) - 16.0f, CGRectGetHeight(self.phoneNumberContainerView.frame));
+    self.pickerButton.frame = self.countryCodeContainerView.frame;
+    
+    self.isVerif = YES;
 }
 
 #pragma mark - Delegate
@@ -182,6 +221,7 @@
             [UIView animateWithDuration:0.2f animations:^{
                 self.loadingImageView.alpha = 1.0f;
                 self.countryCodeLabel.alpha = 0.0f;
+                self.countryFlagImageView.alpha = 0.0f;
                 self.pickerButton.userInteractionEnabled = NO;
                 self.phoneNumberTextField.userInteractionEnabled = NO;
             }];
@@ -201,6 +241,7 @@
         else {
             self.loadingImageView.alpha = 1.0f;
             self.countryCodeLabel.alpha = 0.0f;
+            self.countryFlagImageView.alpha = 0.0f;
             self.pickerButton.userInteractionEnabled = NO;
             self.phoneNumberTextField.userInteractionEnabled = NO;
             
@@ -222,6 +263,7 @@
             [UIView animateWithDuration:0.2f animations:^{
                 self.loadingImageView.alpha = 0.0f;
                 self.countryCodeLabel.alpha = 1.0f;
+                self.countryFlagImageView.alpha = 1.0f;
                 self.pickerButton.userInteractionEnabled = YES;
                 self.phoneNumberTextField.userInteractionEnabled = YES;
             }];
@@ -234,6 +276,7 @@
         else {
             self.loadingImageView.alpha = 0.0f;
             self.countryCodeLabel.alpha = 1.0f;
+            self.countryFlagImageView.alpha = 1.0f;
             self.pickerButton.userInteractionEnabled = YES;
             self.phoneNumberTextField.userInteractionEnabled = YES;
             
@@ -302,6 +345,14 @@
     }
     
     self.countryCodeLabel.text = formattedCountryCodeNumber;
+    
+    [self.countryCodeLabel sizeToFit];
+    CGFloat widthLabel = CGRectGetWidth(self.countryCodeLabel.frame);
+    
+    if(self.isVerif) {
+        self.countryCodeContainerView.frame = CGRectMake(0.0f, 0.0f, 80.0f + widthLabel, 50.0f);
+        self.phoneNumberContainerView.frame = CGRectMake(CGRectGetMaxX(self.countryCodeContainerView.frame), CGRectGetMinY(self.countryCodeContainerView.frame), CGRectGetWidth( self.phoneNumberContainerView.frame), 50.0f);
+    }
 }
 
 - (void)doneKeyboardButtonDidTapped {
@@ -315,7 +366,7 @@
     UIFont *textFieldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
     UIColor *textFieldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
     
-    UIFont *textFieldPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextFieldPlaceholder];
+    UIFont *textFieldPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
     UIColor *textFieldPlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextFieldPlaceholder];
     
     //AS NOTE - ADDED FOR DEFAULT COLOR `countryCodeContainerView`
@@ -347,6 +398,53 @@
         self.phoneNumberTextField.userInteractionEnabled = YES;
         self.countryCodeLabel.textColor = textFieldColor;
         self.phoneNumberTextField.textColor = textFieldColor;
+    }
+}
+
+- (void)setAsLoadiState:(BOOL)isLoading {
+    
+    UIFont *textFieldFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
+    UIColor *textFieldColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
+    
+    UIFont *textFieldPlaceholderFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
+    UIColor *textFieldPlaceholderColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextFieldPlaceholder];
+    
+    //AS NOTE - ADDED FOR DEFAULT COLOR `countryCodeContainerView`
+    self.countryCodeContainerView.backgroundColor = [UIColor whiteColor];
+    self.countryCodeLabel.alpha = 1.0f;
+    
+    //AS NOTE - ADDED FOR DEFAULT COLOR `phoneNumberContainerView`
+    self.phoneNumberContainerView.backgroundColor = [UIColor whiteColor];
+    self.phoneNumberTextField.alpha = 1.0f;
+    
+    self.backgroundColor = [UIColor whiteColor];
+    self.alpha = 1.0f;
+    self.countryCodeContainerView.alpha = 1.0f;
+    
+    if (isLoading) {
+        self.pickerButton.userInteractionEnabled = NO;
+        self.phoneNumberTextField.userInteractionEnabled = NO;
+        
+        //AS NOTE - CHANGE FOR DISABLED COLOR `phoneNumberContainerView`
+        UIColor *phoneNumberContainerViewBackgroundColor = [[TAPUtil getColor:TAP_COLOR_TEXT_DARK] colorWithAlphaComponent:0.1f];
+        self.backgroundColor = phoneNumberContainerViewBackgroundColor;
+        self.alpha = 0.8f;
+        self.phoneNumberContainerView.backgroundColor = [UIColor clearColor];
+        self.countryCodeContainerView.backgroundColor = [UIColor clearColor];; //AS TEMP
+        self.phoneNumberTextField.alpha = 0.4f;
+        self.countryCodeContainerView.alpha = 0.4f;
+    }
+    else {
+        self.pickerButton.userInteractionEnabled = YES;
+        self.phoneNumberTextField.userInteractionEnabled = YES;
+        self.countryCodeLabel.textColor = textFieldColor;
+        self.phoneNumberTextField.textColor = textFieldColor;
+    }
+}
+
+- (void)setAsErrorState:(BOOL)isError {
+    if(isError) {
+        self.layer.borderColor = [UIColor redColor].CGColor;
     }
 }
 
