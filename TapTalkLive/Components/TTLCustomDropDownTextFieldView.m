@@ -20,7 +20,6 @@
 @property (strong, nonatomic) UIView *shadowView;
 @property (strong, nonatomic) UIImageView *arrowImageView;
 @property (strong, nonatomic) UIImageView *loadingImageView;
-@property (strong, nonatomic) UIButton *containerButton;
 
 @property (nonatomic) BOOL isError;
 @property (nonatomic) BOOL isActive;

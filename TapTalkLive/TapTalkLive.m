@@ -271,7 +271,7 @@ Obtain main view controller of TapTalk Live
   //Set custom keyboard option items
     TTLImage *checkListImage = [UIImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     checkListImage = [checkListImage setImageTintColor:[TTLUtil getColor:@"191919"]];
-    TAPCustomKeyboardItemModel *customKeyboardItem = [TAPCustomKeyboardItemModel createCustomKeyboardItemWithImage:checkListImage itemName:NSLocalizedStringFromTableInBundle(@"Mark as solved", nil, [TTLUtil currentBundle], @"") itemID:@"1"];
+    TAPCustomKeyboardItemModel *customKeyboardItem = [TAPCustomKeyboardItemModel createCustomKeyboardItemWithImage:checkListImage itemName:NSLocalizedStringFromTableInBundle(@"Mark as Resolved", nil, [TTLUtil currentBundle], @"") itemID:@"1"];
     return @[customKeyboardItem];
 }
 

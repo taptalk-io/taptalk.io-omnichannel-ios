@@ -61,7 +61,7 @@
         [self.headerView addSubview:self.logoImageView];
         
         _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(14.0f, topGap + 16.0f + 14.0f, 28.0f, 28.0f)];
-        self.closeImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        self.closeImageView.image = [TTLImage imageNamed:@"TTLIconBackArrow" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         TTLImage *closeIconImage = (TTLImage *) self.closeImageView.image;
         closeIconImage = (TTLImage *) [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
         self.closeImageView.image = closeIconImage;
@@ -151,7 +151,7 @@
         [self.messageTextView showTitleLabel:YES];
         
         self.messageTextView.frame = CGRectMake(CGRectGetMinX(self.messageTextView.frame), CGRectGetMinY(self.messageTextView.frame), CGRectGetWidth(self.messageTextView.frame), [self.messageTextView getHeight]);
-        [self.messageTextView setPlaceholderText: NSLocalizedStringFromTableInBundle(@"Type message here", nil, [TTLUtil currentBundle], @"")];
+        [self.messageTextView setPlaceholderText: NSLocalizedStringFromTableInBundle(@"Enter your message", nil, [TTLUtil currentBundle], @"")];
         [self.messageTextView setPlaceholderColor:[TTLUtil getColor:@"C7C7CD"]];
         UIFont *textFieldFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormTextField];
         [self.messageTextView setPlaceholderFont:textFieldFont];
@@ -164,7 +164,8 @@
         _createCaseButtonView = [[TTLCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.messageTextView.frame) + 24.0f, CGRectGetWidth(self.formContainerView.frame), 48.0f)];
         [self.createCaseButtonView setCustomButtonViewStyleType:TTLCustomButtonViewStyleTypeWithIcon];
         [self.createCaseButtonView setCustomButtonViewType:TTLCustomButtonViewTypeInactive];
-        [self.createCaseButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TTLUtil currentBundle], @"") andIcon:@"TTLIconSend" iconPosition:TTLCustomButtonViewIconPosititonLeft];
+       // [self.createCaseButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TTLUtil currentBundle], @"") andIcon:@"" iconPosition:TTLCustomButtonViewIconPosititonLeft];
+        [self.createCaseButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TTLUtil currentBundle], @"")];
         [self.createCaseButtonView setAsActiveState:YES animated:NO];
         [self.formContainerView addSubview:self.createCaseButtonView];
         

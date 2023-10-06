@@ -240,7 +240,7 @@
 }
 
 - (void)updateLatestCaseCellView:(TAPMessageModel *)message {
-    if(message == nil) {
+    if (message == nil || message.isHidden) {
         return;
     }
     TTLHomeHeaderTableViewCell *cell = (TTLHomeHeaderTableViewCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];

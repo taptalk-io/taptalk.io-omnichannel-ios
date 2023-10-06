@@ -23,6 +23,7 @@ typedef NS_ENUM(NSInteger,TTLCustomDropDownTextFieldViewType) {
 @interface TTLCustomDropDownTextFieldView : UIView
 
 @property (strong, nonatomic) UITextField *textField;
+@property (strong, nonatomic) UIButton *containerButton;
 
 @property (weak, nonatomic) id<TTLCustomDropDownTextFieldViewDelegate> delegate;
 

@@ -43,6 +43,10 @@ extern BOOL SRURLRequiresSSL(NSURL *url)
 
 extern NSString *_Nullable SRBasicAuthorizationHeaderFromURL(NSURL *url)
 {
+    if (!url.user || !url.password) {
+        return nil;
+    }
+
     NSData *data = [[NSString stringWithFormat:@"%@:%@", url.user, url.password] dataUsingEncoding:NSUTF8StringEncoding];
     return [NSString stringWithFormat:@"Basic %@", SRBase64EncodedStringFromData(data)];
 }
@@ -68,11 +72,13 @@ extern NSString *_Nullable SRStreamNetworkServiceTypeFromURLRequest(NSURLRequest
         case NSURLNetworkServiceTypeVoice:
             networkServiceType = NSStreamNetworkServiceTypeVoice;
             break;
+#if (__MAC_OS_X_VERSION_MAX_ALLOWED >= 101200 || __IPHONE_OS_VERSION_MAX_ALLOWED >= 100000 || __TV_OS_VERSION_MAX_ALLOWED >= 100000 || __WATCH_OS_VERSION_MAX_ALLOWED >= 30000)
         case NSURLNetworkServiceTypeCallSignaling: {
             if (@available(iOS 10.0, tvOS 10.0, macOS 10.12, *)) {
                 networkServiceType = NSStreamNetworkServiceTypeCallSignaling;
             }
         } break;
+#endif
     }
     return networkServiceType;
 }
