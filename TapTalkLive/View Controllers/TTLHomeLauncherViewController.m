@@ -30,7 +30,7 @@
     
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
-    self.tableView.backgroundColor = [TTLUtil getColor:@"FAFAFA"];
+    self.tableView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorHomeBackground];
     [self showFooterView:YES];
     
     NSDictionary *faqDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_FAQ valid:nil];

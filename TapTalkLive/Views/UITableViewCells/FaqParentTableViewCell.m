@@ -15,11 +15,12 @@
 @property (weak, nonatomic) IBOutlet UIButton *backButton;
 @property (weak, nonatomic) IBOutlet UILabel *faqLabel;
 @property (weak, nonatomic) IBOutlet UIView *faqContainterView;
-
+@property (weak, nonatomic) IBOutlet UIButton *talkToAgentButton;
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *backButtonContainerHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *talkToAgentContainerHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *faqContainerTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *faqContainerBottomConstraint;
 
 @end
 
@@ -28,12 +29,30 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
+    
+    self.topHeaderContainerView.backgroundColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
+    
+    self.faqLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorHomeInfoLabel];
+    self.faqLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontHomeInfoLabel];
+    
+    self.titleLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFaqTitleLabel];
+    self.titleLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFaqTitleLabel];
+    
+    self.detailLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFaqContentLabel];
+    self.detailLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFaqContentLabel];
+    
+    [self.talkToAgentButton setTitleColor:[[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorBorderedButtonLabel] forState:UIControlStateNormal];
+    self.talkToAgentButton.titleLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontBorderedButtonLabel];
+    TTLImage *talkToAgentIcon = [UIImage imageNamed:@"TTLIconMessage" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    talkToAgentIcon = [talkToAgentIcon setImageTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconPrimary]];
+    [self.talkToAgentButton setImage:talkToAgentIcon forState:UIControlStateNormal];
+    
     self.talkToAgentButtonView.layer.cornerRadius = 8.0f;
     self.talkToAgentButtonView.layer.borderWidth = 1.0f;
-    self.talkToAgentButtonView.layer.borderColor = [TTLUtil getColor:@"FF7E00"].CGColor;
+    self.talkToAgentButtonView.layer.borderColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary].CGColor;
     
     TTLImage *backButtonImage = self.backButton.imageView.image;
-    self.backButton.imageView.image = [backButtonImage setImageTintColor:[UIColor whiteColor]];
+    self.backButton.imageView.image = [backButtonImage setImageTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconWhite]];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -63,21 +82,37 @@
 
 - (void)setTopRadius {
     [TTLUtil performBlock:^{
-        UIBezierPath *maskPath = [UIBezierPath
-            bezierPathWithRoundedRect:self.faqContainterView.bounds
-            byRoundingCorners:(UIRectCornerTopRight | UIRectCornerTopLeft)
-            cornerRadii:CGSizeMake(8.0f, 8.0f)
-        ];
-        CAShapeLayer *maskLayer = [CAShapeLayer layer];
-        maskLayer.path = maskPath.CGPath;
-        self.faqContainterView.layer.mask = maskLayer;
+//        UIBezierPath *maskPath = [UIBezierPath
+//            bezierPathWithRoundedRect:self.faqContainterView.bounds
+//            byRoundingCorners:(UIRectCornerTopRight | UIRectCornerTopLeft)
+//            cornerRadii:CGSizeMake(8.0f, 8.0f)
+//        ];
+//        CAShapeLayer *maskLayer = [CAShapeLayer layer];
+//        maskLayer.path = maskPath.CGPath;
+//        self.faqContainterView.layer.mask = maskLayer;
+        self.faqContainterView.layer.cornerRadius = 8.0f;
+        self.faqContainterView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner;
+        self.faqContainerBottomConstraint.constant = 0.0f;
+        [self addShadow];
     } afterDelay:0.05f];
 }
 
 - (void)setAllRoundRadius {
     [TTLUtil performBlock:^{
         self.faqContainterView.layer.cornerRadius = 8.0f;
+        self.faqContainterView.layer.maskedCorners = kCALayerMinXMinYCorner | kCALayerMaxXMinYCorner | kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
+        self.faqContainerBottomConstraint.constant = 2.0f;
+        [self addShadow];
     } afterDelay:0.05f];
+}
+
+- (void)addShadow {
+    self.faqContainterView.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.faqContainterView.layer.shadowOffset = CGSizeMake(0, 2.0f);
+    self.faqContainterView.layer.shadowRadius = 2.0f;
+    self.faqContainterView.layer.shadowOpacity = 0.1f;
+    self.faqContainterView.layer.masksToBounds = NO;
+    self.faqContainterView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.faqContainterView.bounds cornerRadius:self.faqContainterView.layer.cornerRadius].CGPath;
 }
 
 - (void)showTalkToAgentView:(BOOL)isShow {
@@ -103,7 +138,5 @@
         [self.delegate faqParentBackButtonDidTapped];
     }
 }
-
-
 
 @end

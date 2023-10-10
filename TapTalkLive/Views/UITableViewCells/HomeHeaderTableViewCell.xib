@@ -393,6 +393,7 @@
                 <outlet property="closeIconImageView" destination="Va8-CH-nTh" id="LjZ-IT-tZ2"/>
                 <outlet property="collectionView" destination="3em-JI-WR1" id="Be7-IH-hSd"/>
                 <outlet property="collectionViewHeightConstraint" destination="TRZ-DD-9aA" id="d7f-AN-ROV"/>
+                <outlet property="headerBackgroundView" destination="Ff3-Th-49B" id="Bvi-jy-Daa"/>
                 <outlet property="homeNewMessageContainerView" destination="cvg-qa-JBF" id="pYe-x5-L69"/>
                 <outlet property="homeNewMessageLabel" destination="gyx-2C-YoM" id="xV6-rk-tDb"/>
                 <outlet property="messageContentLabel" destination="XBW-4P-SDG" id="V9h-bU-nVj"/>
@@ -407,12 +408,15 @@
                 <outlet property="messageUsButtonImageView" destination="44H-HJ-M0t" id="txb-d6-WZc"/>
                 <outlet property="messageUserImageProfileContainerView" destination="Nxh-eR-geH" id="wgW-FS-oln"/>
                 <outlet property="needHelpTitleLabel" destination="b1f-ao-EYQ" id="Szc-qZ-elt"/>
+                <outlet property="orLabel" destination="9pv-Tl-5LN" id="iDy-5A-Xpj"/>
                 <outlet property="orView" destination="NZm-4E-LIi" id="Iqi-Jh-G2G"/>
                 <outlet property="orViewHeightConstraint" destination="Yl7-5M-5fs" id="MaI-no-xGZ"/>
                 <outlet property="recentCaseListTableView" destination="30K-7g-6st" id="K2H-Uk-AEl"/>
+                <outlet property="seeAllMessageLabel" destination="GfO-fM-Prs" id="FdQ-Cc-lhU"/>
                 <outlet property="selectChannelTitleLabel" destination="9f8-T4-H6Z" id="Swt-49-0tG"/>
                 <outlet property="sendMessageDirectlyContainerView" destination="j0c-ad-qh3" id="NYF-mP-0ru"/>
                 <outlet property="sendMessageDirectlyViewHeightConstraint" destination="chZ-NW-S06" id="uOx-PF-dlC"/>
+                <outlet property="yourMessageLabel" destination="zQM-sq-TUs" id="y1u-P1-dRJ"/>
             </connections>
             <point key="canvasLocation" x="125.19083969465649" y="200.70422535211267"/>
         </tableViewCell>

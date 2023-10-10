@@ -62,10 +62,10 @@
                         </constraints>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IF8-y6-OSr">
-                        <rect key="frame" x="16" y="40" width="288" height="247"/>
+                        <rect key="frame" x="16" y="40" width="288" height="248"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CfA-ua-NA9">
-                                <rect key="frame" x="0.0" y="16" width="288" height="231"/>
+                                <rect key="frame" x="0.0" y="16" width="288" height="232"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jfX-2J-vwi">
                                         <rect key="frame" x="12" y="37.666666666666671" width="256" height="17.666666666666671"/>
@@ -86,14 +86,14 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xyj-94-ypE">
-                                        <rect key="frame" x="12" y="67.333333333333314" width="256" height="87.666666666666686"/>
+                                        <rect key="frame" x="12" y="67.333333333333314" width="256" height="88.666666666666686"/>
                                         <string key="text">A single dashboard to manage WhatsApp, Twitter, FB Messenger, Telegram, LINE and email to elevate your sales, marketing, and support  A single dashboard to manage WhatsApp, Twitter, FB Messenger, Telegram, LINE and email to elevate your sales, marketing, and support </string>
                                         <fontDescription key="fontDescription" name="PTRootUI-Regular" family="PT Root UI" pointSize="16"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.60309898932248551" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EV7-XS-v6i" userLabel="Talk Agent View">
-                                        <rect key="frame" x="12" y="155" width="256" height="60"/>
+                                        <rect key="frame" x="12" y="156" width="256" height="60"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RBq-Gd-Vts">
                                                 <rect key="frame" x="0.0" y="12" width="256" height="48"/>
@@ -160,7 +160,7 @@
                     <constraint firstAttribute="trailing" secondItem="7fx-ex-0Pi" secondAttribute="trailing" id="0D2-G4-fzb"/>
                     <constraint firstItem="IF8-y6-OSr" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="Er7-su-bqp"/>
                     <constraint firstAttribute="trailing" secondItem="IF8-y6-OSr" secondAttribute="trailing" constant="16" id="Hnx-Ul-5o2"/>
-                    <constraint firstAttribute="bottom" secondItem="IF8-y6-OSr" secondAttribute="bottom" constant="1" id="Yga-ev-dBA"/>
+                    <constraint firstAttribute="bottom" secondItem="IF8-y6-OSr" secondAttribute="bottom" id="b4o-CM-qNX"/>
                     <constraint firstItem="7fx-ex-0Pi" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="bdh-VY-fdb"/>
                     <constraint firstItem="7fx-ex-0Pi" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="cUw-Hg-XEX"/>
                     <constraint firstItem="IF8-y6-OSr" firstAttribute="top" secondItem="CSt-bd-XlG" secondAttribute="bottom" id="xp9-EC-jpm"/>
@@ -172,9 +172,11 @@
                 <outlet property="backButton" destination="ehd-1W-gsZ" id="ms7-gS-eoo"/>
                 <outlet property="backButtonContainerHeightConstraint" destination="e9B-W5-lfW" id="Zam-nr-o4L"/>
                 <outlet property="detailLabel" destination="Xyj-94-ypE" id="5pH-kh-O1j"/>
+                <outlet property="faqContainerBottomConstraint" destination="b4o-CM-qNX" id="JTk-hS-rEw"/>
                 <outlet property="faqContainerTopConstraint" destination="KRs-Lq-2X7" id="uMv-KI-T4M"/>
                 <outlet property="faqContainterView" destination="CfA-ua-NA9" id="urs-r6-6v9"/>
                 <outlet property="faqLabel" destination="FAt-C6-LN5" id="e1U-Hv-Jke"/>
+                <outlet property="talkToAgentButton" destination="Bpo-EA-lnO" id="zm6-Ml-Fmh"/>
                 <outlet property="talkToAgentButtonView" destination="RBq-Gd-Vts" id="rEy-5N-MiK"/>
                 <outlet property="talkToAgentContainerHeightConstraint" destination="bMd-WB-orf" id="cjY-SL-EkZ"/>
                 <outlet property="talkToAgentContainerView" destination="EV7-XS-v6i" id="fFX-UF-rRT"/>
