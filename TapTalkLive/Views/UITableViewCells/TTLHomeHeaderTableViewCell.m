@@ -15,11 +15,14 @@
 #import <TapTalk/TapUIChatViewController.h>
 
 @interface TTLHomeHeaderTableViewCell ()<UICollectionViewDelegate, UICollectionViewDataSource, UITableViewDelegate, UITableViewDataSource>
+
+@property (weak, nonatomic) IBOutlet UIView *headerBackgroundView;
 @property (weak, nonatomic) IBOutlet UIImageView *closeIconImageView;
 @property (weak, nonatomic) IBOutlet UILabel *needHelpTitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *selectChannelTitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *clickOneChannelTitleLabel;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic) IBOutlet UILabel *orLabel;
 @property (weak, nonatomic) IBOutlet UIView *messageDirectlyContainerView;
 @property (weak, nonatomic) IBOutlet UILabel *messageDirectlyLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *messageDirectlyImageView;
@@ -30,6 +33,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *MessageUserNameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *messageContentLabel;
 
+@property (weak, nonatomic) IBOutlet UILabel *yourMessageLabel;
+@property (weak, nonatomic) IBOutlet UILabel *seeAllMessageLabel;
 @property (weak, nonatomic) IBOutlet UILabel *homeNewMessageLabel;
 @property (weak, nonatomic) IBOutlet UIView *homeNewMessageContainerView;
 @property (weak, nonatomic) IBOutlet UIView *messageHistoryContainerView;
@@ -89,44 +94,54 @@
     
     self.collectionViewHeightConstraint.constant = (channelrow * self.cellSize) + (channelrow * 10);
     
-    self.needHelpTitleLabel.textColor = [UIColor whiteColor];
-    self.needHelpTitleLabel.font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:20];
-    self.selectChannelTitleLabel.textColor = [UIColor whiteColor];
-    self.selectChannelTitleLabel.font = [UIFont fontWithName:TTL_FONT_FAMILY_REGULAR size:16];
-    self.clickOneChannelTitleLabel.textColor = [[UIColor blackColor] colorWithAlphaComponent:0.6f];
-    self.clickOneChannelTitleLabel.font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:14.0f];
+    self.headerBackgroundView.backgroundColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
+    
+    self.needHelpTitleLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorHomeTitleLabel];
+    self.needHelpTitleLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontHomeTitleLabel];
+    self.selectChannelTitleLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorHomeDescriptionLabel];
+    self.selectChannelTitleLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontHomeDescriptionLabel];
+    self.clickOneChannelTitleLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorHomeInfoLabel];
+    self.clickOneChannelTitleLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontHomeInfoLabel];
+    self.orLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorHomeInfoLabel];
+    self.orLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontHomeInfoLabel];
     
     self.messageDirectlyContainerView.layer.cornerRadius = 8.0f;
     self.messageDirectlyContainerView.layer.borderWidth = 1.0f;
-    self.messageDirectlyContainerView.layer.borderColor = [TTLUtil getColor:@"FF7E00"].CGColor;
+    self.messageDirectlyContainerView.layer.borderColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary].CGColor;
     
     TTLImage *messageDirectlyImage = self.messageDirectlyImageView.image;
-    self.messageDirectlyImageView.image = [messageDirectlyImage setImageTintColor:[TTLUtil getColor:@"FF7E00"]];
+    self.messageDirectlyImageView.image = [messageDirectlyImage setImageTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconPrimary]];
     
-    self.messageDirectlyLabel.textColor = [TTLUtil getColor:@"FF7E00"];
-    self.messageDirectlyLabel.font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:16.0f];
+    self.yourMessageLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorHomeInfoLabel];
+    self.yourMessageLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontHomeInfoLabel];
+    
+    self.seeAllMessageLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorHomeButtonLabel];
+    self.seeAllMessageLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontHomeButtonLabel];
+    
+    self.messageDirectlyLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorBorderedButtonLabel];
+    self.messageDirectlyLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontBorderedButtonLabel];
     
     self.homeNewMessageContainerView.layer.cornerRadius = 8.0f;
     self.homeNewMessageContainerView.layer.borderWidth = 1.0f;
-    self.homeNewMessageContainerView.layer.borderColor  = [TTLUtil getColor:@"FF7E00"].CGColor;
+    self.homeNewMessageContainerView.layer.borderColor  = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary].CGColor;
     
-    self.homeNewMessageLabel.textColor = [TTLUtil getColor:@"FF7E00"];
-    self.homeNewMessageLabel.font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:16.0f];
+    self.homeNewMessageLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorBorderedButtonLabel];
+    self.homeNewMessageLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontBorderedButtonLabel];
     
     TTLImage *closeIconImage = self.closeIconImageView.image;
-    self.closeIconImageView.image = [closeIconImage setImageTintColor:[UIColor whiteColor]];
+    self.closeIconImageView.image = [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconWhite]];
     
     TTLImage *messageUsButtonImage = self.messageUsButtonImageView.image;
-    self.messageUsButtonImageView.image = [messageUsButtonImage setImageTintColor:[TTLUtil getColor:@"FF7E00"]];
+    self.messageUsButtonImageView.image = [messageUsButtonImage setImageTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconPrimary]];
+    
     //[self.channelCollectionView registerNib:[UINib nibWithNibName:@"TTLChannelCollectionViewCell" bundle:[TTLUtil currentBundle]]   forCellWithReuseIdentifier: @"TTLChannelCollectionViewCell"];
     
     // [self hideSendDirectly];
-    //[self hideChannelList];
+    // [self hideChannelList];
     // [self hideChannelContainer];
     
     [self addShadow];
     [self viewLoadedSequence];
-    
 }
 
 - (void)prepareForReuse {

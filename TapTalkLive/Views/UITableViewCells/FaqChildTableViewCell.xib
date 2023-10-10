@@ -77,7 +77,9 @@
             <viewLayoutGuide key="safeArea" id="aW0-zy-SZf"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="arrowIconImageView" destination="vGr-24-Thr" id="sLg-Vr-fFy"/>
                 <outlet property="detailLabel" destination="Sap-Vy-zb7" id="dvn-Vu-8qp"/>
+                <outlet property="faqChildContainerBottomConstraint" destination="bpe-O4-owW" id="Xdj-dg-vz8"/>
                 <outlet property="faqChildContainerView" destination="LW5-bH-INB" id="6ti-Kj-Erc"/>
                 <outlet property="titleLabel" destination="YR3-ax-THd" id="qNg-d0-9MF"/>
             </connections>

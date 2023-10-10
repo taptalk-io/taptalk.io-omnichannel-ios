@@ -441,9 +441,73 @@
         }
         case TTLComponentFontMediaListInfoLabel:
         {
-            
             UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
             font = [font fontWithSize:TTL_MEDIA_LIST_INFO_LABEL_FONTSIZE_STYLE];
+            return font;
+            break;
+        }
+        case TTLComponentFontHomeTitleLabel:
+        {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
+            font = [font fontWithSize:20.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontHomeDescriptionLabel:
+        {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:16.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontHomeInfoLabel:
+        {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
+            font = [font fontWithSize:14.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontHomeButtonLabel:
+        {
+            
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
+            font = [font fontWithSize:14.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontBorderedButtonLabel:
+        {
+            
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
+            font = [font fontWithSize:16.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontFaqTitleLabel:
+        {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
+            font = [font fontWithSize:20.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontFaqContentLabel:
+        {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:16.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontFaqChildTitleLabel:
+        {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:16.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontFaqChildContentLabel:
+        {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:14.0f];
             return font;
             break;
         }
@@ -1160,7 +1224,7 @@
         }
         case TTLDefaultColorIconPrimary:
         {
-            return [TTLUtil getColor:TTL_COLOR_ICON_PRIMARY];
+            return [self getDefaultColorForType:TTLDefaultColorPrimary];
             break;
         }
         case TTLDefaultColorIconWhite:
@@ -1183,7 +1247,6 @@
             return [TTLUtil getColor:TTL_COLOR_ICON_ERROR];
             break;
         }
-            
         default:
         {
             //Set default color to black to prevent crash
@@ -1357,6 +1420,51 @@
         }
         case TTLTextColorTableViewSectionHeaderLabel: {
             UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
+            return color;
+            break;
+        }
+        case TTLTextColorHomeTitleLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TTLTextColorHomeDescriptionLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TTLTextColorHomeInfoLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextMedium];
+            return color;
+            break;
+        }
+        case TTLTextColorHomeButtonLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
+            return color;
+            break;
+        }
+        case TTLTextColorBorderedButtonLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
+            return color;
+            break;
+        }
+        case TTLTextColorFaqTitleLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextDark];
+            return color;
+            break;
+        }
+        case TTLTextColorFaqContentLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextMedium];
+            return color;
+            break;
+        }
+        case TTLTextColorFaqChildTitleLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextDark];
+            return color;
+            break;
+        }
+        case TTLTextColorFaqChildContentLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextMedium];
             return color;
             break;
         }
@@ -1991,6 +2099,12 @@
         case TTLComponentColorSearchBarBorderInactive:
         {
             UIColor *color = [TTLUtil getColor:TTL_SEARCHBAR_BORDER_INACTIVE_COLOR];
+            return color;
+            break;
+        }
+        case TTLComponentColorHomeBackground:
+        {
+            UIColor *color = [TTLUtil getColor:TTL_HOME_BACKGROUND_COLOR];
             return color;
             break;
         }

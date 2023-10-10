@@ -20,7 +20,7 @@
     [super viewDidLoad];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    self.tableView.backgroundColor = [TTLUtil getColor:@"FAFAFA"];
+    self.tableView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorHomeBackground];
     
     [self showFooterView:YES];
     
