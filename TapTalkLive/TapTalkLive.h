@@ -74,6 +74,9 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 @interface TapTalkLive : NSObject
 
 @property (weak, nonatomic) id<TapTalkLiveDelegate> _Nullable delegate;
+@property (strong, nonatomic) NSMutableDictionary<NSString * /*xcRoomID*/, TTLCaseModel *> *caseDictionary;
+@property (strong, nonatomic) NSMutableDictionary<NSString * /*apiUrl*/, NSString * /*contentResponse*/> *contentResponseDictionary;
+@property (strong, nonatomic) NSMutableArray<NSString *> *loadingContentResponseArray;
 @property (weak, nonatomic) UIWindow *activeWindow;
 
 //Initalization

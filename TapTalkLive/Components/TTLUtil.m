@@ -7,6 +7,7 @@
 //
 
 #import "TTLUtil.h"
+#import <TapTalk/TAPUtil.h>
 
 @implementation TTLUtil
 
@@ -477,6 +478,85 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return json;
 }
 
++ (void)fetchJsonFromUrl:(NSString *)jsonUrl
+                 success:(void (^)(NSString *jsonString))success
+                 failure:(void (^)(NSError *error))failure {
+    
+    [[TapTalkLive sharedInstance].loadingContentResponseArray addObject:jsonUrl];
+    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:jsonUrl]];
+
+    __block NSDictionary *json;
+    [NSURLConnection sendAsynchronousRequest:request
+                                       queue:[NSOperationQueue mainQueue]
+    completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+        [[TapTalkLive sharedInstance].loadingContentResponseArray removeObject:jsonUrl];
+        NSError *error;
+        json = [NSJSONSerialization JSONObjectWithData:data
+                                               options:0
+                                                 error:&error];
+        if (json != nil) {
+            NSString *jsonString = [TTLUtil jsonStringFromObject:json];
+            jsonString = [TTLUtil nullToEmptyString:jsonString];
+            [[TapTalkLive sharedInstance].contentResponseDictionary setObject:jsonString forKey:jsonUrl];
+            success(jsonString);
+        }
+        else {
+            failure(error);
+        }
+    }];
+}
+
++ (void)fetchScfPathContentResponse:(TTLFaqModel *)scfPath
+                 fetchChildContents:(BOOL)fetchChildContents
+                            success:(void (^)(NSString *apiUrl, NSString *contentResponse))success {
+    
+    NSMutableDictionary<NSString *, TTLFaqModel *> *scfDictionary = [NSMutableDictionary dictionary];
+    if ([scfPath.type isEqualToString:FAQ_QNA_VIA_API] &&
+        ![TTLUtil isEmptyString:scfPath.apiURL] &&
+        ([TTLUtil isEmptyString:scfPath.contentResponse])
+    ) {
+        [scfDictionary setObject:scfPath forKey:scfPath.apiURL];
+        NSString *contentResponseFromDictionary = [[TapTalkLive sharedInstance].contentResponseDictionary objectForKey:scfPath.apiURL];
+        if (![TTLUtil isEmptyString:contentResponseFromDictionary]) {
+            scfPath.contentResponse = contentResponseFromDictionary;
+            success(scfPath.apiURL, contentResponseFromDictionary);
+            
+            // Send notification
+            NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+            [objectDictionary setObject:scfPath.apiURL forKey:@"apiURL"];
+            [objectDictionary setObject:contentResponseFromDictionary forKey:@"contentResponse"];
+            [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED object:objectDictionary];
+        }
+        else {
+            [TTLUtil fetchJsonFromUrl:scfPath.apiURL
+            success:^(NSString *jsonString) {
+                scfPath.contentResponse = jsonString;
+                success(scfPath.apiURL, jsonString);
+                
+                // Send notification
+                NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                [objectDictionary setObject:scfPath.apiURL forKey:@"apiURL"];
+                [objectDictionary setObject:jsonString forKey:@"contentResponse"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED object:objectDictionary];
+            }
+            failure:^(NSError *error) {
+                // Send notification
+                NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionary];
+                [objectDictionary setObject:scfPath.apiURL forKey:@"apiURL"];
+                [objectDictionary setObject:error forKey:@"error"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED object:objectDictionary];
+            }];
+        }
+    }
+    
+    if (fetchChildContents && scfPath.childItems != nil && scfPath.childItems.count > 0) {
+        for (TTLFaqModel *child in scfPath.childItems) {
+            [scfDictionary setObject:child forKey:child.apiURL];
+            [TTLUtil fetchScfPathContentResponse:child fetchChildContents:NO success:success];
+        }
+    }
+}
+
 #pragma mark - Rect
 + (CGFloat)lineMinimumHeight {
     return 1.0f/[UIScreen mainScreen].scale;
@@ -507,6 +587,25 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     }
     
     return countedRect;
+}
+
+#pragma mark - View
+
++ (void)addSpinAnimation:(UIView *)view {
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    animation.fromValue = [NSNumber numberWithFloat:0.0f];
+    animation.toValue = [NSNumber numberWithFloat:(2 * M_PI)];
+    animation.duration = 1.5f;
+    animation.repeatCount = INFINITY;
+    animation.cumulative = YES;
+    animation.removedOnCompletion = NO;
+    [view.layer addAnimation:animation forKey:@"SpinAnimation"];
+}
+
++ (void)removeSpinAnimation:(UIView *)view {
+    if ([view.layer animationForKey:@"SpinAnimation"] != nil) {
+        [view.layer removeAnimationForKey:@"SpinAnimation"];
+    }
 }
 
 #pragma mark - Device

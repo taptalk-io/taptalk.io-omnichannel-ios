@@ -11,8 +11,13 @@
 @property (weak, nonatomic) IBOutlet UILabel *detailLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *arrowIconImageView;
 @property (weak, nonatomic) IBOutlet UIView *faqChildContainerView;
+@property (weak, nonatomic) IBOutlet UIView *bottomBackgroundView;
 
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *faqChildContainerBottomConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *detailLabelTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomBackgroundViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *faqChildContentHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *faqChildContentZeroHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *faqChildContainerViewBottomConstraint;
 
 @end
 
@@ -31,6 +36,11 @@
     self.arrowIconImageView.image = [self.arrowIconImageView.image imageWithTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconPrimary]];
     
     [self addShadow];
+    
+    self.faqChildContainerView.clipsToBounds = YES;
+    self.faqChildContainerView.layer.cornerRadius = 0.0f;
+    self.bottomBackgroundViewHeightConstraint.constant = 0.0f;
+    self.faqChildContainerViewBottomConstraint.constant = 0.0f;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -44,18 +54,31 @@
     
     self.faqChildContainerView.layer.mask = nil;
     self.faqChildContainerView.layer.cornerRadius = 0.0f;
-    self.faqChildContainerBottomConstraint.constant = 0.0f;
+    self.bottomBackgroundViewHeightConstraint.constant = 0.0f;
+    self.faqChildContainerViewBottomConstraint.constant = 0.0f;
 }
 
 - (void)setFaqChildWithData:(TTLFaqModel *)faqSequenceModel {
     self.titleLabel.text = faqSequenceModel.title;
     self.detailLabel.text = faqSequenceModel.content;
+    
+    if (![TTLUtil isEmptyString:self.detailLabel.text]) {
+        self.detailLabelTopConstraint.constant = 2.0f;
+        self.faqChildContentHeightConstraint.active = YES;
+        self.faqChildContentZeroHeightConstraint.active = NO;
+    }
+    else {
+        self.detailLabelTopConstraint.constant = 0.0f;
+        self.faqChildContentHeightConstraint.active = NO;
+        self.faqChildContentZeroHeightConstraint.active = YES;
+    }
+    [self refreshCellHeight];
 }
 
 - (void)addShadow {
     [TTLUtil performBlock:^{
         self.faqChildContainerView.layer.shadowColor = [UIColor blackColor].CGColor;
-        self.faqChildContainerView.layer.shadowOffset = CGSizeMake(0, 2.0f);
+        self.faqChildContainerView.layer.shadowOffset = CGSizeMake(0, 0.0f);
         self.faqChildContainerView.layer.shadowRadius = 2.0f;
         self.faqChildContainerView.layer.shadowOpacity = 0.1f;
         self.faqChildContainerView.layer.masksToBounds = NO;
@@ -64,7 +87,7 @@
 }
 
 - (void)setLastChildCellView {
-    [TTLUtil performBlock:^{
+//    [TTLUtil performBlock:^{
 //        UIBezierPath *maskPath = [UIBezierPath
 //            bezierPathWithRoundedRect:self.faqChildContainerView.bounds
 //            byRoundingCorners:(UIRectCornerBottomRight | UIRectCornerBottomLeft)
@@ -76,8 +99,10 @@
 //        self.faqChildContainerView.layer.mask = maskLayer;
         self.faqChildContainerView.layer.cornerRadius = 8.0f;
         self.faqChildContainerView.layer.maskedCorners = kCALayerMinXMaxYCorner | kCALayerMaxXMaxYCorner;
-        self.faqChildContainerBottomConstraint.constant = 2.0f;
-    } afterDelay:0.05f];
+        self.bottomBackgroundViewHeightConstraint.constant = 16.0f;
+        self.faqChildContainerViewBottomConstraint.constant = 16.0f;
+        [self refreshCellHeight];
+//    } afterDelay:0.05f];
 }
 
 @end

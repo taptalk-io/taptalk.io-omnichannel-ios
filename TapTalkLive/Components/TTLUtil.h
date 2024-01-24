@@ -95,12 +95,21 @@
 #pragma mark - JSON
 + (NSString *)jsonStringFromObject:(id)json;
 + (id)jsonObjectFromString:(NSString *)string;
++ (void)fetchJsonFromUrl:(NSString *)jsonUrl
+                 success:(void (^)(NSString *jsonString))success;
++ (void)fetchScfPathContentResponse:(TTLFaqModel *)scfPath
+                 fetchChildContents:(BOOL)fetchChildContents
+                            success:(void (^)(NSString *apiUrl, NSString *contentResponse))success;
 
 #pragma mark - Rect
 + (CGFloat)lineMinimumHeight;
 + (CGFloat)screenAdjustedHeight:(CGFloat)currentHeight;
 + (CGFloat)screenAdjustedWidth:(CGFloat)currentWidth;
 + (CGRect)getStringConstrainedSizeWithString:(NSString *)string withFont:(UIFont *)font withConstrainedSize:(CGSize)size;
+
+#pragma mark - View
++ (void)addSpinAnimation:(UIView *)view;
++ (void)removeSpinAnimation:(UIView *)view;
 
 #pragma mark - Device
 + (NSString *)hardwareModel;

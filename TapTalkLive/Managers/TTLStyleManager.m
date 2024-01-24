@@ -1161,6 +1161,18 @@
             return font;
             break;
         }
+        case TTLComponentFontFileNameLabel: {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
+            font = [font fontWithSize:16.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontFileInfoLabel: {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:10.0f];
+            return font;
+            break;
+        }
         default: {
             UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
             font = [font fontWithSize:[UIFont systemFontSize]];
@@ -1940,6 +1952,16 @@
         }
         case TTLTextColorCreateFormDescription: {
             UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TTLTextColorFileNameLabel: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextDark];
+            return color;
+            break;
+        }
+        case TTLTextColorFileInfoLabel: {
+            UIColor *color = [[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextDark] colorWithAlphaComponent:0.8f];
             return color;
             break;
         }

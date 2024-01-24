@@ -24,6 +24,7 @@
 //Notification
 #define TTL_NOTIFICATION_REACHABILITY_STATUS_CHANGED @"Notification.TapTalkLiveReachabilityStatusChanged"
 #define TTL_NOTIFICATION_CREATE_CASE_SUCCEED @"Notification.TapTalkLiveCreateCaseSucceed"
+#define TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED @"Notification.TapTalkLiveScfPathContentResponseFetched"
 
 //Channel
 #pragma mark CHANNEL / MEDIUM
@@ -36,4 +37,15 @@
 #define CHANNEL_TWITTER @"twitter"
 #define CHANNEL_FACEBOOK @"facebook"
 #define CHANNEL_GOOGLE_BUSINESS @"google_business"
+
+// SCF / FAQ Path Type
+#define FAQ_QNA @"qna"
+#define FAQ_QNA_VIA_API @"qna_via_api"
 #define FAQ_TALK_TO_AGENT @"talk_to_agent"
+
+// Message Type String
+#define MESSAGE_TYPE_STRING_TEXT @"text"
+#define MESSAGE_TYPE_STRING_IMAGE @"image"
+#define MESSAGE_TYPE_STRING_VIDEO @"video"
+#define MESSAGE_TYPE_STRING_FILE @"file"
+#define MESSAGE_TYPE_STRING_DOCUMENT @"document"
