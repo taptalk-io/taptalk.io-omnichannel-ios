@@ -23,6 +23,8 @@
 
 @implementation TTLHomeLauncherViewController
 
+#pragma mark - Lifecycle
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -36,6 +38,9 @@
     NSDictionary *faqDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_FAQ valid:nil];
     faqDictionary = [TTLUtil nullToEmptyDictionary:faqDictionary];
     _faqPathModel = [TTLDataManager dictionaryToFaqModel:faqDictionary];
+    [TTLUtil fetchScfPathContentResponse:self.faqPathModel fetchChildContents:YES success:^(NSString *apiUrl, NSString *contentResponse) {
+    }];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scfPathContentResponseFetched:) name:TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -50,6 +55,12 @@
     [super viewWillDisappear:animated];
     _isViewAppear = NO;
 }
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED object:nil];
+}
+
+#pragma mark - UITableViewDataSource
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     
@@ -83,6 +94,7 @@
         FaqParentTableViewCell *cell = (FaqParentTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[FaqParentTableViewCell description] forIndexPath:indexPath];
         [cell hideHeaderView];
         [cell setFaqParentData:self.faqPathModel];
+        cell.navigationController = self.navigationController;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.delegate = self;
         
@@ -98,8 +110,8 @@
         UINib *cellNib = [UINib nibWithNibName:@"FaqChildTableViewCell" bundle:[TTLUtil currentBundle]];
         [tableView registerNib:cellNib forCellReuseIdentifier:[FaqChildTableViewCell description]];
         FaqChildTableViewCell *cell = (FaqChildTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[FaqChildTableViewCell description] forIndexPath:indexPath];
-        NSDictionary *faqSequenceDict = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 2];
-        [cell setFaqChildWithData:[TTLDataManager dictionaryToFaqModel:faqSequenceDict]];
+        TTLFaqModel *faqChild = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 2];
+        [cell setFaqChildWithData:faqChild];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         if(indexPath.row == self.faqPathModel.childItems.count + 1) {
             [cell setLastChildCellView];
@@ -118,7 +130,7 @@
 }
 
 - (NSInteger)tableView:(nonnull UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if(self.faqPathModel != nil && self.faqPathModel.childItems.count > 0) {
+    if (self.faqPathModel != nil) {
         return 2 + [self.faqPathModel.childItems count];
     }
     else {
@@ -126,16 +138,18 @@
     }
 }
 
+#pragma mark - UITableViewDelegate
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if(indexPath.row > 1) {
-        NSDictionary *faqSequenceDict = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 2];
+        TTLFaqModel *faqChild = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 2];
         id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
         if ([tapTalkLiveDelegate respondsToSelector:@selector(faqChildDidTapped:currentShownNavigationController:)]) {
-                [tapTalkLiveDelegate faqChildDidTapped:[TTLDataManager dictionaryToFaqModel:faqSequenceDict] currentShownNavigationController:self.navigationController];
+                [tapTalkLiveDelegate faqChildDidTapped:faqChild currentShownNavigationController:self.navigationController];
             }
         else {
             TTLFaqViewController *faqViewController = [[TTLFaqViewController alloc] initWithNibName:@"TTLFaqViewController" bundle:[TTLUtil currentBundle]];
-            faqViewController.faqPathModel = [TTLDataManager dictionaryToFaqModel:faqSequenceDict];
+            faqViewController.faqPathModel = faqChild;
             [self.navigationController pushViewController:faqViewController animated:YES];
         }
     }
@@ -145,7 +159,8 @@
     return UITableViewAutomaticDimension;
 }
 
-#pragma mark TTLHomeHeaderTableViewCellDelegate
+#pragma mark - TTLHomeHeaderTableViewCellDelegate
+
 - (void)homeHeaderCellSeeAllMessagesButtonTapped {
     id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
     if ([tapTalkLiveDelegate respondsToSelector:@selector(seeAllMessagesButtonDidTappedWithCurrentShownNavigationController:)]) {
@@ -193,7 +208,8 @@
     }
 }
 
-#pragma mark FaqParentTableViewCellDelegate
+#pragma mark - FaqParentTableViewCellDelegate
+
 - (void)faqParentBackButtonDidTapped {
     id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
     if ([tapTalkLiveDelegate respondsToSelector:@selector(didTappedCloseButtonInHomePageViewWithCurrentShownNavigationController:)]) {
@@ -217,8 +233,8 @@
     }
 }
 
+#pragma mark - TAPChatManagerDelegate
 
-#pragma mark TAPChatManagerDelegate
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
     [self updateLatestCaseCellView:message];
 }
@@ -238,6 +254,8 @@
 - (void)chatManagerDidSendNewMessage:(TAPMessageModel *)message {
     [self updateLatestCaseCellView:message];
 }
+
+#pragma mark - Custom Methods
 
 - (void)updateLatestCaseCellView:(TAPMessageModel *)message {
     if (message == nil || message.isHidden) {
@@ -298,6 +316,23 @@
     //    [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
  //   }
     return isContainCaseList;
+}
+
+- (void)scfPathContentResponseFetched:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+        notificationParameterDictionary = [TTLUtil nullToEmptyDictionary:notificationParameterDictionary];
+        
+        NSString *apiURL = [notificationParameterDictionary objectForKey:@"apiURL"];
+        apiURL = [TTLUtil nullToEmptyString:apiURL];
+        
+        NSString *contentResponse = [notificationParameterDictionary objectForKey:@"contentResponse"];
+        contentResponse = [TTLUtil nullToEmptyString:contentResponse];
+        
+        if ([self.faqPathModel.apiURL isEqualToString:apiURL] && ![TTLUtil isEmptyString:contentResponse]) {
+            [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+        }
+    });
 }
 
 @end

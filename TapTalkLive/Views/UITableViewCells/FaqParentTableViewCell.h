@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FaqParentTableViewCell : TTLBaseTableViewCell
 @property (weak, nonatomic) id<FaqParentTableViewCellDelegate> delegate;
+@property (strong, nonatomic) UINavigationController *navigationController;
+
 - (void)hideHeaderView;
 - (void)setFaqParentData:(TTLFaqModel *)faqModel;
 - (void)hideFaqLabel;

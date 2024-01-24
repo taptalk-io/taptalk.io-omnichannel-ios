@@ -327,6 +327,8 @@ typedef NS_ENUM(NSInteger, TTLTextColor) {
     TTLTextColorReviewBubbleDoneReviewButtonTitleLabel,
     TTLTextColorCreateFormTitle,
     TTLTextColorCreateFormDescription,
+    TTLTextColorFileNameLabel,
+    TTLTextColorFileInfoLabel,
 };
 
 typedef NS_ENUM(NSInteger, TTLComponentFont) {
@@ -457,6 +459,8 @@ typedef NS_ENUM(NSInteger, TTLComponentFont) {
     TTLComponentFontRoomAvatarLargeLabel,
     TTLComponentFontRoomAvatarExtraLargeLabel,
     TTLComponentFontTopicListLabel,
+    TTLComponentFontFileNameLabel,
+    TTLComponentFontFileInfoLabel,
 };
 
 @interface TTLStyleManager : NSObject

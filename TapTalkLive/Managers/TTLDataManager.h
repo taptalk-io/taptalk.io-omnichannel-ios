@@ -70,7 +70,11 @@ NS_ASSUME_NONNULL_BEGIN
                                   notes:(NSString *)notes
                                 success:(void (^)(BOOL isSuccess))success
                                 failure:(void (^)(NSError *error))failure;
-
++ (void)callAPISendMessageWithCaseID:(NSString *)caseID
+                     caseCreatedTime:(NSNumber *)caseCreatedTime
+                             message:(TAPMessageModel *)message
+                             success:(void (^)(NSString *successMessage))success
+                             failure:(void (^)(NSError *error))failure;
 + (void)callAPIGetFaqPath:(void (^)(TTLFaqModel *faqModel))success
                   failure:(void (^)(NSError *error))failure;
 @end

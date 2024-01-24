@@ -16,6 +16,8 @@
 
 @implementation TTLFaqViewController
 
+#pragma mark - Lifecycle
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.delegate = self;
@@ -24,6 +26,9 @@
     
     [self showFooterView:YES];
     
+    [TTLUtil fetchScfPathContentResponse:self.faqPathModel fetchChildContents:YES success:^(NSString *apiUrl, NSString *contentResponse) {
+    }];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scfPathContentResponseFetched:) name:TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(closeViewController) name:TTL_NOTIFICATION_CREATE_CASE_SUCCEED object:nil];
 }
 
@@ -35,7 +40,12 @@
     }
 }
 
-#pragma mark FaqParentTableViewCellDelegate
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED object:nil];
+}
+
+#pragma mark - FaqParentTableViewCellDelegate
+
 - (void)faqParentBackButtonDidTapped {
     id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
     if ([tapTalkLiveDelegate respondsToSelector:@selector(closeButtonInFaqDetailsViewDidTapped:currentShownNavigationController:)]) {
@@ -55,14 +65,16 @@
     }
 }
 
+#pragma mark - UITableViewDataSource
+
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     if(indexPath.row == 0) {
         UINib *cellNib = [UINib nibWithNibName:@"FaqParentTableViewCell" bundle:[TTLUtil currentBundle]];
         [tableView registerNib:cellNib forCellReuseIdentifier:[FaqParentTableViewCell description]];
         FaqParentTableViewCell *cell = (FaqParentTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[FaqParentTableViewCell description] forIndexPath:indexPath];
-        //[cell hideHeaderView];
         cell.delegate = self;
         [cell setFaqParentData:self.faqPathModel];
+        cell.navigationController = self.navigationController;
         [cell hideFaqLabel];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         if(self.faqPathModel.childItems.count > 0) {
@@ -77,8 +89,8 @@
         UINib *cellNib = [UINib nibWithNibName:@"FaqChildTableViewCell" bundle:[TTLUtil currentBundle]];
         [tableView registerNib:cellNib forCellReuseIdentifier:[FaqChildTableViewCell description]];
         FaqChildTableViewCell *cell = (FaqChildTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[FaqChildTableViewCell description] forIndexPath:indexPath];
-        NSDictionary *faqSequenceDict = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 1];
-        [cell setFaqChildWithData:[TTLDataManager dictionaryToFaqModel:faqSequenceDict]];
+        TTLFaqModel *faqChild = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 1];
+        [cell setFaqChildWithData:faqChild];
         
         if(indexPath.row == self.faqPathModel.childItems.count) {
             [cell setLastChildCellView];
@@ -93,21 +105,29 @@
     return 1 + [self.faqPathModel.childItems count];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return UITableViewAutomaticDimension;
+}
+
+#pragma mark - UITableViewDelegate
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if(indexPath.row > 0) {
-        NSDictionary *faqSequenceDict = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 1];
+        TTLFaqModel *faqChild = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 1];
         id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
         if ([tapTalkLiveDelegate respondsToSelector:@selector(faqChildDidTapped:currentShownNavigationController:)]) {
-                [tapTalkLiveDelegate faqChildDidTapped:[TTLDataManager dictionaryToFaqModel:faqSequenceDict] currentShownNavigationController:self.navigationController];
+                [tapTalkLiveDelegate faqChildDidTapped:faqChild currentShownNavigationController:self.navigationController];
             }
         else {
             TTLFaqViewController *faqViewController = [[TTLFaqViewController alloc] initWithNibName:@"TTLFaqViewController" bundle:[TTLUtil currentBundle]];
-            faqViewController.faqPathModel = [TTLDataManager dictionaryToFaqModel:faqSequenceDict];
+            faqViewController.faqPathModel = faqChild;
             faqViewController.delegate = self;
             [self.navigationController pushViewController:faqViewController animated:YES];
         }
     }
 }
+
+#pragma mark - Custom Methods
 
 - (void)closeViewController {
     self.isClose = YES;
@@ -153,6 +173,23 @@
     if ([self.delegate respondsToSelector:@selector(faqViewControllercreateCaseSucceed)]) {
         [self.delegate faqViewControllercreateCaseSucceed];
     }
+}
+
+- (void)scfPathContentResponseFetched:(NSNotification *)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *notificationParameterDictionary = (NSDictionary *)[notification object];
+        notificationParameterDictionary = [TTLUtil nullToEmptyDictionary:notificationParameterDictionary];
+        
+        NSString *apiURL = [notificationParameterDictionary objectForKey:@"apiURL"];
+        apiURL = [TTLUtil nullToEmptyString:apiURL];
+        
+        NSString *contentResponse = [notificationParameterDictionary objectForKey:@"contentResponse"];
+        contentResponse = [TTLUtil nullToEmptyString:contentResponse];
+        
+        if ([self.faqPathModel.apiURL isEqualToString:apiURL] && ![TTLUtil isEmptyString:contentResponse]) {
+            [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+        }
+    });
 }
 
 @end

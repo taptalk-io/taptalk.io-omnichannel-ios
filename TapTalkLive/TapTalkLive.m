@@ -9,6 +9,7 @@
 #import "TapTalkLive.h"
 #import <CoreText/CoreText.h>
 #import <TapTalk/TapTalk.h>
+#import <TapTalk/TAPChatManager.h>
 #import <TapTalk/TapUI.h>
 #import <TapTalk/TapUIChatViewController.h>
 #import <TapTalk/TAPUtil.h>
@@ -19,12 +20,11 @@
 #import "TTLRatingViewController.h"
 #import "TTLReviewBubbleTableViewCell.h"
 
-@interface TapTalkLive () <TapUIRoomListDelegate, TapUICustomKeyboardDelegate, TapUIChatRoomDelegate, TTLReviewBubbleTableViewCellDelegate>
+@interface TapTalkLive () <TAPChatManagerDelegate, TapUIRoomListDelegate, TapUICustomKeyboardDelegate, TapUIChatRoomDelegate, TTLReviewBubbleTableViewCellDelegate>
 
 //@property (strong, nonatomic) TTLRoomListViewController *roomListViewController;
 @property (strong, nonatomic) TTLCaseListViewController *caseListViewController;
 @property (strong, nonatomic) TTLHomeLauncherViewController *homeLauncherViewController;
-@property (strong, nonatomic) NSMutableDictionary<NSString * /*xcRoomID*/, TTLCaseModel *> *caseDictionary;
 @property (nonatomic) BOOL isTapTalkInitializationCompleted;
 @property (nonatomic) BOOL isGetCaseListCompleted;
 
@@ -246,6 +246,33 @@ Obtain main view controller of TapTalk Live
 }
 
 #pragma mark - TapTalk Delegate
+
+#pragma mark - TAPChatManagerDelegate
+
+- (void)chatManagerDidSendMessagePending:(TAPMessageModel *)message {
+    if (message == nil || message.room == nil) {
+        return;
+    }
+    TTLCaseModel *caseModel = [self.caseDictionary objectForKey:message.room.xcRoomID];
+    if (caseModel == nil) {
+        return;
+    }
+    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+        [TTLDataManager callAPISendMessageWithCaseID:caseModel.caseID
+                                     caseCreatedTime:caseModel.createdTime
+                                             message:message
+        success:^(NSString * _Nonnull successMessage) {
+            
+        }
+        failure:^(NSError * _Nonnull error) {
+            [[TAPChatManager sharedManager] saveMessageToPendingMessageArray:message];
+        }];
+    }
+    else {
+        [[TAPChatManager sharedManager] saveMessageToPendingMessageArray:message];
+    }
+}
+
 #pragma mark TapUIChatRoom
 - (void)tapTalkGroupMemberAvatarTappedWithRoom:(TAPRoomModel *)room
                             user:(TAPUserModel *)user
@@ -353,6 +380,8 @@ Obtain main view controller of TapTalk Live
     [[TTLAPIManager sharedManager] setBaseAPIURLString:apiURLString];
     
     _caseDictionary = [NSMutableDictionary dictionary];
+    _contentResponseDictionary = [NSMutableDictionary dictionary];
+    _loadingContentResponseArray = [NSMutableArray array];
     
     //Call API project configs
     [TTLDataManager callAPIGetTapTalkLiveProjectConfigsSuccess:^(NSDictionary * _Nonnull tapTalkConfigsDictionary) {
@@ -403,6 +432,9 @@ Obtain main view controller of TapTalk Live
             [[TapUI sharedInstance] setCustomKeyboardDelegate:self];
             [[TapUI sharedInstance] setChatRoomDelegate:self];
             
+            [TAPChatManager sharedManager].isSendMessageDisabled = YES;
+            [[TAPChatManager sharedManager] addDelegate:self];
+            
             //Try to connect to TapTalk.io
             [[TapTalk sharedInstance] connectWithSuccess:^{
                 
@@ -418,18 +450,6 @@ Obtain main view controller of TapTalk Live
     // Call API get case list
     if ([TTLDataManager getAccessToken] != nil && ![[TTLDataManager getAccessToken] isEqualToString:@""]) {
         [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
-            BOOL isContainCaseList = NO;
-            if ([caseListArray count] > 0) {
-                isContainCaseList = YES;
-                for (TTLCaseModel *caseModel in caseListArray) {
-                    [self.caseDictionary setObject:caseModel forKey:caseModel.tapTalkXCRoomID];
-                }
-            }
-            
-            [[NSUserDefaults standardUserDefaults] setSecureBool:isContainCaseList forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
-            [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            
             _isGetCaseListCompleted = YES;
             if (self.isTapTalkInitializationCompleted) {
                 success();
@@ -508,18 +528,6 @@ Obtain main view controller of TapTalk Live
                 // Authenticate TapTalk.io Chat SDK
                 [[TapTalk sharedInstance] authenticateWithAuthTicket:tapTalkAuthTicket connectWhenSuccess:YES success:^{
                     [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
-                        BOOL isContainCaseList = NO;
-                        if ([caseListArray count] > 0) {
-                            isContainCaseList = YES;
-                            for (TTLCaseModel *caseModel in caseListArray) {
-                                [self.caseDictionary setObject:caseModel forKey:caseModel.tapTalkXCRoomID];
-                            }
-                        }
-                        
-                        [[NSUserDefaults standardUserDefaults] setSecureBool:isContainCaseList forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
-                        [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
-                        [[NSUserDefaults standardUserDefaults] synchronize];
-                        
                         _isGetCaseListCompleted = YES;
                         success(NSLocalizedString(@"Successfully authenticated.", @""));
                     } failure:^(NSError * _Nonnull error) {

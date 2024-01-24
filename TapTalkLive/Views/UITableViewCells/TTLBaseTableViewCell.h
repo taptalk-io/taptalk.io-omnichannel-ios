@@ -12,6 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TTLBaseTableViewCell : UITableViewCell
 
+- (UITableView * _Nullable)getTableView;
+
+- (void)refreshCellHeight;
+
 @end
 
 NS_ASSUME_NONNULL_END
