@@ -287,51 +287,51 @@
 }
 
 - (void)setMessageStatusIcon {
-    TAPMessageStatusType statusType = TAPMessageStatusTypeNone;
+    TTLMessageStatusType statusType = TTLMessageStatusTypeNone;
     NSString *currentUserID = [TAPChatManager sharedManager].activeUser.userID;
     if ([self.roomListModel.lastMessage.user.userID isEqualToString:currentUserID]) {
         //last message is from ourself
         if (self.roomListModel.lastMessage.isRead) {
-            statusType = TAPMessageStatusTypeRead;
+            statusType = TTLMessageStatusTypeRead;
         }
         else if (self.roomListModel.lastMessage.isDelivered) {
-            statusType = TAPMessageStatusTypeDelivered;
+            statusType = TTLMessageStatusTypeDelivered;
         }
         else if (self.roomListModel.lastMessage.isSending) {
-            statusType = TAPMessageStatusTypeSending;
+            statusType = TTLMessageStatusTypeSending;
         }
         else if (self.roomListModel.lastMessage.isFailedSend) {
-            statusType = TAPMessageStatusTypeFailed;
+            statusType = TTLMessageStatusTypeFailed;
         }
         else if (self.roomListModel.lastMessage.isDeleted) {
-            statusType = TAPMessageStatusTypeDeleted;
+            statusType = TTLMessageStatusTypeDeleted;
         }
         else {
-            statusType = TAPMessageStatusTypeSent;
+            statusType = TTLMessageStatusTypeSent;
         }
     }
     switch (statusType) {
-        case TAPMessageStatusTypeNone:
+        case TTLMessageStatusTypeNone:
         {
             self.lastMessageStatusIconImageView.alpha = 0.0f;
             break;
         }
-        case TAPMessageStatusTypeSending:
+        case TTLMessageStatusTypeSending:
         {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
-        case TAPMessageStatusTypeSent:
+        case TTLMessageStatusTypeSent:
         {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
-        case TAPMessageStatusTypeDelivered:
+        case TTLMessageStatusTypeDelivered:
         {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
-        case TAPMessageStatusTypeRead:
+        case TTLMessageStatusTypeRead:
         {
             // Check if show read status
             BOOL isHideReadStatus = [[TapUI sharedInstance] getReadStatusHiddenState];
@@ -346,12 +346,12 @@
             
             break;
         }
-        case TAPMessageStatusTypeFailed:
+        case TTLMessageStatusTypeFailed:
         {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconFailed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
-        case TAPMessageStatusTypeDeleted:
+        case TTLMessageStatusTypeDeleted:
         {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;

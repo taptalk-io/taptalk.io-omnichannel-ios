@@ -7,14 +7,14 @@
 
 #import "TTLBaseTableViewCell.h"
 
-typedef NS_ENUM(NSInteger, TAPMessageStatusType) {
-    TAPMessageStatusTypeNone = 0,
-    TAPMessageStatusTypeSending = 1,
-    TAPMessageStatusTypeSent = 2,
-    TAPMessageStatusTypeDelivered = 3,
-    TAPMessageStatusTypeRead = 4,
-    TAPMessageStatusTypeFailed = 5,
-    TAPMessageStatusTypeDeleted = 6,
+typedef NS_ENUM(NSInteger, TTLMessageStatusType) {
+    TTLMessageStatusTypeNone = 0,
+    TTLMessageStatusTypeSending = 1,
+    TTLMessageStatusTypeSent = 2,
+    TTLMessageStatusTypeDelivered = 3,
+    TTLMessageStatusTypeRead = 4,
+    TTLMessageStatusTypeFailed = 5,
+    TTLMessageStatusTypeDeleted = 6,
 };
 
 NS_ASSUME_NONNULL_BEGIN
