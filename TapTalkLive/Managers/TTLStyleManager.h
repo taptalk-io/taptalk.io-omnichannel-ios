@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, TTLDefaultColor) {
     TTLDefaultColorTextLight,
     TTLDefaultColorTextMedium,
     TTLDefaultColorTextDark,
+    TTLDefaultColorTextSoft,
     TTLDefaultColorIconPrimary,
     TTLDefaultColorIconWhite,
     TTLDefaultColorIconGray,
@@ -329,6 +330,12 @@ typedef NS_ENUM(NSInteger, TTLTextColor) {
     TTLTextColorCreateFormDescription,
     TTLTextColorFileNameLabel,
     TTLTextColorFileInfoLabel,
+    TTLTextColorCaseListAvatar,
+    TTLTextColorCaseListTitle,
+    TTLTextColorCaseListSender,
+    TTLTextColorCaseListLastMessage,
+    TTLTextColorCaseListTimestamp,
+    TTLTextColorCaseListUnreadCount,
 };
 
 typedef NS_ENUM(NSInteger, TTLComponentFont) {
@@ -461,6 +468,12 @@ typedef NS_ENUM(NSInteger, TTLComponentFont) {
     TTLComponentFontTopicListLabel,
     TTLComponentFontFileNameLabel,
     TTLComponentFontFileInfoLabel,
+    TTLComponentFontCaseListAvatar,
+    TTLComponentFontCaseListTitle,
+    TTLComponentFontCaseListSender,
+    TTLComponentFontCaseListLastMessage,
+    TTLComponentFontCaseListTimestamp,
+    TTLComponentFontCaseListUnreadCount,
 };
 
 @interface TTLStyleManager : NSObject

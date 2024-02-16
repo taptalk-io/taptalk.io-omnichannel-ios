@@ -46,13 +46,13 @@
         self.titleLabel.textColor = formLabelColor;
         [self addSubview:self.titleLabel];
         
-        _containerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 50.0f)];
+        _containerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 48.0f)];
         self.containerView.backgroundColor = [UIColor whiteColor];
         self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderInactive].CGColor;
         self.containerView.layer.cornerRadius = 8.0f;
         self.containerView.layer.borderWidth = 1.0f;
         
-        _shadowView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.containerView.frame), 50.0f)];
+        _shadowView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.containerView.frame), 48.0f)];
         self.shadowView.backgroundColor = [UIColor whiteColor];
         self.shadowView.layer.cornerRadius = 8.0f;
         self.shadowView.layer.shadowRadius = 5.0f;
@@ -90,13 +90,15 @@
         
         UIFont *formDescriptionLabelBodyFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormDescriptionLabel];
         UIColor *formDescriptionLabelBodyColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFormDescriptionLabel];
-        _infoDescriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.containerView.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
+//        _infoDescriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.containerView.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
+        _infoDescriptionLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.containerView.frame), CGRectGetWidth(self.frame) - 16.0f - 16.0f, 0.0f)];
         self.infoDescriptionLabel.font = formDescriptionLabelBodyFont;
         self.infoDescriptionLabel.textColor = formDescriptionLabelBodyColor;
         self.infoDescriptionLabel.numberOfLines = 0;
         [self addSubview:self.infoDescriptionLabel];
         
-        _errorInfoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame), 16.0f, 16.0f)];
+//        _errorInfoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame), 16.0f, 16.0f)];
+        _errorInfoImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame), 16.0f, 0.0f)];
         self.errorInfoImageView.image = [UIImage imageNamed:@"IconInfo" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         self.errorInfoImageView.alpha = 0.0f;
         [self addSubview:self.errorInfoImageView];
@@ -307,14 +309,21 @@
     }
     
     CGSize size = [self.errorInfoLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.errorInfoLabel.frame), CGFLOAT_MAX)];
-    if(![string isEqualToString:@""]) {
-        self.errorInfoImageView.alpha = 1.0f;
-    }
-    else {
-        self.errorInfoImageView.alpha = 0.0f;
-    }
-   
-    self.errorInfoLabel.frame = CGRectMake(CGRectGetMaxX(self.errorInfoImageView.frame) + 4.0f, CGRectGetMaxY(self.infoDescriptionLabel.frame) + ySpacing, CGRectGetWidth(self.errorInfoLabel.frame), size.height);
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        if (![string isEqualToString:@""]) {
+            self.errorInfoImageView.alpha = 1.0f;
+            self.errorInfoImageView.frame = CGRectMake(CGRectGetMinX(self.errorInfoImageView.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame) + 8.0f, 16.0f, 16.0f);
+            self.errorInfoLabel.frame = CGRectMake(CGRectGetMaxX(self.errorInfoImageView.frame) + 4.0f, CGRectGetMinY(self.errorInfoImageView.frame), CGRectGetWidth(self.errorInfoLabel.frame), 16.0f);
+        }
+        else {
+            self.errorInfoImageView.alpha = 0.0f;
+            self.errorInfoImageView.frame = CGRectMake(CGRectGetMinX(self.errorInfoImageView.frame), CGRectGetMaxY(self.infoDescriptionLabel.frame), 16.0f, 0.0f);
+            self.errorInfoLabel.frame = CGRectMake(CGRectGetMaxX(self.errorInfoImageView.frame) + 4.0f, CGRectGetMinY(self.errorInfoImageView.frame), CGRectGetWidth(self.errorInfoLabel.frame), 0.0f);
+        }
+        [self layoutIfNeeded];
+    }];
+    
 }
 
 - (CGFloat)getTextFieldHeight {

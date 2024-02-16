@@ -225,7 +225,7 @@
     
     _panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGestureAction:)];
     self.panGestureRecognizer.delegate = self;
-    //[self.contentView addGestureRecognizer:self.panGestureRecognizer];
+    [self.contentView addGestureRecognizer:self.panGestureRecognizer];
     
     _bubbleViewTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                               action:@selector(handleBubbleViewTap:)];
@@ -351,8 +351,8 @@
         if (recognizer.state == UIGestureRecognizerStateChanged) {
             CGPoint translation = [recognizer translationInView:self];
             
-            if (translation.x < 0) {
-                //Cannot swipe left
+            if (translation.x < 0 && (self.message == nil || self.message.room.type == RoomTypePersonal)) {
+                // Cannot swipe left on personal room (message info)
                 return;
             }
             
@@ -378,9 +378,16 @@
                 
                 _disableTriggerHapticFeedbackOnDrag = YES;
             }
+            else if (translation.x < -50.0f && !self.disableTriggerHapticFeedbackOnDrag) {
+                [TAPUtil tapticImpactFeedbackGenerator];
+                _disableTriggerHapticFeedbackOnDrag = YES;
+            }
             
             if (translation.x > 70.0f) {
                 translation.x = 70.0f;
+            }
+            else if (translation.x < -70.0f) {
+                translation.x = -70.0f;
             }
             
             self.bubbleView.transform = CGAffineTransformMakeTranslation(translation.x, 0);
@@ -398,6 +405,11 @@
             if (translation.x > 50.0f) {
                 if ([self.delegate respondsToSelector:@selector(myVoiceNoteBubbleDidTriggerSwipeToReplyWithMessage:)]) {
                     [self.delegate myVoiceNoteBubbleDidTriggerSwipeToReplyWithMessage:self.message];
+                }
+            }
+            else if (translation.x < -50.0f && (self.message != nil && self.message.room.type != RoomTypePersonal)) {
+                if ([self.delegate respondsToSelector:@selector(myVoiceNoteBubbleDidTriggerSwipeInfoWithMessage:)]) {
+                    [self.delegate myVoiceNoteBubbleDidTriggerSwipeInfoWithMessage:self.message];
                 }
             }
             
@@ -444,8 +456,30 @@
 - (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
     if (imageView == self.quoteImageView) {
         if (imageView.image == nil) {
-            [self showQuoteView:NO];
-            [self showReplyView:YES withMessage:self.message];
+            if (![TAPUtil isEmptyString:self.message.quote.fileType] && [self.message.quote.fileType isEqualToString:@"video"]) {
+                    [TAPImageView imageFromCacheWithMessage:self.message
+                    start:^(TAPMessageModel *resultMessage) {
+                        
+                    }
+                    progress:^(CGFloat progress, CGFloat total, TAPMessageModel *resultMessage) {
+                        
+                    }
+                    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                        if (savedImage != nil) {
+                            [self.quoteImageView setImage:savedImage];
+                            [self showReplyView:NO withMessage:nil];
+                            [self showQuoteView:YES];
+                        }
+                    }
+                    failure:^(NSError *error, TAPMessageModel *resultMessage) {
+                        [self showQuoteView:NO];
+                        [self showReplyView:YES withMessage:self.message];
+                    }];
+            }
+            else {
+                [self showQuoteView:NO];
+                [self showReplyView:YES withMessage:self.message];
+            }
         }
     }
 }
@@ -572,14 +606,20 @@
         }
         [self.contentView layoutIfNeeded];
         
-        
-        if([message.quote.content isEqualToString:@"🎤 Voice"]){
-            [self showReplyView:YES withMessage:message];
-            [self showQuoteView:NO];
-        }
-        else if((message.quote.fileID && ![message.quote.fileID isEqualToString:@""]) || (message.quote.imageURL  && ![message.quote.imageURL isEqualToString:@""])) {
-            [self showReplyView:NO withMessage:nil];
-            [self showQuoteView:YES];
+        if ((![TAPUtil isEmptyString:message.quote.fileType] &&
+             ([message.quote.fileType isEqualToString:@"image"] ||
+             [message.quote.fileType isEqualToString:@"video"] ||
+             [message.quote.fileType isEqualToString:@"file"])) ||
+            ![TAPUtil isEmptyString:message.quote.imageURL]
+        ) {
+            if ([message.quote.fileType isEqualToString:@"video"]) {
+                [self showReplyView:YES withMessage:message];
+                [self showQuoteView:NO];
+            }
+            else {
+                [self showReplyView:NO withMessage:nil];
+                [self showQuoteView:YES];
+            }
             [self setQuote:message.quote userID:message.replyTo.userID];
         }
         else {
@@ -715,6 +755,8 @@
     [self.forwardFromLabel.layer removeAllAnimations];
     [self.forwardTitleLabel.layer removeAllAnimations];
     [self.quoteImageView.layer removeAllAnimations];
+    
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setAudioSliderValue:(NSTimeInterval)currentTime{
@@ -758,24 +800,24 @@
 
 - (void)showStatusLabel:(BOOL)show {
     if (show) {
-            self.statusLabel.alpha = 1.0f;
-            self.statusLabelTopConstraint.constant = 2.0f;
-            self.statusLabelHeightConstraint.constant = 13.0f;
-            self.replyButton.alpha = 1.0f;
-            self.replyButtonRightConstraint.constant = 2.0f;
-            self.statusIconImageView.alpha = 1.0f;
-            [self.contentView layoutIfNeeded];
+        self.statusLabel.alpha = 1.0f;
+        self.statusLabelTopConstraint.constant = 2.0f;
+        self.statusLabelHeightConstraint.constant = 13.0f;
+        self.replyButton.alpha = 1.0f;
+        self.replyButtonRightConstraint.constant = 2.0f;
+        self.statusIconImageView.alpha = 1.0f;
     }
     else {
-            self.statusLabel.alpha = 0.0f;
-            self.statusLabelTopConstraint.constant = 0.0f;
-            self.statusLabelHeightConstraint.constant = 0.0f;
-            self.replyButton.alpha = 0.0f;
-            self.replyButtonRightConstraint.constant = -28.0f;
-            self.statusIconImageView.alpha = 1.0f;
-            [self.contentView layoutIfNeeded];
+        self.statusLabel.alpha = 0.0f;
+        self.statusLabelTopConstraint.constant = 0.0f;
+        self.statusLabelHeightConstraint.constant = 0.0f;
+        self.replyButton.alpha = 0.0f;
+        self.replyButtonRightConstraint.constant = -28.0f;
+        self.statusIconImageView.alpha = 1.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
+
 - (IBAction)forwardCheckmarkButtonDidTapped:(id)sender {
     if ([self.delegate respondsToSelector:@selector(myVoiceNoteCheckmarkDidTapped:)]) {
         [self.delegate myVoiceNoteCheckmarkDidTapped:self.message];
@@ -816,7 +858,7 @@
 }
 
 - (IBAction)doneDownloadTitleAndDescriptionButtonDidTapped:(id)sender {
-    if ([self.delegate respondsToSelector:@selector(myVoiceNotePlayPauseButtonDidTappedmyVoiceNotePlayPauseButtonDidTappedmyVoiceNotePlayPauseButtonDidTapped:)]) {
+    if ([self.delegate respondsToSelector:@selector(myVoiceNotePlayPauseButtonDidTapped:)]) {
         [self.delegate myVoiceNotePlayPauseButtonDidTapped:self.message];
     }
 }
@@ -1263,15 +1305,16 @@
 }
 
 - (void)showStarMessageView {
-    if(self.starIconImageView.alpha == 0){
+    if (self.starIconImageView.alpha == 0) {
         self.starIconImageView.alpha = 1.0f;
         self.starIconWidthConstraint.constant = 10.0f;
     }
-    else{
+    else {
         self.starIconImageView.alpha = 0.0f;
         self.starIconWidthConstraint.constant = 0.0f;
         self.pinIconTrailingConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showCheckMarkIcon:(BOOL)isShow {
@@ -1318,7 +1361,7 @@
 }
 
 - (void)showPinIcon:(BOOL)isShow {
-    if(isShow){
+    if (isShow) {
         self.pinIconImageView.alpha = 1.0f;
         self.pinIconWidthConstraint.constant = 10.0f;
         if(![self.messageReadCounterLabel.text isEqualToString:@""]) {
@@ -1328,11 +1371,12 @@
             self.pinIconTrailingConstraint.constant = 0.0f;
         }
     }
-    else{
+    else {
         self.pinIconImageView.alpha = 0.0f;
         self.pinIconWidthConstraint.constant = 0.0f;
         self.pinIconTrailingConstraint.constant = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
@@ -1355,6 +1399,7 @@
         self.messageReadCounterLabel.alpha = 0.0f;
         self.messageReadcounterImageView.alpha = 0.0f;
     }
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)showSeperator{
@@ -1363,6 +1408,7 @@
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }
+    [self.contentView layoutIfNeeded];
 }
 
 @end

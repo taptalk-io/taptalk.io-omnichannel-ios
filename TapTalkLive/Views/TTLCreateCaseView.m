@@ -49,18 +49,22 @@
             topGap = 44.0f;
         }
         
-        _headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.frame), 0.0f)];
+        UIButton *dismissKeyboardButton = [[UIButton alloc] initWithFrame:self.frame];
+        [dismissKeyboardButton addTarget:self action:@selector(dismissKeyboardButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.scrollView addSubview:dismissKeyboardButton];
+        
+        _headerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, topGap, CGRectGetWidth(self.frame), 0.0f)];
         self.headerView.backgroundColor = [UIColor clearColor];
         [self.scrollView addSubview:self.headerView];
         
-        _logoImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(12.0f, topGap + 16.0f, 48.0f, 48.0f)];
+        _logoImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(12.0f, 16.0f, 48.0f, 48.0f)];
         self.logoImageView.clipsToBounds = YES;
         self.logoImageView.image = [UIImage imageNamed:@"TapTalkLogo" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         self.logoImageView.layer.cornerRadius = 8.0f;
         self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.headerView addSubview:self.logoImageView];
         
-        _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(14.0f, topGap + 16.0f + 14.0f, 28.0f, 28.0f)];
+        _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(14.0f, 16.0f + 14.0f, 28.0f, 28.0f)];
         self.closeImageView.image = [TTLImage imageNamed:@"TTLIconBackArrow" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         TTLImage *closeIconImage = (TTLImage *) self.closeImageView.image;
         closeIconImage = (TTLImage *) [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
@@ -68,7 +72,7 @@
         self.closeImageView.alpha = 0.0f;
         [self.headerView addSubview:self.closeImageView];
         
-        _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, topGap + 16.0f, 56.0f, 56.0f)];
+        _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 16.0f, 56.0f, 56.0f)];
         self.closeButton.alpha = 0.0f;
         self.closeButton.userInteractionEnabled = NO;
         [self.headerView addSubview:self.closeButton];
@@ -131,6 +135,10 @@
         self.formContainerView.backgroundColor = [UIColor whiteColor];
         [self.scrollView addSubview:self.formContainerView];
         
+        UIButton *formDismissKeyboardButton = [[UIButton alloc] initWithFrame:self.formContainerView.frame];
+        [formDismissKeyboardButton addTarget:self action:@selector(dismissKeyboardButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
+        [self.formContainerView addSubview:formDismissKeyboardButton];
+        
         _fullNameTextField = [[TTLCustomTextFieldView alloc] initWithFrame:CGRectMake(0.0f, 16.0f, CGRectGetWidth(self.formContainerView.frame), 0.0f)];
         [self.fullNameTextField setTtlCustomTextFieldViewType:TTLCustomTextFieldViewTypeFullName];
         self.fullNameTextField.frame = CGRectMake(CGRectGetMinX(self.fullNameTextField.frame), CGRectGetMinY(self.fullNameTextField.frame), CGRectGetWidth(self.fullNameTextField.frame), [self.fullNameTextField getTextFieldHeight]);
@@ -149,6 +157,8 @@
         _messageTextView = [[TTLFormGrowingTextView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.topicDropDownView.frame) + 12.0f, CGRectGetWidth(self.formContainerView.frame), 0.0f)];
         [self.messageTextView setTtlFormGrowingTextViewType:TTLFormGrowingTextViewTypeMessage];
         [self.messageTextView showTitleLabel:YES];
+        [self.messageTextView setMinimumHeight:68.0f];
+        [self.messageTextView setMaximumHeight:1000.0f];
         
         self.messageTextView.frame = CGRectMake(CGRectGetMinX(self.messageTextView.frame), CGRectGetMinY(self.messageTextView.frame), CGRectGetWidth(self.messageTextView.frame), [self.messageTextView getHeight]);
         [self.messageTextView setPlaceholderText: NSLocalizedStringFromTableInBundle(@"Enter your message", nil, [TTLUtil currentBundle], @"")];
@@ -162,7 +172,7 @@
         self.messageTextView.textView.inputAccessoryView = self.keyboardAccessoryView;
         
         _createCaseButtonView = [[TTLCustomButtonView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetMaxY(self.messageTextView.frame) + 24.0f, CGRectGetWidth(self.formContainerView.frame), 48.0f)];
-        [self.createCaseButtonView setCustomButtonViewStyleType:TTLCustomButtonViewStyleTypeWithIcon];
+        [self.createCaseButtonView setCustomButtonViewStyleType:TTLCustomButtonViewStyleTypePlain];
         [self.createCaseButtonView setCustomButtonViewType:TTLCustomButtonViewTypeInactive];
        // [self.createCaseButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TTLUtil currentBundle], @"") andIcon:@"" iconPosition:TTLCustomButtonViewIconPosititonLeft];
         [self.createCaseButtonView setButtonWithTitle:NSLocalizedStringFromTableInBundle(@"Send Message", nil, [TTLUtil currentBundle], @"")];
@@ -176,6 +186,8 @@
         self.formContainerView.layer.cornerRadius = 8.0f;
         self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame) + 60.0f);
         
+        formDismissKeyboardButton.frame = CGRectMake(0.0f, 0.0f, self.formContainerView.frame.size.width, self.formContainerView.frame.size.height);
+        dismissKeyboardButton.frame = CGRectMake(0.0f, 0.0f, self.frame.size.width, self.scrollView.contentSize.height);
         
         //DV Temp
         //DV Note - 21 Feb 2020
@@ -266,7 +278,7 @@
 }
 
 - (void)showCreateCaseButtonAsLoading:(BOOL)loading {    
-    [self.createCaseButtonView setAsLoading:loading animated:YES];
+    [self.createCaseButtonView setAsLoading:loading animated:NO];
     [self.emailTextField setAsEnabled:!loading];
     [self.fullNameTextField setAsEnabled:!loading];
     [self.topicDropDownView setAsEnabled:!loading];
@@ -306,57 +318,64 @@
     [self.messageTextView setAsError:NO animated:YES];
     [self.topicDropDownView setErrorInfoText:@""];
     
-    if(CGRectGetHeight(self.fullNameTextField.frame) > 0) {
-        self.fullNameTextField.frame = CGRectMake(CGRectGetMinX(self.fullNameTextField.frame), CGRectGetMinY(self.fullNameTextField.frame), CGRectGetWidth(self.fullNameTextField.frame), [self.fullNameTextField getTextFieldHeight]);
-    }
-    
-    if(CGRectGetHeight(self.emailTextField.frame) > 0) {
-        self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMaxY(self.fullNameTextField.frame) + 12.0f, CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
-    }
-    
-    if(CGRectGetHeight(self.topicDropDownView.frame) > 0) {
-        self.topicDropDownView.frame = CGRectMake(CGRectGetMinX(self.topicDropDownView.frame), CGRectGetMaxY(self.emailTextField.frame) + 12.0f, CGRectGetWidth(self.topicDropDownView.frame), [self.topicDropDownView getTextFieldHeight]);
-    }
-    
-    if(CGRectGetHeight(self.messageTextView.frame) > 0) {
-        self.messageTextView.frame = CGRectMake(CGRectGetMinX(self.messageTextView.frame), CGRectGetMaxY(self.topicDropDownView.frame) + 12.0f, CGRectGetWidth(self.messageTextView.frame), [self.messageTextView getHeight]);
+    [UIView animateWithDuration:0.2f animations:^{
+        if (CGRectGetHeight(self.fullNameTextField.frame) > 0) {
+            self.fullNameTextField.frame = CGRectMake(CGRectGetMinX(self.fullNameTextField.frame), CGRectGetMinY(self.fullNameTextField.frame), CGRectGetWidth(self.fullNameTextField.frame), [self.fullNameTextField getTextFieldHeight]);
+        }
         
-    }
+        if (CGRectGetHeight(self.emailTextField.frame) > 0) {
+            self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMaxY(self.fullNameTextField.frame) + 12.0f, CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
+        }
+        
+        if (CGRectGetHeight(self.topicDropDownView.frame) > 0) {
+            self.topicDropDownView.frame = CGRectMake(CGRectGetMinX(self.topicDropDownView.frame), CGRectGetMaxY(self.emailTextField.frame) + 12.0f, CGRectGetWidth(self.topicDropDownView.frame), [self.topicDropDownView getTextFieldHeight]);
+        }
+        
+        if (CGRectGetHeight(self.messageTextView.frame) > 0) {
+            self.messageTextView.frame = CGRectMake(CGRectGetMinX(self.messageTextView.frame), CGRectGetMaxY(self.topicDropDownView.frame) + 12.0f, CGRectGetWidth(self.messageTextView.frame), [self.messageTextView getHeight]);
+            
+        }
         self.createCaseButtonView.frame = CGRectMake(CGRectGetMinX(self.createCaseButtonView.frame), CGRectGetMaxY(self.messageTextView.frame) - 10.0f, CGRectGetWidth(self.createCaseButtonView.frame), CGRectGetHeight(self.createCaseButtonView.frame));
         
         self.formContainerView.frame = CGRectMake(CGRectGetMinX(self.formContainerView.frame), CGRectGetMinY(self.formContainerView.frame), CGRectGetWidth(self.formContainerView.frame), CGRectGetMaxY(self.createCaseButtonView.frame) + 16.0f);
-    CAShapeLayer *containerViewLayer = [CAShapeLayer layer];
-    containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.formContainerView.bounds byRoundingCorners: UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
-    self.formContainerView.layer.mask = containerViewLayer;
-    self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame) + 60.0f);
+        CAShapeLayer *containerViewLayer = [CAShapeLayer layer];
+        containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.formContainerView.bounds byRoundingCorners: UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
+        self.formContainerView.layer.mask = containerViewLayer;
+        self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame) + 60.0f);
+    }];
 }
 
 - (void)repositionFieldPosition {
-    if(CGRectGetHeight(self.fullNameTextField.frame) > 0) {
-        self.fullNameTextField.frame = CGRectMake(CGRectGetMinX(self.fullNameTextField.frame), CGRectGetMinY(self.fullNameTextField.frame), CGRectGetWidth(self.fullNameTextField.frame), [self.fullNameTextField getTextFieldHeight]);
-    }
-    
-    if(CGRectGetHeight(self.emailTextField.frame) > 0) {
-        self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMaxY(self.fullNameTextField.frame) + 12.0f, CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
-    }
-    
-    if(CGRectGetHeight(self.topicDropDownView.frame) > 0) {
-        self.topicDropDownView.frame = CGRectMake(CGRectGetMinX(self.topicDropDownView.frame), CGRectGetMaxY(self.emailTextField.frame) + 12.0f, CGRectGetWidth(self.topicDropDownView.frame), [self.topicDropDownView getTextFieldHeight]);
-    }
-    
-    if(CGRectGetHeight(self.messageTextView.frame) > 0) {
-        self.messageTextView.frame = CGRectMake(CGRectGetMinX(self.messageTextView.frame), CGRectGetMaxY(self.topicDropDownView.frame) + 12.0f, CGRectGetWidth(self.messageTextView.frame), [self.messageTextView getHeight]);
+    [UIView animateWithDuration:0.2f animations:^{
+        if (CGRectGetHeight(self.fullNameTextField.frame) > 0) {
+            self.fullNameTextField.frame = CGRectMake(CGRectGetMinX(self.fullNameTextField.frame), CGRectGetMinY(self.fullNameTextField.frame), CGRectGetWidth(self.fullNameTextField.frame), [self.fullNameTextField getTextFieldHeight]);
+        }
         
-    }
-        self.createCaseButtonView.frame = CGRectMake(CGRectGetMinX(self.createCaseButtonView.frame), CGRectGetMaxY(self.messageTextView.frame) + 24.0f, CGRectGetWidth(self.createCaseButtonView.frame), CGRectGetHeight(self.createCaseButtonView.frame));
+        if (CGRectGetHeight(self.emailTextField.frame) > 0) {
+            self.emailTextField.frame = CGRectMake(CGRectGetMinX(self.emailTextField.frame), CGRectGetMaxY(self.fullNameTextField.frame) + 12.0f, CGRectGetWidth(self.emailTextField.frame), [self.emailTextField getTextFieldHeight]);
+        }
         
-        self.formContainerView.frame = CGRectMake(CGRectGetMinX(self.formContainerView.frame), CGRectGetMinY(self.formContainerView.frame), CGRectGetWidth(self.formContainerView.frame), CGRectGetMaxY(self.createCaseButtonView.frame) + 16.0f);
-    CAShapeLayer *containerViewLayer = [CAShapeLayer layer];
-    containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.formContainerView.bounds byRoundingCorners: UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
-    self.formContainerView.layer.mask = containerViewLayer;
-    self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame) + 60.0f);
-    //}
-    
+        if (CGRectGetHeight(self.topicDropDownView.frame) > 0) {
+            if (CGRectGetHeight(self.emailTextField.frame) > 0) {
+                self.topicDropDownView.frame = CGRectMake(CGRectGetMinX(self.topicDropDownView.frame), CGRectGetMaxY(self.emailTextField.frame) + 12.0f, CGRectGetWidth(self.topicDropDownView.frame), [self.topicDropDownView getTextFieldHeight]);
+            }
+            else {
+                self.topicDropDownView.frame = CGRectMake(CGRectGetMinX(self.topicDropDownView.frame), CGRectGetMaxY(self.emailTextField.frame), CGRectGetWidth(self.topicDropDownView.frame), [self.topicDropDownView getTextFieldHeight]);
+            }
+        }
+        
+        if (CGRectGetHeight(self.messageTextView.frame) > 0) {
+            self.messageTextView.frame = CGRectMake(CGRectGetMinX(self.messageTextView.frame), CGRectGetMaxY(self.topicDropDownView.frame) + 12.0f, CGRectGetWidth(self.messageTextView.frame), [self.messageTextView getHeight]);
+            
+        }
+            self.createCaseButtonView.frame = CGRectMake(CGRectGetMinX(self.createCaseButtonView.frame), CGRectGetMaxY(self.messageTextView.frame) + 24.0f, CGRectGetWidth(self.createCaseButtonView.frame), CGRectGetHeight(self.createCaseButtonView.frame));
+            
+            self.formContainerView.frame = CGRectMake(CGRectGetMinX(self.formContainerView.frame), CGRectGetMinY(self.formContainerView.frame), CGRectGetWidth(self.formContainerView.frame), CGRectGetMaxY(self.createCaseButtonView.frame) + 16.0f);
+        CAShapeLayer *containerViewLayer = [CAShapeLayer layer];
+        containerViewLayer.path = [UIBezierPath bezierPathWithRoundedRect:self.formContainerView.bounds byRoundingCorners: UIRectCornerBottomLeft | UIRectCornerBottomRight cornerRadii: (CGSize){8.0, 8.0}].CGPath;
+        self.formContainerView.layer.mask = containerViewLayer;
+        self.scrollView.contentSize = CGSizeMake(CGRectGetWidth(self.scrollView.frame), CGRectGetMaxY(self.formContainerView.frame) + 60.0f);
+    }];
 }
 
 - (void)setCreateCaseViewType:(TTLCreateCaseViewType)createCaseViewType {
@@ -435,5 +454,8 @@
     }
 }
 
+- (void)dismissKeyboardButtonDidTapped {
+    [self endEditing:YES];
+}
 
 @end

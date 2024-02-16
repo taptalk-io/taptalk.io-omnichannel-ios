@@ -137,6 +137,7 @@
         TAPMediaPreviewModel *mediaPreview = [self.mediaDataArray objectAtIndex:0];
         if (mediaPreview.caption != nil && ![mediaPreview.caption isEqualToString:@""]) {
             [self.imagePreviewView.captionTextView setText:mediaPreview.caption];
+            self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", [mediaPreview.caption length], [[TapTalk sharedInstance] getMaxCaptionLength]];
         }
 
     }
@@ -410,17 +411,31 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
                 [cell setThumbnailImagePreviewCollectionViewCellType:TAPThumbnailImagePreviewCollectionViewCellTypeVideo];
             }
             
-            UIImage *thumbnailImage = nil;
-            if (mediaPreview.asset == nil) {
+            if (mediaPreview.url != nil && ![mediaPreview.url isEqualToString:@""]) {
+                // Set thumbnail preview from URL
+                if ([mediaPreview.mediaType isEqualToString:@"video"]) {
+                    // Fetch video data
+                    [TAPUtil fetchVideoThumbnailWithRemoteURL:mediaPreview.url
+                    success:^(UIImage *thumbnail) {
+                        [cell setThumbnailImageView:thumbnail];
+                    }
+                    failure:^(NSError *error) {
+                        
+                    }];
+                }
+                else {
+                    [cell setImageUrl:mediaPreview.url];
+                }
+            }
+            else if (mediaPreview.asset == nil) {
                 //data is from Camera - UIImage
-                thumbnailImage = mediaPreview.image;
+                [cell setThumbnailImageView:mediaPreview.image];
             }
             else {
                 //data is from PHAsset
-                thumbnailImage = mediaPreview.thumbnailImage;
+                [cell setThumbnailImageView:mediaPreview.thumbnailImage];
             }
             
-            [cell setThumbnailImageView:thumbnailImage];
             cell.mediaPreviewData = mediaPreview;
         }
         
@@ -572,8 +587,10 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
             
             [self.mediaDataArray removeObjectAtIndex:indexPath.item];
             
-            NSString *generatedAssetKey = toBeDeletedAsset.localIdentifier;
-            [self.excedeedSizeLimitMediaDictionary removeObjectForKey:generatedAssetKey];
+            if (toBeDeletedAsset != nil && ![TAPUtil isEmptyString:toBeDeletedAsset.localIdentifier]) {
+                NSString *generatedAssetKey = toBeDeletedAsset.localIdentifier;
+                [self.excedeedSizeLimitMediaDictionary removeObjectForKey:generatedAssetKey];
+            }
             
             [self filterAssetSizeExcedeedLimitWithArray:self.mediaDataArray];
             
@@ -874,8 +891,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 - (void)photoAlbumListViewControllerSelectImageWithDataArray:(NSArray *)dataArray {
     
     [self setMediaPreviewDataWithArray:dataArray];
-    self.imagePreviewView.wordCountLabel.text = [NSString stringWithFormat:@"%ld/%ld", [[TapTalk sharedInstance] getMaxCaptionLength], [[TapTalk sharedInstance] getMaxCaptionLength]];
-    [self.imagePreviewView isShowCounterCharCount:NO];
     
     if ([self.mediaDataArray count] != 0 && [self.mediaDataArray count] > 1) {
         [self.imagePreviewView isShowAsSingleImagePreview:NO animated:NO];
@@ -883,11 +898,6 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
     else {
         [self.imagePreviewView isShowAsSingleImagePreview:YES animated:NO];
     }
-    
-    self.selectedIndex = 0;
-    
-    [self.imagePreviewView.thumbnailCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
-    [self.imagePreviewView.imagePreviewCollectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:NO];
     
     [self.imagePreviewView setItemNumberWithCurrentNumber:1 ofTotalNumber:[self.mediaDataArray count]];
     [self.imagePreviewView.imagePreviewCollectionView reloadData];

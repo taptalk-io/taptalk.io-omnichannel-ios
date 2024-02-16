@@ -187,7 +187,7 @@
         case TTLComponentFontFormLabel:
         {
             
-            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontMedium];
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
             font = [font fontWithSize:TTL_FORM_LABEL_FONTSIZE_STYLE];
             return font;
             break;
@@ -203,7 +203,7 @@
         case TTLComponentFontFormErrorInfoLabel:
         {
             
-            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
             font = [font fontWithSize:TTL_FORM_ERROR_INFO_LABEL_FONTSIZE_STYLE];
             return font;
             break;
@@ -1173,6 +1173,42 @@
             return font;
             break;
         }
+        case TTLComponentFontCaseListAvatar: {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
+            font = [font fontWithSize:20.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontCaseListTitle: {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:16.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontCaseListSender: {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:14.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontCaseListLastMessage: {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:14.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontCaseListTimestamp: {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:14.0f];
+            return font;
+            break;
+        }
+        case TTLComponentFontCaseListUnreadCount: {
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
+            font = [font fontWithSize:12.0f];
+            return font;
+            break;
+        }
         default: {
             UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
             font = [font fontWithSize:[UIFont systemFontSize]];
@@ -1232,6 +1268,11 @@
         case TTLDefaultColorTextDark:
         {
             return [TTLUtil getColor:TTL_COLOR_TEXT_DARK];
+            break;
+        }
+        case TTLDefaultColorTextSoft:
+        {
+            return [[TTLUtil getColor:TTL_COLOR_TEXT_DARK] colorWithAlphaComponent:0.4f];
             break;
         }
         case TTLDefaultColorIconPrimary:
@@ -1965,7 +2006,36 @@
             return color;
             break;
         }
-            
+        case TTLTextColorCaseListAvatar: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextLight];
+            return color;
+            break;
+        }
+        case TTLTextColorCaseListTitle: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextDark];
+            return color;
+            break;
+        }
+        case TTLTextColorCaseListSender: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextSoft];
+            return color;
+            break;
+        }
+        case TTLTextColorCaseListLastMessage: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextSoft];
+            return color;
+            break;
+        }
+        case TTLTextColorCaseListTimestamp: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextSoft];
+            return color;
+            break;
+        }
+        case TTLTextColorCaseListUnreadCount: {
+            UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextLight];
+            return color;
+            break;
+        }
         default: {
             //Set default color to black to prevent crash
             UIColor *color = [TTLUtil getColor:@"9B9B9B"];

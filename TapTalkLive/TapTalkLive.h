@@ -78,6 +78,7 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 @property (strong, nonatomic) NSMutableDictionary<NSString * /*apiUrl*/, NSString * /*contentResponse*/> *contentResponseDictionary;
 @property (strong, nonatomic) NSMutableArray<NSString *> *loadingContentResponseArray;
 @property (weak, nonatomic) UIWindow *activeWindow;
+@property (nonatomic) BOOL isTapTalkLiveInitialized;
 
 //Initalization
 + (TapTalkLive *_Nonnull)sharedInstance;

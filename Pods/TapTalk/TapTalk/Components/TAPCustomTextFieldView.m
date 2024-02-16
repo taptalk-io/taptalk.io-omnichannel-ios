@@ -114,7 +114,6 @@
         self.errorInfoLabel.textColor = formErrorInfoLabelColor;
         self.errorInfoLabel.numberOfLines = 0;
         [self addSubview:self.errorInfoLabel];
-                
     }
     
     return self;
@@ -597,6 +596,7 @@
     
     [self.phoneNumberPickerView setCountryCodePhoneNumberWithData:country];
     self.phoneNumberPickerView.phoneNumberTextField.text = phoneNumber;
+    [self.phoneNumberPickerView textFieldTextDidChange];
     self.textField.text = phoneNumber;
 }
 

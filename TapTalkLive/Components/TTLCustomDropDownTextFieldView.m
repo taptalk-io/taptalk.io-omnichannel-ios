@@ -106,7 +106,6 @@
         _containerButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, CGRectGetWidth(self.containerView.frame), CGRectGetHeight(self.containerView.frame))];
         [self.containerButton addTarget:self action:@selector(containerButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
         [self.containerView addSubview:self.containerButton];
-        
     }
     
     return self;
