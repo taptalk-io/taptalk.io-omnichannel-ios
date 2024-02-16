@@ -2205,6 +2205,8 @@
         
         success(faqModel);
         
+        [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_SCF_PATH_UPDATED object:scfPathDictionary];
+        
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
         [TTLDataManager logErrorStringFromError:error];
         
@@ -2223,6 +2225,9 @@
 }
 
 + (TTLFaqModel *)dictionaryToFaqModel:(NSDictionary *)faqDictionary {
+    if (faqDictionary == nil) {
+        return nil;
+    }
     NSNumber *itemID = [faqDictionary objectForKey:@"itemID"];
     NSNumber *pathID = [faqDictionary objectForKey:@"pathID"];
     NSNumber *parentID = [faqDictionary objectForKey:@"parentID"];
@@ -2257,7 +2262,9 @@
         NSMutableArray<TTLFaqModel *> *childFAQs = [NSMutableArray array];
         for (NSDictionary *childDictionary in childItems) {
             TTLFaqModel *child = [TTLDataManager dictionaryToFaqModel:childDictionary];
-            [childFAQs addObject:child];
+            if (child != nil) {
+                [childFAQs addObject:child];
+            }
         }
         faq.childItems = childFAQs;
     }

@@ -8,7 +8,6 @@
 
 #import "TTLFormGrowingTextView.h"
 #import <TapTalk/TAPCustomTextView.h>
-#import <TapTalk/TAPStyleManager.h>
 
 @interface TTLFormGrowingTextView () <UITextViewDelegate>
 
@@ -60,8 +59,8 @@
     
     self.backgroundColor = [UIColor clearColor];
     
-    UIFont *formLabelFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormLabel];
-    UIColor *formLabelColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormLabel];
+    UIFont *formLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormLabel];
+    UIColor *formLabelColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFormLabel];
     _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(16.0f, 0.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 22.0f)];
     self.titleLabel.font = formLabelFont;
     self.titleLabel.textColor = formLabelColor;
@@ -69,7 +68,7 @@
 
     _containerView = [[UIView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 72.0f)];
     self.containerView.backgroundColor = [UIColor whiteColor];
-    self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
+    self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderInactive].CGColor;
     self.containerView.layer.cornerRadius = 8.0f;
     self.containerView.layer.borderWidth = 1.0f;
     
@@ -100,14 +99,14 @@
         NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeMake(CGRectGetWidth(self.containerView.frame) - 16.0f - 16.0f, CGRectGetHeight(self.containerView.frame) - 16.0f - 16.0f)];
         [layoutManager addTextContainer:textContainer];
         
-        UIFont *textViewFont = [[TAPStyleManager sharedManager] getComponentFontForType:TAPComponentFontFormTextField];
-        UIColor *textViewColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorFormTextField];
+        UIFont *textViewFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormTextField];
+        UIColor *textViewColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFormTextField];
         _textView = [[TAPCustomTextView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, CGRectGetWidth(self.containerView.frame) - 16.0f - 16.0f, CGRectGetHeight(self.containerView.frame) - 16.0f - 16.0f) textContainer:textContainer];
         self.textView.delegate = self;
         self.textView.textContainer.lineFragmentPadding = 0;
         self.textView.font = textViewFont;
         self.textView.textColor = textViewColor;
-        [self.textView setTintColor:[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldCursor]];
+        [self.textView setTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldCursor]];
         self.textView.backgroundColor = [UIColor clearColor];
         self.textView.showsVerticalScrollIndicator = NO;
         self.textView.showsHorizontalScrollIndicator = NO;
@@ -130,7 +129,7 @@
     UIFont *formErrorInfoLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFormErrorInfoLabel];
     UIColor *formErrorInfoLabelColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFormErrorInfoLabel];
     
-    _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.errorInfoImageView.frame), CGRectGetMaxY(self.containerView.frame) + 5.0f, CGRectGetWidth(self.frame) - 16.0f - 16.0f, 20.0f)];
+    _errorInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.errorInfoImageView.frame) + 4.0f, CGRectGetMinY(self.errorInfoImageView.frame), CGRectGetWidth(self.frame) - 16.0f - 16.0f, 16.0f)];
     self.errorInfoLabel.font = formErrorInfoLabelFont;
     self.errorInfoLabel.textColor = formErrorInfoLabelColor;
     self.errorInfoLabel.numberOfLines = 0;
@@ -266,6 +265,16 @@
     [self checkHeight];
 }
 
+- (void)setMinimumHeight:(CGFloat)minimumHeight {
+    _minimumHeight = minimumHeight;
+    [self checkHeight];
+}
+
+- (void)setMaximumHeight:(CGFloat)maximumHeight {
+    _maximumHeight = maximumHeight;
+    [self checkHeight];
+}
+
 - (void)checkHeight {
     CGSize contentSize = [self.textView sizeThatFits:CGSizeMake(CGRectGetWidth(self.containerView.frame) - 16.0f - 16.0f, MAXFLOAT)];
     
@@ -282,9 +291,9 @@
     self.textView.frame = CGRectMake(CGRectGetMinX(self.textView.frame), CGRectGetMinY(self.textView.frame), CGRectGetWidth(self.textView.frame), contentSize.height);
     
     if (contentSize.height != CGRectGetHeight(self.frame)) {
-        
         self.containerView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.containerView.frame), contentSize.height + 16.0f + 16.0f);
-        
+        self.errorInfoImageView.frame = CGRectMake(CGRectGetMinX(self.errorInfoImageView.frame), CGRectGetMaxY(self.containerView.frame) + 8.0f, CGRectGetWidth(self.errorInfoImageView.frame), CGRectGetHeight(self.errorInfoImageView.frame));
+        self.errorInfoLabel.frame = CGRectMake(CGRectGetMinX(self.errorInfoLabel.frame), CGRectGetMinY(self.errorInfoImageView.frame), CGRectGetWidth(self.errorInfoLabel.frame), CGRectGetHeight(self.errorInfoLabel.frame));
         self.shadowView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.containerView.frame), CGRectGetHeight(self.containerView.frame));
         
         if ([self.delegate respondsToSelector:@selector(formGrowingTextView:shouldChangeHeight:)]) {
@@ -428,8 +437,8 @@
         if (active) {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 1.0f;
-                self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
-                self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
+                self.shadowView.layer.shadowColor = [[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+                self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderActive].CGColor;
                 self.errorInfoLabel.alpha = 0.0f;
                 self.errorInfoImageView.alpha = 0.0f;
             }];
@@ -438,21 +447,21 @@
         else {
             [UIView animateWithDuration:0.2f animations:^{
                 self.shadowView.alpha = 0.0f;
-                self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
+                self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderInactive].CGColor;
             }];
         }
     }
     else {
         if (active) {
             self.shadowView.alpha = 1.0f;
-            self.shadowView.layer.shadowColor = [[[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
-            self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderActive].CGColor;
+            self.shadowView.layer.shadowColor = [[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderActive] colorWithAlphaComponent:0.24f].CGColor;
+            self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderActive].CGColor;
             self.errorInfoLabel.alpha = 0.0f;
             self.errorInfoImageView.alpha = 0.0f;
         }
         else {
             self.shadowView.alpha = 0.0f;
-            self.containerView.layer.borderColor = [[TAPStyleManager sharedManager] getComponentColorForType:TAPComponentColorTextFieldBorderInactive].CGColor;
+            self.containerView.layer.borderColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorTextFieldBorderInactive].CGColor;
         }
     }
 }
@@ -461,13 +470,14 @@
     if (isShow) {
         self.titleLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMinY(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 22.0f);
         self.containerView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetMaxY(self.titleLabel.frame) + 8.0f, CGRectGetWidth(self.containerView.frame), CGRectGetHeight(self.containerView.frame));
-        self.shadowView.frame = CGRectMake(CGRectGetMinX(self.shadowView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.shadowView.frame), CGRectGetHeight(self.containerView.frame));
     }
     else {
          self.titleLabel.frame = CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMinY(self.titleLabel.frame), CGRectGetWidth(self.titleLabel.frame), 0.0f);
          self.containerView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetMaxY(self.titleLabel.frame), CGRectGetWidth(self.containerView.frame), CGRectGetHeight(self.containerView.frame));
-         self.shadowView.frame = CGRectMake(CGRectGetMinX(self.shadowView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.shadowView.frame), CGRectGetHeight(self.containerView.frame));
     }
+    self.errorInfoImageView.frame = CGRectMake(CGRectGetMinX(self.errorInfoImageView.frame), CGRectGetMaxY(self.containerView.frame) + 8.0f, CGRectGetWidth(self.errorInfoImageView.frame), CGRectGetHeight(self.errorInfoImageView.frame));
+    self.errorInfoLabel.frame = CGRectMake(CGRectGetMinX(self.errorInfoLabel.frame), CGRectGetMinY(self.errorInfoImageView.frame), CGRectGetWidth(self.errorInfoLabel.frame), CGRectGetHeight(self.errorInfoLabel.frame));
+    self.shadowView.frame = CGRectMake(CGRectGetMinX(self.shadowView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.shadowView.frame), CGRectGetHeight(self.containerView.frame));
 }
 
 @end

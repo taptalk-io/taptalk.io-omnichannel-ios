@@ -1681,6 +1681,17 @@
     return coreConfigs;
 }
 
++ (void)seActiveUserPhotos:(NSArray<TAPPhotoListModel *> *)photos {
+    [[NSUserDefaults standardUserDefaults] setSecureObject:photos forKey:TAP_PREFS_ACTIVE_USER_PHOTOS];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
++ (NSArray<TAPPhotoListModel *> *)geActiveUserPhotos {
+    NSArray *photos =  [[NSUserDefaults standardUserDefaults] secureObjectForKey:TAP_PREFS_ACTIVE_USER_PHOTOS valid:nil];
+    [TAPUtil nullToEmptyArray:photos];
+    return photos;
+}
+
 + (void)updateMessageToFailedWhenClosedInDatabase {
     [[TAPDatabaseManager sharedManager] updateMessageToFailedWhenClosed];
 }
@@ -2724,7 +2735,7 @@
     }
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
     
-    for (TAPMessageModel *message in dataArray) {
+    for (TAPMessageModel *message in [dataArray copy]) {
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
@@ -2749,7 +2760,7 @@
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
-    for (TAPMessageModel *message in dataArray) {
+    for (TAPMessageModel *message in [dataArray copy]) {
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
@@ -2774,7 +2785,7 @@
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
-    for (TAPMessageModel *message in dataArray) {
+    for (TAPMessageModel *message in [dataArray copy]) {
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         
@@ -2799,7 +2810,7 @@
     }
     
     NSMutableArray *recentSearchDictionaryArray = [NSMutableArray array];
-    for (TAPRecentSearchModel *recentSearch in dataArray) {
+    for (TAPRecentSearchModel *recentSearch in [dataArray copy]) {
         NSDictionary *recentSearchDictionary = [TAPDataManager dictionaryFromRecentSearchModel:recentSearch];
         recentSearchDictionary = [TAPUtil nullToEmptyDictionary:recentSearchDictionary];
         
@@ -2822,7 +2833,7 @@
     }
     
     NSMutableArray *userDictionaryArray = [NSMutableArray array];
-    for (TAPUserModel *user in dataArray) {
+    for (TAPUserModel *user in [dataArray copy]) {
         NSDictionary *userDictionary = [TAPDataManager dictionaryFromUserModel:user];
         userDictionary = [TAPUtil nullToEmptyDictionary:userDictionary];
         
@@ -2845,7 +2856,7 @@
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
-    for (TAPMessageModel *message in dataArray) {
+    for (TAPMessageModel *message in [dataArray copy]) {
         
         //Changing isRead & isDelivered to true
         message.isRead = YES;
@@ -2875,7 +2886,7 @@
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
-    for (TAPMessageModel *message in dataArray) {
+    for (TAPMessageModel *message in [dataArray copy]) {
         
         //Changing isDelivered to true
         message.isDelivered = YES;
@@ -2904,7 +2915,7 @@
     }
     
     NSMutableArray *messageDictionaryArray = [NSMutableArray array];
-    for (TAPMessageModel *message in dataArray) {
+    for (TAPMessageModel *message in [dataArray copy]) {
         NSDictionary *messageDictionary = [TAPDataManager dictionaryFromMessageModel:message];
         messageDictionary = [TAPUtil nullToEmptyDictionary:messageDictionary];
         

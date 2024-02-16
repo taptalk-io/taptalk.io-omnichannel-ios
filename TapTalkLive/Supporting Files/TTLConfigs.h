@@ -24,7 +24,9 @@
 //Notification
 #define TTL_NOTIFICATION_REACHABILITY_STATUS_CHANGED @"Notification.TapTalkLiveReachabilityStatusChanged"
 #define TTL_NOTIFICATION_CREATE_CASE_SUCCEED @"Notification.TapTalkLiveCreateCaseSucceed"
+#define TTL_NOTIFICATION_SCF_PATH_UPDATED @"Notification.TapTalkLiveScfPathUpdated"
 #define TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED @"Notification.TapTalkLiveScfPathContentResponseFetched"
+#define TTL_NOTIFICATION_ROOM_LIST_UNREAD_COUNT_UPDATED @"Notification.TapTalkLiveRoomListUnreadCountUpdated"
 
 //Channel
 #pragma mark CHANNEL / MEDIUM

@@ -104,15 +104,15 @@
                             <rect key="frame" x="16" y="96" width="382" height="639"/>
                             <subviews>
                                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="Krq-SE-MZV" userLabel="Case List Table View">
-                                    <rect key="frame" x="0.0" y="16" width="382" height="607"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="382" height="639"/>
                                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 </tableView>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
-                                <constraint firstItem="Krq-SE-MZV" firstAttribute="top" secondItem="mFH-xY-4H4" secondAttribute="top" constant="16" id="9wg-K2-Peo"/>
+                                <constraint firstItem="Krq-SE-MZV" firstAttribute="top" secondItem="mFH-xY-4H4" secondAttribute="top" id="9wg-K2-Peo"/>
                                 <constraint firstItem="Krq-SE-MZV" firstAttribute="leading" secondItem="mFH-xY-4H4" secondAttribute="leading" id="a7v-bs-HOb"/>
-                                <constraint firstAttribute="bottom" secondItem="Krq-SE-MZV" secondAttribute="bottom" constant="16" id="fkK-ph-s1Y"/>
+                                <constraint firstAttribute="bottom" secondItem="Krq-SE-MZV" secondAttribute="bottom" id="fkK-ph-s1Y"/>
                                 <constraint firstAttribute="trailing" secondItem="Krq-SE-MZV" secondAttribute="trailing" id="gHE-SO-yZR"/>
                             </constraints>
                         </view>

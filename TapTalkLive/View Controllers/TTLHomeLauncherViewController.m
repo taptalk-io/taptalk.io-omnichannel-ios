@@ -33,13 +33,14 @@
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorHomeBackground];
+    self.tableView.contentInset = UIEdgeInsetsMake(0.0f, 0.0f, 60.0f, 0.0f);
     [self showFooterView:YES];
     
     NSDictionary *faqDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_FAQ valid:nil];
-    faqDictionary = [TTLUtil nullToEmptyDictionary:faqDictionary];
     _faqPathModel = [TTLDataManager dictionaryToFaqModel:faqDictionary];
     [TTLUtil fetchScfPathContentResponse:self.faqPathModel fetchChildContents:YES success:^(NSString *apiUrl, NSString *contentResponse) {
     }];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scfPathUpdated:) name:TTL_NOTIFICATION_SCF_PATH_UPDATED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scfPathContentResponseFetched:) name:TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED object:nil];
 }
 
@@ -57,6 +58,7 @@
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:TTL_NOTIFICATION_SCF_PATH_UPDATED object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:TTL_NOTIFICATION_SCF_PATH_CONTENT_RESPONSE_FETCHED object:nil];
 }
 
@@ -194,14 +196,16 @@
     }
 }
 
-- (void)homeHeaderCaseListTapped:(TAPMessageModel *)lastMessage {
+- (void)homeHeaderCaseListTapped:(TAPMessageModel *)lastMessage cell:(id)cell {
     id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
     if ([tapTalkLiveDelegate respondsToSelector:@selector(caseListItemDidTappedWithCurrentShownNavigationController:lastMessage:)]) {
             [tapTalkLiveDelegate caseListItemDidTappedWithCurrentShownNavigationController:self.navigationController lastMessage:lastMessage];
         }
     else {
         [[TapUI sharedInstance] createRoomWithRoom:lastMessage.room success:^(TapUIChatViewController * _Nonnull chatViewController) {
-            chatViewController.delegate = self;
+            if (cell != nil && [cell isKindOfClass:[TTLHomeHeaderTableViewCell class]]) {
+                chatViewController.delegate = cell;
+            }
             chatViewController.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:chatViewController animated:YES];
         }];
@@ -316,6 +320,10 @@
     //    [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
  //   }
     return isContainCaseList;
+}
+
+- (void)scfPathUpdated:(NSNotification *)notification {
+    [self.tableView reloadData];
 }
 
 - (void)scfPathContentResponseFetched:(NSNotification *)notification {

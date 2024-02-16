@@ -8,18 +8,18 @@
 
 #import "TTLCaseListViewController.h"
 #import "TTLCreateCaseViewController.h"
+#import "TTLHomeLauncherViewController.h"
+#import "TTLCaseListTableViewCell.h"
 #import <TapTalk/TapUI.h>
 #import <TapTalk/TAPChatManager.h>
 #import <TapTalk/TAPDataManager.h>
 #import <TapTalk/TapUtil.h>
 #import <TapTalk/TAPMessageStatusManager.h>
 #import <TapTalk/TapUIChatViewController.h>
-#import <TapTalk/TAPRoomListTableViewCell.h>
-#import "TTLHomeLauncherViewController.h"
 //#import <TapTalk/TapUIRoomListViewController.h>
 //#import <TapTalk/TAPRoomListView.h>
 
-@interface TTLCaseListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPChatViewControllerDelegate>
+@interface TTLCaseListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPChatViewControllerDelegate, TTLCaseListTableViewCellDelegate>
 
 @property IBOutlet UIView *brandBackgroundView;
 @property IBOutlet TTLImageView *logoImageView;
@@ -113,7 +113,9 @@
     
     self.caseListView.clipsToBounds = YES;
     self.caseListView.layer.cornerRadius = 8.0f;
-    self.caseListView.layer.cornerRadius = 8.0f;
+    
+    self.caseListTableView.clipsToBounds = YES;
+    self.caseListTableView.layer.cornerRadius = 8.0f;
     
     [TTLUtil performBlock:^{
         self.caseListView.layer.shadowColor = [UIColor blackColor].CGColor;
@@ -188,7 +190,16 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
-        return 74.0f;
+        if (self.caseListArray.count == 1) {
+            return 113.0f; // Padded top and bottom
+        }
+        if (indexPath.row == 0) {
+            return 97.0f; // Padded top (4.0f)
+        }
+        if (indexPath.row >= (self.caseListArray.count - 1)) {
+            return 109.0f; // Padded bottom (16.0f)
+        }
+        return 93.0f;
     }
     
     return 0.0f;
@@ -196,19 +207,16 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) {
-        static NSString *cellID = @"TAPRoomListTableViewCell";
+        UINib *cellNib = [UINib nibWithNibName:@"TTLCaseListTableViewCell" bundle:[TTLUtil currentBundle]];
+        [tableView registerNib:cellNib forCellReuseIdentifier:[TTLCaseListTableViewCell description]];
+        TTLCaseListTableViewCell *cell = (TTLCaseListTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TTLCaseListTableViewCell description] forIndexPath:indexPath];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.delegate = self;
         
-        TAPRoomListTableViewCell *cell = [[TAPRoomListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
         TAPRoomListModel *roomList = [self.caseListArray objectAtIndex:indexPath.row];
-        cell.tableView = tableView;
-        [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:NO];
-        
-//        if (indexPath.row == [self.caseListArray count] - 1) {
-//            [cell setIsLastCellSeparator:YES];
-//        }
-//        else {
-            [cell setIsLastCellSeparator:NO];
-//        }
+        [cell setData:roomList];
+        [cell setFirstIndexLayout:indexPath.row == 0];
+        [cell setLastIndexLayout:indexPath.row >= (self.caseListArray.count - 1)];
         
         return cell;
     }
@@ -282,16 +290,16 @@
     TAPRoomListModel *roomList = [self.caseListDictionary objectForKey:typing.roomID];
     
     NSInteger index = [self.caseListArray indexOfObject:roomList];
-    TAPRoomListTableViewCell *cell = (TAPRoomListTableViewCell *)[self.caseListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
-    [cell setAsTyping:YES];
+    TTLCaseListTableViewCell *cell = (TTLCaseListTableViewCell *)[self.caseListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+    [cell showTypingState];
 }
 
 - (void)chatManagerDidReceiveStopTyping:(TAPTypingModel *)typing {
     TAPRoomListModel *roomList = [self.caseListDictionary objectForKey:typing.roomID];
 
     NSInteger index = [self.caseListArray indexOfObject:roomList];
-    TAPRoomListTableViewCell *cell = (TAPRoomListTableViewCell *)[self.caseListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
-    [cell setAsTyping:NO];
+    TTLCaseListTableViewCell *cell = (TTLCaseListTableViewCell *)[self.caseListTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+    [cell showLastMessage];
 }
 
 - (void)chatViewControllerDidLeaveOrDeleteGroupWithRoom:(TAPRoomModel *)room {
@@ -333,6 +341,11 @@
     NSInteger cellRow = [self.caseListArray indexOfObject:roomList];
     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+    
+    NSMutableDictionary *notificationDictionary = [NSMutableDictionary dictionary];
+    [notificationDictionary setObject:roomID forKey:@"roomID"];
+    [notificationDictionary setObject:@(roomList.numberOfUnreadMessages) forKey:@"unreadCount"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_ROOM_LIST_UNREAD_COUNT_UPDATED object:notificationDictionary];
 }
 
 - (void)chatViewControllerShouldClearUnreadBubbleForRoomID:(NSString *)roomID {
@@ -349,6 +362,11 @@
     NSInteger cellRow = [self.caseListArray indexOfObject:roomList];
     NSIndexPath *cellIndexPath = [NSIndexPath indexPathForRow:cellRow inSection:0];
     [self updateCellDataAtIndexPath:cellIndexPath updateUnreadBubble:YES];
+    
+    NSMutableDictionary *notificationDictionary = [NSMutableDictionary dictionary];
+    [notificationDictionary setObject:roomID forKey:@"roomID"];
+    [notificationDictionary setObject:@(0) forKey:@"unreadCount"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_ROOM_LIST_UNREAD_COUNT_UPDATED object:notificationDictionary];
 }
 
 - (void)chatViewControllerDidPressCloseButton {
@@ -874,16 +892,9 @@
         return;
     }
     
-    TAPRoomListTableViewCell *cell = [self.caseListTableView cellForRowAtIndexPath:indexPath];
+    TTLCaseListTableViewCell *cell = [self.caseListTableView cellForRowAtIndexPath:indexPath];
     TAPRoomListModel *roomList = [self.caseListArray objectAtIndex:indexPath.row];
-    [cell setRoomListTableViewCellWithData:roomList updateUnreadBubble:updateUnreadBubble];
-    
-    //Check message draft
-    NSString *draftMessage = [[TAPChatManager sharedManager] getMessageFromDraftWithRoomID:roomList.lastMessage.room.roomID];
-    draftMessage = [TAPUtil nullToEmptyString:draftMessage];
-    if (![draftMessage isEqualToString:@""]) {
-        [cell showMessageDraftWithMessage:draftMessage];
-    }
+    [cell setData:roomList];
 }
 
 - (void)reachabilityStatusChange:(NSNotification *)notification {
@@ -938,14 +949,14 @@
 //}
 
 - (void)openCreateCaseFormViewIfNeeded {
-    BOOL isContainCaseList = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST valid:nil];
-    NSString *currentAccessToken = [TTLDataManager getAccessToken];
-    currentAccessToken = [TTLUtil nullToEmptyString:currentAccessToken];
-    
-    if ([currentAccessToken isEqualToString:@""] || (![currentAccessToken isEqualToString:@""] && !isContainCaseList)) {
-        _closeRoomListWhenCreateCaseIsClosed = YES;
-        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
-    }
+//    BOOL isContainCaseList = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST valid:nil];
+//    NSString *currentAccessToken = [TTLDataManager getAccessToken];
+//    currentAccessToken = [TTLUtil nullToEmptyString:currentAccessToken];
+//
+//    if ([currentAccessToken isEqualToString:@""] || (![currentAccessToken isEqualToString:@""] && !isContainCaseList)) {
+//        _closeRoomListWhenCreateCaseIsClosed = YES;
+//        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
+//    }
 }
 
 - (void)showCreateCaseFormView {

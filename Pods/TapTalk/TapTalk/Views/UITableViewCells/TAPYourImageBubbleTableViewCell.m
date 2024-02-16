@@ -312,6 +312,7 @@
 
     self.thumbnailBubbleImageView.image = nil;
     self.bubbleImageView.image = nil;
+    self.thumbnailBubbleImageView.alpha = 0.0f;
     self.progressBackgroundView.alpha = 0.0f;
     self.captionLabel.text = @"";
     self.openImageButton.alpha = 0.0f;
@@ -599,8 +600,30 @@
 - (void)imageViewDidFinishLoadImage:(TAPImageView *)imageView {
     if (imageView == self.quoteImageView) {
         if (imageView.image == nil) {
-            [self showQuoteView:NO];
-            [self showReplyView:YES withMessage:self.message];
+            if (![TAPUtil isEmptyString:self.message.quote.fileType] && [self.message.quote.fileType isEqualToString:@"video"]) {
+                    [TAPImageView imageFromCacheWithMessage:self.message
+                    start:^(TAPMessageModel *resultMessage) {
+                        
+                    }
+                    progress:^(CGFloat progress, CGFloat total, TAPMessageModel *resultMessage) {
+                        
+                    }
+                    success:^(UIImage *savedImage, TAPMessageModel *resultMessage) {
+                        if (savedImage != nil) {
+                            [self.quoteImageView setImage:savedImage];
+                            [self showReplyView:NO withMessage:nil];
+                            [self showQuoteView:YES];
+                        }
+                    }
+                    failure:^(NSError *error, TAPMessageModel *resultMessage) {
+                        [self showQuoteView:NO];
+                        [self showReplyView:YES withMessage:self.message];
+                    }];
+            }
+            else {
+                [self showQuoteView:NO];
+                [self showReplyView:YES withMessage:self.message];
+            }
         }
     }
 }
@@ -741,6 +764,7 @@
     
     CGFloat timestampWidthWithMargin = 0.0f;
     if ([captionString isEqual:@""]) {
+        [self.imageTimestampContainerView layoutIfNeeded];
         timestampWidthWithMargin = CGRectGetWidth(self.imageTimestampContainerView.frame) + (6.0f * 2) + 20.0f;
         CGFloat radians = atan2f(self.transform.b, self.transform.a);
         NSInteger degrees = radians * (180 / M_PI);
@@ -749,6 +773,7 @@
         }
     }
     else {
+        [self.bubbleView layoutIfNeeded];
         CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
         timestampWidthWithMargin = timestampTextSize.width + 50.0f;
     }
@@ -831,7 +856,7 @@
                                       initWithBase64EncodedString:thumbnailImageString options:0];
         UIImage *thumbnailImage = [UIImage imageWithData:thumbnailImageData];
         self.thumbnailBubbleImageView.image = thumbnailImage;
-        
+        [self refreshImageSize];
     }
     
     //    if (!self.isDownloaded) {
@@ -1104,6 +1129,8 @@
     [self.imageTimestampContainerView.layer removeAllAnimations];
     [self.imageTimestampLabel.layer removeAllAnimations];
     [self.checkMarkIconImageView.layer removeAllAnimations];
+    
+    [self.contentView layoutIfNeeded];
 }
 
 - (void)setSmallThumbnailFromMessageData:(NSDictionary *)messageDataDictionary {
@@ -1114,11 +1141,19 @@
     }
     NSData *thumbnailImageData = [[NSData alloc] initWithBase64EncodedString:thumbnailImageBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
     UIImage *image = [UIImage imageWithData:thumbnailImageData];
-    if (image != nil) {
-        self.bubbleImageView.image = image;
-        [self getImageSizeFromImage:image];
-        [self.contentView layoutIfNeeded];
+    if (image != nil && (self.bubbleImageView.image == nil || self.bubbleImageView.image.size.width < image.size.width)) {
+        self.thumbnailBubbleImageView.image = image;
+//        self.bubbleImageView.image = image;
+//        [self getImageSizeFromImage:image];
+//        [self.contentView layoutIfNeeded];
+        if (self.bubbleImageView.image == nil) {
+            self.thumbnailBubbleImageView.alpha = 1.0f;
+        }
+        else {
+            self.thumbnailBubbleImageView.alpha = 0.0f;
+        }
     }
+    [self refreshImageSize];
 }
 
 - (void)showStatusLabel:(BOOL)isShowed animated:(BOOL)animated {
@@ -1221,7 +1256,7 @@
             self.imageTimestampLabel.text = [TAPUtil getMessageTimestampText:self.message.created];
         }
     }
-    [self.contentView layoutIfNeeded];
+    [self refreshImageSize];
 }
 
 - (void)setImageCaptionWithString:(NSString *)captionString {
@@ -1300,89 +1335,91 @@
         return;
     }
     
-    if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
-        //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
-        _cellWidth = self.maxWidth;
-        _cellHeight = self.cellWidth / image.size.width * image.size.height;
-        if (self.cellHeight > self.maxHeight) {
-            _cellHeight = self.maxHeight;
-        }
-        else if (self.cellHeight < self.minHeight) {
-            _cellHeight = self.minHeight;
-        }
-        return;
-    }
+    [self getResizedImageSizeWithHeight:image.size.height width:image.size.width];
     
-    CGFloat imageWidth = image.size.width;
-    CGFloat imageHeight = image.size.height;
-    
-    _cellWidth = imageWidth;
-    _cellHeight = imageHeight;
-    
-    if (imageWidth > imageHeight) {
-        if (imageWidth > self.maxWidth) {
-            imageWidth = self.maxWidth;
-            _cellWidth = imageWidth;
-            
-            imageHeight = (imageWidth / image.size.width) * image.size.height;
-            _cellHeight = imageHeight;
-            if (imageHeight > self.maxHeight) {
-                imageHeight = self.maxHeight;
-                _cellHeight = imageHeight;
-            }
-            else if (imageHeight < self.minHeight) {
-                imageHeight = self.minHeight;
-                _cellHeight = imageHeight;
-            }
-        }
-        else if (imageWidth < self.minWidth) {
-            imageWidth = self.minWidth;
-            _cellWidth = imageWidth;
-            
-            imageHeight = (imageWidth / image.size.width) * image.size.height;
-            _cellHeight = imageHeight;
-            if (imageHeight > self.maxHeight) {
-                imageHeight = self.maxHeight;
-                _cellHeight = imageHeight;
-            }
-            else if (imageHeight < self.minHeight) {
-                imageHeight = self.minHeight;
-                _cellHeight = imageHeight;
-            }
-        }
-    }
-    else {
-        if (imageHeight > self.maxHeight) {
-            imageHeight = self.maxHeight;
-            _cellHeight = imageHeight;
-            
-            imageWidth = (imageHeight / image.size.height) * image.size.width;
-            _cellWidth = imageWidth;
-            if (imageWidth > self.maxWidth) {
-                imageWidth = self.maxWidth;
-                _cellWidth = imageWidth;
-            }
-            else if (imageWidth < self.minWidth) {
-                imageWidth = self.minWidth;
-                _cellWidth = imageWidth;
-            }
-        }
-        else if (imageHeight < self.minHeight) {
-            imageHeight = self.minHeight;
-            _cellHeight = imageHeight;
-            
-            imageWidth = (imageHeight / image.size.height) * image.size.width;
-            _cellWidth = imageWidth;
-            if (imageWidth > self.maxWidth) {
-                imageWidth = self.maxWidth;
-                _cellWidth = imageWidth;
-            }
-            else if (imageWidth < self.minWidth) {
-                imageWidth = self.minWidth;
-                _cellWidth = imageWidth;
-            }
-        }
-    }
+//    if ((![self.message.replyTo.messageID isEqualToString:@"0"] && ![self.message.replyTo.messageID isEqualToString:@""] && self.message.replyTo != nil) || (![self.message.quote.title isEqualToString:@""] && self.message.quote != nil)) {
+//        //if replyTo or quote exists set image width and height to default width = maxWidth height = 244.0f
+//        _cellWidth = self.maxWidth;
+//        _cellHeight = self.cellWidth / image.size.width * image.size.height;
+//        if (self.cellHeight > self.maxHeight) {
+//            _cellHeight = self.maxHeight;
+//        }
+//        else if (self.cellHeight < self.minHeight) {
+//            _cellHeight = self.minHeight;
+//        }
+//        return;
+//    }
+//
+//    CGFloat imageWidth = image.size.width;
+//    CGFloat imageHeight = image.size.height;
+//
+//    _cellWidth = imageWidth;
+//    _cellHeight = imageHeight;
+//
+//    if (imageWidth > imageHeight) {
+//        if (imageWidth > self.maxWidth) {
+//            imageWidth = self.maxWidth;
+//            _cellWidth = imageWidth;
+//
+//            imageHeight = (imageWidth / image.size.width) * image.size.height;
+//            _cellHeight = imageHeight;
+//            if (imageHeight > self.maxHeight) {
+//                imageHeight = self.maxHeight;
+//                _cellHeight = imageHeight;
+//            }
+//            else if (imageHeight < self.minHeight) {
+//                imageHeight = self.minHeight;
+//                _cellHeight = imageHeight;
+//            }
+//        }
+//        else if (imageWidth < self.minWidth) {
+//            imageWidth = self.minWidth;
+//            _cellWidth = imageWidth;
+//
+//            imageHeight = (imageWidth / image.size.width) * image.size.height;
+//            _cellHeight = imageHeight;
+//            if (imageHeight > self.maxHeight) {
+//                imageHeight = self.maxHeight;
+//                _cellHeight = imageHeight;
+//            }
+//            else if (imageHeight < self.minHeight) {
+//                imageHeight = self.minHeight;
+//                _cellHeight = imageHeight;
+//            }
+//        }
+//    }
+//    else {
+//        if (imageHeight > self.maxHeight) {
+//            imageHeight = self.maxHeight;
+//            _cellHeight = imageHeight;
+//
+//            imageWidth = (imageHeight / image.size.height) * image.size.width;
+//            _cellWidth = imageWidth;
+//            if (imageWidth > self.maxWidth) {
+//                imageWidth = self.maxWidth;
+//                _cellWidth = imageWidth;
+//            }
+//            else if (imageWidth < self.minWidth) {
+//                imageWidth = self.minWidth;
+//                _cellWidth = imageWidth;
+//            }
+//        }
+//        else if (imageHeight < self.minHeight) {
+//            imageHeight = self.minHeight;
+//            _cellHeight = imageHeight;
+//
+//            imageWidth = (imageHeight / image.size.height) * image.size.width;
+//            _cellWidth = imageWidth;
+//            if (imageWidth > self.maxWidth) {
+//                imageWidth = self.maxWidth;
+//                _cellWidth = imageWidth;
+//            }
+//            else if (imageWidth < self.minWidth) {
+//                imageWidth = self.minWidth;
+//                _cellWidth = imageWidth;
+//            }
+//        }
+//    }
 }
 
 - (void)getResizedImageSizeWithHeight:(CGFloat)height width:(CGFloat)width {
@@ -1659,7 +1696,10 @@
 
     self.bubbleImageView.image = image;
     [self getImageSizeFromImage:image];
-    [self.contentView layoutIfNeeded];
+    self.bubbleImageView.alpha = 1.0f;
+    self.thumbnailBubbleImageView.alpha = 0.0f;
+    [self refreshCellHeight];
+//    [self.contentView layoutIfNeeded];
 }
 
 - (void)setThumbnailImage:(UIImage *)thumbnailImage {
@@ -1668,6 +1708,14 @@
     }
 
     self.thumbnailBubbleImageView.image = thumbnailImage;
+    [self refreshImageSize];
+    
+    if (self.bubbleImageView.image == nil) {
+        self.thumbnailBubbleImageView.alpha = 1.0f;
+    }
+    else {
+        self.thumbnailBubbleImageView.alpha = 0.0f;
+    }
 }
 
 - (void)showReplyView:(BOOL)show withMessage:(TAPMessageModel *)message {
@@ -1721,7 +1769,7 @@
         self.replyButtonTrailingConstraint.active = NO;
         self.replyView.alpha = 0.0f;
     }
-    [self.contentView layoutIfNeeded];
+    [self refreshImageSize];
 }
 
 - (void)showQuoteView:(BOOL)show {
@@ -1742,7 +1790,7 @@
         self.quoteView.alpha = 0.0f;
         self.replyViewBottomConstraint.active = YES;
     }
-    [self.contentView layoutIfNeeded];
+    [self refreshImageSize];
 }
 
 - (void)showForwardView:(BOOL)show {
@@ -1759,7 +1807,7 @@
         self.forwardFromLabelLeadingConstraint.active = NO;
         self.forwardTitleLabelLeadingConstraint.active = NO;
     }
-    [self.contentView layoutIfNeeded];
+    [self refreshImageSize];
 }
 
 - (void)setForwardData:(TAPForwardFromModel *)forwardData {
@@ -1862,7 +1910,7 @@
         self.senderNameHeightConstraint.constant = 0.0f;
         self.forwardTitleLabelTopConstraint.constant = 0.0f;
     }
-    [self.contentView layoutIfNeeded];
+    [self refreshImageSize];
 }
 
 - (void)updateSpacingConstraint {
@@ -1885,7 +1933,7 @@
         self.quoteViewTopConstraint.constant = 0.0f;
         self.forwardFromLabelTopConstraint.constant = 0.0f;
     }
-    [self layoutIfNeeded];
+    [self refreshImageSize];
 }
 
 - (void)showBubbleHighlight {
@@ -1904,43 +1952,44 @@
 }
 
 - (void)showStarMessageView {
-    if(self.starIconImageView.alpha == 0){
+    if (self.starIconImageView.alpha == 0) {
         self.starIconImageView.alpha = 1.0f;
         self.starImageViewWidthConstaint.constant = 10.0f;
         self.starImageViewLeadingConstant.constant = 8.0f;
         
-        if(self.imageTimestampContainerView.alpha == 0){
+        if (self.imageTimestampContainerView.alpha == 0) {
             self.starIconBottomImageView.alpha = 1.0f;
             self.starIconWidthConstraint.constant = 10.0;
         }
-        else{
+        else {
             self.starIconBottomImageView.alpha = 0.0f;
             self.starIconWidthConstraint.constant = 0.0f;
         }
-        
     }
-    else{
+    else {
         self.starIconImageView.alpha = 0.0f;
         self.starIconBottomImageView.alpha = 0.0f;
         self.starIconWidthConstraint.constant = 0.0f;
         self.starImageViewWidthConstaint.constant = 0.0f;
         self.starImageViewLeadingConstant.constant = 4.0f;
     }
+    [self refreshImageSize];
 }
 
 - (void)showCheckMarkIcon:(BOOL)isShow {
-    if(isShow){
+    if (isShow) {
         self.checkMarkIconImageView.alpha = 1.0f;
         self.senderImageViewLeadingConstraint.constant = 40.0f;
         self.bubbleViewLongPressGestureRecognizer.enabled = NO;
         self.forwardCheckmarkButton.alpha = 1.0f;
     }
-    else{
+    else {
         self.checkMarkIconImageView.alpha = 0.0f;
         self.senderImageViewLeadingConstraint.constant = 16.0f;
         self.bubbleViewLongPressGestureRecognizer.enabled = YES;
         self.forwardCheckmarkButton.alpha = 0.0f;
     }
+    [self refreshImageSize];
 }
 
 - (void)setCheckMarkState:(BOOL)isSelected {
@@ -1958,24 +2007,25 @@
 }
 
 - (void)showPinIcon:(BOOL)isShow {
-    if(isShow){
+    if (isShow) {
         self.pinIconImageView.alpha = 1.0f;
         self.pinIconWidthConstraint.constant = 10.0f;
-        if(self.imageTimestampContainerView.alpha == 0){
+        if (self.imageTimestampContainerView.alpha == 0) {
             self.pinIconBottomImageView.alpha = 1.0f;
             self.pinIconBottomWidthConstraint.constant = 10.0f;
         }
-        else{
+        else {
             self.pinIconBottomImageView.alpha = 0.0f;
         }
         
     }
-    else{
+    else {
         self.pinIconImageView.alpha = 0.0f;
         self.pinIconWidthConstraint.constant = 0.0f;
         self.pinIconBottomImageView.alpha = 0.0f;
         self.pinIconBottomWidthConstraint.constant = 0.0f;
     }
+    [self refreshImageSize];
 }
 
 - (void)showSeperator {
@@ -1986,6 +2036,7 @@
     for (UIGestureRecognizer *recognizer in self.contentView.gestureRecognizers) {
         [self.contentView removeGestureRecognizer:recognizer];
     }
+    [self refreshImageSize];
 }
 
 - (void)showMessageReadCounterWithNumber:(BOOL)isShow readCount:(NSInteger)readCount {
@@ -2032,6 +2083,82 @@
         self.messageReadCounterBoxLabel.alpha = 0.0f;
         self.messageReadCounterBoxImageView.alpha = 0.0f;
     }
+    [self.messageReadCounterLabel sizeToFit];
+    [self.messageReadCounterBoxLabel sizeToFit];
+    [self refreshImageSize];
+}
+
+- (void)refreshImageSize {
+    [self.bubbleView layoutIfNeeded];
+    
+    NSDictionary *dataDictionary = self.message.data;
+    NSString *captionString = [dataDictionary objectForKey:@"caption"];
+    
+    NSNumber *width = [dataDictionary objectForKey:@"width"];
+    CGFloat imageTempWidth;
+    if (width != nil && [width floatValue] > 0.0f) {
+        imageTempWidth = [width floatValue];
+    }
+    else {
+        imageTempWidth = self.cellWidth;
+    }
+    NSNumber *height = [dataDictionary objectForKey:@"height"];
+    CGFloat imageTempHeight;
+    if (height != nil && [height floatValue] > 0.0f) {
+        imageTempHeight = [height floatValue];
+    }
+    else {
+        imageTempHeight = self.cellHeight;
+    }
+    
+    captionString = [TAPUtil nullToEmptyString:captionString];
+    
+    CGFloat timestampWidthWithMargin = 0.0f;
+    if ([captionString isEqual:@""]) {
+        [self.imageTimestampContainerView layoutIfNeeded];
+        timestampWidthWithMargin = CGRectGetWidth(self.imageTimestampContainerView.frame) + (6.0f * 2) + 20.0f;
+        CGFloat radians = atan2f(self.transform.b, self.transform.a);
+        NSInteger degrees = radians * (180 / M_PI);
+        if(degrees == 0){
+            timestampWidthWithMargin += 20.0f;
+        }
+    }
+    else {
+        [self.bubbleView layoutIfNeeded];
+        CGSize timestampTextSize = [self.timestampLabel sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+        timestampWidthWithMargin = timestampTextSize.width + 50.0f;
+    }
+    if (self.minWidth < timestampWidthWithMargin) {
+        _minWidth = timestampWidthWithMargin;
+    }
+    
+    
+    [self getResizedImageSizeWithHeight:imageTempHeight width:imageTempWidth];
+    self.bubbleImageViewWidthConstraint.constant = self.cellWidth;
+    self.bubbleImageViewHeightConstraint.constant = self.cellHeight;
+    [self.contentView layoutIfNeeded];
+}
+
+- (UITableView * _Nullable)getTableView {
+    id view = [self superview];
+    while (view && [view isKindOfClass:[UITableView class]] == NO) {
+        view = [view superview];
+    }
+    if (view != nil && [view isKindOfClass:[UITableView class]]) {
+        UITableView *tableView = (UITableView *)view;
+        return tableView;
+    }
+    return nil;
+}
+
+- (void)refreshCellHeight {
+    [UIView performWithoutAnimation:^{
+        UITableView *tableView = [self getTableView];
+        if (tableView != nil) {
+            [tableView beginUpdates];
+            [tableView endUpdates];
+        }
+    }];
 }
 
 @end

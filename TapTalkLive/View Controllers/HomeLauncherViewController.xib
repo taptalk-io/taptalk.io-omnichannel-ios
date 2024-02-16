@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -19,7 +21,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="GuJ-Za-ggT">
-                    <rect key="frame" x="0.0" y="0.0" width="393" height="802"/>
+                    <rect key="frame" x="0.0" y="59" width="393" height="793"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <inset key="scrollIndicatorInsets" minX="0.0" minY="0.0" maxX="0.0" maxY="40"/>
                 </tableView>
@@ -28,7 +30,7 @@
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
                 <constraint firstItem="GuJ-Za-ggT" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="87G-cQ-qmx"/>
-                <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="GuJ-Za-ggT" secondAttribute="bottom" constant="50" id="AX9-T9-bqS"/>
+                <constraint firstAttribute="bottom" secondItem="GuJ-Za-ggT" secondAttribute="bottom" id="AX9-T9-bqS"/>
                 <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="GuJ-Za-ggT" secondAttribute="trailing" id="lWB-Xq-Iod"/>
                 <constraint firstItem="GuJ-Za-ggT" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" id="pJR-0Y-xqt"/>
             </constraints>

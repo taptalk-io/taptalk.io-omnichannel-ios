@@ -510,6 +510,10 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
                  fetchChildContents:(BOOL)fetchChildContents
                             success:(void (^)(NSString *apiUrl, NSString *contentResponse))success {
     
+    if (scfPath == nil) {
+        return;
+    }
+    
     NSMutableDictionary<NSString *, TTLFaqModel *> *scfDictionary = [NSMutableDictionary dictionary];
     if ([scfPath.type isEqualToString:FAQ_QNA_VIA_API] &&
         ![TTLUtil isEmptyString:scfPath.apiURL] &&

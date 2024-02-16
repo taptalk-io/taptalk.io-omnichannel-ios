@@ -20,7 +20,7 @@
 #import "TTLRatingViewController.h"
 #import "TTLReviewBubbleTableViewCell.h"
 
-@interface TapTalkLive () <TAPChatManagerDelegate, TapUIRoomListDelegate, TapUICustomKeyboardDelegate, TapUIChatRoomDelegate, TTLReviewBubbleTableViewCellDelegate>
+@interface TapTalkLive () <TAPChatManagerDelegate, TapUIRoomListDelegate, TapUICustomKeyboardDelegate, TapUIChatRoomDelegate, TAPPopUpInfoViewControllerDelegate, TTLReviewBubbleTableViewCellDelegate>
 
 //@property (strong, nonatomic) TTLRoomListViewController *roomListViewController;
 @property (strong, nonatomic) TTLCaseListViewController *caseListViewController;
@@ -309,21 +309,55 @@ Obtain main view controller of TapTalk Live
     
     // Do an action when user taps a custom keyboard item
     if ([keyboardItem.itemID isEqualToString:@"1"]) {
-        TTLPopUpHandlerViewController *popupHandlerViewController = [[TTLPopUpHandlerViewController alloc] init];
-        popupHandlerViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
-        popupHandlerViewController.room = room;
-        popupHandlerViewController.sender = sender;
-        popupHandlerViewController.recipient = recipient;
-//        UIViewController *currentActiveController = [self getCurrentTapTalkLiveActiveViewController];
-        UIViewController *currentActiveController = [TAPUtil topViewController];
-        [currentActiveController presentViewController:popupHandlerViewController animated:NO completion:^{
-            [popupHandlerViewController showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeInfoDefault popupIdentifier:@"Custom Keyboard - Close Case Tapped" title:NSLocalizedStringFromTableInBundle(@"Warning", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"This case will be closed and you wont be able to further send messages or receive assistance regarding this case. Would you like to proceed?", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TTLUtil currentBundle], @"") singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TTLUtil currentBundle], @"")];
+        UINavigationController *currentActiveNavigationController = [self getCurrentTapTalkLiveActiveNavigationController];
+        if (currentActiveNavigationController == nil) {
+            return;
+        }
+        TAPPopUpInfoViewController *popupInfoViewController = [[TAPPopUpInfoViewController alloc] init];
+        popupInfoViewController.modalPresentationStyle = UIModalPresentationOverFullScreen;
+        popupInfoViewController.popupIdentifier = room.xcRoomID;
+        popupInfoViewController.delegate = self;
+        [popupInfoViewController setPopUpInfoViewControllerType:TAPPopUpInfoViewControllerTypeInfoDefault
+                                                      withTitle:NSLocalizedStringFromTableInBundle(@"Close Case", nil, [TTLUtil currentBundle], @"")
+                                              detailInformation:NSLocalizedStringFromTableInBundle(@"This case will be closed and you wont be able to further send messages or receive assistance regarding this case. Would you like to proceed?", nil, [TTLUtil currentBundle], @"")
+                                          leftOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"Cancel", nil, [TTLUtil currentBundle], @"")
+                                 singleOrRightOptionButtonTitle:NSLocalizedStringFromTableInBundle(@"OK", nil, [TTLUtil currentBundle], @"")];
+
+        [currentActiveNavigationController presentViewController:popupInfoViewController animated:NO completion:^{
         }];
     }
 }
 
+#pragma mark - TAPPopUpInfoViewControllerDelegate
+
+- (void)popUpInfoViewControllerDidTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)identifier {
+    // Mark as solved - close case
+    NSString *formattedCaseID = identifier;
+    formattedCaseID = [TTLUtil nullToEmptyString:formattedCaseID];
+                
+    NSString *caseID = [formattedCaseID stringByReplacingOccurrencesOfString:@"case:" withString:@""];
+    caseID = [TTLUtil nullToEmptyString:caseID];
+            
+#ifdef DEBUG
+    NSLog(@"Close Case - Case ID: %@", caseID);
+#endif
+            
+    [TTLDataManager callAPICloseCaseWithCaseID:caseID success:^(BOOL isSuccess) {
+        // Hide keyboard and input view
+        UIViewController *activeViewController = [[TapTalkLive sharedInstance] getCurrentTapTalkLiveActiveViewController];
+        if ([activeViewController isKindOfClass:[TapUIChatViewController class]]) {
+            TapUIChatViewController *chatViewController = (TapUIChatViewController *)activeViewController;
+            [chatViewController hideTapTalkMessageComposerView];
+        }
+    } failure:^(NSError * _Nonnull error) {
+
+    }];
+}
+
 #pragma mark - TapTalkLive Delegate
+
 #pragma mark TTLReviewBubbleTableViewCell
+
 - (void)reviewBubbleTableViewCellDidTappedReviewButtonWithMessage:(TAPMessageModel *)message {
     UINavigationController *currentActiveNavigationController = [self getCurrentTapTalkLiveActiveNavigationController];
     TTLCaseModel *currentCase = [TTLDataManager caseDataModelFromDictionary:message.data];
@@ -401,6 +435,7 @@ Obtain main view controller of TapTalk Live
                                            success:^{
             _isTapTalkInitializationCompleted = YES;
             if (self.isGetCaseListCompleted) {
+                _isTapTalkLiveInitialized = YES;
                 success();
             }
             
@@ -421,6 +456,7 @@ Obtain main view controller of TapTalk Live
             [[TapUI sharedInstance] setReportMessageMenuEnabled:NO];
             [[TapUI sharedInstance] setBlockUserMenuEnabled:NO];
             [[TapUI sharedInstance] setMessageInfoMenuEnabled:NO];
+            [[TapUI sharedInstance] setLinkPreviewInMessageEnabled:NO];
             
             //Add custom bubble cell
             [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
@@ -452,12 +488,15 @@ Obtain main view controller of TapTalk Live
         [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
             _isGetCaseListCompleted = YES;
             if (self.isTapTalkInitializationCompleted) {
+                _isTapTalkLiveInitialized = YES;
                 success();
+                
             }
             
         } failure:^(NSError * _Nonnull error) {
             _isGetCaseListCompleted = YES;
             if (self.isTapTalkInitializationCompleted) {
+                _isTapTalkLiveInitialized = YES;
                 success();
             }
         }];
@@ -465,6 +504,7 @@ Obtain main view controller of TapTalk Live
     else {
         _isGetCaseListCompleted = YES;
         if (self.isTapTalkInitializationCompleted) {
+            _isTapTalkLiveInitialized = YES;
             success();
         }
     }

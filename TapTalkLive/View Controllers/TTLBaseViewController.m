@@ -66,7 +66,7 @@
         self.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
     }
     
-    self.footerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight([UIScreen mainScreen].bounds) - 33.0f - [TTLUtil safeAreaBottomPadding], CGRectGetWidth([UIScreen mainScreen].bounds), 33.0f)];
+    self.footerView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, CGRectGetHeight([UIScreen mainScreen].bounds) - 33.0f - [TTLUtil safeAreaBottomPadding], CGRectGetWidth([UIScreen mainScreen].bounds), 33.0f + [TTLUtil safeAreaBottomPadding])];
     self.footerView.backgroundColor = [UIColor whiteColor];
     self.footerView.alpha = 0.0f;
     
