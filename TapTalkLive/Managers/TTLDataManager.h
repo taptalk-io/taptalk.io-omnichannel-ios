@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSTimeInterval)getAccessTokenExpiryTime;
 + (void)setRefreshToken:(NSString *)refreshToken expiryDate:(NSTimeInterval)expiryDate;
 + (NSString *)getRefreshToken;
++ (void)setTopicList:(NSArray<TTLTopicModel *> *)topics;
++ (NSMutableArray<TTLTopicModel *> *)getTopicList;
 + (TTLCaseModel *)caseDataModelFromDictionary:(NSDictionary *)dictionary;
 + (NSDictionary *)dictionaryFromCaseDataModel:(TTLCaseModel *)caseData;
 + (NSArray *)dictionaryToChannelModelList:(NSArray *)channelListDictionary;

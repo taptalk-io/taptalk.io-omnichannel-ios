@@ -250,6 +250,10 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     TAPRoomListModel *selectedRoomList = [self.caseListArray objectAtIndex:indexPath.row];
+    if (selectedRoomList.lastMessage == nil || selectedRoomList.lastMessage.room == nil) {
+        return;
+    }
+    
     TAPRoomModel *selectedRoom = selectedRoomList.lastMessage.room;
     
     id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
@@ -352,6 +356,9 @@
     //Force mark unread bubble and unread mention to 0
     TAPRoomListModel *roomList = [self.caseListDictionary objectForKey:roomID];
     TAPMessageModel *selectedMessage = roomList.lastMessage;
+    if (selectedMessage == nil) {
+        return;
+    }
     TAPRoomModel *selectedRoom = selectedMessage.room;
     roomList.numberOfUnreadMessages = 0;
     roomList.numberOfUnreadMentions = 0;
@@ -501,7 +508,9 @@
         [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
             NSMutableArray *messageArray = [NSMutableArray array];
             for (TTLCaseModel *caseModel in caseListArray) {
-                [messageArray addObject:caseModel.tapTalkRoom.lastMessage];
+                if (caseModel.tapTalkRoom != nil && caseModel.tapTalkRoom.lastMessage != nil) {
+                    [messageArray addObject:caseModel.tapTalkRoom.lastMessage];
+                }
             }
             [self handleGetCaseListSuccess:messageArray];
         } failure:^(NSError * _Nonnull error) {

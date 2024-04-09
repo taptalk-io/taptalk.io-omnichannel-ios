@@ -88,7 +88,9 @@
 //        }
     }
 
-    _topicListDataArray = [[NSArray alloc] init];
+    _topicListDataArray = [TTLDataManager getTopicList];
+    _topicListDataArray = [TTLUtil nullToEmptyArray:self.topicListDataArray];
+    
     _selectedTopic = nil;
     
     //Obtain topic list
@@ -129,6 +131,9 @@
 
 #pragma mark TTLCustomDropDownTextFieldView
 - (void)customDropDownTextFieldViewDidTapped {
+    if (self.topicListDataArray == nil || self.topicListDataArray.count == 0) {
+        return;
+    }
     [self.createCaseView.emailTextField.textField resignFirstResponder];
     [self.createCaseView.fullNameTextField.textField resignFirstResponder];
     [self.createCaseView.messageTextView.textView resignFirstResponder];

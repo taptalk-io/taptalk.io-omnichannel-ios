@@ -13,6 +13,8 @@
 #import <TapTalk/TapUI.h>
 #import <TapTalk/TapUIChatViewController.h>
 #import <TapTalk/TAPUtil.h>
+#import <TapTalk/TAPNetworkManager.h>
+#import <TapTalk/TAPCoreChatRoomManager.h>
 
 #import "TTLCaseListViewController.h"
 #import "TTLPopUpHandlerViewController.h"
@@ -206,6 +208,63 @@ Called to show TapTalk Live view with present animation
    // [[self roomListViewController] openCreateCaseFormViewIfNeeded];
 }
 
+- (void)openCaseChatRoomWithXCRoomID:(NSString *)tapTalkXCRoomID
+                navigationController:(UINavigationController *)navigationController
+                            animated:(BOOL)animated
+                             success:(void (^)(NSString *successMessage))success
+                             failure:(void (^)(NSError *error))failure {
+    
+    if ([TTLUtil isEmptyString:tapTalkXCRoomID]) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_XC_ROOM_ID_REQUIRED
+                                             code:ERROR_CODE_XC_ROOM_ID_REQUIRED
+                                         userInfo:@{@"message": ERROR_MESSAGE_XC_ROOM_ID_REQUIRED}];
+        failure(error);
+        return;
+    }
+    if (navigationController == nil) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_CONTROLLER_REQUIRED
+                                             code:ERROR_CODE_CONTROLLER_REQUIRED
+                                         userInfo:@{@"message": ERROR_MESSAGE_CONTROLLER_REQUIRED}];
+        failure(error);
+        return;
+    }
+    if (!self.isTapTalkLiveInitialized) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_TAPTALKLIVE_NOT_INITIALIZED
+                                             code:ERROR_CODE_TAPTALKLIVE_NOT_INITIALIZED
+                                         userInfo:@{@"message": ERROR_MESSAGE_TAPTALKLIVE_NOT_INITIALIZED}];
+        failure(error);
+        return;
+    }
+    if ([TTLUtil isEmptyString:[TTLDataManager getAccessToken]]) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_ACTIVE_USER_NOT_FOUND
+                                             code:ERROR_CODE_ACTIVE_USER_NOT_FOUND
+                                         userInfo:@{@"message": ERROR_MESSAGE_ACTIVE_USER_NOT_FOUND}];
+        failure(error);
+        return;
+    }
+    [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
+        [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+            if ([TapTalk sharedInstance].isConnected) {
+                [navigationController pushViewController:chatViewController animated:animated];
+                success(@"Successfully opened chat room");
+            }
+            else {
+                [[TapTalk sharedInstance] connectWithSuccess:^{
+                    [navigationController pushViewController:chatViewController animated:animated];
+                    success(@"Successfully opened chat room");
+                }
+                failure:^(NSError * _Nonnull error) {
+                    [navigationController pushViewController:chatViewController animated:animated];
+                    success(@"Successfully opened chat room");
+                }];
+            }
+        }];
+    }
+    failure:^(NSError * _Nonnull error) {
+        failure(error);
+    }];
+}
+
 /**
 Called to show TapTalk Live view with push animation
 
@@ -273,16 +332,19 @@ Obtain main view controller of TapTalk Live
     }
 }
 
-#pragma mark TapUIChatRoom
+#pragma mark - TapUIChatRoomDelegate
+
 - (void)tapTalkGroupMemberAvatarTappedWithRoom:(TAPRoomModel *)room
                             user:(TAPUserModel *)user
               currentShownNavigationController:(UINavigationController *)currentNavigationController {
     
 }
 
-#pragma mark TapUIRoomList
+#pragma mark - TapUIRoomListDelegate
+
 - (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController {
+    
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
     createCaseViewController.previousNavigationController = currentNavigationController;
     [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeAlreadyLogin];
@@ -293,7 +355,8 @@ Obtain main view controller of TapTalk Live
     [currentNavigationController presentViewController:createCaseNavigationController animated:YES completion:nil];
 }
 
-#pragma mark TapUICustomKeyboard
+#pragma mark - TapUICustomKeyboardDelegate
+
 - (NSArray<TAPCustomKeyboardItemModel *> *)setCustomKeyboardItemsForRoom:(TAPRoomModel * _Nonnull)room sender:(TAPUserModel * _Nonnull)sender recipient:(TAPUserModel * _Nullable)recipient {
   //Set custom keyboard option items
     TTLImage *checkListImage = [UIImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
@@ -356,7 +419,7 @@ Obtain main view controller of TapTalk Live
 
 #pragma mark - TapTalkLive Delegate
 
-#pragma mark TTLReviewBubbleTableViewCell
+#pragma mark - TTLReviewBubbleTableViewCellDelegate
 
 - (void)reviewBubbleTableViewCellDidTappedReviewButtonWithMessage:(TAPMessageModel *)message {
     UINavigationController *currentActiveNavigationController = [self getCurrentTapTalkLiveActiveNavigationController];
@@ -369,8 +432,10 @@ Obtain main view controller of TapTalk Live
     [currentActiveNavigationController presentViewController:ratingNavigationController animated:NO completion:nil];
 }
 
-#pragma mark - Custom Method
-#pragma mark Windows & View Controllers
+#pragma mark - Custom Methods
+
+#pragma mark - Windows & View Controllers
+
 - (void)setCurrentActiveWindow:(UIWindow *)activeWindow {
     _activeWindow = activeWindow;
     [[TapUI sharedInstance] setCurrentActiveWindow:self.activeWindow];
@@ -386,7 +451,7 @@ Obtain main view controller of TapTalk Live
     return [[TapUI sharedInstance] getCurrentTapTalkActiveViewController];
 }
 
-#pragma mark General Setup & Methods
+#pragma mark - General Setup & Methods
 /**
  Initialize app to TapTalk.io Omnichannel by providing app key secret
  */
@@ -521,24 +586,7 @@ Obtain main view controller of TapTalk Live
     [[TapTalk sharedInstance] initializeGooglePlacesAPIKey:apiKey];
 }
 
-#pragma mark Others
-- (void)loadCustomFontData {
-    NSArray *fontArray = @[@"DMSans-Italic", @"PTRootUI-Regular", @"PTRootUI-Medium", @"PTRootUI-Bold"];
-    
-    for (NSString *fontName in fontArray) {
-        NSString *fontPath = [[TTLUtil currentBundle] pathForResource:fontName ofType:@"ttf"];
-        NSData *inData = [NSData dataWithContentsOfFile:fontPath];
-        CFErrorRef error;
-        CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)inData);
-        CGFontRef font = CGFontCreateWithDataProvider(provider);
-        if (! CTFontManagerRegisterGraphicsFont(font, &error)) {
-            CFStringRef errorDescription = CFErrorCopyDescription(error);
-            CFRelease(errorDescription);
-        }
-        CFRelease(font);
-        CFRelease(provider);
-    }
-}
+#pragma mark - Authentication
 
 - (void)authenticateUserWithFullName:(NSString *)fullName
                                email:(NSString *)email
@@ -640,6 +688,120 @@ Obtain main view controller of TapTalk Live
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_ID];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_SECRET];
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - Case
+
+- (void)getTopicListWithSuccess:(void (^)(NSArray<TTLTopicModel *> *topicListArray))success
+                        failure:(void (^)(NSError *error))failure {
+    
+    if (!self.isTapTalkLiveInitialized) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_TAPTALKLIVE_NOT_INITIALIZED
+                                             code:ERROR_CODE_TAPTALKLIVE_NOT_INITIALIZED
+                                         userInfo:@{@"message": ERROR_MESSAGE_TAPTALKLIVE_NOT_INITIALIZED}];
+        failure(error);
+        return;
+    }
+    [TTLDataManager callAPIGetTopicListSuccess:^(NSArray<TTLTopicModel *> * _Nonnull topicListArray) {
+        success(topicListArray);
+    }
+    failure:^(NSError * _Nonnull error) {
+        NSArray<TTLTopicModel *> *topicListArray = [TTLDataManager getTopicList];
+        if (topicListArray != nil) {
+            success(topicListArray);
+        }
+        else {
+            failure(error);
+        }
+    }];
+}
+
+- (void)getUserCaseListListWithSuccess:(void (^)(NSArray<TTLCaseModel *> *caseListArray))success
+                               failure:(void (^)(NSError *error))failure {
+    
+    if (!self.isTapTalkLiveInitialized) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_TAPTALKLIVE_NOT_INITIALIZED
+                                             code:ERROR_CODE_TAPTALKLIVE_NOT_INITIALIZED
+                                         userInfo:@{@"message": ERROR_MESSAGE_TAPTALKLIVE_NOT_INITIALIZED}];
+        failure(error);
+        return;
+    }
+    if ([TTLUtil isEmptyString:[TTLDataManager getAccessToken]]) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_ACTIVE_USER_NOT_FOUND
+                                             code:ERROR_CODE_ACTIVE_USER_NOT_FOUND
+                                         userInfo:@{@"message": ERROR_MESSAGE_ACTIVE_USER_NOT_FOUND}];
+        failure(error);
+        return;
+    }
+    [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
+        success(caseListArray);
+    }
+    failure:^(NSError * _Nonnull error) {
+        failure(error);
+    }];
+}
+
+- (void)createNewCaseWithTopicID:(NSString *)topicID
+                    firstMessage:(NSString *)firstMessage
+                         success:(void (^)(TTLCaseModel *caseModel))success
+                         failure:(void (^)(NSError *error))failure {
+    
+    if ([TTLUtil isEmptyString:topicID]) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_TOPIC_ID_REQUIRED
+                                             code:ERROR_CODE_TOPIC_ID_REQUIRED
+                                         userInfo:@{@"message": ERROR_MESSAGE_TOPIC_ID_REQUIRED}];
+        failure(error);
+        return;
+    }
+    if ([TTLUtil isEmptyString:firstMessage]) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_MESSAGE_REQUIRED
+                                             code:ERROR_CODE_MESSAGE_REQUIRED
+                                         userInfo:@{@"message": ERROR_MESSAGE_MESSAGE_REQUIRED}];
+        failure(error);
+        return;
+    }
+    if (!self.isTapTalkLiveInitialized) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_TAPTALKLIVE_NOT_INITIALIZED
+                                             code:ERROR_CODE_TAPTALKLIVE_NOT_INITIALIZED
+                                         userInfo:@{@"message": ERROR_MESSAGE_TAPTALKLIVE_NOT_INITIALIZED}];
+        failure(error);
+        return;
+    }
+    if ([TTLUtil isEmptyString:[TTLDataManager getAccessToken]]) {
+        NSError *error = [NSError errorWithDomain:ERROR_MESSAGE_ACTIVE_USER_NOT_FOUND
+                                             code:ERROR_CODE_ACTIVE_USER_NOT_FOUND
+                                         userInfo:@{@"message": ERROR_MESSAGE_ACTIVE_USER_NOT_FOUND}];
+        failure(error);
+        return;
+    }
+    [TTLDataManager callAPICreateCaseWithTopicID:topicID message:firstMessage success:^(TTLCaseModel * _Nonnull caseData) {
+        [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        success(caseData);
+    }
+    failure:^(NSError * _Nonnull error) {
+        failure(error);
+    }];
+}
+     
+#pragma mark - Others
+
+- (void)loadCustomFontData {
+    NSArray *fontArray = @[@"DMSans-Italic", @"PTRootUI-Regular", @"PTRootUI-Medium", @"PTRootUI-Bold"];
+    
+    for (NSString *fontName in fontArray) {
+        NSString *fontPath = [[TTLUtil currentBundle] pathForResource:fontName ofType:@"ttf"];
+        NSData *inData = [NSData dataWithContentsOfFile:fontPath];
+        CFErrorRef error;
+        CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)inData);
+        CGFontRef font = CGFontCreateWithDataProvider(provider);
+        if (! CTFontManagerRegisterGraphicsFont(font, &error)) {
+            CFStringRef errorDescription = CFErrorCopyDescription(error);
+            CFRelease(errorDescription);
+        }
+        CFRelease(font);
+        CFRelease(provider);
+    }
 }
 
 @end

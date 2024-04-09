@@ -10,6 +10,7 @@
 #define TTL_PREFS_REFRESH_TOKEN_EXPIRED_TIME @"Prefs.TapTalkLiveRefreshTokenExpiredTime"
 #define TTL_PREFS_ACCESS_TOKEN_EXPIRED_TIME @"Prefs.TapTalkLiveAccessTokenExpiredTime"
 #define TTL_PREFS_IS_CONTAIN_CASE_LIST @"Prefs.TapTalkLiveIsContainCaseList"
+#define TTL_PREFS_TOPICS @"Prefs.TapTalkLiveTopics"
 #define TTL_PREFS_CHANNEL_LIST @"Prefs.TapTalkLiveChannelList"
 #define TTL_PREFS_FAQ @"Prefs.TapTalkLiveFAQ"
 
@@ -51,3 +52,19 @@
 #define MESSAGE_TYPE_STRING_VIDEO @"video"
 #define MESSAGE_TYPE_STRING_FILE @"file"
 #define MESSAGE_TYPE_STRING_DOCUMENT @"document"
+
+// Error Code
+#define ERROR_CODE_TAPTALKLIVE_NOT_INITIALIZED 91000
+#define ERROR_CODE_ACTIVE_USER_NOT_FOUND 91001
+#define ERROR_CODE_TOPIC_ID_REQUIRED 91002
+#define ERROR_CODE_MESSAGE_REQUIRED 91003
+#define ERROR_CODE_CONTROLLER_REQUIRED 91004
+#define ERROR_CODE_XC_ROOM_ID_REQUIRED 91005
+
+// Error Message
+#define ERROR_MESSAGE_TAPTALKLIVE_NOT_INITIALIZED @"TapTalkLive instance is not initialized, please initialize by calling initWithSecretKey"
+#define ERROR_MESSAGE_ACTIVE_USER_NOT_FOUND @"Active user not found, please authenticate by calling authenticateUser"
+#define ERROR_MESSAGE_TOPIC_ID_REQUIRED @"Topic ID is required"
+#define ERROR_MESSAGE_MESSAGE_REQUIRED @"Message is required"
+#define ERROR_MESSAGE_CONTROLLER_REQUIRED @"Controller is required"
+#define ERROR_MESSAGE_XC_ROOM_ID_REQUIRED @"XC Room ID is required"
