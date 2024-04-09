@@ -274,7 +274,7 @@
             [UIView animateWithDuration:0.2f animations:^{
                 self.loadingImageView.alpha = 1.0f;
                 self.arrowImageView.alpha = 0.0f;
-                self.containerButton.userInteractionEnabled = NO;
+//                self.containerButton.userInteractionEnabled = NO;
             }];
             
             //ADD ANIMATION
@@ -292,7 +292,7 @@
         else {
             self.loadingImageView.alpha = 1.0f;
             self.arrowImageView.alpha = 0.0f;
-            self.containerButton.userInteractionEnabled = NO;
+//            self.containerButton.userInteractionEnabled = NO;
             
             //ADD ANIMATION
             if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] == nil) {
@@ -312,7 +312,7 @@
             [UIView animateWithDuration:0.2f animations:^{
                 self.loadingImageView.alpha = 0.0f;
                 self.arrowImageView.alpha = 1.0f;
-                self.containerButton.userInteractionEnabled = YES;
+//                self.containerButton.userInteractionEnabled = YES;
             }];
             
             //REMOVE ANIMATION
@@ -323,7 +323,7 @@
         else {
             self.loadingImageView.alpha = 0.0f;
             self.arrowImageView.alpha = 1.0f;
-            self.containerButton.userInteractionEnabled = YES;
+//            self.containerButton.userInteractionEnabled = YES;
 
             //REMOVE ANIMATION
             if ([self.loadingImageView.layer animationForKey:@"SpinAnimation"] != nil) {

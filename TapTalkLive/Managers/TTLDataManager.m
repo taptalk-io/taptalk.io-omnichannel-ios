@@ -128,6 +128,30 @@
     return [TTLUtil nullToEmptyString:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_REFRESH_TOKEN valid:nil]];
 }
 
++ (void)setTopicList:(NSArray<TTLTopicModel *> *)topics {
+    if (topics == nil) {
+        return;
+    }
+    NSMutableArray *topicsDictionaryArray = [NSMutableArray array];
+    for (TTLTopicModel *topic in topics) {
+        [topicsDictionaryArray addObject:[topic toDictionary]];
+    }
+    [[NSUserDefaults standardUserDefaults] setSecureObject:topicsDictionaryArray forKey:TTL_PREFS_TOPICS];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
++ (NSMutableArray<TTLTopicModel *> *)getTopicList {
+    NSDictionary *topicsDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_TOPICS valid:nil];
+    if (topicsDictionary == nil) {
+        return nil;
+    }
+    NSMutableArray *topicsArray = [NSMutableArray array];
+    for (NSDictionary *topic in topicsDictionary) {
+        [topicsArray addObject:[[TTLTopicModel alloc] initWithDictionary:topic error:nil]];
+    }
+    return topicsArray;
+}
+
 + (TTLCaseModel *)caseDataModelFromDictionary:(NSDictionary *)dictionary {
     NSDictionary *caseDictionary = [TTLUtil nullToEmptyDictionary:dictionary];
     
@@ -1155,6 +1179,8 @@
             [topicResultArray addObject:topic];
         }
         
+        [TTLDataManager setTopicList:topicResultArray];
+        
         success(topicResultArray);
         
     } failure:^(NSURLSessionDataTask *dataTask, NSError *error) {
@@ -1352,16 +1378,18 @@
                 lastMessageDictionary = [TTLUtil nullToEmptyDictionary:lastMessageDictionary];
                 TAPMessageModel *lastMessage = [TAPEncryptorManager decryptToMessageModelFromDictionary:lastMessageDictionary];
 
-                NSNumber *unreadCount = [tapTalkRoomDictionary objectForKey:@"unreadCount"];
-                unreadCount = [TTLUtil nullToEmptyNumber:unreadCount];
-                
-                TTLTapTalkRoomModel *tapTalkRoom = [TTLTapTalkRoomModel new];
-                tapTalkRoom.lastMessage = lastMessage;
-                tapTalkRoom.unreadCount = [unreadCount intValue];
-                caseData.tapTalkRoom = tapTalkRoom;
-                
-                [caseListResultArray addObject:caseData];
-                [messageArray addObject:lastMessage];
+                if (lastMessage != nil) {
+                    NSNumber *unreadCount = [tapTalkRoomDictionary objectForKey:@"unreadCount"];
+                    unreadCount = [TTLUtil nullToEmptyNumber:unreadCount];
+                    
+                    TTLTapTalkRoomModel *tapTalkRoom = [TTLTapTalkRoomModel new];
+                    tapTalkRoom.lastMessage = lastMessage;
+                    tapTalkRoom.unreadCount = [unreadCount intValue];
+                    caseData.tapTalkRoom = tapTalkRoom;
+                    
+                    [caseListResultArray addObject:caseData];
+                    [messageArray addObject:lastMessage];
+                }
                 
                 isContainCaseList = YES;
                 [TapTalkLive.sharedInstance.caseDictionary setObject:caseData forKey:tapTalkXCRoomID];

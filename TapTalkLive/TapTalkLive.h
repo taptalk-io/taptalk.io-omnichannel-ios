@@ -14,6 +14,7 @@
 #import "TTLHomeLauncherViewController.h"
 #import "TTLCaseModel.h"
 #import "TTLFaqModel.h"
+#import "TTLTopicModel.h"
 
 //! Project version number for TapTalkLive.
 FOUNDATION_EXPORT double TapTalkLiveVersionNumber;
@@ -218,6 +219,12 @@ Call to show TapTalk Live view with present animation
 - (void)presentHomeLauncherViewWithCurrentNavigationController:(UINavigationController *_Nonnull)navigationController
                                                       animated:(BOOL)animated;
 
+- (void)openCaseChatRoomWithXCRoomID:(NSString *)tapTalkXCRoomID
+                navigationController:(UINavigationController *)navigationController
+                            animated:(BOOL)animated
+                             success:(void (^)(NSString *successMessage))success
+                             failure:(void (^)(NSError *error))failure;
+
 /**
 Call to show TapTalk Live view with push animation
 
@@ -276,4 +283,14 @@ Clear all data from TapTalk Live
 
 - (void)clearAllTapLiveData;
 
+- (void)getTopicListWithSuccess:(void (^)(NSArray<TTLTopicModel *> *topicListArray))success
+                        failure:(void (^)(NSError *error))failure;
+
+- (void)getUserCaseListListWithSuccess:(void (^)(NSArray<TTLCaseModel *> *caseListArray))success
+                               failure:(void (^)(NSError *error))failure;
+
+- (void)createNewCaseWithTopicID:(NSString *)topicID
+                    firstMessage:(NSString *)firstMessage
+                         success:(void (^)(TTLCaseModel *caseModel))success
+                         failure:(void (^)(NSError *error))failure;
 @end
