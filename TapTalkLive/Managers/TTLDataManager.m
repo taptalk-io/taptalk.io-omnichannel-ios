@@ -2210,6 +2210,13 @@
                 errorCode = 999;
             }
             
+            if (errorCode == 40401 && [errorMessage containsString:@"not set"]) {
+                // SCF Path is empty
+                NSDictionary *emptyDictionary = [NSDictionary dictionary];
+                [[NSUserDefaults standardUserDefaults] setSecureObject:emptyDictionary forKey:TTL_PREFS_FAQ];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+            }
+            
             NSError *error = [NSError errorWithDomain:errorMessage code:errorCode userInfo:@{@"message": errorMessage}];
             failure(error);
             return;

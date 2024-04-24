@@ -142,6 +142,8 @@
 + (CGFloat)safeAreaTopPadding;
 + (CGFloat)topGapPresentingViewController;
 + (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay;
++ (void)openUrl:(NSURL *)url fromNavigationController:(UINavigationController *)navigationController;
++ (void)openUrl:(NSURL *)url fromNavigationController:(UINavigationController *)navigationController options:(NSDictionary *)options;
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;

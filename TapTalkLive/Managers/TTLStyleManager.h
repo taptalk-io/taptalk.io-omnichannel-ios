@@ -342,6 +342,7 @@ typedef NS_ENUM(NSInteger, TTLComponentFont) {
     TTLComponentFontTitleLabel,
     TTLComponentFontNavigationBarTitleLabel,
     TTLComponentFontNavigationBarButtonLabel,
+    TTLComponentFontCreateFromDescriptionLabel,
     TTLComponentFontFormLabel,
     TTLComponentFontFormDescriptionLabel,
     TTLComponentFontFormErrorInfoLabel,

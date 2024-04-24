@@ -11,6 +11,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, TTLSnackBarType) {
+    TTLSnackBarTypeDefault,
+    TTLSnackBarTypeError,
+    TTLSnackBarTypeToast,
+};
+
 @interface TTLBaseViewController : UIViewController
 
 - (void)keyboardWillShowWithHeight:(CGFloat)keyboardHeight;
@@ -26,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showNavigationSeparator:(BOOL)show;
 - (void)showFooterView:(BOOL)show;
 - (BOOL)isModal;
+- (void)showSnackBar:(TTLSnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName;
+- (void)showSnackBar:(TTLSnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName showDuration:(CGFloat)showDuration animationDuration:(CGFloat)animationDuration;
 
 @end
 

@@ -6,14 +6,16 @@
 //
 
 #import "FaqParentTableViewCell.h"
+#import "ZSWTappableLabel.h"
 #import <TapTalk/TAPUtil.h>
 #import <TapTalk/TAPMediaDetailViewController.h>
 #import <TapTalk/TAPCoreMessageManager.h>
 #import <TapTalk/TAPFileDownloadManager.h>
+#import <TapTalk/TAPStyleManager.h>
 
 @import QuickLook;
 
-@interface FaqParentTableViewCell() <TTLImageViewDelegate, TAPMediaDetailViewControllerDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource>
+@interface FaqParentTableViewCell() <TTLImageViewDelegate, TAPMediaDetailViewControllerDelegate, ZSWTappableLabelTapDelegate, QLPreviewControllerDelegate, QLPreviewControllerDataSource>
 
 @property (weak, nonatomic) IBOutlet UIView *topHeaderContainerView;
 @property (weak, nonatomic) IBOutlet UIImageView *backButtonImageView;
@@ -34,7 +36,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *faqLabelBottomConstraint;
 
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *detailLabel;
+@property (weak, nonatomic) IBOutlet ZSWTappableLabel *detailLabel;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *detailLabelTopConstraint;
 
 @property (weak, nonatomic) IBOutlet UIImageView *mediaPreviewLoadingImageView;
@@ -94,6 +96,10 @@
     
     self.detailLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorFaqContentLabel];
     self.detailLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontFaqContentLabel];
+    
+    self.detailLabel.tapDelegate = self;
+    self.detailLabel.longPressDelegate = self;
+    self.detailLabel.longPressDuration = 0.2f;
     
     [self.talkToAgentButton setTitleColor:[[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorBorderedButtonLabel] forState:UIControlStateNormal];
     self.talkToAgentButton.titleLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontBorderedButtonLabel];
@@ -171,6 +177,66 @@
     
 }
 
+#pragma mark - ZSWTappableLabelTapDelegate
+
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel
+        tappedAtIndex:(NSInteger)idx
+       withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) {
+            case NSTextCheckingTypePhoneNumber:
+                if ([self.delegate respondsToSelector:@selector(faqParentPhoneDidTapped:)]) {
+                    [self.delegate faqParentPhoneDidTapped:result.phoneNumber];
+                }
+                break;
+            case NSTextCheckingTypeLink:
+                if ([result.URL.scheme.lowercaseString isEqualToString:@"mailto"]) {
+                    if ([self.delegate respondsToSelector:@selector(faqParentEmailDidTapped:)]) {
+                        [self.delegate faqParentEmailDidTapped:result.URL];
+                    }
+                }
+                else {
+                    if ([self.delegate respondsToSelector:@selector(faqParentUrlDidTapped:)]) {
+                        [self.delegate faqParentUrlDidTapped:result.URL];
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+- (void)tappableLabel:(ZSWTappableLabel *)tappableLabel longPressedAtIndex:(NSInteger)idx withAttributes:(NSDictionary<NSAttributedStringKey,id> *)attributes {
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result) {
+        switch (result.resultType) {
+            case NSTextCheckingTypePhoneNumber:
+                if ([self.delegate respondsToSelector:@selector(faqParentPhoneDidLongPressed:)]) {
+                    [self.delegate faqParentPhoneDidLongPressed:result.phoneNumber];
+                }
+                break;
+            case NSTextCheckingTypeLink:
+                if ([result.URL.scheme.lowercaseString isEqualToString:@"mailto"]) {
+                    if ([self.delegate respondsToSelector:@selector(faqParentEmailDidLongPressed:)]) {
+                        [self.delegate faqParentEmailDidLongPressed:result.URL];
+                    }
+                }
+                else {
+                    if ([self.delegate respondsToSelector:@selector(faqParentUrlDidLongPressed:)]) {
+                        [self.delegate faqParentUrlDidLongPressed:result.URL];
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 #pragma mark - Custom Methods
 
 - (void)setFaqParentData:(TTLFaqModel *)faqModel {
@@ -180,7 +246,7 @@
     
     // Content
     if (![TTLUtil isEmptyString:faqModel.content]) {
-        self.detailLabel.text = faqModel.content;
+        [self setContentText:faqModel.content];
     }
     else if (![TTLUtil isEmptyString:faqModel.apiURL]) {
         if (![TTLUtil isEmptyString:faqModel.contentResponse]) {
@@ -193,7 +259,7 @@
                 textDictionary = [TTLUtil nullToEmptyDictionary:textDictionary];
                 NSString *body = [textDictionary objectForKey:@"body"];
                 body = [TTLUtil nullToEmptyString:body];
-                self.detailLabel.text = body;
+                [self setContentText:body];
             }
             else if ([type isEqualToString:MESSAGE_TYPE_STRING_IMAGE] ||
                      [type isEqualToString:MESSAGE_TYPE_STRING_VIDEO] ||
@@ -204,7 +270,7 @@
                 mediaDictionary = [TTLUtil nullToEmptyDictionary:mediaDictionary];
                 NSString *caption = [mediaDictionary objectForKey:@"caption"];
                 caption = [TTLUtil nullToEmptyString:caption];
-                self.detailLabel.text = caption;
+                [self setContentText:caption];
             }
             else {
                 self.detailLabel.text = @"";
@@ -214,7 +280,7 @@
             self.detailLabel.text = @"";
         }
         else {
-            self.detailLabel.text = faqModel.contentOnAPIError;
+            [self setContentText:faqModel.contentOnAPIError];
         }
     }
     else {
@@ -364,6 +430,42 @@
             [TTLUtil removeSpinAnimation:self.mediaPreviewLoadingImageView];
         }
     }
+}
+
+- (void)setContentText:(NSString *)content {
+    NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:NULL];
+    NSDataDetector *phoneNumberDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber error:NULL];
+    UIColor *highlightedUrlColor = [[TAPStyleManager sharedManager] getTextColorForType:TAPTextColorLeftBubbleMessageBodyURLHighlighted];
+    UIColor *defaultUrlColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
+    NSString *contentText = content;
+    
+    // Fix last line truncated
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\n\n" options:NSRegularExpressionCaseInsensitive error:nil];
+    NSUInteger numberOfMatches = [regex numberOfMatchesInString:contentText options:0 range:NSMakeRange(0, [contentText length])];
+    if (numberOfMatches > 0) {
+        contentText = [contentText stringByAppendingString:@"\n"];
+    }
+    
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:contentText attributes:nil];
+    [linkDetector enumerateMatchesInString:contentText options:0 range:NSMakeRange(0, contentText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+        attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+        attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+        attributes[NSForegroundColorAttributeName] = defaultUrlColor;
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedUrlColor;
+        attributes[@"NSTextCheckingResult"] = result;
+        [attributedString addAttributes:attributes range:result.range];
+    }];
+    [phoneNumberDetector enumerateMatchesInString:contentText options:0 range:NSMakeRange(0, contentText.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+        attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+        attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+        attributes[NSForegroundColorAttributeName] = defaultUrlColor;
+        attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = highlightedUrlColor;
+        attributes[@"NSTextCheckingResult"] = result;
+        [attributedString addAttributes:attributes range:result.range];
+    }];
+    self.detailLabel.attributedText = attributedString;
 }
 
 - (void)loadThumbnailImage:(UIImage * _Nullable)image {

@@ -40,6 +40,7 @@
 #define CHANNEL_TWITTER @"twitter"
 #define CHANNEL_FACEBOOK @"facebook"
 #define CHANNEL_GOOGLE_BUSINESS @"google_business"
+#define CHANNEL_EMAIL @"email"
 
 // SCF / FAQ Path Type
 #define FAQ_QNA @"qna"

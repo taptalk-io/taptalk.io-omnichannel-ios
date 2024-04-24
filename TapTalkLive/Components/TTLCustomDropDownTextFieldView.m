@@ -116,7 +116,7 @@
     _ttlCustomDropDownTextFieldViewType = ttlCustomDropDownTextFieldViewType;
     if (ttlCustomDropDownTextFieldViewType == TTLCustomDropDownTextFieldViewTypeTopic) {
         self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"Topic", nil, [TTLUtil currentBundle], @"");
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Select Topic", nil, [TTLUtil currentBundle], @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Select topic", nil, [TTLUtil currentBundle], @"");
         self.containerView.alpha = 1.0f;
         [self setInfoDescriptionText:@""];
        // [self setErrorInfoText:@""];
@@ -259,7 +259,7 @@
         [self setAsError:NO animated:NO];
     }
     else {
-        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Select Topic", nil, [TTLUtil currentBundle], @"");
+        self.textField.placeholder = NSLocalizedStringFromTableInBundle(@"Select topic", nil, [TTLUtil currentBundle], @"");
     }
 }
 
