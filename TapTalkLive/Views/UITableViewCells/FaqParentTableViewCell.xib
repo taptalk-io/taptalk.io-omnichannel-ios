@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -76,7 +76,7 @@
                                 <rect key="frame" x="0.0" y="16" width="288" height="228"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="FAQ" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FAt-C6-LN5">
-                                        <rect key="frame" x="11.999999999999998" y="12" width="29.333333333333329" height="24"/>
+                                        <rect key="frame" x="12" y="12" width="31" height="24"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="24" id="mQ2-C4-NUQ"/>
                                         </constraints>
@@ -172,16 +172,16 @@
                                                 </constraints>
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wfk-Gr-Mni" userLabel="File Label Container View">
-                                                <rect key="frame" x="64" y="8.3333333333333428" width="184" height="39.333333333333336"/>
+                                                <rect key="frame" x="64" y="9.3333333333333428" width="184" height="37.666666666666664"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Document" lineBreakMode="middleTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1dA-vp-oYQ" userLabel="File Name Label">
-                                                        <rect key="frame" x="0.0" y="0.0" width="184" height="20.333333333333332"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="184" height="18.666666666666668"/>
                                                         <fontDescription key="fontDescription" name="PTRootUI-Bold" family="PT Root UI" pointSize="16"/>
                                                         <color key="textColor" red="0.098039215686274508" green="0.098039215686274508" blue="0.098039215686274508" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="123 KB" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9Wx-AB-N4O" userLabel="File Info Label">
-                                                        <rect key="frame" x="2" y="23.333333333333314" width="182" height="16"/>
+                                                        <rect key="frame" x="2" y="21.666666666666657" width="182" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="16" id="fXC-Gg-iXZ"/>
                                                         </constraints>
@@ -212,7 +212,7 @@
                                             <constraint firstAttribute="height" constant="56" id="s0n-Ky-uj7"/>
                                         </constraints>
                                     </view>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xyj-94-ypE">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Xyj-94-ypE" customClass="ZSWTappableLabel">
                                         <rect key="frame" x="12" y="144" width="256" height="8"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <string key="text">A single dashboard to manage WhatsApp, Twitter, FB Messenger, Telegram, LINE and email to elevate your sales, marketing, and support  A single dashboard to manage WhatsApp, Twitter, FB Messenger, Telegram, LINE and email to elevate your sales, marketing, and support </string>

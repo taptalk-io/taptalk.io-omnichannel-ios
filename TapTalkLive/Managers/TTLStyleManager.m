@@ -184,6 +184,14 @@
             return font;
             break;
         }
+        case TTLComponentFontCreateFromDescriptionLabel:
+        {
+            
+            UIFont *font = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
+            font = [font fontWithSize:16.0f];
+            return font;
+            break;
+        }
         case TTLComponentFontFormLabel:
         {
             
@@ -1891,7 +1899,7 @@
             return color;
             break;
         }
-        case TTLComponentFontGroupMemberCount: {
+        case TTLTextColorGroupMemberCount: {
             UIColor *color = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextMedium];
             return color;
             break;

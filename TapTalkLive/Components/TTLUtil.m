@@ -8,6 +8,7 @@
 
 #import "TTLUtil.h"
 #import <TapTalk/TAPUtil.h>
+#import <TapTalk/TAPWebViewViewController.h>
 
 @implementation TTLUtil
 
@@ -1046,6 +1047,30 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     [self performSelector:@selector(performBlock:) withObject:block_ afterDelay:delay];
 }
 
++ (void)openUrl:(NSURL *)url fromNavigationController:(UINavigationController *)navigationController {
+    [self openUrl:url fromNavigationController:navigationController options:[NSDictionary dictionary]];
+}
+
++ (void)openUrl:(NSURL *)url fromNavigationController:(UINavigationController *)navigationController options:(NSDictionary *)options {
+    if (url == nil || ![[UIApplication sharedApplication] canOpenURL:url]) {
+        return;
+    }
+    if (IS_IOS_11_OR_ABOVE) {
+        options = [TTLUtil nullToEmptyDictionary:options];
+        [[UIApplication sharedApplication] openURL:url
+                                           options:options
+                                 completionHandler:^(BOOL success){
+            if (!success) {
+                 TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
+                 webViewController.urlString = url.absoluteString;
+                 [navigationController pushViewController:webViewController animated:YES];
+             }
+        }];
+    }
+    else {
+        [[UIApplication sharedApplication] openURL:url];
+    }
+}
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle {
     NSBundle *resourceBundle = [PodAsset bundleForPod:@"TapTalkLive"];

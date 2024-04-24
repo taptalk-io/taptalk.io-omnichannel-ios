@@ -64,7 +64,7 @@
         self.logoImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.headerView addSubview:self.logoImageView];
         
-        _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(14.0f, 16.0f + 14.0f, 28.0f, 28.0f)];
+        _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(16.0f, 24.0f, 24.0f, 24.0f)];
         self.closeImageView.image = [TTLImage imageNamed:@"TTLIconBackArrow" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         TTLImage *closeIconImage = (TTLImage *) self.closeImageView.image;
         closeIconImage = (TTLImage *) [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
@@ -72,7 +72,7 @@
         self.closeImageView.alpha = 0.0f;
         [self.headerView addSubview:self.closeImageView];
         
-        _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 16.0f, 56.0f, 56.0f)];
+        _closeButton = [[UIButton alloc] initWithFrame:CGRectMake(8.0f, 16.0f, 40.0f, 40.0f)];
         self.closeButton.alpha = 0.0f;
         self.closeButton.userInteractionEnabled = NO;
         [self.headerView addSubview:self.closeButton];
@@ -90,10 +90,9 @@
 //        self.leftCloseButton.userInteractionEnabled = NO;
 //        [self.headerView addSubview:self.leftCloseButton];
         
-        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.closeButton.frame) + 8.0f, CGRectGetMinY(self.closeButton.frame), CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 36.0f)];
+        _titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.closeButton.frame), CGRectGetMinY(self.closeButton.frame) + 2.0f, CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 16.0f, 36.0f)];
         self.titleLabel.text = NSLocalizedStringFromTableInBundle(@"New Message", nil, [TTLUtil currentBundle], @"");
-        UIFont *obtainedTitleLabelFont = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontBold];
-        obtainedTitleLabelFont = [obtainedTitleLabelFont fontWithSize:24.0f];
+        UIFont *obtainedTitleLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontTitleLabel];
         self.titleLabel.font = obtainedTitleLabelFont;
         self.titleLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorCreateFormTitle];
         [self.headerView addSubview:self.titleLabel];
@@ -101,8 +100,7 @@
         _subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.titleLabel.frame), CGRectGetMaxY(self.titleLabel.frame) + 4.0f, CGRectGetWidth(self.titleLabel.frame) - 40.0f, 48.0f)];
         self.subtitleLabel.numberOfLines = 0;
         self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Please fill out the form below before you leave a message", nil, [TTLUtil currentBundle], @"");
-        UIFont *obtainedSubtitleLabelFont = [[TTLStyleManager sharedManager] getDefaultFontForType:TTLDefaultFontRegular];
-        obtainedSubtitleLabelFont = [obtainedSubtitleLabelFont fontWithSize:16.0f];
+        UIFont *obtainedSubtitleLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontCreateFromDescriptionLabel];
         self.subtitleLabel.font = obtainedSubtitleLabelFont;
         self.subtitleLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorCreateFormDescription];
         CGSize subtitleSize = [self.subtitleLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.subtitleLabel.frame), CGFLOAT_MAX)];

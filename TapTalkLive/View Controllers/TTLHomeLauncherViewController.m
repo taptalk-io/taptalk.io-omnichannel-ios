@@ -14,7 +14,7 @@
 #import <TapTalk/TAPChatManager.h>
 #import <TapTalk/TapUI.h>
 
-@interface TTLHomeLauncherViewController () <UITableViewDataSource, UITableViewDelegate, TAPChatManagerDelegate, TTLHomeHeaderTableViewCellDelegate, FaqParentTableViewCellDelegate>
+@interface TTLHomeLauncherViewController () <UITableViewDataSource, UITableViewDelegate, TAPChatManagerDelegate, TTLHomeHeaderTableViewCellDelegate, FaqParentTableViewCellDelegate, FaqChildTableViewCellDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic) BOOL showCaseListSection;
@@ -115,6 +115,7 @@
         TTLFaqModel *faqChild = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 2];
         [cell setFaqChildWithData:faqChild];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.delegate = self;
         if(indexPath.row == self.faqPathModel.childItems.count + 1) {
             [cell setLastChildCellView];
         }
@@ -235,6 +236,160 @@
     else {
         [self openNewMessageForm];
     }
+}
+
+- (void)faqParentUrlDidTapped:(NSURL *)url {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentUrlDidTapped:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:self.faqPathModel contentUrlDidTapped:url currentShownNavigationController:self.navigationController];
+    }
+    else {
+        [TTLUtil openUrl:url fromNavigationController:self.navigationController options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}];
+    }
+}
+
+- (void)faqParentUrlDidLongPressed:(NSURL *)url {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentUrlDidLongPressed:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:self.faqPathModel contentUrlDidLongPressed:url currentShownNavigationController:self.navigationController];
+    }
+    else {
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        [pasteboard setString:url.absoluteString];
+        
+        [self showSnackBar:TTLSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Link copied to clipboard.", nil, [TTLUtil currentBundle], @"") iconName:@""];
+    }
+}
+
+- (void)faqParentEmailDidTapped:(NSURL *)email {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentEmailAddressDidTapped:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:self.faqPathModel contentEmailAddressDidTapped:email currentShownNavigationController:self.navigationController];
+    }
+    else {
+        [TTLUtil openUrl:email fromNavigationController:self.navigationController];
+    }
+}
+
+- (void)faqParentEmailDidLongPressed:(NSURL *)email {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentEmailAddressDidLongPressed:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:self.faqPathModel contentEmailAddressDidLongPressed:email currentShownNavigationController:self.navigationController];
+    }
+    else {
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        [pasteboard setString:[email.absoluteString stringByReplacingOccurrencesOfString:@"mailto:" withString:@""]];
+        
+        [self showSnackBar:TTLSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Email address copied to clipboard.", nil, [TTLUtil currentBundle], @"") iconName:@""];
+    }
+}
+
+- (void)faqParentPhoneDidTapped:(NSString *)phone {
+    NSURL *phoneURL = [NSURL URLWithString:[NSString stringWithFormat:@"tel:%@", phone]];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentPhoneNumberDidTapped:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:self.faqPathModel contentPhoneNumberDidTapped:phoneURL currentShownNavigationController:self.navigationController];
+    }
+    else {
+        [TTLUtil openUrl:phoneURL fromNavigationController:self.navigationController];
+    }
+}
+
+- (void)faqParentPhoneDidLongPressed:(NSString *)phone {
+    NSURL *phoneURL = [NSURL URLWithString:[NSString stringWithFormat:@"tel:%@", phone]];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentPhoneNumberDidLongPressed:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:self.faqPathModel contentPhoneNumberDidLongPressed:phoneURL currentShownNavigationController:self.navigationController];
+    }
+    else {
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        [pasteboard setString:phone];
+        
+        [self showSnackBar:TTLSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Phone number copied to clipboard.", nil, [TTLUtil currentBundle], @"") iconName:@""];
+    }
+}
+
+#pragma mark - FaqChildTableViewCellDelegate
+
+- (void)faqChild:(TTLFaqModel *)faqModel urlDidTapped:(NSURL *)url {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentUrlDidTapped:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:faqModel contentUrlDidTapped:url currentShownNavigationController:self.navigationController];
+    }
+    else {
+        [TTLUtil openUrl:url fromNavigationController:self.navigationController options:@{UIApplicationOpenURLOptionUniversalLinksOnly: @YES}];
+    }
+}
+
+- (void)faqChild:(TTLFaqModel *)faqModel urlDidLongPressed:(NSURL *)url {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentUrlDidLongPressed:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:faqModel contentUrlDidLongPressed:url currentShownNavigationController:self.navigationController];
+    }
+    else {
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        [pasteboard setString:url.absoluteString];
+        
+        [self showSnackBar:TTLSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Link copied to clipboard.", nil, [TTLUtil currentBundle], @"") iconName:@""];
+    }
+}
+
+- (void)faqChild:(TTLFaqModel *)faqModel emailDidTapped:(NSURL *)email {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentEmailAddressDidTapped:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:faqModel contentEmailAddressDidTapped:email currentShownNavigationController:self.navigationController];
+    }
+    else {
+        [TTLUtil openUrl:email fromNavigationController:self.navigationController];
+    }
+}
+
+- (void)faqChild:(TTLFaqModel *)faqModel emailDidLongPressed:(NSURL *)email {
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentEmailAddressDidLongPressed:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:faqModel contentEmailAddressDidLongPressed:email currentShownNavigationController:self.navigationController];
+    }
+    else {
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        [pasteboard setString:[email.absoluteString stringByReplacingOccurrencesOfString:@"mailto:" withString:@""]];
+        
+        [self showSnackBar:TTLSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Email address copied to clipboard.", nil, [TTLUtil currentBundle], @"") iconName:@""];
+    }
+}
+
+- (void)faqChild:(TTLFaqModel *)faqModel phoneDidTapped:(NSString *)phone {
+    NSURL *phoneURL = [NSURL URLWithString:[NSString stringWithFormat:@"tel:%@", phone]];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentPhoneNumberDidTapped:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:faqModel contentPhoneNumberDidTapped:phoneURL currentShownNavigationController:self.navigationController];
+    }
+    else {
+        [TTLUtil openUrl:phoneURL fromNavigationController:self.navigationController];
+    }
+}
+
+-(void)faqChild:(TTLFaqModel *)faqModel phoneDidLongPressed:(NSString *)phone {
+    NSURL *phoneURL = [NSURL URLWithString:[NSString stringWithFormat:@"tel:%@", phone]];
+    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
+    if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentPhoneNumberDidLongPressed:currentShownNavigationController:)]) {
+        [tapTalkLiveDelegate faq:faqModel contentPhoneNumberDidLongPressed:phoneURL currentShownNavigationController:self.navigationController];
+    }
+    else {
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        [pasteboard setString:phone];
+        
+        [self showSnackBar:TTLSnackBarTypeToast message:NSLocalizedStringFromTableInBundle(@"Phone number copied to clipboard.", nil, [TTLUtil currentBundle], @"") iconName:@""];
+    }
+}
+
+#pragma mark - FaqChildTableViewCellDelegate
+
+- (void)faqChildUrlDidTapped:(NSURL *)url {
+    [self faqParentUrlDidTapped:url];
+}
+
+- (void)faqChildUrlDidLongPressed:(NSURL *)url {
+    [self faqParentUrlDidLongPressed:url];
 }
 
 #pragma mark - TAPChatManagerDelegate

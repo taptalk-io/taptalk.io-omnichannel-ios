@@ -65,9 +65,39 @@ FOUNDATION_EXPORT const unsigned char TapTalkLiveVersionString[];
 - (void)closeButtonInFaqDetailsViewDidTapped:(TTLFaqModel *)faqModel currentShownNavigationController:(UINavigationController *)navigationController;
 
 /**
- Called when user tapped the taptalk to agent button in faq details view
+ Called when user tapped the talk to agent button in faq details view
 */
 - (void)talkToAgentButtonDidTapped:(TTLFaqModel *)faqModel currentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped a url in faq content
+*/
+- (void)faq:(TTLFaqModel *)faqModel contentUrlDidTapped:(NSURL *)url currentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user long pressed a url in faq content
+*/
+- (void)faq:(TTLFaqModel *)faqModel contentUrlDidLongPressed:(NSURL *)url currentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped an email  in faq content
+*/
+- (void)faq:(TTLFaqModel *)faqModel contentEmailAddressDidTapped:(NSURL *)emailAddress currentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user long pressed an email address  in faq content
+*/
+- (void)faq:(TTLFaqModel *)faqModel contentEmailAddressDidLongPressed:(NSURL *)emailAddress currentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user tapped a phone number   in faq content
+*/
+- (void)faq:(TTLFaqModel *)faqModel contentPhoneNumberDidTapped:(NSURL *)phoneNumber currentShownNavigationController:(UINavigationController *)navigationController;
+
+/**
+ Called when user long pressed a phone number  in faq content
+*/
+- (void)faq:(TTLFaqModel *)faqModel contentPhoneNumberDidLongPressed:(NSURL *)phoneNumber currentShownNavigationController:(UINavigationController *)navigationController;
 
 
 @end

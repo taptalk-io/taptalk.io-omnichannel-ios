@@ -213,6 +213,9 @@
     else if ([channelName isEqualToString:CHANNEL_GOOGLE_BUSINESS]) {
         channelImage = [UIImage imageNamed:@"IconGoogle" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     }
+    else if ([channelName isEqualToString:CHANNEL_EMAIL]) {
+        channelImage = [UIImage imageNamed:@"IconEmail" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
     else {
         channelImage = [UIImage imageNamed:@"IconTapTalkIo" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     }
