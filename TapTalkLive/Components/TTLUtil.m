@@ -730,6 +730,13 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     return NO;
 }
 
++ (BOOL)isEmptyArray:(NSArray *)array {
+    if (array == nil || [array count] <= 0) {
+        return YES;
+    }
+    return NO;
+}
+
 + (BOOL)validatePhoneNumber:(NSString *)candidate {
     NSString *phoneNumberRegex = @"^\\+?[0-9]*$";
     NSPredicate *phoneNumberTest = [NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", phoneNumberRegex];

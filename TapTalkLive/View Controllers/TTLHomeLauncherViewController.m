@@ -79,9 +79,19 @@
             [cell hideSendDirectly];
         }
         NSArray *channelListDictionary = [[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_CHANNEL_LIST valid:nil];
-        if(channelListDictionary.count == 0) {
+        NSArray *channelList = [TTLDataManager dictionaryToChannelModelList:channelListDictionary];
+        BOOL hasChannelLink = NO;
+        if (channelListDictionary.count > 0) {
+            for (TTLChannelModel *channel in channelList) {
+                if (channel.isEnabled) {
+                    hasChannelLink = YES;
+                    break;
+                }
+            }
+        }
+        if (!hasChannelLink) {
             [cell hideChannelList];
-            if(self.showCaseListSection){
+            if (self.showCaseListSection) {
                 [cell hideChannelContainer];
             }
         }
@@ -134,6 +144,12 @@
 
 - (NSInteger)tableView:(nonnull UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (self.faqPathModel != nil) {
+        if ([TTLUtil isEmptyString:self.faqPathModel.title] &&
+            [TTLUtil isEmptyString:self.faqPathModel.content] &&
+            [TTLUtil isEmptyArray:self.faqPathModel.childItems]
+        ) {
+            return 1;
+        }
         return 2 + [self.faqPathModel.childItems count];
     }
     else {
