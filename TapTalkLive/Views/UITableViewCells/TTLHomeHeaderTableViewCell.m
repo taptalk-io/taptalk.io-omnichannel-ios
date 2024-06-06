@@ -45,10 +45,14 @@
 @property (weak, nonatomic) IBOutlet UIImageView *messageUsButtonImageView;
 @property (weak, nonatomic) IBOutlet UIView *orView;
 
-
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryViewZeroHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *sendMessageDirectlyViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelContainerViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelContainerViewZeroHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelListCollectionTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelTitleLabelTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelTitleLabelHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *collectionViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryContainerTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *orViewHeightConstraint;
@@ -73,9 +77,8 @@
     _filteredChannelList = [NSMutableArray array];
     
     NSArray *channelList = [TTLDataManager dictionaryToChannelModelList:channelListDictionary];
-    
-    for(TTLChannelModel *channel in channelList) {
-        if(channel.isEnabled) {
+    for (TTLChannelModel *channel in channelList) {
+        if (channel.isEnabled) {
             [self.filteredChannelList addObject:channel];
         }
     }
@@ -142,11 +145,22 @@
     
     [[TAPChatManager sharedManager] addDelegate:self];
     
-    NSInteger channelrow = self.filteredChannelList.count / 5;
-    if (self.filteredChannelList.count % 5 > 0) {
-        channelrow += 1;
+    if ([TTLUtil isEmptyArray:self.filteredChannelList]) {
+        self.collectionViewHeightConstraint.constant = 0.0f;
+        self.channelTitleLabelTopConstraint.constant = 0.0f;
+        self.channelTitleLabelHeightConstraint.constant = 0.0f;
+        self.channelListCollectionTopConstraint.constant = 0.0f;
     }
-    self.collectionViewHeightConstraint.constant = (channelrow * self.cellSize) + (channelrow * 12.0f);
+    else {
+        NSInteger channelrow = self.filteredChannelList.count / 5;
+        if (self.filteredChannelList.count % 5 > 0) {
+            channelrow += 1;
+        }
+        self.collectionViewHeightConstraint.constant = (channelrow * self.cellSize) + (channelrow * 12.0f);
+        self.channelTitleLabelTopConstraint.constant = 16.0f;
+        self.channelTitleLabelHeightConstraint.constant = 21.0f;
+        self.channelListCollectionTopConstraint.constant = 12.0f;
+    }
     [self refreshCellHeight];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateRoomListUnreadCount:) name:TTL_NOTIFICATION_ROOM_LIST_UNREAD_COUNT_UPDATED object:nil];
@@ -155,6 +169,8 @@
 - (void)prepareForReuse {
     [super prepareForReuse];
     self.messageHistoryViewHeightConstraint.constant = 206.0f;
+//    self.messageHistoryViewHeightConstraint.active = YES;
+//    self.messageHistoryViewZeroHeightConstraint.active = NO;
     self.messageHistoryContainerView.alpha = 1.0f;
     
     self.channelContainerView.alpha = 1.0f;
@@ -399,6 +415,8 @@
 
 - (void)hideMessageHistoryView {
     self.messageHistoryViewHeightConstraint.constant = 0.0f;
+//    self.messageHistoryViewHeightConstraint.active = NO;
+//    self.messageHistoryViewZeroHeightConstraint.active = YES;
     self.messageHistoryContainerView.alpha = 0.0f;
 }
 
@@ -408,6 +426,8 @@
 }
 
 - (void)hideChannelList {
+    self.channelTitleLabelTopConstraint.constant = 0.0f;
+    self.channelTitleLabelHeightConstraint.constant = 0.0f;
     self.channelListCollectionTopConstraint.constant = 0.0f;
     self.collectionViewHeightConstraint.constant = 0.0f;
     self.clickOneChannelTitleLabel.alpha = 0.0f;
@@ -484,7 +504,17 @@
                     success(self.latestRoomList);
                 });
             }];
+            [self hideSendDirectly];
+            if ([TTLUtil isEmptyArray:self.filteredChannelList]) {
+                self.channelContainerViewZeroHeightConstraint.active = YES;
+                self.channelContainerViewHeightConstraint.active = NO;
+            }
         }
+        else {
+            self.channelContainerViewZeroHeightConstraint.active = NO;
+            self.channelContainerViewHeightConstraint.active = YES;
+        }
+        [self refreshCellHeight];
     }
     failure:^(NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
