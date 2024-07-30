@@ -783,7 +783,15 @@
                         
                         if (errorCode >= 40103 && errorCode <= 40106) {
                             //Refresh token is invalid, ask business side to refresh auth ticket
+                            [[TAPChatManager sharedManager] disconnect];
                             
+                            //Delete all preference
+                            [[TapTalkLive sharedInstance] clearAllTapLiveData];
+                            
+                            id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
+                            if ([tapTalkDelegate respondsToSelector:@selector(tapTalkRefreshTokenExpired)]) {
+                                [tapTalkDelegate tapTalkRefreshTokenExpired];
+                            }
                         }
                         
                         _isShouldRefreshToken = NO;

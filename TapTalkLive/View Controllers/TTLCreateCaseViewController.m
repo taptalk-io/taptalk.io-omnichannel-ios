@@ -132,6 +132,12 @@
 #pragma mark TTLCustomDropDownTextFieldView
 - (void)customDropDownTextFieldViewDidTapped {
     if (self.topicListDataArray == nil || self.topicListDataArray.count == 0) {
+        [TTLDataManager callAPIGetTopicListSuccess:^(NSArray<TTLTopicModel *> * _Nonnull topicListArray) {
+            _topicListDataArray = topicListArray;
+            [self customDropDownTextFieldViewDidTapped];
+        } failure:^(NSError * _Nonnull error) {
+            [self showSnackBar:TTLSnackBarTypeError message:[NSString stringWithFormat:@"Unable to obtain topics: ", error.localizedDescription] iconName:@""];
+        }];
         return;
     }
     [self.createCaseView.emailTextField.textField resignFirstResponder];
@@ -203,6 +209,10 @@
             fieldValidation = NO;
         }
     }
+    else {
+        _obtainedFullNameString = currentActiveUser.fullName;
+        _obtainedEmailString = currentActiveUser.email;
+    }
 
     if (!self.isTopicSelected) {
         //Validation failed - show error topic must be selected
@@ -225,10 +235,6 @@
             
         }
        
-        NSString *currentAccessToken = [TTLDataManager getAccessToken];
-        TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
-        NSString *currentActiveUserID = currentActiveUser.userID;
-        currentActiveUserID = [TTLUtil nullToEmptyString:currentActiveUserID];
         if (![currentAccessToken isEqualToString:@""] && ![currentActiveUserID isEqualToString:@""]) {
             [self handleSubmitCaseFormFlowAfterLogin];
         }
@@ -371,8 +377,8 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
-            self.createCaseView.closeButton.userInteractionEnabled = YES;
-            self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
+//            self.createCaseView.closeButton.userInteractionEnabled = YES;
+//            self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
             
             if ([self.delegate respondsToSelector:@selector(createCaseViewControllercreateCaseSucceed)]) {
                 [self.delegate createCaseViewControllercreateCaseSucceed];
@@ -408,11 +414,16 @@
             self.createCaseView.closeButton.userInteractionEnabled = YES;
             self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
             [self.createCaseView showCreateCaseButtonAsLoading:NO];
+            
+            [TTLUtil performBlock:^{
+                [self.navigationController dismissViewControllerAnimated:NO completion:^{
+                }];
+            } afterDelay:1.0f];
         }];
     } failure:^(NSError * _Nonnull error) {
-        if (error.code == 401) {
-            // Token expired
-            [self handleSubmitCaseFormFlowAfterLogin];
+        if (error.code == 401 || [TTLDataManager getActiveUser] == nil) {
+            // Token expired, re-authenticate
+            [self handleSubmitCaseFormFlow];
             return;
         }
         self.createCaseView.closeButton.userInteractionEnabled = YES;

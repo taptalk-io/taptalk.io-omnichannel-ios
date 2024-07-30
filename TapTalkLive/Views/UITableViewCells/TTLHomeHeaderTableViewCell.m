@@ -232,6 +232,9 @@
     else if ([channelName isEqualToString:CHANNEL_EMAIL]) {
         channelImage = [UIImage imageNamed:@"IconEmail" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     }
+    else if ([channelName isEqualToString:CHANNEL_KATA_AI]) {
+        channelImage = [UIImage imageNamed:@"IconKataAi" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    }
     else {
         channelImage = [UIImage imageNamed:@"IconTapTalkIo" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     }
