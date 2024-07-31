@@ -74,7 +74,9 @@
             UIViewController *activeViewController = [[TapTalkLive sharedInstance] getCurrentTapTalkLiveActiveViewController];
             if ([activeViewController isKindOfClass:[TapUIChatViewController class]]) {
                 TapUIChatViewController *chatViewController = (TapUIChatViewController *)activeViewController;
-                [chatViewController hideTapTalkMessageComposerView];
+                if (chatViewController != nil) {
+                    [chatViewController hideTapTalkMessageComposerView];
+                }
             }
         } failure:^(NSError * _Nonnull error) {
 
