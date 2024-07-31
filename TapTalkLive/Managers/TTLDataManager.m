@@ -786,7 +786,7 @@
                             [[TAPChatManager sharedManager] disconnect];
                             
                             //Delete all preference
-                            [[TapTalkLive sharedInstance] clearAllTapLiveData];
+                            [[TapTalkLive sharedInstance] clearUserData];
                             
                             id<TapTalkDelegate> tapTalkDelegate = [TapTalk sharedInstance].delegate;
                             if ([tapTalkDelegate respondsToSelector:@selector(tapTalkRefreshTokenExpired)]) {
