@@ -110,6 +110,8 @@
 #pragma mark - View
 + (void)addSpinAnimation:(UIView *)view;
 + (void)removeSpinAnimation:(UIView *)view;
++ (UIViewController * _Nullable)topViewController;
++ (UIViewController * _Nullable)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 
 #pragma mark - Device
 + (NSString *)hardwareModel;

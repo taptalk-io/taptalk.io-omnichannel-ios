@@ -372,7 +372,7 @@ Obtain main view controller of TapTalk Live
     
     // Do an action when user taps a custom keyboard item
     if ([keyboardItem.itemID isEqualToString:@"1"]) {
-        UINavigationController *currentActiveNavigationController = [self getCurrentTapTalkLiveActiveNavigationController];
+        UINavigationController *currentActiveNavigationController = [self getCurrentActiveNavigationController];
         if (currentActiveNavigationController == nil) {
             return;
         }
@@ -407,7 +407,7 @@ Obtain main view controller of TapTalk Live
             
     [TTLDataManager callAPICloseCaseWithCaseID:caseID success:^(BOOL isSuccess) {
         // Hide keyboard and input view
-        UIViewController *activeViewController = [[TapTalkLive sharedInstance] getCurrentTapTalkLiveActiveViewController];
+        UIViewController *activeViewController = [TTLUtil topViewController];
         if ([activeViewController isKindOfClass:[TapUIChatViewController class]]) {
             TapUIChatViewController *chatViewController = (TapUIChatViewController *)activeViewController;
             [chatViewController hideTapTalkMessageComposerView];
@@ -422,7 +422,11 @@ Obtain main view controller of TapTalk Live
 #pragma mark - TTLReviewBubbleTableViewCellDelegate
 
 - (void)reviewBubbleTableViewCellDidTappedReviewButtonWithMessage:(TAPMessageModel *)message {
-    UINavigationController *currentActiveNavigationController = [self getCurrentTapTalkLiveActiveNavigationController];
+    UINavigationController *currentActiveNavigationController = [self getCurrentActiveNavigationController];
+    if (currentActiveNavigationController == nil) {
+        return;
+    }
+    
     TTLCaseModel *currentCase = [TTLDataManager caseDataModelFromDictionary:message.data];
 
     TTLRatingViewController *ratingViewController = [[TTLRatingViewController alloc] init];
@@ -444,11 +448,31 @@ Obtain main view controller of TapTalk Live
 }
 
 - (UINavigationController *)getCurrentTapTalkLiveActiveNavigationController {
-    return [[TapUI sharedInstance] getCurrentTapTalkActiveNavigationController];
+    UINavigationController *currentTapTalkActiveNavigationController = [[TapUI sharedInstance] getCurrentTapTalkActiveNavigationController];
+    if (currentTapTalkActiveNavigationController == nil) {
+        currentTapTalkActiveNavigationController = [self getCurrentActiveNavigationController];
+    }
+    return currentTapTalkActiveNavigationController;
 }
 
 - (UIViewController *)getCurrentTapTalkLiveActiveViewController {
-    return [[TapUI sharedInstance] getCurrentTapTalkActiveViewController];
+    UIViewController *currentTapTalkActiveViewController = [[TapUI sharedInstance] getCurrentTapTalkActiveViewController];
+    if (currentTapTalkActiveViewController == nil) {
+        currentTapTalkActiveViewController = [TTLUtil topViewController];
+    }
+    return currentTapTalkActiveViewController;
+}
+
+- (UINavigationController * _Nullable)getCurrentActiveNavigationController {
+    UIViewController *topViewController = [TTLUtil topViewController];
+    if (topViewController == nil) {
+        return nil;
+    }
+    UINavigationController *currentActiveNavigationController = topViewController.navigationController;
+    if (currentActiveNavigationController == nil) {
+        return nil;
+    }
+    return currentActiveNavigationController;
 }
 
 #pragma mark - General Setup & Methods
