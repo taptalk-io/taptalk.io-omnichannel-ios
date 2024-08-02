@@ -613,6 +613,53 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     }
 }
 
++ (UIViewController * _Nullable)topViewController {
+    UIViewController *rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    if (rootViewController == nil) {
+        return nil;
+    }
+    return  [self topViewControllerWithRootViewController:rootViewController];
+}
+
++ (UIViewController * _Nullable)topViewControllerWithRootViewController:(UIViewController *)rootViewController {
+    if (rootViewController == nil) {
+        rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+        if (rootViewController == nil) {
+            return nil;
+        }
+    }
+    if ([rootViewController isKindOfClass:[UITabBarController class]]) {
+        UITabBarController *tabBarController = (UITabBarController *) rootViewController;
+        if (tabBarController.selectedViewController != nil) {
+            return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
+        }
+        else {
+            return rootViewController;
+        }
+    }
+    else if ([rootViewController isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *navigationController = (UINavigationController *) rootViewController;
+        if (navigationController.visibleViewController != nil) {
+            return [self topViewControllerWithRootViewController:navigationController.visibleViewController];
+        }
+        else {
+            return rootViewController;
+        }
+    }
+    else if (rootViewController.presentedViewController) {
+        UIViewController *presentedViewController = rootViewController.presentedViewController;
+        if (rootViewController.presentedViewController != nil) {
+            return [self topViewControllerWithRootViewController:presentedViewController];
+        }
+        else {
+            return rootViewController;
+        }
+    }
+    else {
+        return rootViewController;
+    }
+}
+
 #pragma mark - Device
 + (NSString *)hardwareModel {
     NSString *hardware = [TTLUtil hardwareString];

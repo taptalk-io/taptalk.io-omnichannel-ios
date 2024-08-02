@@ -47,8 +47,8 @@
 
 - (void)popUpInfoDidTappedLeftButtonWithIdentifier:(NSString *)popupIdentifier {
     [self dismissViewControllerAnimated:NO completion:^{
-        UIViewController *activeViewController = [[TapTalkLive sharedInstance] getCurrentTapTalkLiveActiveViewController];
-        if ([activeViewController isKindOfClass:[TapUIChatViewController class]]) {
+        UIViewController *activeViewController = [TTLUtil topViewController];
+        if (activeViewController != nil && [activeViewController isKindOfClass:[TapUIChatViewController class]]) {
             TapUIChatViewController *chatViewController = (TapUIChatViewController *)activeViewController;
             [chatViewController setKeyboardStateDefault];
         }
@@ -71,12 +71,10 @@
         [TTLDataManager callAPICloseCaseWithCaseID:caseID success:^(BOOL isSuccess) {
             //Hide keyboard and input view
             [self dismissViewControllerAnimated:NO completion:nil];
-            UIViewController *activeViewController = [[TapTalkLive sharedInstance] getCurrentTapTalkLiveActiveViewController];
-            if ([activeViewController isKindOfClass:[TapUIChatViewController class]]) {
+            UIViewController *activeViewController = [TTLUtil topViewController];
+            if (activeViewController != nil && [activeViewController isKindOfClass:[TapUIChatViewController class]]) {
                 TapUIChatViewController *chatViewController = (TapUIChatViewController *)activeViewController;
-                if (chatViewController != nil) {
-                    [chatViewController hideTapTalkMessageComposerView];
-                }
+                [chatViewController hideTapTalkMessageComposerView];
             }
         } failure:^(NSError * _Nonnull error) {
 
