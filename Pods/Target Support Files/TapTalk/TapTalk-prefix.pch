@@ -49,3 +49,4 @@
 #import "UIImage+Color.h"
 #import "TAPBaseTableView.h"
 #import "TAPScheduledMessageModel.h"
+#import "TapHighlightCustomButtonView.h"

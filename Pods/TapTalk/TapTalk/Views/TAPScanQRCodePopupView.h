@@ -8,6 +8,7 @@
 
 #import "TAPBaseView.h"
 #import "TAPUserModel.h"
+#import "TapHighlightCustomButtonView.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,8 +23,8 @@ typedef NS_ENUM(NSInteger, ScanQRCodePopupViewType) {
 
 @property (nonatomic) ScanQRCodePopupViewType scanQRCodePopupViewType;
 @property (strong, nonatomic) UIButton *closePopupButton;
-@property (strong, nonatomic) UIButton *chatNowButton;
-@property (strong, nonatomic) UIButton *addContactButton;
+@property (strong, nonatomic) TapHighlightCustomButtonView *chatNowButton;
+@property (strong, nonatomic) TapHighlightCustomButtonView *addContactButton;
 @property (strong, nonatomic) UIView *loadingView;
 @property (strong, nonatomic) UIActivityIndicatorView *activityIndicatorLoading;
 

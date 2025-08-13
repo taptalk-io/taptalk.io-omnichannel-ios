@@ -68,6 +68,10 @@ static const char kBundleKey = 0;
 }
 
 + (NSString *)getMessageTimestampText:(NSNumber *)createdTime {
+    if (!createdTime) {
+        return @"";
+    }
+    
     NSDate *currentDate = [NSDate date];
     NSTimeInterval currentTimeInterval = [currentDate timeIntervalSince1970];
     NSTimeInterval messageTimeInterval = [createdTime doubleValue] / 1000.0f; //change to second from milisecond
@@ -805,7 +809,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 
 #pragma mark - View
 
-- (void)addSpinAnimation:(UIView *)view {
++ (void)addSpinAnimation:(UIView *)view {
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
     animation.fromValue = [NSNumber numberWithFloat:0.0f];
     animation.toValue = [NSNumber numberWithFloat:(2 * M_PI)];
@@ -816,7 +820,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     [view.layer addAnimation:animation forKey:@"SpinAnimation"];
 }
 
-- (void)removeSpinAnimation:(UIView *)view {
++ (void)removeSpinAnimation:(UIView *)view {
     if ([view.layer animationForKey:@"SpinAnimation"] != nil) {
         [view.layer removeAnimationForKey:@"SpinAnimation"];
     }
@@ -933,10 +937,11 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 }
 
 + (BOOL)isEmptyString:(NSString *)string {
-    if (string == nil || [string isEqualToString:@""]) {
-        return YES;
-    }
-    return NO;
+    return string == nil || [string isKindOfClass:[NSNull class]] || [string isEqualToString:@""];
+}
+
++ (BOOL)isEmptyArray:(NSArray *)array {
+    return array == nil || [array isKindOfClass:[NSNull class]] || [array count] <= 0;
 }
 
 + (BOOL)isSaveMessageRoom:(NSString *)roomID {
@@ -1299,15 +1304,43 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     [self performSelector:@selector(performBlock:) withObject:block_ afterDelay:delay];
 }
 
-+ (UIViewController *_Nullable) topViewController {
-    UIViewController *topViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    if (topViewController == nil) {
-        return nil;
++ (UIViewController * _Nullable)topViewControllerWithRootViewController:(UIViewController *)rootViewController {
+    if (rootViewController == nil) {
+        rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+        if (rootViewController == nil) {
+            return nil;
+        }
     }
-    while (topViewController.presentedViewController) {
-        topViewController = topViewController.presentedViewController;
+    if ([rootViewController isKindOfClass:[UITabBarController class]]) {
+        UITabBarController *tabBarController = (UITabBarController *) rootViewController;
+        if (tabBarController.selectedViewController != nil) {
+            return [self topViewControllerWithRootViewController:tabBarController.selectedViewController];
+        }
+        else {
+            return rootViewController;
+        }
     }
-    return topViewController;
+    else if ([rootViewController isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *navigationController = (UINavigationController *) rootViewController;
+        if (navigationController.visibleViewController != nil) {
+            return [self topViewControllerWithRootViewController:navigationController.visibleViewController];
+        }
+        else {
+            return rootViewController;
+        }
+    }
+    else if (rootViewController.presentedViewController) {
+        UIViewController *presentedViewController = rootViewController.presentedViewController;
+        if (rootViewController.presentedViewController != nil) {
+            return [self topViewControllerWithRootViewController:presentedViewController];
+        }
+        else {
+            return rootViewController;
+        }
+    }
+    else {
+        return rootViewController;
+    }
 }
 
 + (void)getContentDataFromURL:(NSURL *)url success:(void (^)(NSString *title, NSString *body, NSURL*imageUrl))success failure:(void (^)(NSError *error))failure {
@@ -1440,7 +1473,10 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
     
     AVAsset *videoAsset = [AVAsset assetWithURL:[NSURL URLWithString:url]];
-    CGSize sizeDimension = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] naturalSize];
+    CGSize sizeDimension = CGSizeZero;
+    if (![TAPUtil isEmptyArray:[videoAsset tracksWithMediaType:AVMediaTypeVideo]]) {
+        sizeDimension = [[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] naturalSize];
+    }
     
     NSURL *URL = [NSURL URLWithString:url];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];

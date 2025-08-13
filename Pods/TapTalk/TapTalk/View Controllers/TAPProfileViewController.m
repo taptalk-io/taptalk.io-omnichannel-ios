@@ -142,6 +142,7 @@
     
     self.photoListArray = [NSMutableArray array];
     
+    self.profileView.collectionView.delaysContentTouches = NO;
     self.profileView.profilImageCollectionView.dataSource = self;
     self.profileView.profilImageCollectionView.delegate = self;
     self.profileView.pageIndicatorCollectionView.dataSource = self;
@@ -476,7 +477,12 @@
     }
     else if(indexPath.section == 2){
         CGFloat height = 56.0f;
-        if (indexPath.row == 0 && ![[TapUI sharedInstance] isStarMessageMenuEnabled]){
+        if ((indexPath.row == 0 && ![[TapUI sharedInstance] isStarMessageMenuEnabled]) ||
+            (indexPath.row == 1 && (![[TapUI sharedInstance] isSharedMediaMenuEnabled] ||
+             (![[TapUI sharedInstance] isSharedMediaMediasTabVisible] &&
+              ![[TapUI sharedInstance] isSharedMediaLinksTabVisible] &&
+              ![[TapUI sharedInstance] isSharedMediaDocumentsTabVisible])))
+        ) {
             height = 0.0f;
         }
         CGSize cellSize = CGSizeMake(CGRectGetWidth([UIScreen mainScreen].bounds), height);
@@ -1809,6 +1815,23 @@ minimumLineSpacingForSectionAtIndex:(NSInteger)section {
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath {
    
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didHighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+    if (cell == nil || ![cell isKindOfClass:[TAPProfileCollectionViewCell class]]) {
+        return;
+    }
+    TAPProfileCollectionViewCell *profileCell = (TAPProfileCollectionViewCell *) cell;
+    [profileCell showHighlight:profileCell.type != profileCollectionViewCellTypeUserDetail];
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didUnhighlightItemAtIndexPath:(NSIndexPath *)indexPath {
+    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+    if (cell == nil || ![cell isKindOfClass:[TAPProfileCollectionViewCell class]]) {
+        return;
+    }
+    [((TAPProfileCollectionViewCell *) cell) showHighlight:NO];
 }
 
 /**

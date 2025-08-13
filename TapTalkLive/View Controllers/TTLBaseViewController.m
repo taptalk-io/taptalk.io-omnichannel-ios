@@ -7,7 +7,7 @@
 //
 
 #import "TTLBaseViewController.h"
-#import <AFNetworking/AFNetworking.h>
+#import <TapTalk/AFNetworking.h>
 
 @interface TTLBaseViewController ()
 

@@ -6,12 +6,13 @@
 //  Copyright © 2018 Moselo. All rights reserved.
 //
 
+#import "AFNetworkReachabilityManager.h"
 #import "TapTalk.h"
 #import "TAPProfileViewController.h"
 #import <CoreText/CoreText.h>
 #import <CoreLocation/CoreLocation.h>
 
-@import AFNetworking;
+//@import AFNetworking;
 @import GooglePlaces;
 @import GoogleMaps;
 
@@ -484,8 +485,7 @@
 - (void)initializeGooglePlacesAPIKey:(NSString * _Nonnull)apiKey {
     //Google API Key
     [GMSPlacesClient provideAPIKey:apiKey];
-    [GMSServices provideAPIKey:apiKey];
-    _isGooglePlacesAPIInitialize = YES;
+    _isGooglePlacesAPIInitialize = [GMSServices provideAPIKey:apiKey];
 }
 
 - (BOOL)obtainGooglePlacesAPIInitializeState {

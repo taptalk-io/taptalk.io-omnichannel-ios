@@ -16,6 +16,7 @@
 #import <TapTalk/TapUtil.h>
 #import <TapTalk/TAPMessageStatusManager.h>
 #import <TapTalk/TapUIChatViewController.h>
+#import <TapTalk/AFNetworkReachabilityManager.h>
 //#import <TapTalk/TapUIRoomListViewController.h>
 //#import <TapTalk/TAPRoomListView.h>
 
