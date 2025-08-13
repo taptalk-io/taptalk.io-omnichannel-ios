@@ -15,6 +15,7 @@
 #import <TapTalk/TAPUtil.h>
 #import <TapTalk/TAPNetworkManager.h>
 #import <TapTalk/TAPCoreChatRoomManager.h>
+#import <TapTalk/AFNetworkReachabilityManager.h>
 
 #import "TTLCaseListViewController.h"
 #import "TTLPopUpHandlerViewController.h"
@@ -549,6 +550,10 @@ Obtain main view controller of TapTalk Live
             
             //Add custom bubble cell
             [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3002 delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3005 delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3006 delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3007 delegate:self bundle:[TTLUtil currentBundle]];
             [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLReviewBubbleTableViewCell" type:3003 delegate:self bundle:[TTLUtil currentBundle]];
             [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLDoneReviewBubbleTableViewCell" type:3004 delegate:self bundle:[TTLUtil currentBundle]];
             
@@ -619,6 +624,8 @@ Obtain main view controller of TapTalk Live
  
     [TTLDataManager callAPICreateUserWithFullName:fullName email:email success:^(TTLUserModel * _Nonnull user, NSString * _Nonnull ticket) {
         // Get TapTalkLive access token
+        [self clearUserData];
+        [TTLDataManager setActiveUser:user];
         [self requestAccessTokenWithAuthTicket:ticket success:success failure:failure];
     } failure:^(NSError * _Nonnull error) {
         // Error create user

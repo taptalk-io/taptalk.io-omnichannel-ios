@@ -8,6 +8,7 @@
 
 #import "TAPBaseView.h"
 #import "TAPCustomButtonView.h"
+#import "TapHighlightCustomButtonView.h"
 
 typedef NS_ENUM(NSInteger, TAPSyncNotificationViewType) {
     TAPSyncNotificationViewTypeSyncing,
@@ -22,7 +23,7 @@ typedef NS_ENUM(NSInteger, TAPSyncNotificationViewType) {
 @property (strong, nonatomic) UIButton *searchBarCancelButton;
 @property (strong, nonatomic) TAPBaseTableView *contactsTableView;
 @property (strong, nonatomic) TAPBaseTableView *searchResultTableView;
-@property (strong, nonatomic) TAPCustomButtonView *syncButton;
+@property (strong, nonatomic) TapHighlightCustomButtonView *syncButton;
 
 - (void)showOverlayView:(BOOL)isVisible;
 - (void)showSyncContactButtonView:(BOOL)show;

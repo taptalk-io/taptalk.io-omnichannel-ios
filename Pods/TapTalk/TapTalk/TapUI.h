@@ -396,12 +396,12 @@ Use to set custom right bar button view for chat room navigation bar.
 /**
  Obtain current active navigation controller
  */
-- (UINavigationController *)getCurrentTapTalkActiveNavigationController;
+- (UINavigationController * _Nullable)getCurrentTapTalkActiveNavigationController;
 
 /**
  Obtain current active view controller
  */
-- (UIViewController *)getCurrentTapTalkActiveViewController;
+- (UIViewController * _Nullable)getCurrentTapTalkActiveViewController;
 
 //==========================================================
 //                    Custom Bubble Chat
@@ -937,6 +937,46 @@ Show or hide star message menu from message bubble long press & chat profile
 Get current status of star message menu from message bubble long press & chat profile
 */
 - (BOOL)isStarMessageMenuEnabled;
+
+/**
+Show or hide shared media menu in chat profile
+*/
+- (void)setSharedMediaMenuEnabled:(BOOL)isEnabled;
+
+/**
+Get current status of shared media  menu in chat profile
+*/
+- (BOOL)isSharedMediaMenuEnabled;
+
+/**
+Show or hide Medias tab in  shared media page
+*/
+- (void)setSharedMediaMediasTabVisible:(BOOL)isVisible;
+
+/**
+Get current visibility of Medias tab in shared media page
+*/
+- (BOOL)isSharedMediaMediasTabVisible;
+
+/**
+Show or hide Links tab in  shared media page
+*/
+- (void)setSharedMediaLinksTabVisible:(BOOL)isVisible;
+
+/**
+Get current visibility of Links tab in shared media page
+*/
+- (BOOL)isSharedMediaLinksTabVisible;
+
+/**
+Show or hide Documents tab in  shared media page
+*/
+- (void)setSharedMediaDocumentsTabVisible:(BOOL)isVisible;
+
+/**
+Get current visibility of Documents tab in shared media page
+*/
+- (BOOL)isSharedMediaDocumentsTabVisible;
 
 /**
 Show or hide voice note menu from message bubble long press & chat profile

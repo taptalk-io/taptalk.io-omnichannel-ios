@@ -7,6 +7,8 @@
 //
 
 #import "TTLNetworkManager.h"
+#import <TapTalk/AFNetworkReachabilityManager.h>
+#import <TapTalk/AFHTTPSessionManager.h>
 
 static const NSInteger kAPITimeOut = 60;
 

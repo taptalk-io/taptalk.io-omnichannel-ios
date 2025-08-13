@@ -1,0 +1,1 @@
+../../../TapTalk/TapTalk/Components/AFNetworking/Reachability/AFNetworkReachabilityManager.h

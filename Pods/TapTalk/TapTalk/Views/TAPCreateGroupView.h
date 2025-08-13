@@ -8,6 +8,7 @@
 
 #import "TAPBaseView.h"
 #import "TAPCustomButtonView.h"
+#import "TapHighlightCustomButtonView.h"
 
 typedef NS_ENUM(NSInteger, TAPCreateGroupViewType) {
     TAPCreateGroupViewTypeDefault = 0,
@@ -41,11 +42,11 @@ typedef NS_ENUM(NSInteger, TAPCreateGroupActionExtensionType) {
 @property (strong, nonatomic) UILabel *selectedContactsTitleLabel;
 @property (strong, nonatomic) UICollectionView *selectedContactsCollectionView;
 //@property (strong, nonatomic) UIButton *continueButton;
-@property (strong, nonatomic) TAPCustomButtonView *continueButtonView;
-@property (strong, nonatomic) TAPCustomButtonView *addMembersButtonView;
-@property (strong, nonatomic) TAPCustomButtonView *removeMembersButtonView;
-@property (strong, nonatomic) TAPCustomButtonView *promoteAdminButtonView;
-@property (strong, nonatomic) TAPCustomButtonView *demoteAdminButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *continueButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *addMembersButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *removeMembersButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *promoteAdminButtonView;
+@property (strong, nonatomic) TapHighlightCustomButtonView *demoteAdminButtonView;
 
 @property (strong, nonatomic) UIView *loadingBackgroundView;
 

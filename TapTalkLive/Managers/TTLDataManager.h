@@ -12,7 +12,6 @@
 #import "TTLTopicModel.h"
 #import "TTLChannelModel.h"
 #import "TTLFaqModel.h"
-@import AFNetworking;
 
 NS_ASSUME_NONNULL_BEGIN
 

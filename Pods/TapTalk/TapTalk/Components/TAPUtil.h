@@ -115,8 +115,8 @@
 + (CGRect)getStringConstrainedSizeWithString:(NSString *)string withFont:(UIFont *)font withConstrainedSize:(CGSize)size;
 
 #pragma mark - View
-- (void)addSpinAnimation:(UIView *)view;
-- (void)removeSpinAnimation:(UIView *)view;
++ (void)addSpinAnimation:(UIView *)view;
++ (void)removeSpinAnimation:(UIView *)view;
 
 #pragma mark - Device
 + (NSString *)hardwareModel;
@@ -125,6 +125,7 @@
 #pragma mark - Validation
 + (BOOL)isAlphabetCharactersOnlyFromText:(NSString *)text;
 + (BOOL)isEmptyString:(NSString *)string;
++ (BOOL)isEmptyArray:(NSArray *)array;
 + (BOOL)validatePhoneNumber:(NSString *)candidate;
 + (BOOL)validateAllNumber:(NSString *)candidate;
 + (BOOL)validateEmail:(NSString *)candidate;
@@ -152,7 +153,7 @@
 + (CGFloat)safeAreaTopPadding;
 + (CGFloat)topGapPresentingViewController;
 + (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay;
-+ (UIViewController *_Nullable) topViewController;
++ (UIViewController * _Nullable)topViewControllerWithRootViewController:(UIViewController *)rootViewController;
 + (NSDictionary *) objectToDictionary:(id)object;
 + (NSArray *)getUrlsFromString:(NSString *)text;
 + (void)getImageFromRemoteUrl:(NSString *)urlString  success:(void (^)(UIImage *image))success failure:(void (^)(NSError *error))failure;

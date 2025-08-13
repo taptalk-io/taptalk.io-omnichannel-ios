@@ -1,6 +1,0 @@
-framework module Pods_TapTalkLive {
-  umbrella header "Pods-TapTalkLive-umbrella.h"
-
-  export *
-  module * { export * }
-}

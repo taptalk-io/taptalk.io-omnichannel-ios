@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-@import AFNetworking;
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -7,8 +7,7 @@
 //
 
 #import "TAPConnectionManager.h"
-
-#import <AFNetworking/AFNetworking.h>
+#import "AFNetworking.h"
 
 #define kSocketAutomaticallyReconnect YES
 #define kSocketReconnectDelay 0.5f
@@ -78,7 +77,7 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_CONNECTED object:nil];
     
-    for (id delegate in self.delegatesArray) {
+    for (id delegate in [self.delegatesArray copy]) {
         if ([delegate respondsToSelector:@selector(connectionManagerDidConnected)]) {
             [delegate connectionManagerDidConnected];
         }
@@ -102,7 +101,7 @@
         NSString *eventName = [messageDictionary objectForKey:@"eventName"];
         NSDictionary *dataDictionary = [messageDictionary objectForKey:@"data"];
         
-        for (id delegate in self.delegatesArray) {
+        for (id delegate in [self.delegatesArray copy]) {
             if ([delegate respondsToSelector:@selector(connectionManagerDidReceiveNewEmit:parameter:)]) {
                 [delegate connectionManagerDidReceiveNewEmit:eventName parameter:messageDictionary];
             }
@@ -119,7 +118,7 @@
     
     _tapConnectionStatus = TAPConnectionManagerStatusTypeDisconnected;
     
-    for (id delegate in self.delegatesArray) {
+    for (id delegate in [self.delegatesArray copy]) {
         if ([delegate respondsToSelector:@selector(connectionManagerDidReceiveError:)]) {
             [delegate connectionManagerDidReceiveError:error];
         }
@@ -137,7 +136,7 @@
     
     _tapConnectionStatus = TAPConnectionManagerStatusTypeDisconnected;
     
-    for (id delegate in self.delegatesArray) {
+    for (id delegate in [self.delegatesArray copy]) {
         if ([delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
             if (reason == nil) {
                 reason = @"";
@@ -174,7 +173,7 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_CONNECTING object:nil];
     
-    for (id delegate in self.delegatesArray) {
+    for (id delegate in [self.delegatesArray copy]) {
         if ([delegate respondsToSelector:@selector(connectionManagerIsConnecting)]) {
             [delegate connectionManagerIsConnecting];
         }
@@ -222,7 +221,7 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_RECONNECTING object:nil];
     
-    for (id delegate in self.delegatesArray) {
+    for (id delegate in [self.delegatesArray copy]) {
         if ([delegate respondsToSelector:@selector(connectionManagerIsReconnecting)]) {
             [delegate connectionManagerIsReconnecting];
         }
@@ -266,7 +265,7 @@
     
     [[NSNotificationCenter defaultCenter] postNotificationName:TAP_NOTIFICATION_SOCKET_DISCONNECTED object:nil];
     
-    for (id delegate in self.delegatesArray) {
+    for (id delegate in [self.delegatesArray copy]) {
         if ([delegate respondsToSelector:@selector(connectionManagerDidDisconnectedWithCode:reason:cleanClose:)]) {
             [delegate connectionManagerDidDisconnectedWithCode:1 reason:@"User close connection" cleanClose:YES];
         }
