@@ -16,7 +16,7 @@
 #import <TapTalk/TapUtil.h>
 #import <TapTalk/TAPMessageStatusManager.h>
 #import <TapTalk/TapUIChatViewController.h>
-#import <TapTalk/AFNetworkReachabilityManager.h>
+#import <TapTalk/TapAFNetworkReachabilityManager.h>
 //#import <TapTalk/TapUIRoomListViewController.h>
 //#import <TapTalk/TAPRoomListView.h>
 
@@ -908,7 +908,7 @@
 }
 
 - (void)reachabilityStatusChange:(NSNotification *)notification {
-    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([TapAFNetworkReachabilityManager sharedManager].reachable) {
         if (self.isNeedRefreshOnNetworkDown) {
             //Reload new data from API
             _isShouldNotLoadFromAPI = NO;
@@ -970,6 +970,10 @@
 }
 
 - (void)showCreateCaseFormView {
+    if (![TTLUtil isEmptyString:[TTLDataManager getCreateNewCaseBlockingMessage]]) {
+        [self showSnackBar:TTLSnackBarTypeWarning message:[TTLDataManager getCreateNewCaseBlockingMessage] iconName:@"TTLIconWarningTriangle"];
+        return;
+    }
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
     createCaseViewController.previousNavigationController = self.navigationController;
     [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeDefault];

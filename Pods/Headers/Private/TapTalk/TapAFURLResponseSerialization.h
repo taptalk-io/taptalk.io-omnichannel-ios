@@ -1,0 +1,1 @@
+../../../TapTalk/TapTalk/Components/TapAFNetworking/Serialization/TapAFURLResponseSerialization.h

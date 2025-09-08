@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)setRefreshToken:(NSString *)refreshToken expiryDate:(NSTimeInterval)expiryDate;
 + (NSString *)getRefreshToken;
 + (void)setTopicList:(NSArray<TTLTopicModel *> *)topics;
++ (NSString *)getCreateNewCaseBlockingMessage;
 + (NSMutableArray<TTLTopicModel *> *)getTopicList;
 + (TTLCaseModel *)caseDataModelFromDictionary:(NSDictionary *)dictionary;
 + (NSDictionary *)dictionaryFromCaseDataModel:(TTLCaseModel *)caseData;

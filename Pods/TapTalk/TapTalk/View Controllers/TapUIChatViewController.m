@@ -8,7 +8,7 @@
 
 #import "TapUIChatViewController.h"
 
-#import "AFNetworking.h"
+#import "TapAFNetworking.h"
 #import <Photos/Photos.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
@@ -4407,7 +4407,7 @@ CGPoint center;
 }
 
 - (void)myImageRetryDidTappedWithMessage:(TAPMessageModel *)message {
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         return;
     }
     
@@ -4719,7 +4719,7 @@ CGPoint center;
 }
 
 - (void)myVoiceNoteRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         return;
     }
     
@@ -4928,7 +4928,7 @@ CGPoint center;
 }
 
 - (void)myFileRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         return;
     }
     
@@ -5296,7 +5296,7 @@ CGPoint center;
 }
 
 - (void)myVideoRetryUploadDownloadButtonDidTapped:(TAPMessageModel *)tappedMessage {
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         return;
     }
     
@@ -11367,21 +11367,23 @@ CGPoint center;
 //                           [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
 //                       } completion:^(BOOL finished) {
 //                       }];
-                       @try {
-                           [self.tableView performBatchUpdates:^{
-                               //changing beginUpdates and endUpdates with this because of deprecation
-                               NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-                               [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
-                           } completion:^(BOOL finished) {
-                           }];
-                       }
-                       @catch (NSException *exception) {
-                           NSLog(@"%@", exception.reason);
-                           [self.tableView reloadData];
-                       }
-                       @finally {
-                           
-                       }
+                       // FIXME: CRASH
+//                       @try {
+//                           [self.tableView performBatchUpdates:^{
+//                               //changing beginUpdates and endUpdates with this because of deprecation
+//                               NSIndexPath *insertAtIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+//                               [self.tableView insertRowsAtIndexPaths:@[insertAtIndexPath] withRowAnimation:UITableViewRowAnimationTop];
+//                           } completion:^(BOOL finished) {
+//                           }];
+//                       }
+//                       @catch (NSException *exception) {
+//                           NSLog(@"%@", exception.reason);
+//                           [self.tableView reloadData];
+//                       }
+//                       @finally {
+//                           
+//                       }
+                       [self.tableView reloadData];
                    }
                }
            }
@@ -12906,7 +12908,7 @@ CGPoint center;
 }
 
 - (void)reachabilityStatusChange:(NSNotification *)notification {
-    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([TapAFNetworkReachabilityManager sharedManager].reachable) {
         if (self.isNeedRefreshOnNetworkDown) {
             //Update data from API when network down and reconnect
             [self callAPIAfterAndUpdateUIAndScrollToTop:NO];

@@ -279,6 +279,10 @@
 }
 
 - (void)openNewMessageForm {
+    if (![TTLUtil isEmptyString:[TTLDataManager getCreateNewCaseBlockingMessage]]) {
+        [self showSnackBar:TTLSnackBarTypeWarning message:[TTLDataManager getCreateNewCaseBlockingMessage] iconName:@"TTLIconWarningTriangle"];
+        return;
+    }
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
     createCaseViewController.previousNavigationController = self.navigationController;
     [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeDefault];

@@ -7,7 +7,7 @@
 //
 
 #import "TTLBaseViewController.h"
-#import <TapTalk/AFNetworking.h>
+#import <TapTalk/TapAFNetworking.h>
 
 @interface TTLBaseViewController ()
 
@@ -318,6 +318,9 @@
     UIImageView *iconImageView = nil;
     if (![TTLUtil isEmptyString:iconName]) {
         iconImage = [UIImage imageNamed:iconName];
+        if (iconImage == nil) {
+            iconImage = [UIImage imageNamed:iconName inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
     }
     if (iconImage != nil) {
         iconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 12.0f, 24.0f, 24.0f)];
@@ -348,6 +351,16 @@
         if (iconImageView != nil && iconImageView.image != nil) {
             TTLImage *image = iconImageView.image;
             iconImageView.image = [image setImageTintColor:[TTLUtil getColor:TTL_COLOR_ERROR]];
+        }
+    }
+    if (type == TTLSnackBarTypeWarning) {
+        snackBarView.backgroundColor = [TTLUtil getColor:@"FFF4B1"];
+        snackBarView.layer.borderColor = [TTLUtil getColor:TTL_COLOR_PRIMARY].CGColor;
+        snackBarView.layer.borderWidth = 1.0f;
+        label.textColor = [TTLUtil getColor:TTL_COLOR_PRIMARY];
+        if (iconImageView != nil && iconImageView.image != nil) {
+            TTLImage *image = iconImageView.image;
+            iconImageView.image = [image setImageTintColor:[TTLUtil getColor:TTL_COLOR_PRIMARY]];
         }
     }
     else {

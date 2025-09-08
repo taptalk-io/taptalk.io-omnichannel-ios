@@ -152,6 +152,17 @@
     return topicsArray;
 }
 
++ (NSString *)getCreateNewCaseBlockingMessage {
+//    NSNumber *maxOpenCases = [TTLUtil nullToEmptyNumber:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_MAX_OPEN_CASES valid:nil]];
+//    NSNumber *caseListCount = [TTLUtil nullToEmptyNumber:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_OPEN_CASE_LIST_COUNT valid:nil]];
+//    
+//    BOOL isLimitAllowed = maxOpenCases.longValue == 0 || maxOpenCases.longValue > caseListCount.longValue;
+//    if (!isLimitAllowed) {
+//        return [NSString stringWithFormat:@"You can only have maximum %ld open cases at the same time", maxOpenCases.longValue];
+//    }
+    return @"";
+}
+
 + (TTLCaseModel *)caseDataModelFromDictionary:(NSDictionary *)dictionary {
     NSDictionary *caseDictionary = [TTLUtil nullToEmptyDictionary:dictionary];
     
@@ -1012,11 +1023,18 @@
         NSString *tapTalkAppKeySecret = [tapTalkConfigsDictionary objectForKey:@"appKeySecret"];
         tapTalkAppKeySecret = [TTLUtil nullToEmptyString:tapTalkAppKeySecret];
         
+        NSDictionary *launcherConfigsDictionary = [dataDictionary objectForKey:@"launcherConfigs"];
+        launcherConfigsDictionary = [TTLUtil nullToEmptyDictionary:launcherConfigsDictionary];
+        
+        NSNumber *maxOpenCases = [launcherConfigsDictionary objectForKey:@"maxOpenCases"];
+        maxOpenCases = [TTLUtil nullToEmptyNumber:maxOpenCases];
+        
         NSArray *channelList = [dataDictionary objectForKey:@"channelLinks"];
         
         [[NSUserDefaults standardUserDefaults] setSecureObject:tapTalkAPIURLString forKey:TTL_PREFS_TAPTALK_API_URL];
         [[NSUserDefaults standardUserDefaults] setSecureObject:tapTalkAppKeyID forKey:TTL_PREFS_TAPTALK_APP_KEY_ID];
         [[NSUserDefaults standardUserDefaults] setSecureObject:tapTalkAppKeySecret forKey:TTL_PREFS_TAPTALK_APP_KEY_SECRET];
+        [[NSUserDefaults standardUserDefaults] setSecureObject:maxOpenCases forKey:TTL_PREFS_MAX_OPEN_CASES];
         [[NSUserDefaults standardUserDefaults] setSecureObject:channelList forKey:TTL_PREFS_CHANNEL_LIST];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
@@ -1262,6 +1280,7 @@
             NSMutableArray *caseListResultArray = [[NSMutableArray alloc] init];
             NSMutableArray *messageArray = [[NSMutableArray alloc] init];
             
+            NSInteger openCaseCount = 0;
             BOOL isContainCaseList = NO;
             
             for (NSDictionary *caseDictionary in caseListArray) {
@@ -1399,6 +1418,10 @@
                     [messageArray addObject:lastMessage];
                 }
                 
+                if (!caseData.isClosed) {
+                    openCaseCount++;
+                }
+                
                 isContainCaseList = YES;
                 [TapTalkLive.sharedInstance.caseDictionary setObject:caseData forKey:tapTalkXCRoomID];
             }
@@ -1414,6 +1437,7 @@
                 }];
             }
             
+            [[NSUserDefaults standardUserDefaults] setSecureObject:@(openCaseCount) forKey:TTL_PREFS_OPEN_CASE_LIST_COUNT];
             [[NSUserDefaults standardUserDefaults] setSecureBool:isContainCaseList forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
             [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
             [[NSUserDefaults standardUserDefaults] synchronize];
