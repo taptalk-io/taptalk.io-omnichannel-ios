@@ -12,7 +12,6 @@
 
 #import "Configs.h"
 #import "TAPStyle.h"
-#import "AFNetworkActivityIndicatorManager.h"
 #import "NSBundle+Language.h"
 #import "NSUserDefaults+MPSecureUserDefaults.h"
 #import "PodAsset.h"
@@ -50,3 +49,8 @@
 #import "TAPBaseTableView.h"
 #import "TAPScheduledMessageModel.h"
 #import "TapHighlightCustomButtonView.h"
+#import "TapAFNetworking.h"
+#import "TapAFHTTPSessionManager.h"
+#import "TapAFURLSessionManager.h"
+#import "TapAFNetworkReachabilityManager.h"
+#import "TapAFNetworkActivityIndicatorManager.h"

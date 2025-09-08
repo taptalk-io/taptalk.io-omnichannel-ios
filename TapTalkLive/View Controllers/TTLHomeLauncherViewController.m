@@ -412,6 +412,7 @@
 
 - (void)chatManagerDidReceiveNewMessageOnOtherRoom:(TAPMessageModel *)message {
     [self updateLatestCaseCellView:message];
+    [self checkCaseClosedMessage:message];
 }
 
 - (void)chatManagerDidReceiveUpdateMessageOnOtherRoom:(TAPMessageModel *)message {
@@ -420,6 +421,7 @@
 
 - (void)chatManagerDidReceiveNewMessageInActiveRoom:(TAPMessageModel *)message {
     [self updateLatestCaseCellView:message];
+    [self checkCaseClosedMessage:message];
 }
 
 - (void)chatManagerDidReceiveUpdateMessageInActiveRoom:(TAPMessageModel *)message {
@@ -445,7 +447,10 @@
 }
 
 - (void)openNewMessageForm {
-    
+    if (![TTLUtil isEmptyString:[TTLDataManager getCreateNewCaseBlockingMessage]]) {
+        [self showSnackBar:TTLSnackBarTypeWarning message:[TTLDataManager getCreateNewCaseBlockingMessage] iconName:@"TTLIconWarningTriangle"];
+        return;
+    }
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
     createCaseViewController.previousNavigationController = self.navigationController;
     [createCaseViewController setCreateCaseViewControllerType:TTLCreateCaseViewControllerTypeDefault];
@@ -512,6 +517,17 @@
             [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
         }
     });
+}
+
+- (void)checkCaseClosedMessage:(TAPMessageModel *)message {
+    if (message.type == MESSAGE_TYPE_CLOSE_CASE || message.type == MESSAGE_TYPE_REOPEN_CASE || message.type == MESSAGE_TYPE_CASE_CREATED) {
+        // Refresh case list count
+        [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
+            
+        } failure:^(NSError * _Nonnull error) {
+            
+        }];
+    }
 }
 
 @end

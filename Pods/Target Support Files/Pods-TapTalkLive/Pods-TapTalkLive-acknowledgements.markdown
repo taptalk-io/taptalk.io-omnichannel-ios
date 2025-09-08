@@ -3,11 +3,11 @@ This application makes use of the following third party libraries:
 
 ## GoogleMaps
 
-Copyright 2025 Google LLC
+Copyright 2021 Google
 
 ## GooglePlaces
 
-Copyright 2025 Google LLC
+Copyright 2021 Google
 
 ## JSONModel
 

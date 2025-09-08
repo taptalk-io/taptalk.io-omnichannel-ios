@@ -1,1 +1,0 @@
-../../../TapTalk/TapTalk/Components/AFNetworking/UIKit/AFNetworkActivityIndicatorManager.h

@@ -7,8 +7,8 @@
 //
 
 #import "TTLNetworkManager.h"
-#import <TapTalk/AFNetworkReachabilityManager.h>
-#import <TapTalk/AFHTTPSessionManager.h>
+#import <TapTalk/TapAFNetworkReachabilityManager.h>
+#import <TapTalk/TapAFHTTPSessionManager.h>
 
 static const NSInteger kAPITimeOut = 60;
 
@@ -17,7 +17,7 @@ static const NSInteger kAPITimeOut = 60;
 @property (strong, nonatomic) NSString *secretKey;
 @property (strong, nonatomic) NSMutableDictionary *currentDownloadTaskDictionary;
 
-- (AFHTTPSessionManager *)defaultManager;
+- (TapAFHTTPSessionManager *)defaultManager;
 - (NSString *)urlEncodeForString:(NSString *)stringToEncode;
 
 @end
@@ -38,8 +38,8 @@ static const NSInteger kAPITimeOut = 60;
     self = [super init];
     
     if (self) {
-        [[AFNetworkReachabilityManager sharedManager] startMonitoring];
-        [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        [[TapAFNetworkReachabilityManager sharedManager] startMonitoring];
+        [[TapAFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
             NSDictionary *statusDictionary = @{@"AFNetworkReachabilityNotificationStatusItem" : [NSNumber numberWithInteger:status]};
             [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_REACHABILITY_STATUS_CHANGED object:statusDictionary userInfo:statusDictionary];
             
@@ -65,11 +65,11 @@ static const NSInteger kAPITimeOut = 60;
 }
 
 #pragma mark - Custom Method
-- (AFHTTPSessionManager *)defaultManager {
+- (TapAFHTTPSessionManager *)defaultManager {
     NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    manager.requestSerializer = [AFJSONRequestSerializer serializer];
+    TapAFHTTPSessionManager *manager = [TapAFHTTPSessionManager manager];
+    manager.responseSerializer = [TapAFJSONResponseSerializer serializer];
+    manager.requestSerializer = [TapAFJSONRequestSerializer serializer];
     [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [manager.requestSerializer setValue:self.secretKey forHTTPHeaderField:@"Secret-Key"];
     [manager.requestSerializer setValue:bundleIdentifier forHTTPHeaderField:@"App-Identifier"];
@@ -95,7 +95,7 @@ static const NSInteger kAPITimeOut = 60;
     NSLog(@"App-Version: %@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]);
 #endif
     
-    AFSecurityPolicy *securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
+    TapAFSecurityPolicy *securityPolicy = [TapAFSecurityPolicy policyWithPinningMode:AFSSLPinningModeCertificate];
     [securityPolicy setAllowInvalidCertificates:YES];
     
     return manager;
@@ -118,7 +118,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
     
@@ -165,7 +165,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -207,7 +207,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
     }
@@ -238,7 +238,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
     }
@@ -331,7 +331,7 @@ static const NSInteger kAPITimeOut = 60;
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -341,7 +341,7 @@ static const NSInteger kAPITimeOut = 60;
         failure (nil, error);
     }
     
-    AFHTTPSessionManager *manager = [[TTLNetworkManager sharedManager] defaultManager];
+    TapAFHTTPSessionManager *manager = [[TTLNetworkManager sharedManager] defaultManager];
     NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", authTicket];
     [manager.requestSerializer setValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     
@@ -373,7 +373,7 @@ refreshToken:(NSString *)refreshToken
         parameters = [NSDictionary dictionary];
     }
     
-    if ([[AFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
+    if ([[TapAFNetworkReachabilityManager sharedManager] networkReachabilityStatus] == AFNetworkReachabilityStatusNotReachable) {
         //No internet connection notification
         [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_MANAGER_NO_CONNECTION_NOTIFICATION_KEY object:nil];
         
@@ -383,7 +383,7 @@ refreshToken:(NSString *)refreshToken
         failure (nil, error);
     }
     
-    AFHTTPSessionManager *manager = [[TTLNetworkManager sharedManager] defaultManager];
+    TapAFHTTPSessionManager *manager = [[TTLNetworkManager sharedManager] defaultManager];
     NSString *authorizationValueString = [NSString stringWithFormat:@"Bearer %@", refreshToken];
     [manager.requestSerializer setValue:authorizationValueString forHTTPHeaderField:@"Authorization"];
     

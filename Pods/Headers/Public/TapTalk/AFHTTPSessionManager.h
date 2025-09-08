@@ -1,1 +1,0 @@
-../../../TapTalk/TapTalk/Components/AFNetworking/NSURLSession/AFHTTPSessionManager.h

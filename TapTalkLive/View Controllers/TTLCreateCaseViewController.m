@@ -420,6 +420,13 @@
                 }];
             } afterDelay:1.0f];
         }];
+        
+        // Refresh case list count
+        [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
+            
+        } failure:^(NSError * _Nonnull error) {
+            
+        }];
     } failure:^(NSError * _Nonnull error) {
         if (error.code == 401 || [TTLDataManager getActiveUser] == nil) {
             // Token expired, re-authenticate

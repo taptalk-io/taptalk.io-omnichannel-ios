@@ -15,7 +15,7 @@
 #import <TapTalk/TAPUtil.h>
 #import <TapTalk/TAPNetworkManager.h>
 #import <TapTalk/TAPCoreChatRoomManager.h>
-#import <TapTalk/AFNetworkReachabilityManager.h>
+#import <TapTalk/TapAFNetworkReachabilityManager.h>
 
 #import "TTLCaseListViewController.h"
 #import "TTLPopUpHandlerViewController.h"
@@ -177,6 +177,7 @@ Called to show TapTalk Live view with present animation
     if ([self roomListViewController].isViewAppear) {
         return;
     }
+    
    // [self roomListViewController].navigationType = TTLCaseListViewControllerNavigationTypePresent;
     UINavigationController *caseListNavigationController = [[UINavigationController alloc] initWithRootViewController:[self roomListViewController]];
     caseListNavigationController.modalPresentationStyle = UIModalPresentationOverFullScreen;
@@ -317,7 +318,7 @@ Obtain main view controller of TapTalk Live
     if (caseModel == nil) {
         return;
     }
-    if ([AFNetworkReachabilityManager sharedManager].reachable) {
+    if ([TapAFNetworkReachabilityManager sharedManager].reachable) {
         [TTLDataManager callAPISendMessageWithCaseID:caseModel.caseID
                                      caseCreatedTime:caseModel.createdTime
                                              message:message
@@ -345,6 +346,10 @@ Obtain main view controller of TapTalk Live
 
 - (void)tapTalkNewChatButtonTapped:(UIViewController *)currentViewController
   currentShownNavigationController:(UINavigationController *)currentNavigationController {
+    
+    if (![TTLUtil isEmptyString:[TTLDataManager getCreateNewCaseBlockingMessage]]) {
+        return;
+    }
     
     TTLCreateCaseViewController *createCaseViewController = [[TTLCreateCaseViewController alloc] init];
     createCaseViewController.previousNavigationController = currentNavigationController;
@@ -549,13 +554,13 @@ Obtain main view controller of TapTalk Live
             [[TapUI sharedInstance] setLinkPreviewInMessageEnabled:NO];
             
             //Add custom bubble cell
-            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3001 delegate:self bundle:[TTLUtil currentBundle]];
-            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3002 delegate:self bundle:[TTLUtil currentBundle]];
-            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3005 delegate:self bundle:[TTLUtil currentBundle]];
-            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3006 delegate:self bundle:[TTLUtil currentBundle]];
-            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:3007 delegate:self bundle:[TTLUtil currentBundle]];
-            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLReviewBubbleTableViewCell" type:3003 delegate:self bundle:[TTLUtil currentBundle]];
-            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLDoneReviewBubbleTableViewCell" type:3004 delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:MESSAGE_TYPE_CLOSE_CASE delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:MESSAGE_TYPE_REOPEN_CASE delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:MESSAGE_TYPE_CASE_CREATED delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:MESSAGE_TYPE_AGENT_CHANGED delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLCaseCloseBubbleTableViewCell" type:MESSAGE_TYPE_CASE_DETAILS_UPDATED delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLReviewBubbleTableViewCell" type:MESSAGE_TYPE_REVIEW delegate:self bundle:[TTLUtil currentBundle]];
+            [[TapUI sharedInstance] addCustomBubbleWithClassName:@"TTLDoneReviewBubbleTableViewCell" type:MESSAGE_TYPE_REVIEW_SUBMITTED delegate:self bundle:[TTLUtil currentBundle]];
             
             //Set delegate for Room List TapTalk
             [[TapUI sharedInstance] setRoomListDelegate:self];
@@ -697,10 +702,11 @@ Obtain main view controller of TapTalk Live
 - (void)clearUserData {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACTIVE_USER];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACCESS_TOKEN];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACCESS_TOKEN_EXPIRED_TIME];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_REFRESH_TOKEN];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_REFRESH_TOKEN_EXPIRED_TIME];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_ACCESS_TOKEN_EXPIRED_TIME];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_OPEN_CASE_LIST_COUNT];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TAP_PREFS_IS_DONE_FIRST_SETUP];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -714,10 +720,11 @@ Obtain main view controller of TapTalk Live
 - (void)clearAllTapLiveData {
     // Remove all preference
     [self clearUserData];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_CHANNEL_LIST];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_API_URL];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_ID];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_TAPTALK_APP_KEY_SECRET];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_MAX_OPEN_CASES];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TTL_PREFS_CHANNEL_LIST];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
