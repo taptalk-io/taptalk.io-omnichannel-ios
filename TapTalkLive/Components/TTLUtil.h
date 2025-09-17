@@ -147,6 +147,9 @@
 + (void)performBlock:(void (^)(void))block afterDelay:(NSTimeInterval)delay;
 + (void)openUrl:(NSURL *)url fromNavigationController:(UINavigationController *)navigationController;
 + (void)openUrl:(NSURL *)url fromNavigationController:(UINavigationController *)navigationController options:(NSDictionary *)options;
++ (NSString *)getDefaultMessageFromError:(NSError *)error;
++ (void)showErrorSnackBar:(NSError *)error fromViewController:(TTLBaseViewController *)viewController;
++ (void)showErrorSnackBarWithMessage:(NSString *)errorMessage fromViewController:(TTLBaseViewController *)viewController;
 
 #pragma mark - TapTalk
 + (NSBundle *)currentBundle;

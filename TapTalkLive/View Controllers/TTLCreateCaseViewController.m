@@ -376,50 +376,64 @@
         [[NSUserDefaults standardUserDefaults] setSecureBool:YES forKey:TTL_PREFS_IS_CONTAIN_CASE_LIST];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
-        [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
+        if (![TTLUtil isEmptyString:caseData.tapTalkXCRoomID]) {
+            [[TAPCoreChatRoomManager sharedManager] getChatRoomByXCRoomID:caseData.tapTalkXCRoomID success:^(TAPRoomModel * _Nonnull room) {
 //            self.createCaseView.closeButton.userInteractionEnabled = YES;
 //            self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
-            
-            if ([self.delegate respondsToSelector:@selector(createCaseViewControllercreateCaseSucceed)]) {
-                [self.delegate createCaseViewControllercreateCaseSucceed];
-            }
-            
-            [TTLUtil performBlock:^{
-                [self.createCaseView showCreateCaseButtonAsLoading:NO];
-                [[TapTalkLive sharedInstance] roomListViewController].isShouldNotLoadFromAPI = NO;
-                [[[TapTalkLive sharedInstance] roomListViewController] viewLoadedSequence];
-
-                [self.navigationController dismissViewControllerAnimated:NO completion:^{
-                    [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
-                        chatViewController.delegate = [[TapTalkLive sharedInstance] roomListViewController];
-                        if ([TapTalk sharedInstance].isConnected) {
-                            [self.previousNavigationController pushViewController:chatViewController animated:YES];
-                        }
-                        else {
-                            [[TapTalk sharedInstance] connectWithSuccess:^{
+                
+                if ([self.delegate respondsToSelector:@selector(createCaseViewControllercreateCaseSucceed)]) {
+                    [self.delegate createCaseViewControllercreateCaseSucceed];
+                }
+                
+                [TTLUtil performBlock:^{
+                    [self.createCaseView showCreateCaseButtonAsLoading:NO];
+                    [[TapTalkLive sharedInstance] roomListViewController].isShouldNotLoadFromAPI = NO;
+                    [[[TapTalkLive sharedInstance] roomListViewController] viewLoadedSequence];
+                    
+                    [self.navigationController dismissViewControllerAnimated:NO completion:^{
+                        [[TapUI sharedInstance] createRoomWithRoom:room success:^(TapUIChatViewController * _Nonnull chatViewController) {
+                            chatViewController.delegate = [[TapTalkLive sharedInstance] roomListViewController];
+                            if ([TapTalk sharedInstance].isConnected) {
                                 [self.previousNavigationController pushViewController:chatViewController animated:YES];
                             }
-                            failure:^(NSError * _Nonnull error) {
-                                [self.previousNavigationController pushViewController:chatViewController animated:YES];
-                            }];
-                        }
-                        
-                       // [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_CREATE_CASE_SUCCEED object:nil];
+                            else {
+                                [[TapTalk sharedInstance] connectWithSuccess:^{
+                                    [self.previousNavigationController pushViewController:chatViewController animated:YES];
+                                }
+                                 failure:^(NSError * _Nonnull error) {
+                                    [self.previousNavigationController pushViewController:chatViewController animated:YES];
+                                }];
+                            }
+                            
+// [[NSNotificationCenter defaultCenter] postNotificationName:TTL_NOTIFICATION_CREATE_CASE_SUCCEED object:nil];
+                        }];
                     }];
-                }];
-            } afterDelay:1.0f];
-            
-        } failure:^(NSError * _Nonnull error) {
-            //Error get chat room from TapTalk
+                } afterDelay:1.0f];
+            }
+            failure:^(NSError * _Nonnull error) {
+                // Error get chat room from TapTalk
+                self.createCaseView.closeButton.userInteractionEnabled = YES;
+                self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
+                [self.createCaseView showCreateCaseButtonAsLoading:NO];
+                [TTLUtil showErrorSnackBarWithMessage:NSLocalizedString(@"Case successfully created, but there was an error while fetching chat room data, please reopen the live chat if it does not show up", @"") fromViewController:self];
+                
+                [TTLUtil performBlock:^{
+                    [self.navigationController dismissViewControllerAnimated:NO completion:^{
+                    }];
+                } afterDelay:1.0f];
+            }];
+        }
+        else {
             self.createCaseView.closeButton.userInteractionEnabled = YES;
             self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
             [self.createCaseView showCreateCaseButtonAsLoading:NO];
+            [TTLUtil showErrorSnackBarWithMessage:NSLocalizedString(@"Case successfully created, but there was an error while fetching chat room data, please reopen the live chat if it does not show up", @"") fromViewController:self];
             
             [TTLUtil performBlock:^{
                 [self.navigationController dismissViewControllerAnimated:NO completion:^{
                 }];
             } afterDelay:1.0f];
-        }];
+        }
         
         // Refresh case list count
         [TTLDataManager callAPIGetCaseListSuccess:^(NSArray<TTLCaseModel *> * _Nonnull caseListArray) {
@@ -427,7 +441,8 @@
         } failure:^(NSError * _Nonnull error) {
             
         }];
-    } failure:^(NSError * _Nonnull error) {
+    }
+    failure:^(NSError * _Nonnull error) {
         if (error.code == 401 || [TTLDataManager getActiveUser] == nil) {
             // Token expired, re-authenticate
             [self handleSubmitCaseFormFlow];
@@ -436,6 +451,7 @@
         self.createCaseView.closeButton.userInteractionEnabled = YES;
         self.createCaseView.topicDropDownView.containerButton.userInteractionEnabled = YES;
         [self.createCaseView showCreateCaseButtonAsLoading:NO];
+        [TTLUtil showErrorSnackBar:error fromViewController:self];
     }];
 }
 

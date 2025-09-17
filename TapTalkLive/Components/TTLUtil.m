@@ -9,6 +9,7 @@
 #import "TTLUtil.h"
 #import <TapTalk/TAPUtil.h>
 #import <TapTalk/TAPWebViewViewController.h>
+#import <TapTalk/TapAFNetworkReachabilityManager.h>
 
 @implementation TTLUtil
 
@@ -1125,7 +1126,37 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         [[UIApplication sharedApplication] openURL:url];
     }
 }
+
++ (NSString *)getDefaultMessageFromError:(NSError *)error {
+    NSString *errorMessage;
+    if (error != nil) {
+        errorMessage = [error.userInfo objectForKey:@"message"];
+    }
+    if (error != nil && [TTLUtil isEmptyString:errorMessage]) {
+        errorMessage = error.localizedDescription;
+    }
+    if ([TTLUtil isEmptyString:errorMessage]) {
+        errorMessage = NSLocalizedString(@"Something went wrong, please try again.", @"");
+    }
+    return errorMessage;
+}
+
++ (void)showErrorSnackBar:(NSError *)error fromViewController:(TTLBaseViewController *)viewController {
+    NSString *errorMessage = [TTLUtil getDefaultMessageFromError:error];
+    [TTLUtil showErrorSnackBarWithMessage:errorMessage fromViewController:viewController];
+}
+
++ (void)showErrorSnackBarWithMessage:(NSString *)errorMessage fromViewController:(TTLBaseViewController *)viewController {
+    if ([TapAFNetworkReachabilityManager sharedManager].reachable) {
+        [viewController showSnackBar:TTLSnackBarTypeError message:errorMessage iconName:@"TAPIconRedAlertCircle"];
+    }
+    else {
+        [viewController showSnackBar:TTLSnackBarTypeError message:NSLocalizedString(@"It seems that your device is offline. Please check your connection and try again.", @"") iconName:@"TAPIconConnectionLost"];
+    }
+}
+
 #pragma mark - TapTalk
+
 + (NSBundle *)currentBundle {
     NSBundle *resourceBundle = [PodAsset bundleForPod:@"TapTalkLive"];
     
