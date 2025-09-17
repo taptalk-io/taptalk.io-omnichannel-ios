@@ -8,11 +8,13 @@
 
 #import "TTLBaseViewController.h"
 #import <TapTalk/TapAFNetworking.h>
+#import <TapTalk/TAPUtil.h>
 
 @interface TTLBaseViewController ()
 
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 @property (strong, nonatomic) UIView *footerView;
+@property (strong, nonatomic) UIView *snackBarView;
 @property (nonatomic) CGFloat navigationBarShadowOpacity;
 @property (nonatomic) CGFloat currentKeyboardHeight;
 
@@ -305,19 +307,25 @@
 }
 
 - (void)showSnackBar:(TTLSnackBarType)type message:(NSString *_Nonnull)message iconName:(NSString *_Nullable)iconName showDuration:(CGFloat)showDuration animationDuration:(CGFloat)animationDuration {
-    UIView *snackBarView = [[UIView alloc] initWithFrame:CGRectMake(
+    if (self.snackBarView) {
+        [self.snackBarView removeFromSuperview];
+    }
+    _snackBarView = [[UIView alloc] initWithFrame:CGRectMake(
         16.0f,
         CGRectGetHeight(self.view.frame) - 80.0f - [TTLUtil safeAreaBottomPadding] - self.currentKeyboardHeight,
         CGRectGetWidth(self.view.frame) - 32.0f,
         48.0f
     )];
-    snackBarView.clipsToBounds = YES;
-    snackBarView.alpha = 0.0f;
+    self.snackBarView.clipsToBounds = YES;
+    self.snackBarView.alpha = 0.0f;
     
     UIImage *iconImage = nil;
     UIImageView *iconImageView = nil;
     if (![TTLUtil isEmptyString:iconName]) {
         iconImage = [UIImage imageNamed:iconName];
+        if (iconImage == nil) {
+            iconImage = [UIImage imageNamed:iconName inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
+        }
         if (iconImage == nil) {
             iconImage = [UIImage imageNamed:iconName inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         }
@@ -325,7 +333,7 @@
     if (iconImage != nil) {
         iconImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 12.0f, 24.0f, 24.0f)];
         iconImageView.image = iconImage;
-        [snackBarView addSubview:iconImageView];
+        [self.snackBarView addSubview:iconImageView];
     }
     
     CGFloat labelX = 0.0f;
@@ -335,41 +343,38 @@
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(
         16.0f + labelX,
         12.0f,
-        CGRectGetWidth(snackBarView.frame) - 32.0f - labelX,
+        CGRectGetWidth(self.snackBarView.frame) - 32.0f - labelX,
         24.0f
     )];
     label.font = [UIFont fontWithName:TTL_FONT_FAMILY_BOLD size:16.0f];
     label.text = message;
     label.numberOfLines = 0;
-    [snackBarView addSubview:label];
+    [self.snackBarView addSubview:label];
     
     if (type == TTLSnackBarTypeError) {
-        snackBarView.backgroundColor = [TTLUtil getColor:@"FFECEE"];
-        snackBarView.layer.borderColor = [TTLUtil getColor:TTL_COLOR_ERROR].CGColor;
-        snackBarView.layer.borderWidth = 1.0f;
+        self.snackBarView.backgroundColor = [TTLUtil getColor:@"FFECEE"];
+        self.snackBarView.layer.borderColor = [TTLUtil getColor:TTL_COLOR_ERROR].CGColor;
+        self.snackBarView.layer.borderWidth = 1.0f;
         label.textColor = [TTLUtil getColor:TTL_COLOR_ERROR];
         if (iconImageView != nil && iconImageView.image != nil) {
-            TTLImage *image = iconImageView.image;
-            iconImageView.image = [image setImageTintColor:[TTLUtil getColor:TTL_COLOR_ERROR]];
+            iconImageView.image = [(TTLImage *) iconImageView.image setImageTintColor:[TTLUtil getColor:TTL_COLOR_ERROR]];
         }
     }
-    if (type == TTLSnackBarTypeWarning) {
-        snackBarView.backgroundColor = [TTLUtil getColor:@"FFF4B1"];
-        snackBarView.layer.borderColor = [TTLUtil getColor:TTL_COLOR_PRIMARY].CGColor;
-        snackBarView.layer.borderWidth = 1.0f;
+    else if (type == TTLSnackBarTypeWarning) {
+        self.snackBarView.backgroundColor = [TTLUtil getColor:@"FFF4B1"];
+        self.snackBarView.layer.borderColor = [TTLUtil getColor:TTL_COLOR_PRIMARY].CGColor;
+        self.snackBarView.layer.borderWidth = 1.0f;
         label.textColor = [TTLUtil getColor:TTL_COLOR_PRIMARY];
         if (iconImageView != nil && iconImageView.image != nil) {
-            TTLImage *image = iconImageView.image;
-            iconImageView.image = [image setImageTintColor:[TTLUtil getColor:TTL_COLOR_PRIMARY]];
+            iconImageView.image = [(TTLImage *) iconImageView.image setImageTintColor:[TTLUtil getColor:TTL_COLOR_PRIMARY]];
         }
     }
     else {
-        snackBarView.backgroundColor = [TTLUtil getColor:TTL_COLOR_TEXT_DARK];
-        snackBarView.layer.borderWidth = 0.0f;
+        self.snackBarView.backgroundColor = [TTLUtil getColor:TTL_COLOR_TEXT_DARK];
+        self.snackBarView.layer.borderWidth = 0.0f;
         label.textColor = [UIColor whiteColor];
         if (iconImageView != nil && iconImageView.image != nil) {
-            TTLImage *image = iconImageView.image;
-            iconImageView.image = [image setImageTintColor:[UIColor whiteColor]];
+            iconImageView.image = [(TTLImage *) iconImageView.image setImageTintColor:[UIColor whiteColor]];
         }
     }
     
@@ -379,14 +384,15 @@
         if (iconImageView != nil && iconImageView.image != nil) {
             iconWidth = 32.0f;
         }
-        snackBarView.frame = CGRectMake(
-            MAX(CGRectGetMinX(snackBarView.frame), (CGRectGetWidth(self.view.frame) - CGRectGetWidth(label.frame) - iconWidth - 32.0f) / 2),
-            MIN(CGRectGetMinY(snackBarView.frame), CGRectGetHeight(self.view.frame) - CGRectGetHeight(label.frame) - 24.0f - [TTLUtil safeAreaBottomPadding] - self.currentKeyboardHeight),
-            MIN(CGRectGetWidth(snackBarView.frame), CGRectGetWidth(label.frame) + iconWidth + 32.0f),
-            MAX(CGRectGetHeight(snackBarView.frame), CGRectGetHeight(label.frame) + 24.0f)
+        CGFloat height = MAX(CGRectGetHeight(self.snackBarView.frame), CGRectGetHeight(label.frame) + 24.0f);
+        self.snackBarView.frame = CGRectMake(
+            MAX(CGRectGetMinX(self.snackBarView.frame), (CGRectGetWidth(self.view.frame) - CGRectGetWidth(label.frame) - iconWidth - 32.0f) / 2),
+            MIN(CGRectGetMinY(self.snackBarView.frame), CGRectGetHeight(self.view.frame) - height - 24.0f - [TTLUtil safeAreaBottomPadding] - self.currentKeyboardHeight),
+            MIN(CGRectGetWidth(self.snackBarView.frame), CGRectGetWidth(label.frame) + iconWidth + 32.0f),
+            height
         );
-        snackBarView.backgroundColor = [[TTLUtil getColor:TTL_COLOR_TEXT_DARK] colorWithAlphaComponent:0.8f];
-        snackBarView.layer.cornerRadius = 24.0f;
+        self.snackBarView.backgroundColor = [[TTLUtil getColor:TTL_COLOR_TEXT_DARK] colorWithAlphaComponent:0.8f];
+        self.snackBarView.layer.cornerRadius = 24.0f;
     }
     else {
         CGSize labelSize = [label sizeThatFits:CGSizeMake(CGRectGetWidth(label.frame), CGFLOAT_MAX)];
@@ -396,34 +402,44 @@
             CGRectGetWidth(label.frame),
             MAX(CGRectGetHeight(label.frame), labelSize.height)
         );
-        snackBarView.frame = CGRectMake(
-            CGRectGetMinX(snackBarView.frame),
-            MIN(CGRectGetMinY(snackBarView.frame), CGRectGetHeight(self.view.frame) - CGRectGetHeight(label.frame) - 24.0f - [TTLUtil safeAreaBottomPadding] - self.currentKeyboardHeight),
-            CGRectGetWidth(snackBarView.frame),
-            MAX(CGRectGetHeight(snackBarView.frame), CGRectGetHeight(label.frame) + 24.0f)
+        CGFloat height = MAX(CGRectGetHeight(self.snackBarView.frame), CGRectGetHeight(label.frame) + 24.0f);
+        self.snackBarView.frame = CGRectMake(
+            CGRectGetMinX(self.snackBarView.frame),
+            MIN(CGRectGetMinY(self.snackBarView.frame), CGRectGetHeight(self.view.frame) - height - 24.0f - [TTLUtil safeAreaBottomPadding] - self.currentKeyboardHeight),
+            CGRectGetWidth(self.snackBarView.frame),
+            height
         );
-        snackBarView.layer.cornerRadius = 8.0f;
+        self.snackBarView.layer.cornerRadius = 8.0f;
     }
     
     if (iconImageView != nil && iconImageView.image != nil) {
         iconImageView.frame = CGRectMake(
             CGRectGetMinX(iconImageView.frame),
-            (CGRectGetHeight(snackBarView.frame) - CGRectGetHeight(iconImageView.frame)) / 2,
+            (CGRectGetHeight(self.snackBarView.frame) - CGRectGetHeight(iconImageView.frame)) / 2,
             CGRectGetWidth(iconImageView.frame),
             CGRectGetHeight(iconImageView.frame)
         );
     }
     
-    [self.view addSubview:snackBarView];
+    UIButton *dismissButton = [[UIButton alloc] initWithFrame:CGRectMake(
+        0.0f,
+        0.0f,
+        CGRectGetWidth(self.snackBarView.frame),
+        CGRectGetHeight(self.snackBarView.frame))
+    ];
+    [dismissButton addTarget:self action:@selector(dismissSnackBar) forControlEvents:UIControlEventTouchUpInside];
+    [self.snackBarView addSubview:dismissButton];
+    
+    [self.view addSubview:self.snackBarView];
     
     [UIView animateWithDuration:animationDuration animations:^{
-        snackBarView.alpha = 1.0f;
+        self.snackBarView.alpha = 1.0f;
     } completion:^(BOOL finished) {
         [TTLUtil performBlock:^{
             [UIView animateWithDuration:animationDuration * 3.0f animations:^{
-                snackBarView.alpha = 0.0f;
+                self.snackBarView.alpha = 0.0f;
             } completion:^(BOOL finished) {
-                [snackBarView removeFromSuperview];
+                [self.snackBarView removeFromSuperview];
             }];
         } afterDelay:showDuration];
     }];

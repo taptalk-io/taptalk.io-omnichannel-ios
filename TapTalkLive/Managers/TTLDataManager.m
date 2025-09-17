@@ -153,13 +153,13 @@
 }
 
 + (NSString *)getCreateNewCaseBlockingMessage {
-//    NSNumber *maxOpenCases = [TTLUtil nullToEmptyNumber:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_MAX_OPEN_CASES valid:nil]];
-//    NSNumber *caseListCount = [TTLUtil nullToEmptyNumber:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_OPEN_CASE_LIST_COUNT valid:nil]];
-//    
-//    BOOL isLimitAllowed = maxOpenCases.longValue == 0 || maxOpenCases.longValue > caseListCount.longValue;
-//    if (!isLimitAllowed) {
-//        return [NSString stringWithFormat:@"You can only have maximum %ld open cases at the same time", maxOpenCases.longValue];
-//    }
+    NSNumber *maxOpenCases = [TTLUtil nullToEmptyNumber:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_MAX_OPEN_CASES valid:nil]];
+    NSNumber *caseListCount = [TTLUtil nullToEmptyNumber:[[NSUserDefaults standardUserDefaults] secureObjectForKey:TTL_PREFS_OPEN_CASE_LIST_COUNT valid:nil]];
+    
+    BOOL isLimitAllowed = maxOpenCases.longValue == 0 || maxOpenCases.longValue > caseListCount.longValue;
+    if (!isLimitAllowed) {
+        return [NSString stringWithFormat:@"You can only have maximum %ld open cases at the same time", maxOpenCases.longValue];
+    }
     return @"";
 }
 
