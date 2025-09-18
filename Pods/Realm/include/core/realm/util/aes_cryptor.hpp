@@ -16,12 +16,36 @@
  *
  **************************************************************************/
 
-#include <cstddef>
-#include <memory>
+#ifndef REALM_AES_CRYPTOR_HPP
+#define REALM_AES_CRYPTOR_HPP
+
 #include <realm/util/features.h>
-#include <cstdint>
-#include <vector>
 #include <realm/util/file.hpp>
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <vector>
+
+namespace realm::util {
+class WriteObserver {
+public:
+    virtual bool no_concurrent_writer_seen() = 0;
+
+protected:
+    ~WriteObserver() = default;
+};
+
+class WriteMarker {
+public:
+    virtual void mark(uint64_t page_offset) = 0;
+    virtual void unmark() = 0;
+
+protected:
+    ~WriteMarker() = default;
+};
+} // namespace realm::util
 
 #if REALM_ENABLE_ENCRYPTION
 
@@ -37,21 +61,29 @@
 #include <openssl/evp.h>
 #endif
 
-namespace realm {
-namespace util {
+namespace realm::util {
 
-struct iv_table;
+struct IVTable;
 class EncryptedFileMapping;
 
 class AESCryptor {
 public:
-    AESCryptor(const uint8_t* key);
+    AESCryptor(const char* key);
     ~AESCryptor() noexcept;
 
-    void set_file_size(off_t new_size);
+    void set_data_size(File::SizeType new_size);
 
-    bool read(FileDesc fd, off_t pos, char* dst, size_t size);
-    void write(FileDesc fd, off_t pos, const char* src, size_t size) noexcept;
+    enum class ReadResult { Eof, Uninitialized, InterruptedFirstWrite, StaleHmac, Failed, Success };
+    ReadResult read(FileDesc fd, File::SizeType pos, char* dst, WriteObserver* observer = nullptr);
+    void try_read_block(FileDesc fd, File::SizeType pos, char* dst) noexcept;
+    void write(FileDesc fd, File::SizeType pos, const char* src, WriteMarker* marker = nullptr) noexcept;
+    bool refresh_iv(FileDesc fd, size_t page_ndx);
+    void invalidate_ivs() noexcept;
+
+    const char* get_key() const noexcept
+    {
+        return reinterpret_cast<const char*>(m_key.data());
+    }
 
 private:
     enum EncryptionMode {
@@ -67,47 +99,35 @@ private:
 #endif
     };
 
+    enum class IVLookupMode { UseCache, Refetch };
+    using Hmac = std::array<uint8_t, 28>;
+
 #if REALM_PLATFORM_APPLE
     CCCryptorRef m_encr;
     CCCryptorRef m_decr;
 #elif defined(_WIN32)
     BCRYPT_KEY_HANDLE m_aes_key_handle;
 #else
-    uint8_t m_aesKey[32];
     EVP_CIPHER_CTX* m_ctx;
 #endif
 
-    uint8_t m_hmacKey[32];
-    std::vector<iv_table> m_iv_buffer;
+    const std::array<uint8_t, 64> m_key;
+    std::vector<IVTable> m_iv_buffer;
+    std::vector<IVTable> m_iv_buffer_cache;
+    std::vector<bool> m_iv_blocks_read;
     std::unique_ptr<char[]> m_rw_buffer;
     std::unique_ptr<char[]> m_dst_buffer;
 
-    void calc_hmac(const void* src, size_t len, uint8_t* dst, const uint8_t* key) const;
-    bool check_hmac(const void* data, size_t len, const uint8_t* hmac) const;
-    void crypt(EncryptionMode mode, off_t pos, char* dst, const char* src, const char* stored_iv) noexcept;
-    iv_table& get_iv_table(FileDesc fd, off_t data_pos) noexcept;
+    bool constant_time_equals(const Hmac&, const Hmac&) const;
+    void calculate_hmac(Hmac&) const;
+    void crypt(EncryptionMode mode, File::SizeType pos, char* dst, const char* src, const char* stored_iv) noexcept;
+    IVTable& get_iv_table(FileDesc fd, File::SizeType data_pos, IVLookupMode mode = IVLookupMode::UseCache) noexcept;
     void handle_error();
+    void read_iv_block(FileDesc fd, File::SizeType data_pos);
+    ReadResult attempt_read(FileDesc fd, File::SizeType pos, char* dst, IVLookupMode iv_mode, uint32_t& iv,
+                            Hmac& hmac);
 };
-
-struct ReaderInfo {
-    const void* reader_ID;
-    uint64_t version;
-};
-
-struct SharedFileInfo {
-    FileDesc fd;
-    AESCryptor cryptor;
-    std::vector<EncryptedFileMapping*> mappings;
-    uint64_t last_scanned_version = 0;
-    uint64_t current_version = 0;
-    size_t num_decrypted_pages = 0;
-    size_t num_reclaimed_pages = 0;
-    size_t progress_index = 0;
-    std::vector<ReaderInfo> readers;
-
-    SharedFileInfo(const uint8_t* key, FileDesc file_descriptor);
-};
-}
-}
+} // namespace realm::util
 
 #endif // REALM_ENABLE_ENCRYPTION
+#endif // REALM_AES_CRYPTOR_HPP

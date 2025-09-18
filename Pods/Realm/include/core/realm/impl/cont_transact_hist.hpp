@@ -75,8 +75,8 @@ public:
     /// of update_early_from_top_ref(). In that case, the caller may assume that
     /// the memory references stay valid for the remainder of the transaction
     /// (up until initiation of the commit operation).
-    virtual void get_changesets(version_type begin_version, version_type end_version, BinaryIterator* buffer) const
-        noexcept = 0;
+    virtual void get_changesets(version_type begin_version, version_type end_version,
+                                BinaryIterator* buffer) const noexcept = 0;
 
     /// \brief Specify the version of the oldest bound snapshot.
     ///
@@ -112,6 +112,13 @@ public:
     virtual void set_oldest_bound_version(version_type version) = 0;
 
     virtual void verify() const = 0;
+
+    /// Returns true if all local changes has been integrated on the server.
+    /// The history is effectively clean
+    virtual bool no_pending_local_changes(version_type) const
+    {
+        return true;
+    }
 
     virtual void set_group(Group* group, bool updated = false)
     {

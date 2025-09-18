@@ -2,22 +2,21 @@
 #ifndef REALM_IMPL_INSTRUCTIONS_HPP
 #define REALM_IMPL_INSTRUCTIONS_HPP
 
-#include <vector>
-#include <unordered_map>
 #include <iosfwd> // string conversion, debug prints
 #include <memory> // shared_ptr
 #include <type_traits>
+#include <unordered_map>
+#include <vector>
 
 #include <external/mpark/variant.hpp>
-#include <realm/util/string_buffer.hpp>
-#include <realm/string_data.hpp>
 #include <realm/binary_data.hpp>
 #include <realm/data_type.hpp>
-#include <realm/timestamp.hpp>
+#include <realm/string_data.hpp>
 #include <realm/sync/object_id.hpp>
-#include <realm/impl/input_stream.hpp>
 #include <realm/table_ref.hpp>
-#include <realm/util/overloaded.hpp>
+#include <realm/timestamp.hpp>
+#include <realm/util/input_stream.hpp>
+#include <realm/util/overload.hpp>
 
 namespace realm {
 
@@ -30,12 +29,14 @@ namespace sync {
     X(EraseColumn)                                                                                                   \
     X(CreateObject)                                                                                                  \
     X(EraseObject)                                                                                                   \
-    X(Set)                                                                                                           \
+    X(Update)                                                                                                        \
     X(AddInteger)                                                                                                    \
     X(ArrayInsert)                                                                                                   \
     X(ArrayMove)                                                                                                     \
     X(ArrayErase)                                                                                                    \
-    X(ArrayClear)
+    X(Clear)                                                                                                         \
+    X(SetInsert)                                                                                                     \
+    X(SetErase)
 
 struct StringBufferRange {
     uint32_t offset, size;
@@ -78,19 +79,19 @@ struct Instruction;
 
 namespace instr {
 
-using PrimaryKey = mpark::variant<mpark::monostate, int64_t, InternString, GlobalKey, ObjectId>;
+using PrimaryKey = mpark::variant<mpark::monostate, int64_t, GlobalKey, InternString, ObjectId, UUID>;
 
 struct Path {
     using Element = mpark::variant<InternString, uint32_t>;
 
-    // FIXME: Use a "small_vector" type for this -- most paths are very short.
-    // Alternatively, we could use some kind of interning with copy-on-write,
-    // but that seems complicated.
-    std::vector<Element> m_path;
-
     size_t size() const noexcept
     {
         return m_path.size();
+    }
+
+    void reserve(size_t sz)
+    {
+        m_path.reserve(sz);
     }
 
     // If this path is referring to an element of an array (the last path
@@ -141,15 +142,44 @@ struct Path {
         m_path.push_back(element);
     }
 
+    void clear()
+    {
+        m_path.clear();
+    }
+
     friend bool operator==(const Path& lhs, const Path& rhs) noexcept
     {
         return lhs.m_path == rhs.m_path;
     }
+
+    using const_iterator = typename std::vector<Element>::const_iterator;
+    const_iterator begin() const noexcept
+    {
+        return m_path.begin();
+    }
+    const_iterator end() const noexcept
+    {
+        return m_path.end();
+    }
+
+private:
+    // FIXME: Use a "small_vector" type for this -- most paths are very short.
+    // Alternatively, we could use some kind of interning with copy-on-write,
+    // but that seems complicated.
+    std::vector<Element> m_path;
 };
 
 struct Payload {
-    struct ObjectValue {
-    };
+    /// Create a new object in-place (embedded object).
+    struct ObjectValue {};
+    /// Create an empty list in-place (does not clear an existing list).
+    struct List {};
+    /// Create an empty dictionary in-place (does not clear an existing dictionary).
+    struct Dictionary {};
+    /// Create an empty set in-place (does not clear an existing set).
+    struct Set {};
+    /// Sentinel value for an erased dictionary element.
+    struct Erased {};
 
     /// Payload data types, corresponding loosely to the `DataType` enum in
     /// Core, but with some special values:
@@ -157,10 +187,28 @@ struct Payload {
     /// - Null (0) indicates a NULL value of any type.
     /// - GlobalKey (-1) indicates an internally generated object ID.
     /// - ObjectValue (-2) indicates the creation of an embedded object.
+    /// - Dictionary (-3) indicates the creation of a dictionary.
+    /// - Erased (-4) indicates that a dictionary element should be erased.
+    /// - List (-5) indicates the creation of a list
     ///
     /// Furthermore, link values for both Link and LinkList columns are
     /// represented by a single Link type.
+    ///
+    /// Note: For Mixed columns (including typed links), no separate value is required, because the
+    /// instruction set encodes the type of each value in the instruction.
     enum class Type : int8_t {
+        // Special value indicating that a set should be created at the position.
+        Set = -6,
+
+        // Special value indicating that a list should be created at the position.
+        List = -5,
+
+        // Special value indicating that a dictionary element should be erased.
+        Erased = -4,
+
+        // Special value indicating that a dictionary should be created at the position.
+        Dictionary = -3,
+
         // Special value indicating that an embedded object should be created at
         // the position.
         ObjectValue = -2,
@@ -176,6 +224,7 @@ struct Payload {
         Decimal = 8,
         Link = 9,
         ObjectId = 10,
+        UUID = 11,
     };
 
     struct Link {
@@ -199,7 +248,9 @@ struct Payload {
         double dnum;
         Decimal128 decimal;
         ObjectId object_id;
+        UUID uuid;
         Link link;
+        ObjLink typed_link;
 
         Data() {}
     };
@@ -257,6 +308,24 @@ struct Payload {
     {
     }
 
+    // Note: Intentionally implicit.
+    Payload(const Erased&) noexcept
+        : type(Type::Erased)
+    {
+    }
+    Payload(const Dictionary&) noexcept
+        : type(Type::Dictionary)
+    {
+    }
+    Payload(const List&) noexcept
+        : type(Type::List)
+    {
+    }
+    Payload(const Set&) noexcept
+        : type(Type::Set)
+    {
+    }
+
     explicit Payload(Timestamp value) noexcept
         : type(value.is_null() ? Type::Null : Type::Timestamp)
     {
@@ -286,6 +355,12 @@ struct Payload {
         }
     }
 
+    explicit Payload(UUID value) noexcept
+        : type(Type::UUID)
+    {
+        data.uuid = value;
+    }
+
     Payload(const Payload&) noexcept = default;
     Payload& operator=(const Payload&) noexcept = default;
 
@@ -298,12 +373,15 @@ struct Payload {
     {
         if (lhs.type == rhs.type) {
             switch (lhs.type) {
+                case Type::Null:
+                case Type::Erased:
+                case Type::List:
+                case Type::Set:
+                case Type::Dictionary:
                 case Type::ObjectValue:
                     return true;
                 case Type::GlobalKey:
                     return lhs.data.key == rhs.data.key;
-                case Type::Null:
-                    return true;
                 case Type::Int:
                     return lhs.data.integer == rhs.data.integer;
                 case Type::Bool:
@@ -324,6 +402,8 @@ struct Payload {
                     return lhs.data.link == rhs.data.link;
                 case Type::ObjectId:
                     return lhs.data.object_id == rhs.data.object_id;
+                case Type::UUID:
+                    return lhs.data.uuid == rhs.data.uuid;
             }
         }
         return false;
@@ -334,6 +414,10 @@ struct Payload {
         return !(lhs == rhs);
     }
 };
+
+// This is backwards compatible with previous boolean type where 0
+// indicated simple type and 1 indicated list.
+enum class CollectionType : uint8_t { Single, List, Dictionary, Set };
 
 /// All instructions are TableInstructions.
 struct TableInstruction {
@@ -382,14 +466,16 @@ protected:
 struct AddTable : TableInstruction {
     // Note: Tables "without" a primary key have a secret primary key of type
     // ObjKey. The field name of such primary keys is assumed to be "_id".
-    struct PrimaryKeySpec {
-        InternString field;
-        Payload::Type type;
-        bool nullable;
+    struct TopLevelTable {
+        InternString pk_field;
+        Payload::Type pk_type;
+        bool pk_nullable;
+        bool is_asymmetric;
 
-        bool operator==(const PrimaryKeySpec& rhs) const noexcept
+        bool operator==(const TopLevelTable& rhs) const noexcept
         {
-            return field == rhs.field && type == rhs.type && nullable == rhs.nullable;
+            return pk_field == rhs.pk_field && pk_type == rhs.pk_type && pk_nullable == rhs.pk_nullable &&
+                   is_asymmetric == rhs.is_asymmetric;
         }
     };
 
@@ -400,7 +486,7 @@ struct AddTable : TableInstruction {
         }
     };
 
-    mpark::variant<PrimaryKeySpec, EmbeddedTable> type;
+    mpark::variant<TopLevelTable, EmbeddedTable> type;
 
     bool operator==(const AddTable& rhs) const noexcept
     {
@@ -421,15 +507,26 @@ struct AddColumn : TableInstruction {
     using TableInstruction::TableInstruction;
 
     InternString field;
+
+    // `Type::Null` for Mixed columns. Mixed columns are always nullable.
     Payload::Type type;
+    // `Type::Null` for other than dictionary columns
+    Payload::Type key_type;
+
     bool nullable;
-    bool list;
+
+    // For Mixed columns, this is `none`. Mixed columns are always nullable.
+    //
+    // For dictionaries, this must always be `Type::String`.
+    CollectionType collection_type;
+
     InternString link_target_table;
 
     bool operator==(const AddColumn& rhs) const noexcept
     {
         return TableInstruction::operator==(rhs) && field == rhs.field && type == rhs.type &&
-               nullable == rhs.nullable && list == rhs.list && link_target_table == rhs.link_target_table;
+               key_type == rhs.key_type && nullable == rhs.nullable && collection_type == rhs.collection_type &&
+               link_target_table == rhs.link_target_table;
     }
 };
 
@@ -461,30 +558,30 @@ struct EraseObject : ObjectInstruction {
     }
 };
 
-struct Set : PathInstruction {
+struct Update : PathInstruction {
     using PathInstruction::PathInstruction;
 
-    // Note: For "ArraySet", the path ends with an integer.
+    // Note: For "ArrayUpdate", the path ends with an integer.
     Payload value;
     union {
         bool is_default;     // For fields
-        uint32_t prior_size; // For "ArraySet"
+        uint32_t prior_size; // For "ArrayUpdate"
     };
 
-    Set()
+    Update()
         : prior_size(0)
     {
     }
 
-    bool is_array_set() const noexcept
+    bool is_array_update() const noexcept
     {
         return path.is_array_index();
     }
 
-    bool operator==(const Set& rhs) const noexcept
+    bool operator==(const Update& rhs) const noexcept
     {
         return PathInstruction::operator==(rhs) && value == rhs.value &&
-               (is_array_set() ? is_default == rhs.is_default : prior_size == rhs.prior_size);
+               (is_array_update() ? prior_size == rhs.prior_size : is_default == rhs.is_default);
     }
 };
 
@@ -533,15 +630,36 @@ struct ArrayErase : PathInstruction {
     }
 };
 
-struct ArrayClear : PathInstruction {
+struct Clear : PathInstruction {
     using PathInstruction::PathInstruction;
-    uint32_t prior_size;
+    CollectionType collection_type;
 
-    bool operator==(const ArrayClear& rhs) const noexcept
+    bool operator==(const Clear& rhs) const noexcept
     {
-        return PathInstruction::operator==(rhs) && prior_size == rhs.prior_size;
+        return PathInstruction::operator==(rhs);
     }
 };
+
+struct SetInsert : PathInstruction {
+    using PathInstruction::PathInstruction;
+    Payload value;
+
+    bool operator==(const SetInsert& rhs) const noexcept
+    {
+        return PathInstruction::operator==(rhs) && value == rhs.value;
+    }
+};
+
+struct SetErase : PathInstruction {
+    using PathInstruction::PathInstruction;
+    Payload value;
+
+    bool operator==(const SetErase& rhs) const noexcept
+    {
+        return PathInstruction::operator==(rhs) && value == rhs.value;
+    }
+};
+
 
 } // namespace instr
 
@@ -557,6 +675,7 @@ struct Instruction {
     using Payload = instr::Payload;
     using Path = instr::Path;
     using Vector = std::vector<Instruction>;
+    using CollectionType = instr::CollectionType;
 
     // CAUTION: Any change to the enum values for the instruction types is a protocol-breaking
     // change!
@@ -565,14 +684,16 @@ struct Instruction {
         EraseTable = 1,
         CreateObject = 2,
         EraseObject = 3,
-        Set = 4, // Note: Also covers ArraySet
+        Update = 4, // Note: Also covers ArrayUpdate
         AddInteger = 5,
         AddColumn = 6,
         EraseColumn = 7,
         ArrayInsert = 8,
         ArrayMove = 9,
         ArrayErase = 10,
-        ArrayClear = 11,
+        Clear = 11,
+        SetInsert = 12,
+        SetErase = 13,
     };
 
     template <Type t>
@@ -644,8 +765,8 @@ struct Instruction {
     const Instruction& at(size_t) const noexcept;
 
 private:
-    template <class>
-    struct Visitor;
+    template <class V, class F>
+    static decltype(auto) visit(F&& lambda, V&& instr);
 };
 
 inline const char* get_type_name(Instruction::Type type)
@@ -669,6 +790,14 @@ inline const char* get_type_name(Instruction::Payload::Type type)
 {
     using Type = Instruction::Payload::Type;
     switch (type) {
+        case Type::Erased:
+            return "Erased";
+        case Type::Set:
+            return "Set";
+        case Type::List:
+            return "List";
+        case Type::Dictionary:
+            return "Dictionary";
         case Type::ObjectValue:
             return "ObjectValue";
         case Type::GlobalKey:
@@ -695,8 +824,36 @@ inline const char* get_type_name(Instruction::Payload::Type type)
             return "Link";
         case Type::ObjectId:
             return "ObjectId";
+        case Type::UUID:
+            return "UUID";
     }
     return "(unknown)";
+}
+
+inline const char* get_collection_type(Instruction::CollectionType type)
+{
+    using Type = Instruction::CollectionType;
+    switch (type) {
+        case Type::Single:
+            return "Single";
+        case Type::List:
+            return "List";
+        case Type::Dictionary:
+            return "Dictionary";
+        case Type::Set:
+            return "Set";
+    }
+    return "(unknown)";
+}
+
+inline const char* get_type_name(util::Optional<Instruction::Payload::Type> type)
+{
+    if (type) {
+        return get_type_name(*type);
+    }
+    else {
+        return "Mixed";
+    }
 }
 
 inline std::ostream& operator<<(std::ostream& os, Instruction::Payload::Type type)
@@ -708,16 +865,18 @@ inline bool is_valid_key_type(Instruction::Payload::Type type) noexcept
 {
     using Type = Instruction::Payload::Type;
     switch (type) {
-        case Type::Null:
-            [[fallthrough]];
         case Type::Int:
             [[fallthrough]];
         case Type::String:
             [[fallthrough]];
         case Type::ObjectId:
             [[fallthrough]];
+        case Type::UUID:
+            [[fallthrough]];
         case Type::GlobalKey:
             return true;
+        case Type::Null: // Mixed is not a valid primary key
+            [[fallthrough]];
         default:
             return false;
     }
@@ -747,12 +906,22 @@ inline DataType get_data_type(Instruction::Payload::Type type) noexcept
             return type_Link;
         case Type::ObjectId:
             return type_ObjectId;
+        case Type::UUID:
+            return type_UUID;
+        case Type::Null: // Mixed is encoded as null
+            return type_Mixed;
+        case Type::Erased:
+            [[fallthrough]];
+        case Type::Dictionary:
+            [[fallthrough]];
+        case Type::List:
+            [[fallthrough]];
+        case Type::Set:
+            [[fallthrough]];
         case Type::ObjectValue:
             [[fallthrough]];
         case Type::GlobalKey:
-            [[fallthrough]];
-        case Type::Null:
-            REALM_TERMINATE("Invalid data type");
+            REALM_TERMINATE(util::format("Invalid data type: %1", int8_t(type)).c_str());
     }
     return type_Int; // Make compiler happy
 }
@@ -804,47 +973,17 @@ Instruction::Instruction(T instr)
     static_assert(!std::is_same_v<T, Vector>);
 }
 
-template <class F>
-struct Instruction::Visitor {
-    F lambda; // reference type
-    Visitor(F lambda)
-        : lambda(lambda)
-    {
-    }
-
-    template <class T>
-    decltype(auto) operator()(T& instr)
-    {
-        return lambda(instr);
-    }
-
-    template <class T>
-    decltype(auto) operator()(const T& instr)
-    {
-        return lambda(instr);
-    }
-
-    auto operator()(const Instruction::Vector&) -> decltype(lambda(std::declval<const Instruction::Set&>()))
-    {
-        REALM_TERMINATE("visiting instruction vector");
-    }
-    auto operator()(Instruction::Vector&) -> decltype(lambda(std::declval<Instruction::Set&>()))
-    {
-        REALM_TERMINATE("visiting instruction vector");
-    }
-};
-
-template <class F>
-inline decltype(auto) Instruction::visit(F&& lambda)
+template <class V, class F>
+inline decltype(auto) Instruction::visit(F&& lambda, V&& instr)
 {
     // Cannot use std::visit, because it does not pass lvalue references to the visitor.
-    if (mpark::holds_alternative<Vector>(m_instr)) {
+    if (mpark::holds_alternative<Vector>(instr)) {
         REALM_TERMINATE("visiting instruction vector");
     }
 #define REALM_VISIT_VARIANT(X)                                                                                       \
-    else if (mpark::holds_alternative<Instruction::X>(m_instr))                                                      \
+    else if (auto ptr = mpark::get_if<Instruction::X>(&instr))                                                       \
     {                                                                                                                \
-        return lambda(mpark::get<Instruction::X>(m_instr));                                                          \
+        return lambda(*ptr);                                                                                         \
     }
     REALM_FOR_EACH_INSTRUCTION_TYPE(REALM_VISIT_VARIANT)
 #undef REALM_VISIT_VARIANT
@@ -855,23 +994,15 @@ inline decltype(auto) Instruction::visit(F&& lambda)
 }
 
 template <class F>
+inline decltype(auto) Instruction::visit(F&& lambda)
+{
+    return visit(std::forward<F>(lambda), m_instr);
+}
+
+template <class F>
 inline decltype(auto) Instruction::visit(F&& lambda) const
 {
-    // Cannot use std::visit, because it does not pass lvalue references to the visitor.
-    if (mpark::holds_alternative<Vector>(m_instr)) {
-        REALM_TERMINATE("visiting instruction vector");
-    }
-#define REALM_VISIT_VARIANT(X)                                                                                       \
-    else if (mpark::holds_alternative<Instruction::X>(m_instr))                                                      \
-    {                                                                                                                \
-        return lambda(mpark::get<Instruction::X>(m_instr));                                                          \
-    }
-    REALM_FOR_EACH_INSTRUCTION_TYPE(REALM_VISIT_VARIANT)
-#undef REALM_VISIT_VARIANT
-    else
-    {
-        REALM_TERMINATE("Unhandled instruction variant entry");
-    }
+    return visit(std::forward<F>(lambda), m_instr);
 }
 
 inline Instruction::Type Instruction::type() const noexcept
@@ -888,7 +1019,7 @@ inline bool Instruction::operator==(const Instruction& other) const noexcept
 }
 
 template <class T>
-inline T* Instruction::get_if() noexcept
+REALM_NOINLINE T* Instruction::get_if() noexcept
 {
     // FIXME: Is there a way to express this without giant switch statements? Note: Putting the
     // base class into a union does not seem to be allowed by the standard.
@@ -900,7 +1031,7 @@ inline T* Instruction::get_if() noexcept
     }
     else if constexpr (std::is_same_v<ObjectInstruction, T>) {
         // This should compile to nothing but a comparison of the type.
-        return visit(util::overloaded{
+        return visit(util::overload{
             [](AddTable&) -> ObjectInstruction* {
                 return nullptr;
             },
@@ -920,7 +1051,7 @@ inline T* Instruction::get_if() noexcept
     }
     else if constexpr (std::is_same_v<PathInstruction, T>) {
         // This should compile to nothing but a comparison of the type.
-        return visit(util::overloaded{
+        return visit(util::overload{
             [](AddTable&) -> PathInstruction* {
                 return nullptr;
             },

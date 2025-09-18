@@ -58,7 +58,11 @@ public:
     {
         return Array::get(ndx);
     }
-
+    Mixed get_any(size_t ndx) const override
+    {
+        REALM_ASSERT(false);
+        return Mixed(get(ndx));
+    }
     void add(int64_t val)
     {
         Array::add(val);
@@ -80,7 +84,8 @@ public:
         Array::truncate_and_destroy_children(0);
     }
     void verify() const;
+    bool verify_backlink(size_t ndx, int64_t link);
 };
-}
+} // namespace realm
 
 #endif /* SRC_REALM_ARRAY_KEY_HPP_ */

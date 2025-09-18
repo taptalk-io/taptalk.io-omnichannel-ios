@@ -20,6 +20,7 @@
 #define REALM_ARRAY_LIST_HPP
 
 #include <realm/array.hpp>
+#include <realm/mixed.hpp>
 
 namespace realm {
 
@@ -75,6 +76,11 @@ public:
     {
         return Array::get_as_ref(ndx);
     }
+    Mixed get_any(size_t) const override
+    {
+        REALM_ASSERT_DEBUG(false);
+        return {};
+    }
     bool is_null(size_t ndx) const
     {
         return Array::get(ndx) == 0;
@@ -89,6 +95,6 @@ public:
         return Array::find_first(from_ref(value), begin, end);
     }
 };
-}
+} // namespace realm
 
 #endif /* REALM_ARRAY_LIST_HPP */

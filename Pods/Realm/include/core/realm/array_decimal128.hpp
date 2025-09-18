@@ -61,15 +61,35 @@ public:
 
     bool is_null(size_t ndx) const
     {
-        return this->get_width() == 0 || get(ndx).is_null();
+        if (m_width == 0) {
+            return !get_context_flag();
+        }
+        return get(ndx).is_null();
     }
 
     Decimal128 get(size_t ndx) const
     {
         REALM_ASSERT(ndx < m_size);
-        auto values = reinterpret_cast<Decimal128*>(this->m_data);
-        return values[ndx];
+        switch (m_width) {
+            case 0:
+                return get_context_flag() ? Decimal128() : Decimal128(realm::null());
+            case 4: {
+                auto values = reinterpret_cast<Decimal128::Bid32*>(this->m_data);
+                return Decimal128(values[ndx]);
+            }
+            case 8: {
+                auto values = reinterpret_cast<Decimal128::Bid64*>(this->m_data);
+                return Decimal128(values[ndx]);
+            }
+            case 16: {
+                auto values = reinterpret_cast<Decimal128*>(this->m_data);
+                return values[ndx];
+            }
+        }
+        return {};
     }
+
+    Mixed get_any(size_t ndx) const override;
 
     void add(Decimal128 value)
     {
@@ -92,73 +112,17 @@ public:
 
     size_t find_first(Decimal128 value, size_t begin = 0, size_t end = npos) const noexcept;
 
+    uint8_t get_width() const noexcept
+    {
+        return m_width;
+    }
+
 protected:
     size_t calc_byte_len(size_t num_items, size_t) const override
     {
         return num_items * sizeof(Decimal128) + header_size;
     }
-};
-
-template <>
-class QueryState<Decimal128> : public QueryStateBase {
-public:
-    Decimal128 m_state;
-
-    template <Action action>
-    bool uses_val()
-    {
-        return (action == act_Max || action == act_Min || action == act_Sum);
-    }
-
-    QueryState(Action action, Array* = nullptr, size_t limit = -1)
-        : QueryStateBase(limit)
-    {
-        if (action == act_Max)
-            m_state = Decimal128("-inf");
-        else if (action == act_Min)
-            m_state = Decimal128("+inf");
-    }
-
-    template <Action action, bool>
-    inline bool match(size_t index, uint64_t /*indexpattern*/, Decimal128 value)
-    {
-        static_assert(action == act_Sum || action == act_Max || action == act_Min || action == act_Count,
-                      "Search action not supported");
-
-        if (action == act_Count) {
-            ++m_match_count;
-        }
-        else if (!value.is_null()) {
-            ++m_match_count;
-            if (action == act_Max) {
-                if (value > m_state) {
-                    m_state = value;
-                    if (m_key_values) {
-                        m_minmax_index = m_key_values->get(index) + m_key_offset;
-                    }
-                    else {
-                        m_minmax_index = int64_t(index);
-                    }
-                }
-            }
-            else if (action == act_Min) {
-                if (value < m_state) {
-                    m_state = value;
-                    if (m_key_values) {
-                        m_minmax_index = m_key_values->get(index) + m_key_offset;
-                    }
-                    else {
-                        m_minmax_index = int64_t(index);
-                    }
-                }
-            }
-            else if (action == act_Sum) {
-                m_state += value;
-            }
-        }
-
-        return (m_limit > m_match_count);
-    }
+    size_t upgrade_leaf(uint8_t width);
 };
 
 } // namespace realm
