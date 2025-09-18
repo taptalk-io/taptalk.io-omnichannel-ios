@@ -19,52 +19,22 @@
 #ifndef REALM_UTIL_OVERLOAD_HPP
 #define REALM_UTIL_OVERLOAD_HPP
 
-#include <utility>
-
-namespace realm {
-
-namespace _impl {
-
-template<typename Fn, typename... Fns>
-struct Overloaded;
-
-} // namespace _impl
-
-
-namespace util {
-
-// Declare an overload set using lambdas or other function objects.
-// A minimal version of C++ Library Evolution Working Group proposal P0051R2.
-
-template<typename... Fns>
-_impl::Overloaded<Fns...> overload(Fns&&... f)
-{
-    return _impl::Overloaded<Fns...>(std::forward<Fns>(f)...);
-}
-
-} // namespace util
-
-
-namespace _impl {
-
-template<typename Fn, typename... Fns>
-struct Overloaded : Fn, Overloaded<Fns...> {
-    template<typename U, typename... Rest>
-    Overloaded(U&& fn, Rest&&... rest) : Fn(std::forward<U>(fn)), Overloaded<Fns...>(std::forward<Rest>(rest)...) { }
-
-    using Fn::operator();
-    using Overloaded<Fns...>::operator();
+namespace realm::util {
+template <class... Ts>
+struct overload : Ts... {
+    using Ts::operator()...;
+#ifdef _MSC_VER
+    // https://developercommunity.visualstudio.com/t/runtime-stack-corruption-using-stdvisit/346200
+    // A bug in VC++'s Empty Base Optimization causes it to compute the wrong
+    // size if both the type and the last base class have zero size. This
+    // results in the stack pointer being adjusted incorrectly if the final
+    // lambda passed to overload has no captures. Making overload non-zero size
+    // prevents this.
+    char dummy = 0;
+#endif
 };
-
-template<typename Fn>
-struct Overloaded<Fn> : Fn {
-    template<typename U>
-    Overloaded(U&& fn) : Fn(std::forward<U>(fn)) { }
-
-    using Fn::operator();
-};
-
-} // namespace _impl
-} // namespace realm
+template <class... Ts>
+overload(Ts...) -> overload<Ts...>;
+} // namespace realm::util
 
 #endif // REALM_UTIL_OVERLOAD_HPP

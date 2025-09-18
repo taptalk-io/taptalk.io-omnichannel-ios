@@ -20,6 +20,7 @@
 #define REALM_UTIL_BIND_PTR_HPP
 
 #include <algorithm>
+#include <memory>
 #include <atomic>
 #include <ostream>
 #include <utility>
@@ -33,8 +34,7 @@ namespace util {
 
 class bind_ptr_base {
 public:
-    struct adopt_tag {
-    };
+    struct adopt_tag {};
 };
 
 
@@ -112,6 +112,12 @@ public:
     bind_ptr(bind_ptr<U>&& p) noexcept
         : m_ptr(p.release())
     {
+    }
+
+    // Move from std::unique_ptr
+    bind_ptr(std::unique_ptr<T>&& p) noexcept
+    {
+        bind(p.release());
     }
 
     // Move assign
@@ -199,6 +205,17 @@ public:
         bind_ptr(p).swap(*this);
     }
 
+    void reset(T* p, adopt_tag) noexcept
+    {
+        bind_ptr(p, adopt_tag{}).swap(*this);
+    }
+
+    template <class U>
+    void reset(U* p, adopt_tag) noexcept
+    {
+        bind_ptr(p, adopt_tag{}).swap(*this);
+    }
+
     T* release() noexcept
     {
         T* const p = m_ptr;
@@ -216,8 +233,7 @@ public:
     }
 
 protected:
-    struct casting_move_tag {
-    };
+    struct casting_move_tag {};
     template <class U>
     bind_ptr(bind_ptr<U>* p, casting_move_tag) noexcept
         : m_ptr(static_cast<T*>(p->release()))
@@ -242,6 +258,18 @@ private:
     template <class>
     friend class bind_ptr;
 };
+
+// Deduction guides
+template <class T>
+bind_ptr(T*) -> bind_ptr<T>;
+template <class T>
+bind_ptr(T*, bind_ptr_base::adopt_tag) -> bind_ptr<T>;
+
+template <class T, typename... Args>
+bind_ptr<T> make_bind(Args&&... __args)
+{
+    return bind_ptr<T>(new T(std::forward<Args>(__args)...));
+}
 
 
 template <class C, class T, class U>
@@ -286,11 +314,11 @@ public:
         REALM_ASSERT(m_ref_count == 0);
     }
 
-    RefCountBase(const RefCountBase&) = delete;
-    RefCountBase(RefCountBase&&) = delete;
-
-    void operator=(const RefCountBase&) = delete;
-    void operator=(RefCountBase&&) = delete;
+    RefCountBase(const RefCountBase&)
+        : m_ref_count(0)
+    {
+    }
+    void operator=(const RefCountBase&) {}
 
 protected:
     void bind_ptr() const noexcept
@@ -327,11 +355,11 @@ public:
         REALM_ASSERT(m_ref_count == 0);
     }
 
-    AtomicRefCountBase(const AtomicRefCountBase&) = delete;
-    AtomicRefCountBase(AtomicRefCountBase&&) = delete;
-
-    void operator=(const AtomicRefCountBase&) = delete;
-    void operator=(AtomicRefCountBase&&) = delete;
+    AtomicRefCountBase(const AtomicRefCountBase&)
+        : m_ref_count(0)
+    {
+    }
+    void operator=(const AtomicRefCountBase&) {}
 
 protected:
     // FIXME: Operators ++ and -- as used below use

@@ -24,6 +24,8 @@
 
 namespace realm {
 
+class Mixed;
+
 /// Special index value. It has various meanings depending on
 /// context. It is returned by some search functions to indicate 'not
 /// found'. It is similar in function to std::string::npos.
@@ -241,11 +243,7 @@ public:
     void set_parent(ArrayParent* parent, size_t ndx_in_parent) noexcept
     {
         m_parent = parent;
-        m_ndx_in_parent = ndx_in_parent;
-    }
-    void set_ndx_in_parent(size_t ndx) noexcept
-    {
-        m_ndx_in_parent = ndx;
+        m_ndx_in_parent = unsigned(ndx_in_parent);
     }
 
     void clear_missing_parent_update()
@@ -335,14 +333,16 @@ protected:
                             WidthType width_type, int width, size_t size, size_t capacity) noexcept;
 
 private:
+    friend class NodeTree;
     ArrayParent* m_parent = nullptr;
-    size_t m_ndx_in_parent = 0; // Ignored if m_parent is null.
+    unsigned m_ndx_in_parent = 0; // Ignored if m_parent is null.
     bool m_missing_parent_update = false;
 
     void do_copy_on_write(size_t minimum_size = 0);
 };
 
 class Spec;
+class Mixed;
 
 /// Base class for all nodes holding user data
 class ArrayPayload {
@@ -350,6 +350,7 @@ public:
     virtual ~ArrayPayload();
     virtual void init_from_ref(ref_type) noexcept = 0;
     virtual void set_parent(ArrayParent* parent, size_t ndx_in_parent) noexcept = 0;
+    virtual Mixed get_any(size_t ndx) const = 0;
     virtual bool need_spec() const
     {
         return false;

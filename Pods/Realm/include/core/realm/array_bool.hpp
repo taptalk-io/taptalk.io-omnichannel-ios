@@ -20,6 +20,7 @@
 #define REALM_ARRAY_BOOL_HPP
 
 #include <realm/array.hpp>
+#include <realm/mixed.hpp>
 
 namespace realm {
 
@@ -68,6 +69,10 @@ public:
     bool get(size_t ndx) const
     {
         return Array::get(ndx) != 0;
+    }
+    Mixed get_any(size_t ndx) const override
+    {
+        return Mixed(get(ndx));
     }
     void add(bool value)
     {
@@ -129,6 +134,10 @@ public:
             Array::insert(ndx, null_value);
         }
     }
+    Mixed get_any(size_t ndx) const override
+    {
+        return Mixed(get(ndx));
+    }
     void set_null(size_t ndx)
     {
         Array::set(ndx, null_value);
@@ -143,6 +152,6 @@ public:
         return (val == null_value) ? util::none : util::make_optional(val != 0);
     }
 };
-}
+} // namespace realm
 
 #endif /* REALM_ARRAY_BOOL_HPP */

@@ -20,6 +20,7 @@
 #define REALM_ARRAY_STRING_SHORT_HPP
 
 #include <realm/array.hpp>
+#include <realm/string_data.hpp>
 
 namespace realm {
 
@@ -47,9 +48,7 @@ public:
     // Constructor defaults to non-nullable because we use non-nullable ArrayStringShort so many places internally
     // in core (data which isn't user payload) where null isn't needed.
     explicit ArrayStringShort(Allocator&, bool nullable = false) noexcept;
-    ~ArrayStringShort() noexcept override
-    {
-    }
+    ~ArrayStringShort() noexcept override {}
 
     bool is_null(size_t ndx) const;
     void set_null(size_t ndx);

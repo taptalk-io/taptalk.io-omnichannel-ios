@@ -19,6 +19,7 @@
 #ifndef REALM_BPLUSTREE_HPP
 #define REALM_BPLUSTREE_HPP
 
+#include <realm/aggregate_ops.hpp>
 #include <realm/column_type_traits.hpp>
 #include <realm/decimal128.hpp>
 #include <realm/timestamp.hpp>
@@ -49,8 +50,8 @@ public:
     // Erase element at erase_pos. May cause nodes to be merged
     using EraseFunc = util::FunctionRef<size_t(BPlusTreeNode*, size_t erase_pos)>;
     // Function to be called for all leaves in the tree until the function
-    // returns 'true'. 'offset' gives index of the first element in the leaf.
-    using TraverseFunc = util::FunctionRef<bool(BPlusTreeNode*, size_t offset)>;
+    // returns 'IteratorControl::Stop'. 'offset' gives index of the first element in the leaf.
+    using TraverseFunc = util::FunctionRef<IteratorControl(BPlusTreeNode*, size_t offset)>;
 
     BPlusTreeNode(BPlusTreeBase* tree)
         : m_tree(tree)
@@ -132,8 +133,6 @@ public:
     }
     virtual ~BPlusTreeBase();
 
-    BPlusTreeBase& operator=(const BPlusTreeBase& rhs);
-    BPlusTreeBase& operator=(BPlusTreeBase&& rhs) noexcept;
 
     Allocator& get_alloc() const
     {
@@ -143,6 +142,11 @@ public:
     bool is_attached() const
     {
         return bool(m_root);
+    }
+
+    void detach()
+    {
+        m_root = nullptr;
     }
 
     bool get_context_flag() const noexcept
@@ -159,6 +163,8 @@ public:
     {
         return m_size;
     }
+
+    static size_t size_from_header(const char* header);
 
     bool is_empty() const
     {
@@ -184,16 +190,11 @@ public:
 
     bool init_from_parent()
     {
-        ref_type ref = m_parent->get_child_ref(m_ndx_in_parent);
-        if (!ref) {
-            return false;
+        if (ref_type ref = m_parent->get_child_ref(m_ndx_in_parent)) {
+            init_from_ref(ref);
+            return true;
         }
-        auto new_root = create_root_from_ref(ref);
-        new_root->bp_set_parent(m_parent, m_ndx_in_parent);
-        m_root = std::move(new_root);
-        invalidate_leaf_cache();
-        m_size = m_root->get_tree_size();
-        return true;
+        return false;
     }
 
     void set_parent(ArrayParent* parent, size_t ndx_in_parent)
@@ -203,6 +204,10 @@ public:
         if (is_attached())
             m_root->bp_set_parent(parent, ndx_in_parent);
     }
+
+    virtual void erase(size_t) = 0;
+    virtual void clear() = 0;
+    virtual void swap(size_t, size_t) = 0;
 
     void create();
     void destroy();
@@ -272,6 +277,7 @@ template <class T>
 class BPlusTree : public BPlusTreeBase {
 public:
     using LeafArray = typename LeafTypeTrait<T>::type;
+    using value_type = T;
 
     /**
      * Actual class for the leaves. Maps the abstract interface defined
@@ -332,32 +338,6 @@ public:
     {
     }
 
-    BPlusTree(const BPlusTree& other)
-        : BPlusTree(other.get_alloc())
-    {
-        *this = other;
-    }
-
-    BPlusTree(BPlusTree&& other) noexcept
-        : BPlusTree(other.get_alloc())
-    {
-        *this = std::move(other);
-    }
-
-    /********************* Assignment ********************/
-
-    BPlusTree& operator=(const BPlusTree& rhs)
-    {
-        this->BPlusTreeBase::operator=(rhs);
-        return *this;
-    }
-
-    BPlusTree& operator=(BPlusTree&& rhs) noexcept
-    {
-        this->BPlusTreeBase::operator=(std::move(rhs));
-        return *this;
-    }
-
     /************ Tree manipulation functions ************/
 
     static T default_value(bool nullable = false)
@@ -382,23 +362,30 @@ public:
         m_size++;
     }
 
-    T get(size_t n) const
+    inline T get(size_t n) const
     {
+        // Fast path
         if (m_cached_leaf_begin <= n && n < m_cached_leaf_end) {
             return m_leaf_cache.get(n - m_cached_leaf_begin);
         }
         else {
-            T value;
-
-            auto func = [&value](BPlusTreeNode* node, size_t ndx) {
-                LeafNode* leaf = static_cast<LeafNode*>(node);
-                value = leaf->get(ndx);
-            };
-
-            m_root->bptree_access(n, func);
-
-            return value;
+            // Slow path
+            return get_uncached(n);
         }
+    }
+
+    REALM_NOINLINE T get_uncached(size_t n) const
+    {
+        T value;
+
+        auto func = [&value](BPlusTreeNode* node, size_t ndx) {
+            LeafNode* leaf = static_cast<LeafNode*>(node);
+            value = leaf->get(ndx);
+        };
+
+        m_root->bptree_access(n, func);
+
+        return value;
     }
 
     std::vector<T> get_all() const
@@ -412,7 +399,7 @@ public:
             for (size_t i = 0; i < sz; i++) {
                 all_values.push_back(leaf->get(i));
             }
-            return false;
+            return IteratorControl::AdvanceToNext;
         };
 
         m_root->bptree_traverse(func);
@@ -430,7 +417,7 @@ public:
         m_root->bptree_access(n, func);
     }
 
-    void swap(size_t ndx1, size_t ndx2)
+    void swap(size_t ndx1, size_t ndx2) override
     {
         if constexpr (std::is_same_v<T, StringData> || std::is_same_v<T, BinaryData>) {
             struct SwapBuffer {
@@ -451,6 +438,20 @@ public:
             set(ndx1, tmp2.get());
             set(ndx2, tmp1.get());
         }
+        else if constexpr (std::is_same_v<T, Mixed>) {
+            std::string buf1;
+            std::string buf2;
+            Mixed tmp1 = get(ndx1);
+            Mixed tmp2 = get(ndx2);
+            if (tmp1.is_type(type_String, type_Binary)) {
+                tmp1.use_buffer(buf1);
+            }
+            if (tmp2.is_type(type_String, type_Binary)) {
+                tmp2.use_buffer(buf2);
+            }
+            set(ndx1, tmp2);
+            set(ndx2, tmp1);
+        }
         else {
             T tmp = get(ndx1);
             set(ndx1, get(ndx2));
@@ -458,7 +459,7 @@ public:
         }
     }
 
-    void erase(size_t n)
+    void erase(size_t n) override
     {
         auto func = [](BPlusTreeNode* node, size_t ndx) {
             LeafNode* leaf = static_cast<LeafNode*>(node);
@@ -470,7 +471,7 @@ public:
         m_size--;
     }
 
-    void clear()
+    void clear() override
     {
         if (m_root->is_leaf()) {
             LeafNode* leaf = static_cast<LeafNode*>(m_root.get());
@@ -503,9 +504,9 @@ public:
             auto i = leaf->find_first(value, 0, sz);
             if (i < sz) {
                 result = i + offset;
-                return true;
+                return IteratorControl::Stop;
             }
-            return false;
+            return IteratorControl::AdvanceToNext;
         };
 
         m_root->bptree_traverse(func);
@@ -522,26 +523,37 @@ public:
             while ((i = leaf->find_first(value, i + 1, sz)) < sz) {
                 callback(i + offset);
             }
-            return false;
+            return IteratorControl::AdvanceToNext;
         };
 
         m_root->bptree_traverse(func);
     }
 
-    void dump_values(std::ostream& o, int level) const
+    template <typename Func>
+    void for_all(Func&& callback) const
     {
-        std::string indent(" ", level * 2);
-
-        auto func = [&o, indent](BPlusTreeNode* node, size_t) {
+        using Ret = std::invoke_result_t<Func, T>;
+        m_root->bptree_traverse([&callback](BPlusTreeNode* node, size_t) {
             LeafNode* leaf = static_cast<LeafNode*>(node);
             size_t sz = leaf->size();
             for (size_t i = 0; i < sz; i++) {
-                o << indent << leaf->get(i) << std::endl;
+                if constexpr (std::is_same_v<Ret, void>) {
+                    callback(leaf->get(i));
+                }
+                else {
+                    if (!callback(leaf->get(i)))
+                        return IteratorControl::Stop;
+                }
             }
-            return false;
-        };
+            return IteratorControl::AdvanceToNext;
+        });
+    }
 
-        m_root->bptree_traverse(func);
+    void split_if_needed()
+    {
+        while (m_root->get_node_size() > REALM_MAX_BPNODE_SIZE) {
+            split_root();
+        }
     }
 
 protected:
@@ -582,147 +594,83 @@ protected:
 
     template <class R>
     friend R bptree_sum(const BPlusTree<T>& tree);
+
+    void split_root();
 };
 
 template <class T>
-inline bool bptree_aggregate_not_null(T)
-{
-    return true;
-}
-template <class R, class T>
-inline R bptree_aggregate_value(T val)
-{
-    return val;
-}
-template <class T>
-inline bool bptree_aggregate_not_null(util::Optional<T> val)
-{
-    return !!val;
-}
-template <>
-inline bool bptree_aggregate_not_null(Timestamp val)
-{
-    return !val.is_null();
-}
-inline bool bptree_aggregate_not_null(StringData val)
-{
-    return !val.is_null();
-}
-inline bool bptree_aggregate_not_null(BinaryData val)
-{
-    return !val.is_null();
-}
-template <>
-inline bool bptree_aggregate_not_null(float val)
-{
-    return !null::is_null_float(val);
-}
-template <>
-inline bool bptree_aggregate_not_null(double val)
-{
-    return !null::is_null_float(val);
-}
-template <>
-inline bool bptree_aggregate_not_null(Decimal128 val)
-{
-    return !val.is_null();
-}
-template <class T>
-inline T bptree_aggregate_value(util::Optional<T> val)
-{
-    return *val;
-}
+using SumAggType = typename aggregate_operations::Sum<typename util::RemoveOptional<T>::type>;
 
 template <class T>
-ColumnSumType<T> bptree_sum(const BPlusTree<T>& tree, size_t* return_cnt = nullptr)
+typename SumAggType<T>::ResultType bptree_sum(const BPlusTree<T>& tree, size_t* return_cnt = nullptr)
 {
-    using ResultType = typename AggregateResultType<T, act_Sum>::result_type;
-    ResultType result{};
-    size_t cnt = 0;
+    SumAggType<T> agg;
 
-    auto func = [&result, &cnt](BPlusTreeNode* node, size_t) {
+    auto func = [&agg](BPlusTreeNode* node, size_t) {
         auto leaf = static_cast<typename BPlusTree<T>::LeafNode*>(node);
         size_t sz = leaf->size();
         for (size_t i = 0; i < sz; i++) {
             auto val = leaf->get(i);
-            if (bptree_aggregate_not_null(val)) {
-                result += bptree_aggregate_value<ResultType>(val);
-                cnt++;
-            }
+            agg.accumulate(val);
         }
-        return false;
+        return IteratorControl::AdvanceToNext;
     };
 
     tree.traverse(func);
 
     if (return_cnt)
-        *return_cnt = cnt;
+        *return_cnt = agg.items_counted();
 
-    return result;
+    return agg.result();
 }
 
-template <class T>
-ColumnMinMaxType<T> bptree_maximum(const BPlusTree<T>& tree, size_t* return_ndx = nullptr)
+template <class AggType, class T>
+util::Optional<typename util::RemoveOptional<T>::type> bptree_min_max(const BPlusTree<T>& tree,
+                                                                      size_t* return_ndx = nullptr)
 {
-    using ResultType = typename AggregateResultType<T, act_Max>::result_type;
-    ResultType max = std::numeric_limits<ResultType>::lowest();
+    AggType agg;
     if (tree.size() == 0) {
-        return max;
+        if (return_ndx)
+            *return_ndx = not_found;
+        return util::none;
     }
 
-    auto func = [&max, return_ndx](BPlusTreeNode* node, size_t offset) {
+    auto func = [&agg, return_ndx](BPlusTreeNode* node, size_t offset) {
         auto leaf = static_cast<typename BPlusTree<T>::LeafNode*>(node);
         size_t sz = leaf->size();
         for (size_t i = 0; i < sz; i++) {
             auto val_or_null = leaf->get(i);
-            if (bptree_aggregate_not_null(val_or_null)) {
-                auto val = bptree_aggregate_value<ResultType>(val_or_null);
-                if (val > max) {
-                    max = val;
-                    if (return_ndx) {
-                        *return_ndx = i + offset;
-                    }
-                }
+            bool found_new_min = agg.accumulate(val_or_null);
+            if (found_new_min && return_ndx) {
+                *return_ndx = i + offset;
             }
         }
-        return false;
+        return IteratorControl::AdvanceToNext;
     };
 
     tree.traverse(func);
 
-    return max;
+    return agg.is_null() ? util::none : std::optional{agg.result()};
 }
 
 template <class T>
-ColumnMinMaxType<T> bptree_minimum(const BPlusTree<T>& tree, size_t* return_ndx = nullptr)
+using MinAggType = typename aggregate_operations::Minimum<typename util::RemoveOptional<T>::type>;
+
+template <class T>
+util::Optional<typename util::RemoveOptional<T>::type> bptree_minimum(const BPlusTree<T>& tree,
+                                                                      size_t* return_ndx = nullptr)
 {
-    using ResultType = typename AggregateResultType<T, act_Max>::result_type;
-    ResultType min = std::numeric_limits<ResultType>::max();
-    if (tree.size() == 0) {
-        return min;
-    }
+    return bptree_min_max<MinAggType<T>, T>(tree, return_ndx);
+}
 
-    auto func = [&min, return_ndx](BPlusTreeNode* node, size_t offset) {
-        auto leaf = static_cast<typename BPlusTree<T>::LeafNode*>(node);
-        size_t sz = leaf->size();
-        for (size_t i = 0; i < sz; i++) {
-            auto val_or_null = leaf->get(i);
-            if (bptree_aggregate_not_null(val_or_null)) {
-                auto val = bptree_aggregate_value<ResultType>(val_or_null);
-                if (val < min) {
-                    min = val;
-                    if (return_ndx) {
-                        *return_ndx = i + offset;
-                    }
-                }
-            }
-        }
-        return false;
-    };
+template <class T>
+using MaxAggType = typename aggregate_operations::Maximum<typename util::RemoveOptional<T>::type>;
 
-    tree.traverse(func);
-
-    return min;
+template <class T>
+util::Optional<typename util::RemoveOptional<T>::type> bptree_maximum(const BPlusTree<T>& tree,
+                                                                      size_t* return_ndx = nullptr)
+{
+    return bptree_min_max<MaxAggType<T>, T>(tree, return_ndx);
 }
 
 template <class T>
@@ -737,6 +685,6 @@ ColumnAverageType<T> bptree_average(const BPlusTree<T>& tree, size_t* return_cnt
         *return_cnt = cnt;
     return avg;
 }
-}
+} // namespace realm
 
 #endif /* REALM_BPLUSTREE_HPP */

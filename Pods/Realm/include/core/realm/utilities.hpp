@@ -43,6 +43,7 @@ typedef SSIZE_T ssize_t;
 
 #include <realm/util/features.h>
 #include <realm/util/assert.hpp>
+#include <realm/util/functional.hpp>
 #include <realm/util/safe_int_ops.hpp>
 
 // GCC defines __i386__ and __x86_64__
@@ -74,7 +75,7 @@ typedef SSIZE_T ssize_t;
 
 namespace realm {
 
-using StringCompareCallback = std::function<bool(const char* string1, const char* string2)>;
+using StringCompareCallback = util::UniqueFunction<bool(const char* string1, const char* string2)>;
 
 extern signed char sse_support;
 extern signed char avx_support;
@@ -120,10 +121,6 @@ REALM_FORCEINLINE bool sseavx()
 }
 
 void cpuid_init();
-void* round_up(void* p, size_t align);
-void* round_down(void* p, size_t align);
-size_t round_up(size_t p, size_t align);
-size_t round_down(size_t p, size_t align);
 void millisleep(unsigned long milliseconds);
 
 #ifdef _WIN32
@@ -249,6 +246,7 @@ enum FindRes {
 enum IndexMethod {
     index_FindFirst,
     index_FindAll_nocopy,
+    index_FindAll_prefix,
     index_Count,
 };
 
@@ -269,16 +267,13 @@ struct InternalFindResult {
 // realm::is_any<T, U1, U2, U3, ...> ==
 // std::is_same<T, U1>::value || std::is_same<T, U2>::value || std::is_same<T, U3>::value ...
 template <typename... T>
-struct is_any : std::false_type {
-};
+struct is_any : std::false_type {};
 
 template <typename T, typename... Ts>
-struct is_any<T, T, Ts...> : std::true_type {
-};
+struct is_any<T, T, Ts...> : std::true_type {};
 
 template <typename T, typename U, typename... Ts>
-struct is_any<T, U, Ts...> : is_any<T, Ts...> {
-};
+struct is_any<T, U, Ts...> : is_any<T, Ts...> {};
 
 template <typename... Ts>
 inline constexpr bool is_any_v = is_any<Ts...>::value;
@@ -321,38 +316,61 @@ OutputIt safe_copy_n(InputIt first, Size count, OutputIt result)
 #endif
 }
 
-
-template <class T>
-struct Wrap {
-    Wrap(const T& v)
-        : m_value(v)
-    {
+// Converts ascii c-locale uppercase characters to lower case,
+// leaves other char values unchanged.
+inline char toLowerAscii(char c)
+{
+    if (isascii(c) && isupper(c)) {
+#if REALM_ANDROID
+        return tolower(c); // _tolower is not supported on all ABI levels
+#else
+        return _tolower(c);
+#endif
     }
-    operator T() const
-    {
-        return m_value;
-    }
+    return c;
+}
 
-private:
-    T m_value;
-};
+inline void* round_up(void* p, uintptr_t align)
+{
+    uintptr_t r = uintptr_t(p) % align == 0 ? 0 : align - uintptr_t(p) % align;
+    return static_cast<char*>(p) + r;
+}
 
-// PlacementDelete is intended for use with std::unique_ptr when it holds an object allocated with
-// placement new. It simply calls the object's destructor without freeing the memory.
-struct PlacementDelete {
-    template <class T>
-    void operator()(T* v) const
-    {
-        v->~T();
+inline void* round_down(void* p, uintptr_t align)
+{
+    uintptr_t r = uintptr_t(p);
+    return reinterpret_cast<void*>(r & ~(align - 1));
+}
+
+constexpr size_t round_up(size_t p, size_t align)
+{
+    size_t r = p % align == 0 ? 0 : align - p % align;
+    return p + r;
+}
+
+constexpr size_t round_down(size_t p, size_t align)
+{
+    size_t r = p;
+    return r & (~(align - 1));
+}
+
+// return pointer to found character or to terminating NUL
+static inline const char* find_chr(const char* p, char c)
+{
+    while (*p && *p != c) {
+        ++p;
     }
-};
+    return p;
+}
 
 #ifdef _WIN32
-typedef void* FileDesc;
+typedef HANDLE FileDesc;
 #else
 typedef int FileDesc;
 #endif
 
+
+enum class IteratorControl { AdvanceToNext, Stop };
 
 } // namespace realm
 
