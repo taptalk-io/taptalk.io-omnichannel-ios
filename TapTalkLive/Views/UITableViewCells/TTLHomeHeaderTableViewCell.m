@@ -261,10 +261,7 @@
     NSString *channelLink = channel.url;
     NSURL *channelLinkUrl = [NSURL URLWithString:channelLink];
     
-    if ([[UIApplication sharedApplication] canOpenURL: channelLinkUrl]) {
-        [[UIApplication sharedApplication] openURL: channelLinkUrl];
-        //[[UIApplication sharedApplication] openURL:channelLinkUrl options:nil completionHandler:nil];
-    }
+    [TTLUtil openUrl:channelLinkUrl fromNavigationController:self.navigationController];
 }
 
 #pragma mark - UITableViewViewDataSource

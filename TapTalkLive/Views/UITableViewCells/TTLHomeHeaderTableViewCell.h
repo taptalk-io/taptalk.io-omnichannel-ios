@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TTLHomeHeaderTableViewCell : TTLBaseTableViewCell
 
 @property (weak, nonatomic) id<TTLHomeHeaderTableViewCellDelegate> delegate;
+@property (strong, nonatomic) UINavigationController *navigationController;
 
 - (void)hideMessageHistoryView;
 - (void)hideChannelContainer;

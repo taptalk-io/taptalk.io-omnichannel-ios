@@ -1114,8 +1114,8 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
         options = [TTLUtil nullToEmptyDictionary:options];
         [[UIApplication sharedApplication] openURL:url
                                            options:options
-                                 completionHandler:^(BOOL success){
-            if (!success) {
+                                 completionHandler:^(BOOL success) {
+            if (!success && navigationController != nil) {
                  TAPWebViewViewController *webViewController = [[TAPWebViewViewController alloc] init];
                  webViewController.urlString = url.absoluteString;
                  [navigationController pushViewController:webViewController animated:YES];
