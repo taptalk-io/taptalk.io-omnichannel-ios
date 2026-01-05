@@ -70,6 +70,7 @@
         UINib *cellNib = [UINib nibWithNibName:@"HomeHeaderTableViewCell" bundle:[TTLUtil currentBundle]];
         [tableView registerNib:cellNib forCellReuseIdentifier:[TTLHomeHeaderTableViewCell description]];
         TTLHomeHeaderTableViewCell *cell = (TTLHomeHeaderTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TTLHomeHeaderTableViewCell description] forIndexPath:indexPath];
+        cell.navigationController = self.navigationController;
         
         _showCaseListSection = [self isContainCaseList];
         if(!self.showCaseListSection) {
