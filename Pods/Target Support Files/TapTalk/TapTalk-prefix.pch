@@ -49,6 +49,7 @@
 #import "TAPBaseTableView.h"
 #import "TAPScheduledMessageModel.h"
 #import "TapHighlightCustomButtonView.h"
+#import "TapBarButtonItem.h"
 #import "TapAFNetworking.h"
 #import "TapAFHTTPSessionManager.h"
 #import "TapAFURLSessionManager.h"

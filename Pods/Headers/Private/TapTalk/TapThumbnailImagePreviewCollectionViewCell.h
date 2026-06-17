@@ -1,1 +1,1 @@
-../../../TapTalk/TapTalk/Views/UICollectionViewCells/TapThumbnailImagePreviewCollectionViewCell.h
+../../../TapTalk/TapTalk/Views/UICollectionViewCells/TAPThumbnailImagePreviewCollectionViewCell.h

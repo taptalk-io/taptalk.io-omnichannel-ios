@@ -10,6 +10,7 @@
 #import "TTLCreateCaseViewController.h"
 #import <TapTalk/TAPRoomListModel.h>
 #import <TapTalk/TapUIChatViewController.h>
+#import <TapTalk/TapBarButtonItem.h>
 #import <TapTalk/TapUI.h>
 
 @interface TTLRoomListViewController ()
@@ -35,7 +36,7 @@
     button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
     
 //    id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;

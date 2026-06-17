@@ -480,8 +480,6 @@
         return;
     }
     
-    NSLog(@"isEnable%ld", self.bubbleViewLongPressGestureRecognizer.isEnabled);
-    
      if (recognizer.state == UIGestureRecognizerStateBegan) {
             _disableTriggerHapticFeedbackOnDrag = NO;
         }
