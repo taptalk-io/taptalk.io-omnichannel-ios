@@ -7,6 +7,7 @@
 //
 
 #import "TTLPopUpInfoView.h"
+#import "TTLStyleManager.h"
 
 @interface TTLPopUpInfoView ()
 
@@ -15,14 +16,12 @@
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *detailLabel;
 
-- (void)resizeSubview;
-- (void)isShowTwoOptionButton:(BOOL)isShow;
-
 @end
 
 @implementation TTLPopUpInfoView
 
 #pragma mark - Lifecycle
+
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {

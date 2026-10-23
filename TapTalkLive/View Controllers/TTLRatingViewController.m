@@ -8,6 +8,7 @@
 
 #import "TTLRatingViewController.h"
 #import "TTLRatingView.h"
+#import "OneTalkLiveChat.h"
 
 @interface TTLRatingViewController () <TTLFormGrowingTextViewDelegate, TTLCustomButtonViewDelegate>
 
@@ -83,7 +84,7 @@
 
 - (BOOL)formGrowingTextView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     NSString *newString = [textView.text stringByReplacingCharactersInRange:range withString:text];
-    if(newString.length >= 1000) {
+    if (newString.length >= 1000) {
         return NO;
     }
     else {
@@ -93,6 +94,7 @@
     newString = [newString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (![newString isEqualToString:@""] && self.isRatingStarTapped) {
         [self.ratingView setSubmitButtonAsActive:YES];
+        [self.ratingView showCommentTextViewError:NO];
     }
 
     return YES;
@@ -108,15 +110,20 @@
 
 #pragma mark TTLCustomButtonView
 - (void)customButtonViewDidTappedButton {
-    //Submit button tapped
+    // Submit button tapped
+    NSString *additionalNotes = [self.ratingView.commentTextView getText];
+    additionalNotes = [TTLUtil nullToEmptyString:additionalNotes];
+    
+    if (self.starRatingValue <= 3 && [TTLUtil isEmptyString:additionalNotes]) {
+        [self.ratingView showCommentTextViewError:YES];
+        return;
+    }
+    
     [self.view endEditing:YES];
     [self.ratingView.submitButtonView setAsLoading:YES animated:YES];
     
     NSString *caseID = self.currentCase.caseID;
     caseID = [TTLUtil nullToEmptyString:caseID];
-    
-    NSString *additionalNotes = [self.ratingView.commentTextView getText];
-    additionalNotes = [TTLUtil nullToEmptyString:additionalNotes];
     
     [self.ratingView setLoadingState:YES];
     [TTLDataManager callAPIRateConversionWithCaseID:caseID rating:self.starRatingValue notes:additionalNotes success:^(BOOL isSuccess) {
@@ -136,12 +143,10 @@
         [self.ratingView.submitButtonView setAsLoading:NO animated:YES];
         [self showPopupViewWithPopupType:TTLPopUpInfoViewControllerTypeErrorMessage popupIdentifier:@"fail" title:NSLocalizedStringFromTableInBundle(@"Failed to Submit", nil, [TTLUtil currentBundle], @"") detailInformation:NSLocalizedStringFromTableInBundle(@"There’s an error while submitting, please try to resubmit your rating of this conversation.", nil, [TTLUtil currentBundle], @"") leftOptionButtonTitle:nil singleOrRightOptionButtonTitle:@"OK"];
     }];
-    
-    
 }
 
 - (void)popUpInfoTappedSingleButtonOrRightButtonWithIdentifier:(NSString *)popupIdentifier {
-    if([popupIdentifier isEqualToString:@"success"]) {
+    if ([popupIdentifier isEqualToString:@"success"]) {
         [self closeButtonDidTapped];
     }
 }
@@ -175,7 +180,7 @@
 }
 
 - (void)firstStarRatingDidTapped {
-    if(![self.ratingView.commentTextView.text isEqualToString:@""]) {
+    if (![self.ratingView.commentTextView.text isEqualToString:@""]) {
         [self.ratingView setSubmitButtonAsActive:YES];
     }
     else {
@@ -192,7 +197,7 @@
     _starRatingValue = 2;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
     self.ratingView.commentLabel.text = @"Comment";
-    if(![self.ratingView.commentTextView.text isEqualToString:@""]) {
+    if (![self.ratingView.commentTextView.text isEqualToString:@""]) {
         [self.ratingView setSubmitButtonAsActive:YES];
     }
     else {
@@ -204,7 +209,8 @@
     _isRatingStarTapped = YES;
     _starRatingValue = 3;
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
-    self.ratingView.commentLabel.text = @"Comment";    if(![self.ratingView.commentTextView.text isEqualToString:@""]) {
+    self.ratingView.commentLabel.text = @"Comment";
+    if (![self.ratingView.commentTextView.text isEqualToString:@""]) {
         [self.ratingView setSubmitButtonAsActive:YES];
     }
     else {
@@ -218,13 +224,17 @@
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
     self.ratingView.commentLabel.text = @"Comment (Optional)";
-    UIFont *opsionalLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBody];
+    UIFont *optionalLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBody];
     NSRange range = [self.ratingView.commentLabel.text rangeOfString:@"(Optional)"];
-    NSMutableAttributedString *charCounterAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.ratingView.commentLabel.text];
-    [charCounterAttribuetdString addAttribute:NSFontAttributeName
-                                  value:opsionalLabelFont
-                                  range:range];
-    self.ratingView.commentLabel.attributedText = charCounterAttribuetdString;
+    NSMutableAttributedString *optionalAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.ratingView.commentLabel.text];
+    [optionalAttribuetdString addAttribute:NSFontAttributeName
+                                     value:optionalLabelFont
+                                     range:range];
+    [optionalAttribuetdString addAttribute:NSForegroundColorAttributeName
+                                     value:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextMedium]
+                                     range:range];
+    self.ratingView.commentLabel.attributedText = optionalAttribuetdString;
+    [self.ratingView showCommentTextViewError:NO];
 }
 
 - (void)fifthStarRatingDidTapped {
@@ -233,13 +243,17 @@
     [self.ratingView setStarRatingWithValue:self.starRatingValue];
     [self.ratingView setSubmitButtonAsActive:YES];
     self.ratingView.commentLabel.text = @"Comment (Optional)";
-    UIFont *opsionalLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBody];
+    UIFont *optionalLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBody];
     NSRange range = [self.ratingView.commentLabel.text rangeOfString:@"(Optional)"];
-    NSMutableAttributedString *charCounterAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.ratingView.commentLabel.text];
-    [charCounterAttribuetdString addAttribute:NSFontAttributeName
-                                  value:opsionalLabelFont
-                                  range:range];
-    self.ratingView.commentLabel.attributedText = charCounterAttribuetdString;
+    NSMutableAttributedString *optionalAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.ratingView.commentLabel.text];
+    [optionalAttribuetdString addAttribute:NSFontAttributeName
+                                     value:optionalLabelFont
+                                     range:range];
+    [optionalAttribuetdString addAttribute:NSForegroundColorAttributeName
+                                     value:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextMedium]
+                                     range:range];
+    self.ratingView.commentLabel.attributedText = optionalAttribuetdString;
+    [self.ratingView showCommentTextViewError:NO];
 }
 
 @end

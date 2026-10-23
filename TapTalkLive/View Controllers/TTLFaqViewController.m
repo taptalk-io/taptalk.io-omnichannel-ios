@@ -6,8 +6,9 @@
 //
 
 #import "TTLFaqViewController.h"
-#import "FaqParentTableViewCell.h"
-#import "FaqChildTableViewCell.h"
+#import "TTLFaqParentTableViewCell.h"
+#import "TTLFaqChildTableViewCell.h"
+#import "OneTalkLiveChat.h"
 
 @interface TTLFaqViewController ()<UITableViewDataSource, UITableViewDelegate, FaqParentTableViewCellDelegate, FaqChildTableViewCellDelegate, TTLCreateCaseViewControllerDelegate, TTLFaqViewControllerDelegate>
 @property (unsafe_unretained, nonatomic) IBOutlet UITableView *tableView;
@@ -213,9 +214,9 @@
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     if(indexPath.row == 0) {
-        UINib *cellNib = [UINib nibWithNibName:@"FaqParentTableViewCell" bundle:[TTLUtil currentBundle]];
-        [tableView registerNib:cellNib forCellReuseIdentifier:[FaqParentTableViewCell description]];
-        FaqParentTableViewCell *cell = (FaqParentTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[FaqParentTableViewCell description] forIndexPath:indexPath];
+        UINib *cellNib = [UINib nibWithNibName:@"TTLFaqParentTableViewCell" bundle:[TTLUtil currentBundle]];
+        [tableView registerNib:cellNib forCellReuseIdentifier:[TTLFaqParentTableViewCell description]];
+        TTLFaqParentTableViewCell *cell = (TTLFaqParentTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TTLFaqParentTableViewCell description] forIndexPath:indexPath];
         cell.delegate = self;
         [cell setFaqParentData:self.faqPathModel];
         cell.navigationController = self.navigationController;
@@ -230,9 +231,9 @@
         return cell;
     }
     else {
-        UINib *cellNib = [UINib nibWithNibName:@"FaqChildTableViewCell" bundle:[TTLUtil currentBundle]];
-        [tableView registerNib:cellNib forCellReuseIdentifier:[FaqChildTableViewCell description]];
-        FaqChildTableViewCell *cell = (FaqChildTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[FaqChildTableViewCell description] forIndexPath:indexPath];
+        UINib *cellNib = [UINib nibWithNibName:@"TTLFaqChildTableViewCell" bundle:[TTLUtil currentBundle]];
+        [tableView registerNib:cellNib forCellReuseIdentifier:[TTLFaqChildTableViewCell description]];
+        TTLFaqChildTableViewCell *cell = (TTLFaqChildTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TTLFaqChildTableViewCell description] forIndexPath:indexPath];
         TTLFaqModel *faqChild = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 1];
         cell.delegate = self;
         [cell setFaqChildWithData:faqChild];

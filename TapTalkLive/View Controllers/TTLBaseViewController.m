@@ -7,10 +7,9 @@
 //
 
 #import "TTLBaseViewController.h"
-#import <TapTalk/TapAFNetworking.h>
-#import <TapTalk/TAPUtil.h>
+#import "OneTalkLiveChat.h"
 
-@interface TTLBaseViewController ()
+@interface TTLBaseViewController () <TTLPopUpInfoViewControllerDelegate>
 
 @property (strong, nonatomic) UIImage *navigationShadowImage;
 @property (strong, nonatomic) UIView *footerView;
@@ -190,35 +189,35 @@
 }
 
 - (void)showCustomBackButton {
-    TTLImage *buttonImage = [TTLImage imageNamed:@"TTLIconBackArrow" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *buttonImage = [UIImage imageNamed:@"TTLIconBackArrow" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     buttonImage = [buttonImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconNavigationBarBackButton]];
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(backButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
 
 - (void)showCustomCloseButton {
-    TTLImage *buttonImage = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *buttonImage = [UIImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     buttonImage = [buttonImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconNavigationBarCloseButton]];
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setLeftBarButtonItem:barButtonItem];
 }
 
 - (void)showCustomRightCloseButton {
-    TTLImage *buttonImage = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *buttonImage = [UIImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     buttonImage = [buttonImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconNavigationBarCloseButton]];
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
     button.contentEdgeInsets = UIEdgeInsetsMake(0.0f, 18.0f, 0.0f, 0.0f);
     [button setImage:buttonImage forState:UIControlStateNormal];
     [button addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *barButtonItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+    TapBarButtonItem *barButtonItem = [[TapBarButtonItem alloc] initWithCustomView:button];
     [self.navigationItem setRightBarButtonItem:barButtonItem];
 }
 
@@ -232,7 +231,7 @@
     leftBarButton.contentEdgeInsets  = UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 18.0f);
     leftBarButton.titleLabel.font = leftBarButtonItemFont;
     [leftBarButton addTarget:self action:@selector(closeButtonDidTapped) forControlEvents:UIControlEventTouchUpInside];
-    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftBarButton];
+    TapBarButtonItem *leftBarButtonItem = [[TapBarButtonItem alloc] initWithCustomView:leftBarButton];
     [self.navigationItem setLeftBarButtonItem:leftBarButtonItem];
 }
 
@@ -357,7 +356,7 @@
         self.snackBarView.layer.borderWidth = 1.0f;
         label.textColor = [TTLUtil getColor:TTL_COLOR_ERROR];
         if (iconImageView != nil && iconImageView.image != nil) {
-            iconImageView.image = [(TTLImage *) iconImageView.image setImageTintColor:[TTLUtil getColor:TTL_COLOR_ERROR]];
+            iconImageView.image = [iconImageView.image setImageTintColor:[TTLUtil getColor:TTL_COLOR_ERROR]];
         }
     }
     else if (type == TTLSnackBarTypeWarning) {
@@ -366,7 +365,7 @@
         self.snackBarView.layer.borderWidth = 1.0f;
         label.textColor = [TTLUtil getColor:TTL_COLOR_PRIMARY];
         if (iconImageView != nil && iconImageView.image != nil) {
-            iconImageView.image = [(TTLImage *) iconImageView.image setImageTintColor:[TTLUtil getColor:TTL_COLOR_PRIMARY]];
+            iconImageView.image = [iconImageView.image setImageTintColor:[TTLUtil getColor:TTL_COLOR_PRIMARY]];
         }
     }
     else {
@@ -374,7 +373,7 @@
         self.snackBarView.layer.borderWidth = 0.0f;
         label.textColor = [UIColor whiteColor];
         if (iconImageView != nil && iconImageView.image != nil) {
-            iconImageView.image = [(TTLImage *) iconImageView.image setImageTintColor:[UIColor whiteColor]];
+            iconImageView.image = [iconImageView.image setImageTintColor:[UIColor whiteColor]];
         }
     }
     

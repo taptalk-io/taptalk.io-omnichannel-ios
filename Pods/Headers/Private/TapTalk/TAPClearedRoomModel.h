@@ -1,1 +1,0 @@
-../../../TapTalk/TapTalk/Models/TAPClearedRoomModel.h

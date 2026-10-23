@@ -1,1 +1,0 @@
-../../../TapTalk/TapTalk/Views/UICollectionViewCells/TAPProductListCollectionViewCell.h

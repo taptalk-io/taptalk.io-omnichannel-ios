@@ -7,7 +7,7 @@
 //
 
 #import "TTLDoneReviewBubbleTableViewCell.h"
-#import <TapTalk/TapUserModel.h>
+#import "OneTalkLiveChat.h"
 
 @interface TTLDoneReviewBubbleTableViewCell ()
 
@@ -38,15 +38,14 @@
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewLeadingConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *bubbleViewTrailingConstraint;
 
-- (IBAction)reviewButtonDidTapped:(id)sender;
-- (IBAction)senderProfileImageButtonDidTapped:(id)sender;
-
 @property (strong, nonatomic) TAPMessageModel *currentMessage;
 
 @end
 
 @implementation TTLDoneReviewBubbleTableViewCell
+
 #pragma mark - Lifecycle
+
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
@@ -88,7 +87,7 @@
     self.doneReviewView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonInactiveBackgroundGradientLight];
     
     self.doneReviewIconImageView.image = [UIImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
-    TTLImage *checkIconImage = self.doneReviewIconImageView.image;
+    UIImage *checkIconImage = self.doneReviewIconImageView.image;
     checkIconImage = [checkIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconReviewBubbleCellDoneReviewCheck]];
     self.doneReviewIconImageView.image = checkIconImage;
     
@@ -108,12 +107,13 @@
 }
 
 #pragma mark - Custom Method
+
 - (void)setMessage:(TAPMessageModel *)message {
     [super setMessage:message];
     
     _currentMessage = message;
     
-    TAPUserModel *currentActiveUser = [TTLDataManager getActiveUser];
+    TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
     NSString *activeUserID = currentActiveUser.userID;
     activeUserID = [TTLUtil nullToEmptyString:activeUserID];
     

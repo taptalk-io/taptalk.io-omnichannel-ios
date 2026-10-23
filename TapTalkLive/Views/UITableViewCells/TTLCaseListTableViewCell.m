@@ -6,10 +6,7 @@
 //
 
 #import "TTLCaseListTableViewCell.h"
-#import <TapTalk/TapUI.h>
-#import <TapTalk/TAPChatManager.h>
-#import <TapTalk/TAPStyleManager.h>
-#import <TapTalk/TAPUtil.h>
+#import "OneTalkLiveChat.h"
 
 @interface TTLCaseListTableViewCell () <TTLImageViewDelegate>
 
@@ -35,7 +32,6 @@
 @property IBOutlet NSLayoutConstraint *lastMessageStatusViewLeftConstraint;
 
 @property IBOutlet UIView *separatorView;
-
 
 @end
 
@@ -311,28 +307,23 @@
         }
     }
     switch (statusType) {
-        case TTLMessageStatusTypeNone:
-        {
+        case TTLMessageStatusTypeNone: {
             self.lastMessageStatusIconImageView.alpha = 0.0f;
             break;
         }
-        case TTLMessageStatusTypeSending:
-        {
+        case TTLMessageStatusTypeSending: {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconSending" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
-        case TTLMessageStatusTypeSent:
-        {
+        case TTLMessageStatusTypeSent: {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconSent" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
-        case TTLMessageStatusTypeDelivered:
-        {
+        case TTLMessageStatusTypeDelivered: {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconDelivered" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
-        case TTLMessageStatusTypeRead:
-        {
+        case TTLMessageStatusTypeRead: {
             // Check if show read status
             BOOL isHideReadStatus = [[TapUI sharedInstance] getReadStatusHiddenState];
             if (isHideReadStatus) {
@@ -346,13 +337,11 @@
             
             break;
         }
-        case TTLMessageStatusTypeFailed:
-        {
+        case TTLMessageStatusTypeFailed: {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconFailed" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
-        case TTLMessageStatusTypeDeleted:
-        {
+        case TTLMessageStatusTypeDeleted: {
             self.lastMessageStatusIconImageView.image = [UIImage imageNamed:@"TAPIconBlock" inBundle:[TAPUtil currentBundle] compatibleWithTraitCollection:nil];
             break;
         }
@@ -421,7 +410,6 @@
         
         timeString = dateString;
     }
-    
     return timeString;
 }
 

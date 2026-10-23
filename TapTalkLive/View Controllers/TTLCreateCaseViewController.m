@@ -10,11 +10,7 @@
 #import "TTLCreateCaseView.h"
 #import "TTLCustomDropDownTextFieldView.h"
 #import "TTLTopicListViewController.h"
-
-#import <TapTalk/TapTalk.h>
-#import <TapTalk/TapUI.h>
-#import <TapTalk/TapUIRoomListViewController.h>
-#import <TapTalk/TAPCoreChatRoomManager.h>
+#import "OneTalkLiveChat.h"
 
 @interface TTLCreateCaseViewController () <UIScrollViewDelegate, TTLCustomDropDownTextFieldViewDelegate, TTLFormGrowingTextViewDelegate, TTLCustomButtonViewDelegate, TTLTopicListViewControllerDelegate, TTLCustomTextFieldViewDelegate>
 
@@ -135,8 +131,9 @@
         [TTLDataManager callAPIGetTopicListSuccess:^(NSArray<TTLTopicModel *> * _Nonnull topicListArray) {
             _topicListDataArray = topicListArray;
             [self customDropDownTextFieldViewDidTapped];
-        } failure:^(NSError * _Nonnull error) {
-            [self showSnackBar:TTLSnackBarTypeError message:[NSString stringWithFormat:@"Unable to obtain topics: ", error.localizedDescription] iconName:@""];
+        }
+        failure:^(NSError * _Nonnull error) {
+            [self showSnackBar:TTLSnackBarTypeError message:[NSString stringWithFormat:@"Unable to obtain topics: %@", [TTLUtil getDefaultMessageFromError:error]] iconName:@""];
         }];
         return;
     }
@@ -145,7 +142,7 @@
     [self.createCaseView.messageTextView.textView resignFirstResponder];
     TTLTopicListViewController *topicListViewController = [[TTLTopicListViewController alloc] init];
     topicListViewController.delegate = self;
-    topicListViewController.topicListArray = self.topicListDataArray;
+    topicListViewController.topicListArray = [self.topicListDataArray mutableCopy];
     if (self.selectedTopic != nil) {
         topicListViewController.selectedTopic = self.selectedTopic;
     }

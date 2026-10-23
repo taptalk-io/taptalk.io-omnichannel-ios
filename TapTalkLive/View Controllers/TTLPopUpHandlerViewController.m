@@ -8,7 +8,7 @@
 
 #import "TTLPopUpHandlerViewController.h"
 #import "TTLPopUpInfoViewController.h"
-#import <TapTalk/TapUIChatViewController.h>
+#import "OneTalkLiveChat.h"
 
 @interface TTLPopUpHandlerViewController () <TTLPopUpInfoViewControllerDelegate>
 

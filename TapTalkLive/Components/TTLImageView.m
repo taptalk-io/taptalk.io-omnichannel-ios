@@ -6,9 +6,9 @@
 //  Copyright © 2020 taptalk.io. All rights reserved.
 //
 
+@import SDWebImage;
+
 #import "TTLImageView.h"
-#import "SDWebImageDownloader.h"
-#import "SDImageCache.h"
 
 @interface TTLImageView ()
 
@@ -41,8 +41,8 @@
 
 - (void)initialization {
     SDImageCache *imageCache = [SDImageCache sharedImageCache];
-    imageCache.config.maxDiskSize = kMaxDiskCountLimit;
-    imageCache.config.maxDiskAge = kMaxCacheAge;
+    imageCache.config.maxDiskSize = 1048576000;
+    imageCache.config.maxDiskAge = 60 * 60 * 24 * 7;
 }
 
 /*

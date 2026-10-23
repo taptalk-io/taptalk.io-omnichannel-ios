@@ -8,54 +8,50 @@
 #import "TTLHomeHeaderTableViewCell.h"
 #import "TTLChannelCollectionViewCell.h"
 #import "TTLCaseListTableViewCell.h"
-#import <TapTalk/TAPChatManager.h>
-#import <TapTalk/TAPDataManager.h>
-#import <TapTalk/TapUtil.h>
-#import <TapTalk/TAPMessageStatusManager.h>
-#import <TapTalk/TapUIChatViewController.h>
+#import "OneTalkLiveChat.h"
 
-@interface TTLHomeHeaderTableViewCell () <UICollectionViewDelegate, UICollectionViewDataSource, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPChatViewControllerDelegate>
+@interface TTLHomeHeaderTableViewCell () <UICollectionViewDelegate, UICollectionViewDataSource, UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPChatViewControllerDelegate, TTLCaseListTableViewCellDelegate>
 
-@property (weak, nonatomic) IBOutlet UIView *headerBackgroundView;
-@property (weak, nonatomic) IBOutlet UIImageView *closeIconImageView;
-@property (weak, nonatomic) IBOutlet UILabel *needHelpTitleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *selectChannelTitleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *clickOneChannelTitleLabel;
-@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
-@property (weak, nonatomic) IBOutlet UILabel *orLabel;
-@property (weak, nonatomic) IBOutlet UIView *messageDirectlyContainerView;
-@property (weak, nonatomic) IBOutlet UILabel *messageDirectlyLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *messageDirectlyImageView;
+@property (strong, nonatomic) IBOutlet UIView *headerBackgroundView;
+@property (strong, nonatomic) IBOutlet UIImageView *closeIconImageView;
+@property (strong, nonatomic) IBOutlet UILabel *needHelpTitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *selectChannelTitleLabel;
+@property (strong, nonatomic) IBOutlet UILabel *clickOneChannelTitleLabel;
+@property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (strong, nonatomic) IBOutlet UILabel *orLabel;
+@property (strong, nonatomic) IBOutlet UIView *messageDirectlyContainerView;
+@property (strong, nonatomic) IBOutlet UILabel *messageDirectlyLabel;
+@property (strong, nonatomic) IBOutlet UIImageView *messageDirectlyImageView;
 
-@property (weak, nonatomic) IBOutlet UIView *messageUserImageProfileContainerView;
-@property (weak, nonatomic) IBOutlet UILabel *messageTopicLabel;
-@property (weak, nonatomic) IBOutlet UILabel *messageTimeLabel;
-@property (weak, nonatomic) IBOutlet UILabel *MessageUserNameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *messageContentLabel;
+@property (strong, nonatomic) IBOutlet UIView *messageUserImageProfileContainerView;
+@property (strong, nonatomic) IBOutlet UILabel *messageTopicLabel;
+@property (strong, nonatomic) IBOutlet UILabel *messageTimeLabel;
+@property (strong, nonatomic) IBOutlet UILabel *MessageUserNameLabel;
+@property (strong, nonatomic) IBOutlet UILabel *messageContentLabel;
 
-@property (weak, nonatomic) IBOutlet UILabel *yourMessageLabel;
-@property (weak, nonatomic) IBOutlet UILabel *seeAllMessageLabel;
-@property (weak, nonatomic) IBOutlet UILabel *homeNewMessageLabel;
-@property (weak, nonatomic) IBOutlet UIView *homeNewMessageContainerView;
-@property (weak, nonatomic) IBOutlet UIView *messageHistoryContainerView;
-@property (weak, nonatomic) IBOutlet UIView *channelContainerView;
-@property (weak, nonatomic) IBOutlet UIView *sendMessageDirectlyContainerView;
-@property (weak, nonatomic) IBOutlet UICollectionView *channelCollectionView;
-@property (weak, nonatomic) IBOutlet UITableView *recentCaseListTableView;
-@property (weak, nonatomic) IBOutlet UIImageView *messageUsButtonImageView;
-@property (weak, nonatomic) IBOutlet UIView *orView;
+@property (strong, nonatomic) IBOutlet UILabel *yourMessageLabel;
+@property (strong, nonatomic) IBOutlet UILabel *seeAllMessageLabel;
+@property (strong, nonatomic) IBOutlet UILabel *homeNewMessageLabel;
+@property (strong, nonatomic) IBOutlet UIView *homeNewMessageContainerView;
+@property (strong, nonatomic) IBOutlet UIView *messageHistoryContainerView;
+@property (strong, nonatomic) IBOutlet UIView *channelContainerView;
+@property (strong, nonatomic) IBOutlet UIView *sendMessageDirectlyContainerView;
+@property (strong, nonatomic) IBOutlet UICollectionView *channelCollectionView;
+@property (strong, nonatomic) IBOutlet UITableView *recentCaseListTableView;
+@property (strong, nonatomic) IBOutlet UIImageView *messageUsButtonImageView;
+@property (strong, nonatomic) IBOutlet UIView *orView;
 
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryViewHeightConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryViewZeroHeightConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *sendMessageDirectlyViewHeightConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelContainerViewHeightConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelContainerViewZeroHeightConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelListCollectionTopConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelTitleLabelTopConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *channelTitleLabelHeightConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *collectionViewHeightConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryContainerTopConstraint;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *orViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryViewZeroHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *sendMessageDirectlyViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *channelContainerViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *channelContainerViewZeroHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *channelListCollectionTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *channelTitleLabelTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *channelTitleLabelHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *collectionViewHeightConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *messageHistoryContainerTopConstraint;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *orViewHeightConstraint;
 
 @property (nonatomic) CGFloat cellSize;
 @property (strong, nonatomic) NSMutableArray *filteredChannelList;
@@ -109,7 +105,7 @@
     self.messageDirectlyContainerView.layer.borderWidth = 1.0f;
     self.messageDirectlyContainerView.layer.borderColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary].CGColor;
     
-    TTLImage *messageDirectlyImage = self.messageDirectlyImageView.image;
+    UIImage *messageDirectlyImage = self.messageDirectlyImageView.image;
     self.messageDirectlyImageView.image = [messageDirectlyImage setImageTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconPrimary]];
     
     self.yourMessageLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorHomeInfoLabel];
@@ -128,10 +124,10 @@
     self.homeNewMessageLabel.textColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorBorderedButtonLabel];
     self.homeNewMessageLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontBorderedButtonLabel];
     
-    TTLImage *closeIconImage = self.closeIconImageView.image;
+    UIImage *closeIconImage = self.closeIconImageView.image;
     self.closeIconImageView.image = [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconWhite]];
     
-    TTLImage *messageUsButtonImage = self.messageUsButtonImageView.image;
+    UIImage *messageUsButtonImage = self.messageUsButtonImageView.image;
     self.messageUsButtonImageView.image = [messageUsButtonImage setImageTintColor:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorIconPrimary]];
     
     //[self.channelCollectionView registerNib:[UINib nibWithNibName:@"TTLChannelCollectionViewCell" bundle:[TTLUtil currentBundle]]   forCellWithReuseIdentifier: @"TTLChannelCollectionViewCell"];
@@ -456,7 +452,8 @@
 #pragma mark - Room List Methods
 
 - (void)viewLoadedSequence {
-    if ([TAPChatManager sharedManager].activeUser == nil) {
+//    if ([TAPChatManager sharedManager].activeUser == nil) {
+    if ([TTLDataManager getActiveUser] == nil) {
         [[TAPChatManager sharedManager] disconnect];
         
         if ([TapTalk sharedInstance].isAuthenticated) {

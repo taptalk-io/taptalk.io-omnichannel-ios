@@ -7,7 +7,7 @@
 //
 
 #import "TTLCaseListView.h"
-#import "TTLCustomButtonView.h"
+#import "OneTalkLiveChat.h"
 
 @interface TTLCaseListView ()
 
@@ -24,7 +24,9 @@
 @end
 
 @implementation TTLCaseListView
+
 #pragma mark - Lifecycle
+
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
@@ -43,8 +45,8 @@
         [self addSubview:self.closeButtonContainerView];
         
         _closeImageView = [[UIImageView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.closeButtonContainerView.frame) - 24.0f) / 2.0f, (CGRectGetHeight(self.closeButtonContainerView.frame) - 24.0f) / 2.0f, 24.0f, 24.0f)];
-        self.closeImageView.image = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
-        TTLImage *closeIconImage = self.closeImageView.image;
+        self.closeImageView.image = [UIImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        UIImage *closeIconImage = self.closeImageView.image;
         closeIconImage = [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
         self.closeImageView.image = closeIconImage;
         [self addSubview:self.closeImageView];
@@ -76,7 +78,5 @@
     
     return self;
 }
-
-#pragma mark - Custom Method
 
 @end

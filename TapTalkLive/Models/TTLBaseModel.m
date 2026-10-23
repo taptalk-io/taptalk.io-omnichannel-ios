@@ -9,9 +9,9 @@
 #import "TTLBaseModel.h"
 
 @implementation TTLBaseModel
-#pragma mark - Lifecycle
 
 #pragma mark - Custom Method
+
 + (BOOL)propertyIsOptional:(NSString*)propertyName {
     return YES;
 }

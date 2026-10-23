@@ -10,9 +10,9 @@
 
 @implementation TTLUserModel
 
-//used to save model to preference
+// Used to save model to preference
 - (void)encodeWithCoder:(NSCoder *)encoder {
-    //Encode properties, other class variables, etc
+    // Encode properties, other class variables, etc
     [encoder encodeObject:self.userID forKey:@"userID"];
     [encoder encodeObject:self.fullName forKey:@"fullName"];
     [encoder encodeObject:self.source forKey:@"source"];
@@ -35,7 +35,7 @@
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
-    if((self = [super init])) {
+    if ((self = [super init])) {
         //decode properties, other class vars
         self.userID = [decoder decodeObjectForKey:@"userID"];
         self.fullName = [decoder decodeObjectForKey:@"fullName"];

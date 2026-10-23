@@ -7,8 +7,10 @@
 //
 
 #import "TTLCreateCaseView.h"
+#import "OneTalkLiveChat.h"
 
 @interface TTLCreateCaseView ()
+
 @property (strong, nonatomic) UIView *topBackgroundView;
 
 @property (strong, nonatomic) UIView *headerView;
@@ -23,7 +25,9 @@
 @end
 
 @implementation TTLCreateCaseView
+
 #pragma mark - Lifecycle
+
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
@@ -65,9 +69,9 @@
         [self.headerView addSubview:self.logoImageView];
         
         _closeImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(16.0f, 24.0f, 24.0f, 24.0f)];
-        self.closeImageView.image = [TTLImage imageNamed:@"TTLIconBackArrow" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
-        TTLImage *closeIconImage = (TTLImage *) self.closeImageView.image;
-        closeIconImage = (TTLImage *) [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
+        self.closeImageView.image = [UIImage imageNamed:@"TTLIconBackArrow" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        UIImage *closeIconImage = self.closeImageView.image;
+        closeIconImage = [closeIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
         self.closeImageView.image = closeIconImage;
         self.closeImageView.alpha = 0.0f;
         [self.headerView addSubview:self.closeImageView];
@@ -77,10 +81,10 @@
         self.closeButton.userInteractionEnabled = NO;
         [self.headerView addSubview:self.closeButton];
         
-//        _leftCloseImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(12.0f, topGap + 16.0f, 24.0f, 24.0f)];
-//        self.leftCloseImageView.image = (TTLImage *) [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
-//        TTLImage *leftCloseIconImage = (TTLImage *) self.leftCloseImageView.image;
-//        leftCloseIconImage = (TTLImage *) [leftCloseIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
+//        _leftCloseImageView = [[UIImageView alloc] initWithFrame:CGRectMake(12.0f, topGap + 16.0f, 24.0f, 24.0f)];
+//        self.leftCloseImageView.image = [UIImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+//        UIImage *leftCloseIconImage = self.leftCloseImageView.image;
+//        leftCloseIconImage = [leftCloseIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonIcon]];
 //        self.leftCloseImageView.image = leftCloseIconImage;
 //        self.leftCloseImageView.alpha = 0.0f;
 //        [self.headerView addSubview:self.leftCloseImageView];

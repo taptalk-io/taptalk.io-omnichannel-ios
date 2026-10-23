@@ -4,11 +4,11 @@ platform :ios, '12.0'
 inhibit_all_warnings!
 
 def tapTalkLive_pods
-  pod 'TapTalk'
-  pod 'JSONModel', '1.8.0', :modular_headers => true
-  pod 'SDWebImage'
-  pod 'PodAsset'
-  pod 'GoogleMaps', '5.2.0'
+  #pod 'TapTalk'
+  #pod 'JSONModel', '1.8.0', :modular_headers => true
+  #pod 'SDWebImage'
+  #pod 'PodAsset'
+  #pod 'GoogleMaps', '5.2.0'
 end
 
 target "TapTalkLive" do
