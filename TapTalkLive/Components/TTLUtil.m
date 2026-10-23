@@ -7,9 +7,7 @@
 //
 
 #import "TTLUtil.h"
-#import <TapTalk/TAPUtil.h>
-#import <TapTalk/TAPWebViewViewController.h>
-#import <TapTalk/TapAFNetworkReachabilityManager.h>
+#import "OneTalkLiveChat.h"
 
 @implementation TTLUtil
 
@@ -453,10 +451,11 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json
                                                        options:0
                                                          error:&error];
-    NSString *jsonString;
+    NSString *jsonString = @"";
     if (!jsonData) {
         NSLog(@"Got an error stringFromJSON method: %@", error);
-    } else {
+    }
+    else {
         jsonString = [[NSString alloc] initWithData:jsonData
                                            encoding:NSUTF8StringEncoding];
     }
@@ -1128,7 +1127,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 }
 
 + (NSString *)getDefaultMessageFromError:(NSError *)error {
-    NSString *errorMessage;
+    NSString *errorMessage = @"";
     if (error != nil) {
         errorMessage = [error.userInfo objectForKey:@"message"];
     }
@@ -1158,8 +1157,14 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect, float ovalWi
 #pragma mark - TapTalk
 
 + (NSBundle *)currentBundle {
-    NSBundle *resourceBundle = [PodAsset bundleForPod:@"TapTalkLive"];
-    
+    NSBundle *resourceBundle = [TAPUtil bundleForPod:@"TapTalkLive"];
+    if (resourceBundle == nil) {
+#ifndef SWIFTPM_MODULE_BUNDLE
+        extern NSBundle* TapTalkLive_TapTalkLive_SWIFTPM_MODULE_BUNDLE(void);
+        #define SWIFTPM_MODULE_BUNDLE [NSBundle bundleForClass:[TAPUtil class]]
+#endif
+        resourceBundle = SWIFTPM_MODULE_BUNDLE;
+    }
     return resourceBundle;
 }
 

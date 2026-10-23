@@ -1,1 +1,0 @@
-../../../TapTalk/TapTalk/Supporting Files/Configs.h

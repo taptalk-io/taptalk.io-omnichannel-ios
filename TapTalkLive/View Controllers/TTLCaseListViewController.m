@@ -7,18 +7,8 @@
 //
 
 #import "TTLCaseListViewController.h"
-#import "TTLCreateCaseViewController.h"
-#import "TTLHomeLauncherViewController.h"
 #import "TTLCaseListTableViewCell.h"
-#import <TapTalk/TapUI.h>
-#import <TapTalk/TAPChatManager.h>
-#import <TapTalk/TAPDataManager.h>
-#import <TapTalk/TapUtil.h>
-#import <TapTalk/TAPMessageStatusManager.h>
-#import <TapTalk/TapUIChatViewController.h>
-#import <TapTalk/TapAFNetworkReachabilityManager.h>
-//#import <TapTalk/TapUIRoomListViewController.h>
-//#import <TapTalk/TAPRoomListView.h>
+#import "OneTalkLiveChat.h"
 
 @interface TTLCaseListViewController () <UITableViewDelegate, UITableViewDataSource, TAPChatManagerDelegate, TAPChatViewControllerDelegate, TTLCaseListTableViewCellDelegate>
 
@@ -83,7 +73,7 @@
     
     self.brandBackgroundView.backgroundColor = [[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorPrimary];
     
-    TTLImage *backButtonImage;
+    UIImage *backButtonImage;
     if (self.navigationType == TTLCaseListViewControllerNavigationTypePresent) {
         backButtonImage = [UIImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     }
@@ -448,7 +438,8 @@
 }
 
 - (void)viewLoadedSequence {
-    if ([TAPChatManager sharedManager].activeUser == nil) {
+//    if ([TAPChatManager sharedManager].activeUser == nil) {
+    if ([TTLDataManager getActiveUser] == nil) {
         [[TAPChatManager sharedManager] disconnect];
         
         if ([TapTalk sharedInstance].isAuthenticated) {
@@ -699,7 +690,7 @@
                     [oldcaseListArray removeObjectAtIndex:oldIndex];
                     [self.caseListTableView performBatchUpdates:^{
                         //changing beginUpdates and endUpdates with this because of deprecation
-                        [self.caseListTableView deleteRowsAtIndexPaths:[NSIndexPath indexPathForRow:oldIndex inSection:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+                        [self.caseListTableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
                     } completion:^(BOOL finished) {
                     }];
                 }
@@ -958,7 +949,7 @@
 //    }];
 //}
 
-- (void)openCreateCaseFormViewIfNeeded {
+//- (void)openCreateCaseFormViewIfNeeded {
 //    BOOL isContainCaseList = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST valid:nil];
 //    NSString *currentAccessToken = [TTLDataManager getAccessToken];
 //    currentAccessToken = [TTLUtil nullToEmptyString:currentAccessToken];
@@ -967,7 +958,7 @@
 //        _closeRoomListWhenCreateCaseIsClosed = YES;
 //        [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
 //    }
-}
+//}
 
 - (void)showCreateCaseFormView {
     if (![TTLUtil isEmptyString:[TTLDataManager getCreateNewCaseBlockingMessage]]) {

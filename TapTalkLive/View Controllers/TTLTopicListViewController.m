@@ -9,6 +9,7 @@
 #import "TTLTopicListViewController.h"
 #import "TTLTopicListView.h"
 #import "TTLTopicOptionTableViewCell.h"
+#import "TTLUtil.h"
 
 @interface TTLTopicListViewController () <UITableViewDelegate, UITableViewDataSource>
 

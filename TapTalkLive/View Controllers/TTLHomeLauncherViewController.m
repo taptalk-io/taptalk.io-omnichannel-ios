@@ -8,11 +8,10 @@
 #import "TTLHomeLauncherViewController.h"
 #import "TTLHomeHeaderTableViewCell.h"
 #import "TTLFaqViewController.h"
-#import "FaqParentTableViewCell.h"
-#import "FaqChildTableViewCell.h"
+#import "TTLFaqParentTableViewCell.h"
+#import "TTLFaqChildTableViewCell.h"
 #import "TTLCaseListViewController.h"
-#import <TapTalk/TAPChatManager.h>
-#import <TapTalk/TapUI.h>
+#import "OneTalkLiveChat.h"
 
 @interface TTLHomeLauncherViewController () <UITableViewDataSource, UITableViewDelegate, TAPChatManagerDelegate, TTLHomeHeaderTableViewCellDelegate, FaqParentTableViewCellDelegate, FaqChildTableViewCellDelegate>
 
@@ -65,15 +64,14 @@
 #pragma mark - UITableViewDataSource
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    
-    if(indexPath.row == 0) {
-        UINib *cellNib = [UINib nibWithNibName:@"HomeHeaderTableViewCell" bundle:[TTLUtil currentBundle]];
+    if (indexPath.row == 0) {
+        UINib *cellNib = [UINib nibWithNibName:@"TTLHomeHeaderTableViewCell" bundle:[TTLUtil currentBundle]];
         [tableView registerNib:cellNib forCellReuseIdentifier:[TTLHomeHeaderTableViewCell description]];
         TTLHomeHeaderTableViewCell *cell = (TTLHomeHeaderTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TTLHomeHeaderTableViewCell description] forIndexPath:indexPath];
         cell.navigationController = self.navigationController;
         
         _showCaseListSection = [self isContainCaseList];
-        if(!self.showCaseListSection) {
+        if (!self.showCaseListSection) {
             [cell hideMessageHistoryView];
         }
         else {
@@ -101,17 +99,17 @@
         cell.delegate = self;
         return cell;
     }
-    else if(indexPath.row == 1) {
-        UINib *cellNib = [UINib nibWithNibName:@"FaqParentTableViewCell" bundle:[TTLUtil currentBundle]];
-        [tableView registerNib:cellNib forCellReuseIdentifier:[FaqParentTableViewCell description]];
-        FaqParentTableViewCell *cell = (FaqParentTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[FaqParentTableViewCell description] forIndexPath:indexPath];
+    else if (indexPath.row == 1) {
+        UINib *cellNib = [UINib nibWithNibName:@"TTLFaqParentTableViewCell" bundle:[TTLUtil currentBundle]];
+        [tableView registerNib:cellNib forCellReuseIdentifier:[TTLFaqParentTableViewCell description]];
+        TTLFaqParentTableViewCell *cell = (TTLFaqParentTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TTLFaqParentTableViewCell description] forIndexPath:indexPath];
         [cell hideHeaderView];
         [cell setFaqParentData:self.faqPathModel];
         cell.navigationController = self.navigationController;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.delegate = self;
         
-        if(self.faqPathModel.childItems.count > 0) {
+        if (self.faqPathModel.childItems.count > 0) {
             [cell setTopRadius];
         }
         else {
@@ -120,20 +118,20 @@
         return cell;
     }
     else {
-        UINib *cellNib = [UINib nibWithNibName:@"FaqChildTableViewCell" bundle:[TTLUtil currentBundle]];
-        [tableView registerNib:cellNib forCellReuseIdentifier:[FaqChildTableViewCell description]];
-        FaqChildTableViewCell *cell = (FaqChildTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[FaqChildTableViewCell description] forIndexPath:indexPath];
+        UINib *cellNib = [UINib nibWithNibName:@"TTLFaqChildTableViewCell" bundle:[TTLUtil currentBundle]];
+        [tableView registerNib:cellNib forCellReuseIdentifier:[TTLFaqChildTableViewCell description]];
+        TTLFaqChildTableViewCell *cell = (TTLFaqChildTableViewCell *)[tableView dequeueReusableCellWithIdentifier:[TTLFaqChildTableViewCell description] forIndexPath:indexPath];
         TTLFaqModel *faqChild = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 2];
         [cell setFaqChildWithData:faqChild];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.delegate = self;
-        if(indexPath.row == self.faqPathModel.childItems.count + 1) {
+        if (indexPath.row == self.faqPathModel.childItems.count + 1) {
             [cell setLastChildCellView];
         }
         return cell;
     }
     
-    return nil;
+    return [[UITableViewCell alloc] init];
     
    // CGRect cellFrame = cell.frame;
     //cellFrame.size.width = CGRectGetWidth([UIScreen mainScreen].bounds);
@@ -161,7 +159,7 @@
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.row > 1) {
+    if (indexPath.row > 1) {
         TTLFaqModel *faqChild = [self.faqPathModel.childItems objectAtIndex:indexPath.row - 2];
         id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
         if ([tapTalkLiveDelegate respondsToSelector:@selector(faqChildDidTapped:currentShownNavigationController:)]) {
@@ -385,7 +383,7 @@
     }
 }
 
--(void)faqChild:(TTLFaqModel *)faqModel phoneDidLongPressed:(NSString *)phone {
+- (void)faqChild:(TTLFaqModel *)faqModel phoneDidLongPressed:(NSString *)phone {
     NSURL *phoneURL = [NSURL URLWithString:[NSString stringWithFormat:@"tel:%@", phone]];
     id<TapTalkLiveDelegate> tapTalkLiveDelegate = [TapTalkLive sharedInstance].delegate;
     if ([tapTalkLiveDelegate respondsToSelector:@selector(faq:contentPhoneNumberDidLongPressed:currentShownNavigationController:)]) {
@@ -490,13 +488,7 @@
 - (BOOL)isContainCaseList {
     BOOL isContainCaseList = [[NSUserDefaults standardUserDefaults] secureBoolForKey:TTL_PREFS_IS_CONTAIN_CASE_LIST valid:nil];
     NSString *currentAccessToken = [TTLDataManager getAccessToken];
-    currentAccessToken = [TTLUtil nullToEmptyString:currentAccessToken];
-    
-   // if ([currentAccessToken isEqualToString:@""] || (![currentAccessToken isEqualToString:@""] && !isContainCaseList)) {
-     //   _closeRoomListWhenCreateCaseIsClosed = YES;
-    //    [self performSelector:@selector(showCreateCaseFormView) withObject:nil afterDelay:0.05f];
- //   }
-    return isContainCaseList;
+    return ![TTLUtil isEmptyString:currentAccessToken] && isContainCaseList;
 }
 
 - (void)scfPathUpdated:(NSNotification *)notification {

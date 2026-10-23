@@ -1,1 +1,0 @@
-../../../TapTalk/TapTalk/Views/UICollectionViewCells/TAPImagePreviewCollectionViewCell.h

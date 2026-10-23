@@ -8,8 +8,9 @@
 
 #import "TTLCustomDropDownTextFieldView.h"
 #import "TTLStyleManager.h"
+#import "TTLUtil.h"
 
-@interface TTLCustomDropDownTextFieldView ()
+@interface TTLCustomDropDownTextFieldView () <UITextFieldDelegate>
 
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *infoDescriptionLabel;
@@ -29,7 +30,9 @@
 @end
 
 @implementation TTLCustomDropDownTextFieldView
+
 #pragma mark - Lifecycle
+
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     

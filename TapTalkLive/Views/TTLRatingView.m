@@ -7,6 +7,7 @@
 //
 
 #import "TTLRatingView.h"
+#import "OneTalkLiveChat.h"
 
 @interface TTLRatingView ()
 
@@ -44,7 +45,7 @@
         [self addSubview:self.containerView];
         
         _closeImageView = [[UIImageView alloc] initWithFrame:CGRectMake(16.0f, 16.0f, 22.0f, 22.0f)];
-        TTLImage *buttonImage = [TTLImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        UIImage *buttonImage = [UIImage imageNamed:@"TTLIconClose" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         buttonImage = [buttonImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconNavigationBarCloseButton]];
         self.closeImageView.image = buttonImage;
         self.closeImageView.clipsToBounds = YES;
@@ -73,7 +74,7 @@
         _starRatingContainerView = [[UIView alloc] initWithFrame:CGRectMake((CGRectGetWidth(self.containerView.frame) - 264.0f) / 2.0f, CGRectGetMaxY(self.titleLabel.frame) + 32.0f, 264.0f, 40.0f)];
         [self.containerView addSubview:self.starRatingContainerView];
 
-        TTLImage *starRatingInactiveImage = [TTLImage imageNamed:@"TTLIconStarInactive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        UIImage *starRatingInactiveImage = [UIImage imageNamed:@"TTLIconStarInactive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         starRatingInactiveImage = [starRatingInactiveImage setImageTintColor:[TTLUtil getColor:@"F4C12A"]];
 
         _starRating1ImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 40.0f, 40.0f)];
@@ -150,13 +151,16 @@
         self.commentLabel.text = @"Comment (Optional)";
         self.commentLabel.font = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBodyBold];
         
-        UIFont *opsionalLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBody];
+        UIFont *optionalLabelFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontInfoLabelBody];
         NSRange range = [self.commentLabel.text rangeOfString:@"(Optional)"];
-        NSMutableAttributedString *charCounterAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.commentLabel.text];
-        [charCounterAttribuetdString addAttribute:NSFontAttributeName
-                                      value:opsionalLabelFont
-                                      range:range];
-        self.commentLabel.attributedText = charCounterAttribuetdString;
+        NSMutableAttributedString *optionalAttribuetdString = [[NSMutableAttributedString alloc] initWithString:self.commentLabel.text];
+        [optionalAttribuetdString addAttribute:NSFontAttributeName
+                                         value:optionalLabelFont
+                                         range:range];
+        [optionalAttribuetdString addAttribute:NSForegroundColorAttributeName
+                                         value:[[TTLStyleManager sharedManager] getDefaultColorForType:TTLDefaultColorTextMedium]
+                                         range:range];
+        self.commentLabel.attributedText = optionalAttribuetdString;
         [self.containerView addSubview:self.commentLabel];
         
         _characterCounterLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(self.commentTextView.frame) - 16.0f - 134.0f, CGRectGetMinY(self.commentLabel.frame), 134.0f, 25.0f)];
@@ -186,6 +190,7 @@
 }
 
 #pragma mark - Custom Method
+
 - (void)animateOpeningView {
     [UIView animateWithDuration:0.2f animations:^{
         CGFloat bottomGap = 16.0f;
@@ -195,16 +200,15 @@
         self.containerView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetHeight([UIScreen mainScreen].bounds) - CGRectGetMaxY(self.submitButtonView.frame) - bottomGap, CGRectGetWidth(self.containerView.frame), CGRectGetMaxY(self.submitButtonView.frame) + bottomGap);
     } completion:nil];
 }
+
 - (void)setStarRatingWithValue:(NSInteger)starValue {
-    TTLImage *starRatingInactiveImage = [TTLImage imageNamed:@"TTLIconStarInactive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *starRatingInactiveImage = [UIImage imageNamed:@"TTLIconStarInactive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     starRatingInactiveImage = [starRatingInactiveImage setImageTintColor:[TTLUtil getColor:@"F4C12A"]];
-    TTLImage *starRatingActiveImage = [TTLImage imageNamed:@"TTLIconStarActive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+    UIImage *starRatingActiveImage = [UIImage imageNamed:@"TTLIconStarActive" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
     starRatingActiveImage = [starRatingActiveImage setImageTintColor:[TTLUtil getColor:@"F4C12A"]];
 
     switch (starValue) {
-        case 1:
-        {
-            //1 Star Rating
+        case 1: {
             self.starRating1ImageView.image = starRatingActiveImage;
             self.starRating2ImageView.image = starRatingInactiveImage;
             self.starRating3ImageView.image = starRatingInactiveImage;
@@ -213,9 +217,7 @@
             self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Horrible", nil, [TTLUtil currentBundle], @"");
             break;
         }
-        case 2:
-        {
-            //2 Star Rating
+        case 2: {
             self.starRating1ImageView.image = starRatingActiveImage;
             self.starRating2ImageView.image = starRatingActiveImage;
             self.starRating3ImageView.image = starRatingInactiveImage;
@@ -224,9 +226,7 @@
             self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Not good", nil, [TTLUtil currentBundle], @"");
             break;
         }
-        case 3:
-        {
-            //3 Star Rating
+        case 3: {
             self.starRating1ImageView.image = starRatingActiveImage;
             self.starRating2ImageView.image = starRatingActiveImage;
             self.starRating3ImageView.image = starRatingActiveImage;
@@ -235,9 +235,7 @@
             self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Okay", nil, [TTLUtil currentBundle], @"");
             break;
         }
-        case 4:
-        {
-            //4 Star Rating
+        case 4: {
             self.starRating1ImageView.image = starRatingActiveImage;
             self.starRating2ImageView.image = starRatingActiveImage;
             self.starRating3ImageView.image = starRatingActiveImage;
@@ -246,9 +244,7 @@
             self.subtitleLabel.text = NSLocalizedStringFromTableInBundle(@"Good", nil, [TTLUtil currentBundle], @"");
             break;
         }
-        case 5:
-        {
-            //5 Star Rating
+        case 5: {
             self.starRating1ImageView.image = starRatingActiveImage;
             self.starRating2ImageView.image = starRatingActiveImage;
             self.starRating3ImageView.image = starRatingActiveImage;
@@ -259,7 +255,6 @@
         }
         default:
             {
-            //0 Star Rating
             self.starRating1ImageView.image = starRatingInactiveImage;
             self.starRating2ImageView.image = starRatingInactiveImage;
             self.starRating3ImageView.image = starRatingInactiveImage;
@@ -295,8 +290,20 @@
     [self.submitButtonView setAsActiveState:active animated:YES];
 }
 
+- (void)showCommentTextViewError:(BOOL)show {
+    [self.commentTextView setAsError:show animated:YES];
+    [UIView animateWithDuration:0.2f animations:^{
+        self.submitButtonView.frame = CGRectMake(
+            CGRectGetMinX(self.submitButtonView.frame),
+            CGRectGetMaxY(self.commentTextView.frame) + 24.0f,
+            CGRectGetWidth(self.submitButtonView.frame),
+            CGRectGetHeight(self.submitButtonView.frame)
+        );
+    }];
+}
+
 - (void)setLoadingState:(BOOL)isLoading {
-    if(isLoading) {
+    if (isLoading) {
         self.starRating1Button.userInteractionEnabled = NO;
         self.starRating2Button.userInteractionEnabled = NO;
         self.starRating3Button.userInteractionEnabled = NO;
@@ -313,4 +320,3 @@
 }
 
 @end
-    

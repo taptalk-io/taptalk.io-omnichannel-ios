@@ -7,14 +7,16 @@
 //
 
 #import "TTLTopicListView.h"
-#import <TapTalk/TAPStyleManager.h>
+#import "TAPStyleManager.h"
 
 @interface TTLTopicListView ()
 
 @end
 
 @implementation TTLTopicListView
+
 #pragma mark - Lifecycle
+
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
@@ -30,7 +32,5 @@
     
     return self;
 }
-
-#pragma mark - Custom Method
 
 @end

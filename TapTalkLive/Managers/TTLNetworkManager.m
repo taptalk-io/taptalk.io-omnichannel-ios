@@ -7,8 +7,7 @@
 //
 
 #import "TTLNetworkManager.h"
-#import <TapTalk/TapAFNetworkReachabilityManager.h>
-#import <TapTalk/TapAFHTTPSessionManager.h>
+#import "OneTalkLiveChat.h"
 
 static const NSInteger kAPITimeOut = 60;
 

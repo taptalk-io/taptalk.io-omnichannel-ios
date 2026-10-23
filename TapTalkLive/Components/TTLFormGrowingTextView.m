@@ -7,7 +7,7 @@
 //
 
 #import "TTLFormGrowingTextView.h"
-#import <TapTalk/TAPCustomTextView.h>
+#import "OneTalkLiveChat.h"
 
 @interface TTLFormGrowingTextView () <UITextViewDelegate>
 
@@ -163,14 +163,14 @@
         self.placeholderLabel.alpha = 1.0f;
         
         if ([self.delegate respondsToSelector:@selector(formGrowingTextViewDidStopTyping:)]) {
-            [self.delegate formGrowingTextViewDidStopTyping:self];
+            [self.delegate formGrowingTextViewDidStopTyping:textView];
         }
     }
     else {
         self.placeholderLabel.alpha = 0.0f;
         
         if ([self.delegate respondsToSelector:@selector(formGrowingTextViewDidStartTyping:)]) {
-            [self.delegate formGrowingTextViewDidStartTyping:self];
+            [self.delegate formGrowingTextViewDidStartTyping:textView];
         }
     }
     
@@ -190,7 +190,7 @@
     self.placeholderLabel.alpha = 0.0f;
     
     if ([self.delegate respondsToSelector:@selector(formGrowingTextViewDidBeginEditing:)]) {
-        [self.delegate formGrowingTextViewDidBeginEditing:self];
+        [self.delegate formGrowingTextViewDidBeginEditing:textView];
     }
 }
 
@@ -203,7 +203,7 @@
     }
     
     if ([self.delegate respondsToSelector:@selector(formGrowingTextViewDidEndEditing:)]) {
-        [self.delegate formGrowingTextViewDidEndEditing:self];
+        [self.delegate formGrowingTextViewDidEndEditing:self.textView];
     }
 }
 
@@ -236,14 +236,14 @@
         self.placeholderLabel.alpha = 1.0f;
         
         if ([self.delegate respondsToSelector:@selector(formGrowingTextViewDidStopTyping:)]) {
-            [self.delegate formGrowingTextViewDidStopTyping:self];
+            [self.delegate formGrowingTextViewDidStopTyping:self.textView];
         }
     }
     else {
         self.placeholderLabel.alpha = 0.0f;
         
         if ([self.delegate respondsToSelector:@selector(formGrowingTextViewDidStartTyping:)]) {
-            [self.delegate formGrowingTextViewDidStartTyping:self];
+            [self.delegate formGrowingTextViewDidStartTyping:self.textView];
         }
     }
     
@@ -297,7 +297,7 @@
         self.shadowView.frame = CGRectMake(CGRectGetMinX(self.containerView.frame), CGRectGetMinY(self.containerView.frame), CGRectGetWidth(self.containerView.frame), CGRectGetHeight(self.containerView.frame));
         
         if ([self.delegate respondsToSelector:@selector(formGrowingTextView:shouldChangeHeight:)]) {
-            [self.delegate formGrowingTextView:self shouldChangeHeight:contentSize.height];
+            [self.delegate formGrowingTextView:self.textView shouldChangeHeight:contentSize.height];
         }
     }
 }

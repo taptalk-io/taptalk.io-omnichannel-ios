@@ -7,10 +7,12 @@
 //
 
 #import "TTLBaseView.h"
+#import "TTLUtil.h"
 
 @implementation TTLBaseView
 
 #pragma mark - Lifecycle
+
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
@@ -21,15 +23,8 @@
     return self;
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
-
 #pragma mark - Custom Method
+
 + (CGRect)frameWithNavigationBar {
     return CGRectMake(0.0f, 0.0f, CGRectGetWidth([UIScreen mainScreen].bounds), CGRectGetHeight([UIScreen mainScreen].bounds) - [TTLUtil currentDeviceNavigationBarHeightWithStatusBar:YES iPhoneXLargeLayout:NO]);
 }

@@ -1,1 +1,0 @@
-../../../TapTalk/TapTalk/Managers/TAPCoreManager/TAPCoreChatRoomManager.h

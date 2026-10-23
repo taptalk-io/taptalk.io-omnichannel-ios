@@ -7,6 +7,7 @@
 //
 
 #import "TTLCaseCloseBubbleTableViewCell.h"
+#import "TTLStyleManager.h"
 
 @interface TTLCaseCloseBubbleTableViewCell()
 
@@ -14,12 +15,12 @@
 @property (strong, nonatomic) IBOutlet UIView *shadowView;
 @property (strong, nonatomic) IBOutlet UIView *containerView;
 
-- (void)setCellStyle;
-
 @end
 
 @implementation TTLCaseCloseBubbleTableViewCell
+
 #pragma mark - Life Cycle
+
 - (void)awakeFromNib {
     [super awakeFromNib];
     // Initialization code
@@ -42,6 +43,7 @@
 }
 
 #pragma mark - Custom Method
+
 - (void)setCellStyle {
     
     UIFont *systemMessageFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontSystemMessageBody];
@@ -57,6 +59,5 @@
     NSString *contentString = message.body;
     self.contentLabel.text = contentString;
 }
-
 
 @end

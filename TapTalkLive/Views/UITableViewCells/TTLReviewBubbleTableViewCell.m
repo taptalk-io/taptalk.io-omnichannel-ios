@@ -7,12 +7,12 @@
 //
 
 #import "TTLReviewBubbleTableViewCell.h"
-#import <TapTalk/TapUserModel.h>
+#import "OneTalkLiveChat.h"
 
-@interface TTLReviewBubbleTableViewCell ()
+@interface TTLReviewBubbleTableViewCell () <ZSWTappableLabelTapDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView *bubbleView;
-@property (strong, nonatomic) IBOutlet UILabel *titleLabel;
+@property (strong, nonatomic) IBOutlet TappableLabel *titleLabel;
 @property (strong, nonatomic) IBOutlet UIView *reviewButtonView;
 
 @property (strong, nonatomic) IBOutlet UIView *doneReviewView;
@@ -27,7 +27,6 @@
 @property (strong, nonatomic) IBOutlet UIView *senderInitialView;
 @property (strong, nonatomic) IBOutlet UILabel *senderInitialLabel;
 @property (strong, nonatomic) IBOutlet UILabel *senderNameLabel;
-
 
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewWidthConstraint;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *senderImageViewTrailingConstraint;
@@ -74,6 +73,8 @@
     self.senderNameLabel.font = senderNameLabelFont;
     self.senderNameLabel.textColor = senderNameLabelColor;
     
+    self.titleLabel.tapDelegate = self;
+    
     UIFont *buttonFont = [[TTLStyleManager sharedManager] getComponentFontForType:TTLComponentFontButtonLabel];
     UIColor *buttonColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorButtonLabel];
     UIColor *inactiveButtonColor = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorReviewBubbleDoneReviewButtonTitleLabel];
@@ -95,7 +96,7 @@
     self.doneReviewView.backgroundColor = [[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorButtonInactiveBackgroundGradientLight];
     
     self.doneReviewIconImageView.image = [UIImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
-    TTLImage *checkIconImage = self.doneReviewIconImageView.image;
+    UIImage *checkIconImage = self.doneReviewIconImageView.image;
     checkIconImage = [checkIconImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconReviewBubbleCellDoneReviewCheck]];
     self.doneReviewIconImageView.image = checkIconImage;
     
@@ -114,13 +115,28 @@
     // Configure the view for the selected state
 }
 
+#pragma mark - ZSWTappedLabelDelegate
+
+- (void)tappableLabel:(TappableLabel *)tappableLabel
+        tappedAtIndex:(NSInteger)idx
+       withAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
+    
+    NSTextCheckingResult *result = attributes[@"NSTextCheckingResult"];
+    if (result && result.resultType == NSTextCheckingTypeLink) {
+        NSURL *url = result.URL;
+        if ([self.delegate respondsToSelector:@selector(reviewBubbleTableViewCellDidTappedReviewURL:withMessage:)]) {
+            [self.delegate reviewBubbleTableViewCellDidTappedReviewURL:url withMessage:self.currentMessage];
+        }
+    }
+}
+
 #pragma mark - Custom Method
 - (void)setMessage:(TAPMessageModel *)message {
     [super setMessage:message];
     
     _currentMessage = message;
     
-    TAPUserModel *currentActiveUser = [TTLDataManager getActiveUser];
+    TTLUserModel *currentActiveUser = [TTLDataManager getActiveUser];
     NSString *activeUserID = currentActiveUser.userID;
     activeUserID = [TTLUtil nullToEmptyString:activeUserID];
     
@@ -211,8 +227,6 @@
         self.senderProfileImageButtonWidthConstraint.constant = 30.0f;
         self.senderProfileImageButton.userInteractionEnabled = YES;
         
-        self.reviewButtonViewHeightConstraint.constant = 48.0f;
-        self.reviewButtonViewTopConstraint.constant = 10.0f;
         self.senderNameHeightConstraint.constant = 18.0f;
         self.senderNameTopConstraint.constant = 10.0f;
         
@@ -220,6 +234,31 @@
         self.senderImageViewLeadingConstraint.active = YES;
         self.bubbleViewTrailingConstraint.active = NO;
         self.bubbleViewTrailingConstraint.constant = 0.0f;
+        
+        if (message.data != nil && [[TTLUtil nullToEmptyString:[message.data objectForKey:@"assigneeType"]] isEqualToString:@"chatbot"]) {
+            // Hide review button & enable URL for chatbot rating
+            self.reviewButtonViewHeightConstraint.constant = 0.0f;
+            self.reviewButtonViewTopConstraint.constant = 0.0f;
+            
+            NSDataDetector *linkDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+            [linkDetector enumerateMatchesInString:bodyString options:0 range:NSMakeRange(0, bodyString.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+                NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+                attributes[ZSWTappableLabelTappableRegionAttributeName] = @YES;
+                attributes[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
+                attributes[NSForegroundColorAttributeName] = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorLeftBubbleMessageBodyURL];
+                attributes[ZSWTappableLabelHighlightedBackgroundAttributeName] = [[TTLStyleManager sharedManager] getTextColorForType:TTLTextColorLeftBubbleMessageBodyURLHighlighted];
+                attributes[@"NSTextCheckingResult"] = result;
+                
+                NSMutableAttributedString *bodyAttributedString = [[NSMutableAttributedString alloc] initWithString:bodyString];
+                [bodyAttributedString addAttributes:attributes range:result.range];
+                self.titleLabel.attributedText = bodyAttributedString;
+            }];
+        }
+        else {
+            // Show review button available
+            self.reviewButtonViewHeightConstraint.constant = 48.0f;
+            self.reviewButtonViewTopConstraint.constant = 10.0f;
+        }
     }
 }
 

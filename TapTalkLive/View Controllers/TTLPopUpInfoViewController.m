@@ -7,6 +7,7 @@
 //
 
 #import "TTLPopUpInfoViewController.h"
+#import "TTLUtil.h"
 
 @interface TTLPopUpInfoViewController ()
 

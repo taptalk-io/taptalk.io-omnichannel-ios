@@ -8,6 +8,12 @@
 
 #import "TTLBaseTableViewCell.h"
 
+@interface TTLBaseTableViewCell ()
+
+@property (strong, nonatomic) UITableView *tableView;
+
+@end
+
 @implementation TTLBaseTableViewCell
 
 - (void)awakeFromNib {
@@ -22,12 +28,16 @@
 }
 
 - (UITableView * _Nullable)getTableView {
+    if (self.tableView != nil) {
+        return self.tableView;
+    }
     id view = [self superview];
     while (view && [view isKindOfClass:[UITableView class]] == NO) {
         view = [view superview];
     }
     if (view != nil && [view isKindOfClass:[UITableView class]]) {
         UITableView *tableView = (UITableView *)view;
+        _tableView = tableView;
         return tableView;
     }
     return nil;
@@ -36,8 +46,11 @@
 - (void)refreshCellHeight {
     UITableView *tableView = [self getTableView];
     if (tableView != nil) {
-        [tableView beginUpdates];
-        [tableView endUpdates];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [tableView beginUpdates];
+            [tableView endUpdates];
+//            [tableView reloadData];
+        });
     }
 }
 

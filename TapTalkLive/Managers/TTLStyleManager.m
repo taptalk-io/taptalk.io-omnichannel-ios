@@ -7,7 +7,7 @@
 //
 
 #import "TTLStyleManager.h"
-#import <TapTalk/TAPStyleManager.h>
+#import "OneTalkLiveChat.h"
 
 @interface TTLStyleManager ()
 

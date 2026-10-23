@@ -7,6 +7,7 @@
 //
 
 #import "TTLCustomTextFieldView.h"
+#import "OneTalkLiveChat.h"
 
 @interface TTLCustomTextFieldView () <UITextFieldDelegate>
 
@@ -70,8 +71,8 @@
         
         _passwordShowImageView = [[UIImageView alloc] initWithFrame:CGRectMake(CGRectGetMinX(self.containerSeparatorView.frame) + 15.0f, 15.0f, 20.0f, 20.0f)];
         self.passwordShowImageView.image = [UIImage imageNamed:@"TTLIconShowPassword" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
-        TTLImage *passwordShowImage = (TTLImage *) self.passwordShowImageView.image;
-        passwordShowImage = (TTLImage *) [passwordShowImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconViewPasswordInactive]];
+        UIImage *passwordShowImage = self.passwordShowImageView.image;
+        passwordShowImage = [passwordShowImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconViewPasswordInactive]];
         self.passwordShowImageView.image = passwordShowImage;
         [self.containerView addSubview:self.passwordShowImageView];
         
@@ -431,15 +432,15 @@
     if (self.textField.isSecureTextEntry) {
         self.textField.secureTextEntry = NO;
         self.passwordShowImageView.image = [UIImage imageNamed:@"TTLIconShowPassword" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
-        TTLImage *passwordShowImage = (TTLImage *) self.passwordShowImageView.image;
-        passwordShowImage = (TTLImage *) [passwordShowImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconViewPasswordActive]];
+        UIImage *passwordShowImage = self.passwordShowImageView.image;
+        passwordShowImage = [passwordShowImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconViewPasswordActive]];
         self.passwordShowImageView.image = passwordShowImage;
     }
     else {
         self.textField.secureTextEntry = YES;
         self.passwordShowImageView.image = [UIImage imageNamed:@"TTLIconShowPassword" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
-        TTLImage *passwordShowImage = (TTLImage *) self.passwordShowImageView.image;
-        passwordShowImage = (TTLImage *) [passwordShowImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconViewPasswordInactive]];
+        UIImage *passwordShowImage = self.passwordShowImageView.image;
+        passwordShowImage = [passwordShowImage setImageTintColor:[[TTLStyleManager sharedManager] getComponentColorForType:TTLComponentColorIconViewPasswordInactive]];
         self.passwordShowImageView.image = passwordShowImage;
     }
 }

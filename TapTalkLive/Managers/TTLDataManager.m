@@ -7,11 +7,7 @@
 //
 
 #import "TTLDataManager.h"
-#import "TTLAPIManager.h"
-#import "TTLTapTalkRoomModel.h"
-#import "TAPDataManager.h"
-#import "TAPEncryptorManager.h"
-#import "TTLChannelModel.h"
+#import "OneTalkLiveChat.h"
 
 @interface TTLDataManager()
 
@@ -2308,6 +2304,7 @@
     NSString *apiURL = [faqDictionary objectForKey:@"apiURL"];
     NSString *contentOnAPIError = [faqDictionary objectForKey:@"contentOnAPIError"];
     NSString *contentResponse = [faqDictionary objectForKey:@"contentResponse"];
+    NSArray<NSDictionary *> *topics = [faqDictionary objectForKey:@"topics"];
     NSArray<NSDictionary *> *childItems = [faqDictionary objectForKey:@"childItems"];
     
     TTLFaqModel *faq = [TTLFaqModel new];
@@ -2324,6 +2321,20 @@
     faq.apiURL = [TTLUtil nullToEmptyString:apiURL];
     faq.contentOnAPIError = [TTLUtil nullToEmptyString:contentOnAPIError];
     faq.contentResponse = [TTLUtil nullToEmptyString:contentResponse];
+    
+    if (topics != nil && topics.count > 0) {
+        NSMutableArray<TTLTopicModel *> *topicsArray = [NSMutableArray array];
+        for (NSDictionary *topicDictionary in topics) {
+            TTLTopicModel *topic = [TTLTopicModel new];
+            topic.topicID = [[TTLUtil nullToEmptyNumber:[topicDictionary objectForKey:@"id"]] stringValue];
+            topic.topicName = [TTLUtil nullToEmptyString:[topicDictionary objectForKey:@"name"]];
+            [topicsArray addObject:topic];
+        }
+        faq.topics = topicsArray;
+    }
+    else {
+        faq.topics = [NSArray array];
+    }
     
     if (childItems != nil && childItems.count > 0) {
         NSMutableArray<TTLFaqModel *> *childFAQs = [NSMutableArray array];
@@ -2344,28 +2355,30 @@
 
 + (NSArray *)dictionaryToChannelModelList:(NSArray *)channelListDictionary {
     NSMutableArray *channelModelList = [NSMutableArray array];
-    for(NSDictionary *channelLink in channelListDictionary) {
-        NSString *channelID = [channelLink objectForKey:@"id"];
-        channelID = [TTLUtil nullToEmptyString:channelID];
+    for (NSDictionary *channelLink in channelListDictionary) {
+        NSNumber *channelID = [channelLink objectForKey:@"id"];
+        channelID = [TTLUtil nullToEmptyNumber:channelID];
         NSNumber *sequence = [channelLink objectForKey:@"sequence"];
-        sequence = [TTLUtil nullToEmptyString:sequence];
+        sequence = [TTLUtil nullToEmptyNumber:sequence];
         NSString *channel = [channelLink objectForKey:@"channel"];
         channel = [TTLUtil nullToEmptyString:channel];
         NSString *url = [channelLink objectForKey:@"url"];
         url = [TTLUtil nullToEmptyString:url];
+        NSNumber *sendPageURL = [channelLink objectForKey:@"sendPageURL"];
+        sendPageURL = [TTLUtil nullToEmptyNumber:sendPageURL];
         NSNumber *isEnabled = [channelLink objectForKey:@"isEnabled"];
+        isEnabled = [TTLUtil nullToEmptyNumber:isEnabled];
         
         TTLChannelModel *channelModel = [TTLChannelModel new];
         channelModel.channelID = channelID;
         channelModel.channel = channel;
         channelModel.sequence = sequence;
         channelModel.url = url;
-        channelModel.isEnabled = [isEnabled integerValue];
+        channelModel.sendPageURL = [isEnabled boolValue];
+        channelModel.isEnabled = [isEnabled boolValue];
         
         [channelModelList addObject:channelModel];
-        
     }
-    
     return [channelModelList copy];
 }
 

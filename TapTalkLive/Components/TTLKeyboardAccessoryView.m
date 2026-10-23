@@ -7,6 +7,7 @@
 //
 
 #import "TTLKeyboardAccessoryView.h"
+#import "OneTalkLiveChat.h"
 
 @implementation TTLKeyboardAccessoryView
 #pragma mark - Lifecycle

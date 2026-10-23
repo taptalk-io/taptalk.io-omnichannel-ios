@@ -1,1 +1,0 @@
-../../../TapTalk/TapTalk/Models/TAPImageURLModel.h

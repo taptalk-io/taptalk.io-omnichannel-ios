@@ -7,6 +7,7 @@
 //
 
 #import "TTLTopicOptionTableViewCell.h"
+#import "OneTalkLiveChat.h"
 
 @interface TTLTopicOptionTableViewCell ()
 
@@ -14,11 +15,12 @@
 @property (strong, nonatomic) TTLImageView *iconImageView;
 @property (strong, nonatomic) UIView *separatorView;
 
-
 @end
 
 @implementation TTLTopicOptionTableViewCell
+
 #pragma mark - Lifecycle
+
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     
@@ -34,7 +36,7 @@
         
         _iconImageView = [[TTLImageView alloc] initWithFrame:CGRectMake(CGRectGetWidth([UIScreen mainScreen].bounds) - 16.0f - 24.0f, (44.0f - 24.0f) / 2.0f, 24.0f, 24.0f)];
         self.iconImageView.clipsToBounds = YES;
-        TTLImage *selectedIconImage = [TTLImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
+        UIImage *selectedIconImage = [UIImage imageNamed:@"TTLIconCheck" inBundle:[TTLUtil currentBundle] compatibleWithTraitCollection:nil];
         self.iconImageView.image = selectedIconImage;
         self.iconImageView.contentMode = UIViewContentModeScaleAspectFit;
         [self.contentView addSubview:self.iconImageView];

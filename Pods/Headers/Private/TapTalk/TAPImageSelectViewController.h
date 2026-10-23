@@ -1,1 +1,0 @@
-../../../TapTalk/TapTalk/View Controllers/TAPImageSelectViewController.h
