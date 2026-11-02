@@ -7,7 +7,7 @@ let package = Package(
     name: "TapTalkLive",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v16) // Needs to be iOS 16+ for newer Google Maps SDKs
+        .iOS(.v15)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
